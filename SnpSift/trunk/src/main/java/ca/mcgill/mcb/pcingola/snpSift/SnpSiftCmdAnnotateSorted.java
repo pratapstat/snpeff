@@ -25,7 +25,7 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 	public static final int SHOW = 10000;
 	public static final int SHOW_LINES = 100 * SHOW;
 
-	protected boolean suppressOutput = true; // Do not show output (used for debugging and test cases)
+	protected boolean suppressOutput = false; // Do not show output (used for debugging and test cases)
 	protected int countAnnotated = 0, count = 0, countBadRef = 0;
 	protected String chrPrev = "";
 	protected String vcfDbFileName;
