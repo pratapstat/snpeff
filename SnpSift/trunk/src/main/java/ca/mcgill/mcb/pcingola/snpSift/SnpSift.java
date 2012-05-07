@@ -132,6 +132,7 @@ public class SnpSift {
 		else if (command.startsWith("ANN")) SnpSiftCmdAnnotateSorted.main(args);
 		else if (command.startsWith("CA")) SnpSiftCmdCaseControl.main(args);
 		else if (command.startsWith("COVMAT")) SnpSiftCmdCovarianceMatrix.main(args);
+		else if (command.startsWith("DBNSFP")) SnpSiftCmdAnnotateSortedDbNSFP.main(args);
 		else if (command.startsWith("EX")) SnpSiftCmdExtractFields.main(args);
 		else if (command.startsWith("FI")) SnpSiftCmdFilter.main(args);
 		else if (command.startsWith("GWASCAT")) SnpSiftCmdGwasCatalog.main(args);
@@ -206,6 +207,7 @@ public class SnpSift {
 				+ "\n\tannMem        : Annotate 'ID' from a database (e.g. dbSnp). Loads db in memory. Does not assume sorted entries." //
 				+ "\n\tcaseControl   : Compare how many variants are in 'case' and in 'control' groups. Also calculates p-values (Fisher exact test and Cochran-Armitage test)" //
 				+ "\n\tcovMat        : Create an covariance matrix output (allele matrix as input)." //
+				+ "\n\tdbnsfp        : Annotate with multiple entries from dbNSFP. <EXPERIMENTAL>" //
 				+ "\n\textractFields : Extract fields from VCF file into tab separated format." //
 				+ "\n\tfilter        : Filter using arbitrary expressions" //
 				+ "\n\tgwasCat       : Annotate using GWAS catalog" //
