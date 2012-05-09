@@ -11,6 +11,6 @@ import ca.mcgill.mcb.pcingola.akka.vcf.MasterVcf;
 public class MasterVcfHwe extends MasterVcf<String> {
 
 	public MasterVcfHwe(int numWorkers) {
-		super(new Props(WorkerVcfHwe.class), numWorkers, DEFAULT_BATCH_SIZE);
+		super(new Props(WorkerVcfHwe.class), numWorkers);
 	}
 }

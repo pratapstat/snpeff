@@ -23,6 +23,6 @@ public class MasterVcfCaseControl extends MasterVcf<String> {
 					}
 
 				}) //
-				, numWorkers, DEFAULT_BATCH_SIZE);
+				, numWorkers);
 	}
 }
