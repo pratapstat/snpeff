@@ -12,23 +12,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ca.mcgill.mcb.pcingola.interval.Genome;
-
 public class DbNSFPFileIterator extends MarkerFileIterator<DbNSFPEntry> {
-	private TObjectIntHashMap<String> columnNames;
+	private TObjectIntHashMap<String> columnNames = new TObjectIntHashMap<String>();
 	private int chromosomeIdx;
 	private int startIdx;
 
 	public DbNSFPFileIterator(BufferedReader reader) {
 		super(reader, 1);
-	}
-
-	public DbNSFPFileIterator(String fileName, Genome genome) {
-		super(fileName, genome, 1);
-	}
-
-	public DbNSFPFileIterator(String fileName) {
-		super(fileName, 1);
 	}
 
 	private DbNSFPEntry parseEntry(List<String[]> linesForEntry) {
@@ -69,16 +59,19 @@ public class DbNSFPFileIterator extends MarkerFileIterator<DbNSFPEntry> {
 						columnNames.put(values[idx], idx);
 						if (values[idx].equals("chr"))
 							chromosomeIdx = idx;
-						else if (values[idx].equals("pos"))
+						else if (values[idx].equals("pos(1-coor)"))
 							startIdx = idx;
+					}
+					if(chromosomeIdx == -1 || startIdx == -1) {
+					  throw new RuntimeException("Missing 'chr' and/or 'os(1-coor)' columns in dbNSFP file");
 					}
 					continue;
 				}
 				String values[] = split(line, '\t');
 				if (linesForEntry.size() > 0) {
 					String currentValues[] = linesForEntry.get(0);
-					if (currentValues[chromosomeIdx] != values[chromosomeIdx]
-							|| currentValues[startIdx] != values[startIdx]) {
+					if (!currentValues[chromosomeIdx].equals(values[chromosomeIdx])
+							|| !currentValues[startIdx].equals(values[startIdx])) {
 						nextLine = line;
 						break;
 					}
