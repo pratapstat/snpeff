@@ -159,7 +159,7 @@ public class SnpSiftCmdAnnotateSortedDbNSFP extends SnpSift {
         // Show header?
         if (showHeader) {
           addHeader(vcfFile);
-          System.out.print(vcfFile.getHeader());
+          System.out.println(vcfFile.getHeader());
           showHeader = false;
         }
 
