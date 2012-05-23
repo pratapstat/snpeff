@@ -24,7 +24,8 @@ import ca.mcgill.mcb.pcingola.vcf.VcfFileIndexIntervals;
  */
 public class SnpSiftCmdAnnotateSortedDbNSFP extends SnpSift {
   private static final String KEY_PREFIX = "dbnsfp";
-  private static final Map<String, String> fieldsToAdd;
+  private static final Map<String, String> alleleSpecificFieldsToAdd;
+  private static final Map<String, String> positionSpecificFieldsToAdd;
 
   protected String dbNSFPFileName;
   protected String vcfFileName;
@@ -37,20 +38,22 @@ public class SnpSiftCmdAnnotateSortedDbNSFP extends SnpSift {
   protected String prevChr = null;
 
   static {
-    fieldsToAdd = new HashMap<String, String>();
-    fieldsToAdd.put("Ensembl_transcriptid", "Ensembl transcript ids (separated by ',')");
-    fieldsToAdd.put("SIFT_score", "SIFT score, If a score is smaller than 0.05 the corresponding NS is predicted as 'D(amaging)' otherwise it is predicted as 'T(olerated)'");
-    fieldsToAdd.put("Polyphen2_HVAR_pred", "Polyphen2 prediction based on HumVar, 'D' ('probably damaging'), 'P' ('possibly damaging') and 'B' ('benign') (separated by ',')");
-    fieldsToAdd.put("GERP_NR", "GERP++ neutral rate");
-    fieldsToAdd.put("GERP_RS", "GERP++ RS score, the larger the score, the more conserved the site.");
-    fieldsToAdd.put("29way_logOdds", "SiPhy score based on 29 mammals genomes. The larger the score, the more conserved the site.");
-    fieldsToAdd.put("1000Gp1_AF", "Alternative allele frequency in the whole 1000Gp1 data.");
-    fieldsToAdd.put("1000Gp1_AFR_AF", "Alternative allele frequency in the 1000Gp1 African descendent samples.");
-    fieldsToAdd.put("1000Gp1_EUR_AF", "Alternative allele frequency in the 1000Gp1 European descendent samples.");
-    fieldsToAdd.put("1000Gp1_AMR_AF", "Alternative allele frequency in the 1000Gp1 American descendent samples.");
-    fieldsToAdd.put("1000Gp1_ASN_AF", "Alternative allele frequency in the 1000Gp1 Asian descendent samples.");
-    fieldsToAdd.put("ESP5400_AA_AF", "Alternative allele frequency in the Afrian American samples of the NHLBI GO Exome Sequencing Project (ESP5400 data set).");
-    fieldsToAdd.put("ESP5400_EA_AF", "Alternative allele frequency in the European American samples of the NHLBI GO Exome Sequencing Project (ESP5400 data set).");
+    positionSpecificFieldsToAdd = new HashMap<String, String>();
+    positionSpecificFieldsToAdd.put("Ensembl_transcriptid", "Ensembl transcript ids (separated by ',')");
+
+    alleleSpecificFieldsToAdd = new HashMap<String, String>();
+    alleleSpecificFieldsToAdd.put("SIFT_score", "SIFT score, If a score is smaller than 0.05 the corresponding NS is predicted as 'D(amaging)' otherwise it is predicted as 'T(olerated)'");
+    alleleSpecificFieldsToAdd.put("Polyphen2_HVAR_pred", "Polyphen2 prediction based on HumVar, 'D' ('probably damaging'), 'P' ('possibly damaging') and 'B' ('benign') (separated by ',')");
+    alleleSpecificFieldsToAdd.put("GERP_NR", "GERP++ neutral rate");
+    alleleSpecificFieldsToAdd.put("GERP_RS", "GERP++ RS score, the larger the score, the more conserved the site.");
+    alleleSpecificFieldsToAdd.put("29way_logOdds", "SiPhy score based on 29 mammals genomes. The larger the score, the more conserved the site.");
+    alleleSpecificFieldsToAdd.put("1000Gp1_AF", "Alternative allele frequency in the whole 1000Gp1 data.");
+    alleleSpecificFieldsToAdd.put("1000Gp1_AFR_AF", "Alternative allele frequency in the 1000Gp1 African descendent samples.");
+    alleleSpecificFieldsToAdd.put("1000Gp1_EUR_AF", "Alternative allele frequency in the 1000Gp1 European descendent samples.");
+    alleleSpecificFieldsToAdd.put("1000Gp1_AMR_AF", "Alternative allele frequency in the 1000Gp1 American descendent samples.");
+    alleleSpecificFieldsToAdd.put("1000Gp1_ASN_AF", "Alternative allele frequency in the 1000Gp1 Asian descendent samples.");
+    alleleSpecificFieldsToAdd.put("ESP5400_AA_AF", "Alternative allele frequency in the Afrian American samples of the NHLBI GO Exome Sequencing Project (ESP5400 data set).");
+    alleleSpecificFieldsToAdd.put("ESP5400_EA_AF", "Alternative allele frequency in the European American samples of the NHLBI GO Exome Sequencing Project (ESP5400 data set).");
   }
 
   /**
@@ -236,7 +239,7 @@ public class SnpSiftCmdAnnotateSortedDbNSFP extends SnpSift {
     }
 
     StringBuilder info = new StringBuilder();
-    for (String fieldKey : fieldsToAdd.keySet()) {
+    for (String fieldKey : alleleSpecificFieldsToAdd.keySet()) {
       info.setLength(0);
       for (String alt : vcf.getAlts()) {
         Map<String, String> values = currentEntry.getAltAlelleValues(alt);
@@ -248,7 +251,23 @@ public class SnpSiftCmdAnnotateSortedDbNSFP extends SnpSift {
         else
           info.append(values.get(fieldKey));
       }
-      vcf.addInfo(KEY_PREFIX + fieldKey, info.toString().replace(';', ','));
+      String infoStr = info.toString().replace(';', ',').replace('\t', '_').replace(' ', '_');
+      vcf.addInfo(KEY_PREFIX + fieldKey, infoStr);
+    }
+
+    for (String fieldKey : positionSpecificFieldsToAdd.keySet()) {
+      info.setLength(0);
+      if(vcf.getAlts().length > 0) {
+        String alt = vcf.getAlts()[0];
+        Map<String, String> values = currentEntry.getAltAlelleValues(alt);
+
+        if (values == null)
+          info.append('.');
+        else
+          info.append(values.get(fieldKey));
+      }
+      String infoStr = info.toString().replace(';', ',').replace('\t', '_').replace(' ', '_');
+      vcf.addInfo(KEY_PREFIX + fieldKey, infoStr);
     }
 
     currentEntry = null;
@@ -270,8 +289,11 @@ public class SnpSiftCmdAnnotateSortedDbNSFP extends SnpSift {
   @Override
   protected void addHeader(VcfFileIterator vcfFile) {
     super.addHeader(vcfFile);
-    for (String key : fieldsToAdd.keySet()) {
-      vcfFile.addHeader("##INFO=<ID="+ KEY_PREFIX + key + ",Number=A,Type=String,Description=\"" + fieldsToAdd.get(key) + "\">");
+    for (String key : alleleSpecificFieldsToAdd.keySet()) {
+      vcfFile.addHeader("##INFO=<ID="+ KEY_PREFIX + key + ",Number=A,Type=String,Description=\"" + alleleSpecificFieldsToAdd.get(key) + "\">");
+    }
+    for (String key : positionSpecificFieldsToAdd.keySet()) {
+      vcfFile.addHeader("##INFO=<ID="+ KEY_PREFIX + key + ",Number=.,Type=String,Description=\"" + positionSpecificFieldsToAdd.get(key) + "\">");
     }
   }
 }
