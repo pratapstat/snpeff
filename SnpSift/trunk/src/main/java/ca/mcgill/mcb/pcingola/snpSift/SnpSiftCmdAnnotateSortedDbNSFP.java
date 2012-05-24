@@ -44,8 +44,8 @@ public class SnpSiftCmdAnnotateSortedDbNSFP extends SnpSift {
     alleleSpecificFieldsToAdd = new HashMap<String, String>();
     alleleSpecificFieldsToAdd.put("SIFT_score", "SIFT score, If a score is smaller than 0.05 the corresponding NS is predicted as 'D(amaging)' otherwise it is predicted as 'T(olerated)'");
     alleleSpecificFieldsToAdd.put("Polyphen2_HVAR_pred", "Polyphen2 prediction based on HumVar, 'D' ('probably damaging'), 'P' ('possibly damaging') and 'B' ('benign') (separated by ',')");
-    alleleSpecificFieldsToAdd.put("GERP_NR", "GERP++ neutral rate");
-    alleleSpecificFieldsToAdd.put("GERP_RS", "GERP++ RS score, the larger the score, the more conserved the site.");
+    alleleSpecificFieldsToAdd.put("GERP++_NR", "GERP++ neutral rate");
+    alleleSpecificFieldsToAdd.put("GERP++_RS", "GERP++ RS score, the larger the score, the more conserved the site.");
     alleleSpecificFieldsToAdd.put("29way_logOdds", "SiPhy score based on 29 mammals genomes. The larger the score, the more conserved the site.");
     alleleSpecificFieldsToAdd.put("1000Gp1_AF", "Alternative allele frequency in the whole 1000Gp1 data.");
     alleleSpecificFieldsToAdd.put("1000Gp1_AFR_AF", "Alternative allele frequency in the 1000Gp1 African descendent samples.");
