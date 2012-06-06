@@ -61,7 +61,7 @@ public class SnpSiftCmdFilter extends SnpSift {
 
 	public static final String VERSION = SnpSiftCmdFilter.class.getSimpleName() + " v0.2";
 
-	static boolean debug = false;
+	static boolean debug = true;
 
 	boolean usePassField;
 	String inputFile;
@@ -103,16 +103,16 @@ public class SnpSiftCmdFilter extends SnpSift {
 	public void addSet(String fileName) {
 		// Open file and check
 		String file = Gpr.readFile(fileName);
-		if( file.isEmpty() ) throw new RuntimeException("Could not read any entries from file '" + fileName + "'");
+		if (file.isEmpty()) throw new RuntimeException("Could not read any entries from file '" + fileName + "'");
 
 		// Create hash
 		HashSet<String> set = new HashSet<String>();
-		for( String str : file.split("\n") )
+		for (String str : file.split("\n"))
 			set.add(str.trim());
 
 		// Add set to array
 		sets.add(set);
-		if( verbose ) System.err.println("Adding set '" + fileName + "', " + set.size() + " elements.");
+		if (verbose) System.err.println("Adding set '" + fileName + "', " + set.size() + " elements.");
 	}
 
 	/**
@@ -131,12 +131,12 @@ public class SnpSiftCmdFilter extends SnpSift {
 		Tree parseTree = (Tree) root.getTree();
 
 		// Error creating?
-		if( parseTree == null ) {
+		if (parseTree == null) {
 			System.err.println("Can't create expression");
 			return null;
 		}
 
-		if( debug ) Gpr.debug("Tree: " + parseTree.toStringTree());
+		if (debug) Gpr.debug("Tree: " + parseTree.toStringTree());
 
 		// Create a language factory
 		LangFactory langFactory = new LangFactory(sets);
@@ -153,11 +153,11 @@ public class SnpSiftCmdFilter extends SnpSift {
 		fieldIterator.reset();
 
 		do {
-			if( vcfExpression.eval(vcfEntry) ) return true; // Finish: We found one 'true' condition
+			if (vcfExpression.eval(vcfEntry)) return true; // Finish: We found one 'true' condition
 
-			if( fieldIterator.hasNext() ) fieldIterator.next(); // End of iteration?
+			if (fieldIterator.hasNext()) fieldIterator.next(); // End of iteration?
 			else break;
-		} while(true);
+		} while (true);
 
 		return false;
 	}
@@ -193,26 +193,26 @@ public class SnpSiftCmdFilter extends SnpSift {
 	 */
 	@Override
 	public void parse(String[] args) {
-		for( int i = 0; i < args.length; i++ ) {
+		for (int i = 0; i < args.length; i++) {
 			// Argument starts with '-'?
-			if( args[i].startsWith("-") ) {
-				if( args[i].equals("-h") || args[i].equalsIgnoreCase("-help") ) usage(null);
-				else if( args[i].equals("-f") || args[i].equalsIgnoreCase("--file") ) inputFile = args[++i];
-				else if( args[i].equals("-s") || args[i].equalsIgnoreCase("--set") ) addSet(args[++i]);
-				else if( args[i].equals("-p") || args[i].equalsIgnoreCase("--pass") ) usePassField = true;
-				else if( args[i].equals("-v") ) verbose = true;
-				else if( args[i].equals("-q") ) verbose = false;
-				else if( args[i].equals("-i") || args[i].equalsIgnoreCase("--filterId") ) filterId = args[++i];
-				else if( args[i].equals("-e") || args[i].equalsIgnoreCase("--exprfile") ) {
+			if (args[i].startsWith("-")) {
+				if (args[i].equals("-h") || args[i].equalsIgnoreCase("-help")) usage(null);
+				else if (args[i].equals("-f") || args[i].equalsIgnoreCase("--file")) inputFile = args[++i];
+				else if (args[i].equals("-s") || args[i].equalsIgnoreCase("--set")) addSet(args[++i]);
+				else if (args[i].equals("-p") || args[i].equalsIgnoreCase("--pass")) usePassField = true;
+				else if (args[i].equals("-v")) verbose = true;
+				else if (args[i].equals("-q")) verbose = false;
+				else if (args[i].equals("-i") || args[i].equalsIgnoreCase("--filterId")) filterId = args[++i];
+				else if (args[i].equals("-e") || args[i].equalsIgnoreCase("--exprfile")) {
 					String exprFile = args[++i];
-					if( verbose ) System.err.println("Reading expression from file '" + exprFile + "'");
+					if (verbose) System.err.println("Reading expression from file '" + exprFile + "'");
 					expression = Gpr.readFile(exprFile);
 				} else usage("Unknow option '" + args[i] + "'");
-			} else if( expression == null ) expression = args[i];
+			} else if (expression == null) expression = args[i];
 			else usage("Unknow parameter '" + args[i] + "'");
 		}
 
-		if( expression == null ) usage("Missing filter expression!");
+		if (expression == null) usage("Missing filter expression!");
 	}
 
 	/**
@@ -220,7 +220,7 @@ public class SnpSiftCmdFilter extends SnpSift {
 	 * @throws Exception
 	 */
 	void parseExpression() throws Exception {
-		if( debug ) Gpr.debug("Parse expression: \"" + expression + "\"");
+		if (debug) Gpr.debug("Parse expression: \"" + expression + "\"");
 
 		// Parse string (lexer first, then parser)
 		VcfFilterLexer lexer = new VcfFilterLexer(new ANTLRStringStream(expression));
@@ -228,12 +228,12 @@ public class SnpSiftCmdFilter extends SnpSift {
 		// Parse tree and create expression
 		vcfExpression = createFromLexer(lexer, true);
 
-		if( vcfExpression == null ) {
+		if (vcfExpression == null) {
 			System.err.println("Fatal error: Cannot build expression tree.");
 			System.exit(-1);
 		}
 
-		if( debug ) Gpr.debug("VcfExpression: " + vcfExpression);
+		if (debug) Gpr.debug("VcfExpression: " + vcfExpression);
 	}
 
 	@Override
@@ -250,7 +250,7 @@ public class SnpSiftCmdFilter extends SnpSift {
 		// Parse expression
 		try {
 			parseExpression();
-		} catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			usage("Error parsing expression: '" + expression + "'");
 		}
@@ -261,11 +261,11 @@ public class SnpSiftCmdFilter extends SnpSift {
 		// Open and read entries
 		VcfFileIterator vcfFile = new VcfFileIterator(inputFile);
 		int entryNum = 0;
-		for( VcfEntry vcfEntry : vcfFile ) {
+		for (VcfEntry vcfEntry : vcfFile) {
 			// Show header before first entry
-			if( entryNum == 0 ) {
+			if (entryNum == 0) {
 				addHeader();
-				if( !createList ) System.out.print(vcfFile.getHeader());
+				if (!createList) System.out.print(vcfFile.getHeader());
 			}
 
 			// Does this entry pass the filter? => Show it
@@ -275,26 +275,29 @@ public class SnpSiftCmdFilter extends SnpSift {
 			boolean eval = evaluate(vcfEntry);
 
 			// Actions after evaluation
-			if( eval ) {
+			if (usePassField) { // Add to 'FILTER' field?
 				show = true;
-				if( usePassField ) vcfEntry.setFilterPass("PASS");
-			} else if( usePassField ) { // Show in filterPass field
-				// Get current value
-				String filter = vcfEntry.getFilterPass();
-				if( filter.equals(".") ) filter = ""; // Empty?
 
-				filter += (!filter.isEmpty() ? ";" : "") + filterId; // Add this filter to the not-passed list
-				vcfEntry.setFilterPass(filter);
-			}
+				if (eval) vcfEntry.setFilterPass("PASS");
+				else {
+					// Show in filterPass field
+					// Get current value
+					String filter = vcfEntry.getFilterPass();
+					if (filter.equals(".")) filter = ""; // Empty?
+					// Append new value
+					filter += (!filter.isEmpty() ? ";" : "") + filterId; // Add this filter to the not-passed list
+					vcfEntry.setFilterPass(filter);
+				}
+			} else show = eval; // Show entry (or not) depending on evaluation 
 
-			if( show ) {
-				if( passEntries != null ) passEntries.add(vcfEntry);
+			if (show) {
+				if (passEntries != null) passEntries.add(vcfEntry); // Do not show. just add to the list
 				else System.out.println(vcfEntry);
 			}
 
 			// Debug mode? => Break after a few lines
 			entryNum++;
-			if( debug && (entryNum > 1000) ) break;
+			if (debug && (entryNum > 1000)) break;
 		}
 
 		return passEntries;
@@ -306,7 +309,7 @@ public class SnpSiftCmdFilter extends SnpSift {
 	 */
 	@Override
 	public void usage(String msg) {
-		if( msg != null ) {
+		if (msg != null) {
 			System.out.println("Error: " + msg);
 			showCmd();
 		}

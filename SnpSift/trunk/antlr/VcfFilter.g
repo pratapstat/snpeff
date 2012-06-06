@@ -134,4 +134,4 @@ functionGenotypeBool	:	f=functionGenotypeBoolName '(' g=varGenotype ')'	-> ^(FUN
 functionGenotypeBoolName	:	'isHom' | 'isHet' | 'isVariant' | 'isRef';
 
 // You can use '*' for 'any'
-index 		:	FLOAT | '*' | 'ALL';
+index 		:	FLOAT | '*' | 'ANY' | '?' | 'ALL';

@@ -760,8 +760,8 @@ public class TestCasesFilter extends TestCase {
 	public void test_34() {
 		// Filter data
 		SnpSiftCmdFilter vcfFilter = new SnpSiftCmdFilter();
-		String expression = "(EFF[ALL].EFFECT = 'UPSTREAM')";
-		List<VcfEntry> list = vcfFilter.filter("test/test03.vcf", expression, true);
+		String expression = "(EFF[ALL].EFFECT = 'DOWNSTREAM')";
+		List<VcfEntry> list = vcfFilter.filter("test/downstream.vcf", expression, true);
 
 		// Check that it satisfies the condition
 		System.out.println("Expression: '" + expression + "'");
@@ -774,6 +774,9 @@ public class TestCasesFilter extends TestCase {
 				String e = eff.split("\\(")[0];
 				all &= e.equals("UPSTREAM");
 			}
+
+			//if (!all) 
+			Gpr.debug("Error: " + effStr);
 
 			Assert.assertEquals(true, all);
 		}
