@@ -15,6 +15,7 @@ import ca.mcgill.mcb.pcingola.snpSift.antlr.VcfFilterLexer;
 import ca.mcgill.mcb.pcingola.snpSift.antlr.VcfFilterParser;
 import ca.mcgill.mcb.pcingola.snpSift.lang.LangFactory;
 import ca.mcgill.mcb.pcingola.snpSift.lang.condition.Condition;
+import ca.mcgill.mcb.pcingola.snpSift.lang.expression.Field;
 import ca.mcgill.mcb.pcingola.snpSift.lang.expression.FieldIterator;
 import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
@@ -61,7 +62,7 @@ public class SnpSiftCmdFilter extends SnpSift {
 
 	public static final String VERSION = SnpSiftCmdFilter.class.getSimpleName() + " v0.2";
 
-	static boolean debug = true;
+	static boolean debug = false;
 
 	boolean usePassField;
 	String inputFile;
@@ -152,14 +153,22 @@ public class SnpSiftCmdFilter extends SnpSift {
 		FieldIterator fieldIterator = FieldIterator.get();
 		fieldIterator.reset();
 
+		boolean all = true, any = false;
 		do {
-			if (vcfExpression.eval(vcfEntry)) return true; // Finish: We found one 'true' condition
+			boolean eval = vcfExpression.eval(vcfEntry);
+
+			all &= eval;
+			any |= eval;
+
+			if ((fieldIterator.getType() == Field.TYPE_ALL) && !all) return all;
+			if ((fieldIterator.getType() == Field.TYPE_ANY) && any) return any;
 
 			if (fieldIterator.hasNext()) fieldIterator.next(); // End of iteration?
 			else break;
 		} while (true);
 
-		return false;
+		if (fieldIterator.getType() == Field.TYPE_ALL) return all;
+		return any;
 	}
 
 	/**

@@ -34,6 +34,7 @@ public class FieldSub extends Field {
 		int idx = index;
 		if (index < 0) {
 			FieldIterator.get().setMax(IteratorType.VAR, sub.length - 1);
+			FieldIterator.get().setType(index);
 			idx = FieldIterator.get().get(IteratorType.VAR);
 		}
 
@@ -47,6 +48,6 @@ public class FieldSub extends Field {
 
 	@Override
 	public String toString() {
-		return name + "[" + index + "]";
+		return name + "[" + indexStr(index) + "]";
 	}
 }

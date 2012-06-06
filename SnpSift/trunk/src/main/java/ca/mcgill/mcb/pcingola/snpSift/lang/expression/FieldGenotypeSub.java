@@ -32,6 +32,7 @@ public class FieldGenotypeSub extends FieldGenotype {
 		int idx = index;
 		if (index < 0) {
 			FieldIterator.get().setMax(IteratorType.GENOTYPE_VAR, sub.length - 1);
+			FieldIterator.get().setType(index);
 			idx = FieldIterator.get().get(IteratorType.GENOTYPE_VAR);
 		}
 
@@ -41,6 +42,6 @@ public class FieldGenotypeSub extends FieldGenotype {
 
 	@Override
 	public String toString() {
-		return "GEN[" + genotypeIndex + "]." + name + "[" + index + "]";
+		return "GEN[" + indexStr(genotypeIndex) + "]." + name + "[" + indexStr(index) + "]";
 	}
 }

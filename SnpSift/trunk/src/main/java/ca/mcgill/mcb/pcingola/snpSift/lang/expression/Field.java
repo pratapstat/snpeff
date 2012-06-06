@@ -13,6 +13,9 @@ import ca.mcgill.mcb.pcingola.vcf.VcfInfoType;
  */
 public class Field extends Expression {
 
+	public static final int TYPE_ALL = -2;
+	public static final int TYPE_ANY = -1;
+
 	String name;
 	boolean exceptionIfNotFound = true;
 
@@ -129,6 +132,17 @@ public class Field extends Expression {
 
 	public String getName() {
 		return name;
+	}
+
+	/**
+	 * Convert and index to a string
+	 * @param index
+	 * @return
+	 */
+	public String indexStr(int index) {
+		if (index == TYPE_ANY) return "*";
+		if (index == TYPE_ALL) return "ALL";
+		return Integer.toString(index);
 	}
 
 	public void setExceptionIfNotFound(boolean exceptionIfNotFound) {

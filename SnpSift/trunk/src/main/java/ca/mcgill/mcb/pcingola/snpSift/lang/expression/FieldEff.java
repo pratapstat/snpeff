@@ -61,6 +61,7 @@ public class FieldEff extends FieldSub {
 		int idx = index;
 		if (index < 0) {
 			FieldIterator.get().setMax(IteratorType.EFFECT, effects.length - 1);
+			FieldIterator.get().setType(index);
 			idx = FieldIterator.get().get(IteratorType.EFFECT);
 		}
 
@@ -82,6 +83,6 @@ public class FieldEff extends FieldSub {
 
 	@Override
 	public String toString() {
-		return "EFF[" + index + "]." + name;
+		return "EFF[" + indexStr(index) + "]." + name;
 	}
 }

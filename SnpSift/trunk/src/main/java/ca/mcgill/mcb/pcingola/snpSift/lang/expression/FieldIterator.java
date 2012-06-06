@@ -1,5 +1,6 @@
 package ca.mcgill.mcb.pcingola.snpSift.lang.expression;
 
+
 /**
  * Iterates on fields / sub-fields
  * It's a singleton
@@ -14,6 +15,7 @@ public class FieldIterator {
 
 	private static final FieldIterator fieldIterator = new FieldIterator();
 
+	int type = 0;
 	SimpleIterator var = new SimpleIterator();
 	SimpleIterator gentype = new SimpleIterator();
 	SimpleIterator effect = new SimpleIterator();
@@ -29,22 +31,26 @@ public class FieldIterator {
 	 * @param max
 	 */
 	public int get(IteratorType iterType) {
-		switch(iterType) {
-			case VAR:
-				return var.current;
+		switch (iterType) {
+		case VAR:
+			return var.current;
 
-			case GENOTYPE:
-				return gentype.current;
+		case GENOTYPE:
+			return gentype.current;
 
-			case GENOTYPE_VAR:
-				return gentypeVar.current;
+		case GENOTYPE_VAR:
+			return gentypeVar.current;
 
-			case EFFECT:
-				return effect.current;
+		case EFFECT:
+			return effect.current;
 
-			default:
-				throw new RuntimeException("Unknown iterator type '" + iterType + "'");
+		default:
+			throw new RuntimeException("Unknown iterator type '" + iterType + "'");
 		}
+	}
+
+	public int getType() {
+		return type;
 	}
 
 	/**
@@ -59,25 +65,25 @@ public class FieldIterator {
 	 * Next in iteration
 	 */
 	public void next() {
-		if( gentypeVar.hasNext() ) {
+		if (gentypeVar.hasNext()) {
 			gentypeVar.next();
 			return;
 		}
 
-		if( gentype.hasNext() ) {
+		if (gentype.hasNext()) {
 			gentypeVar.reset();
 			gentype.next();
 			return;
 		}
 
-		if( effect.hasNext() ) {
+		if (effect.hasNext()) {
 			gentypeVar.reset();
 			gentype.reset();
 			effect.next();
 			return;
 		}
 
-		if( var.hasNext() ) {
+		if (var.hasNext()) {
 			gentypeVar.reset();
 			gentype.reset();
 			effect.reset();
@@ -92,6 +98,7 @@ public class FieldIterator {
 	 * Reset all counters
 	 */
 	public void reset() {
+		type = 0;
 		gentypeVar.reset();
 		gentype.reset();
 		effect.reset();
@@ -104,31 +111,41 @@ public class FieldIterator {
 	 * @param max
 	 */
 	public void setMax(IteratorType iterType, int max) {
-		switch(iterType) {
-			case VAR:
-				var.max = Math.max(max, var.max);
-				break;
+		switch (iterType) {
+		case VAR:
+			var.max = Math.max(max, var.max);
+			break;
 
-			case GENOTYPE:
-				gentype.max = Math.max(max, gentype.max);
-				break;
+		case GENOTYPE:
+			gentype.max = Math.max(max, gentype.max);
+			break;
 
-			case GENOTYPE_VAR:
-				gentypeVar.max = Math.max(max, gentypeVar.max);
-				break;
+		case GENOTYPE_VAR:
+			gentypeVar.max = Math.max(max, gentypeVar.max);
+			break;
 
-			case EFFECT:
-				effect.max = Math.max(max, effect.max);
-				break;
+		case EFFECT:
+			effect.max = Math.max(max, effect.max);
+			break;
 
-			default:
-				throw new RuntimeException("Unknown iterator type '" + iterType + "'");
+		default:
+			throw new RuntimeException("Unknown iterator type '" + iterType + "'");
 		}
+	}
+
+	public void setType(int type) {
+		if ((this.type != 0) && (this.type != type)) throw new RuntimeException("Mixing 'ANY' and 'ALL' (or '*' and '?') is not supported!");
+		this.type = type;
 	}
 
 	@Override
 	public String toString() {
-		return "[ " + var.current + " | " + effect.current + " | " + gentype.current + " | " + gentypeVar.current + " ]";
+		String typeStr = "";
+
+		if (type == Field.TYPE_ALL) typeStr = "ALL ";
+		else if (type == Field.TYPE_ANY) typeStr = "ANY ";
+
+		return typeStr + "[ " + var.current + " | " + effect.current + " | " + gentype.current + " | " + gentypeVar.current + " ]";
 	}
 }
 

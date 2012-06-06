@@ -46,7 +46,7 @@ import ca.mcgill.mcb.pcingola.util.Gpr;
  */
 public class LangFactory {
 
-	protected static boolean debug = true;
+	protected static boolean debug = false;
 	ArrayList<HashSet<String>> sets = new ArrayList<HashSet<String>>();
 
 	public LangFactory(ArrayList<HashSet<String>> sets) {
@@ -154,7 +154,7 @@ public class LangFactory {
 			expr = functionEntryFactory(tree);
 		} else throw new RuntimeException("Unknown expression '" + leaveName + "'");
 
-		if (debug) Gpr.debug("vcfExpression: " + expr);
+		if (debug) Gpr.debug("vcfExpression [" + expr.getClass().getSimpleName() + "]: " + expr);
 		return expr;
 	}
 

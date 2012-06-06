@@ -766,18 +766,14 @@ public class TestCasesFilter extends TestCase {
 		// Check that it satisfies the condition
 		System.out.println("Expression: '" + expression + "'");
 		for (VcfEntry vcfEntry : list) {
-			if (verbose) System.out.println("\t" + vcfEntry);
-
 			boolean all = true;
 			String effStr = vcfEntry.getInfo("EFF");
 			for (String eff : effStr.split(",")) {
 				String e = eff.split("\\(")[0];
-				all &= e.equals("UPSTREAM");
+				all &= e.equals("DOWNSTREAM");
 			}
 
-			//if (!all) 
-			Gpr.debug("Error: " + effStr);
-
+			if (!all) Gpr.debug("Error: " + effStr);
 			Assert.assertEquals(true, all);
 		}
 	}

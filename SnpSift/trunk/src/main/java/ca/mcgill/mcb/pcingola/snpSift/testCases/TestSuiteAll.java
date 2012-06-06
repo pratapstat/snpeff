@@ -20,6 +20,7 @@ public class TestSuiteAll {
 		TestSuite suite = new TestSuite();
 
 		suite.addTestSuite(TestCasesFilter.class);
+		suite.addTestSuite(TestCasesFilterALL.class);
 		suite.addTestSuite(TestCasesHwe.class);
 		suite.addTestSuite(TestCasesLd.class);
 		suite.addTestSuite(TestCasesCaseControl.class);
