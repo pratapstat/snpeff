@@ -30,11 +30,11 @@ tokens {
 }
 
 @lexer::header {
-package ca.mcgill.mcb.pcingola.vcfEtc.antlr;
+package ca.mcgill.mcb.pcingola.snpSift.antlr;
 }
 
 @header {
-package ca.mcgill.mcb.pcingola.vcfEtc.antlr;
+package ca.mcgill.mcb.pcingola.snpSift.antlr;
 }
 
 
@@ -134,4 +134,4 @@ functionGenotypeBool	:	f=functionGenotypeBoolName '(' g=varGenotype ')'	-> ^(FUN
 functionGenotypeBoolName	:	'isHom' | 'isHet' | 'isVariant' | 'isRef';
 
 // You can use '*' for 'any'
-index 		:	FLOAT | '*';
+index 		:	FLOAT | '*' | 'ALL';

@@ -1,0 +1,5 @@
+( 'hi' in SET[1] )
+&
+( EFF[*].EFFECT = 'NON_SYNONYMOUS_CODING' )
+
+

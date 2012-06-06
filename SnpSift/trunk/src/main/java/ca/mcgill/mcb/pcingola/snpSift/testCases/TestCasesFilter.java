@@ -754,4 +754,29 @@ public class TestCasesFilter extends TestCase {
 		}
 	}
 
+	/**
+	 * Filter by EFF[ALL].CODING 
+	 */
+	public void test_34() {
+		// Filter data
+		SnpSiftCmdFilter vcfFilter = new SnpSiftCmdFilter();
+		String expression = "(EFF[ALL].EFFECT = 'UPSTREAM')";
+		List<VcfEntry> list = vcfFilter.filter("test/test03.vcf", expression, true);
+
+		// Check that it satisfies the condition
+		System.out.println("Expression: '" + expression + "'");
+		for (VcfEntry vcfEntry : list) {
+			if (verbose) System.out.println("\t" + vcfEntry);
+
+			boolean all = true;
+			String effStr = vcfEntry.getInfo("EFF");
+			for (String eff : effStr.split(",")) {
+				String e = eff.split("\\(")[0];
+				all &= e.equals("UPSTREAM");
+			}
+
+			Assert.assertEquals(true, all);
+		}
+	}
+
 }
