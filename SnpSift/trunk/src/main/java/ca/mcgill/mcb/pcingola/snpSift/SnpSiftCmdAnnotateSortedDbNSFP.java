@@ -40,6 +40,8 @@ public class SnpSiftCmdAnnotateSortedDbNSFP extends SnpSift {
   static {
     positionSpecificFieldsToAdd = new HashMap<String, String>();
     positionSpecificFieldsToAdd.put("Ensembl_transcriptid", "Ensembl transcript ids (separated by ',')");
+    positionSpecificFieldsToAdd.put("Uniprot_acc", "Uniprot accession number. (separated by ',')");
+    positionSpecificFieldsToAdd.put("Interpro_domain", " domain or conserved site on which the variant locates. Domain annotations come from Interpro database. The number in the brackets following a specific domain is the count of times Interpro assigns the variant position to that domain, typically coming from different predicting databases. Multiple entries. (separated by ',')");
 
     alleleSpecificFieldsToAdd = new HashMap<String, String>();
     alleleSpecificFieldsToAdd.put("SIFT_score", "SIFT score, If a score is smaller than 0.05 the corresponding NS is predicted as 'D(amaging)' otherwise it is predicted as 'T(olerated)'");
