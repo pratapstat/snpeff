@@ -60,10 +60,10 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 	protected void addAnnotation(VcfEntry vcf) {
 		// Is this change in db?
 		String id = findAnnotation(vcf);
-		if( id != null ) {
+		if (id != null) {
 			countAnnotated++;
 			// Add ID
-			if( !vcf.getId().isEmpty() ) id = vcf.getId() + ";" + id;
+			if (!vcf.getId().isEmpty()) id = vcf.getId() + ";" + id;
 			vcf.setId(id);
 		}
 	}
@@ -73,7 +73,7 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 	 * @param vcfDb
 	 */
 	void addDb(VcfEntry vcfDb) {
-		for( int i = 0; i < vcfDb.getAlts().length; i++ ) {
+		for (int i = 0; i < vcfDb.getAlts().length; i++) {
 			String key = key(vcfDb, i);
 			db.put(key, vcfDb.getId());
 		}
@@ -87,12 +87,12 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 	public void annotate(VcfEntry vcf) throws IOException {
 		// Do we have to seek in db file?
 		String chr = vcf.getChromosomeName();
-		if( !chr.equals(chrPrev) ) {
+		if (!chr.equals(chrPrev)) {
 			// Get to the beginning of the new chromosome
 			long start = indexDb.getStart(chr);
 
 			// No such chromosome?
-			if( start < 0 ) {
+			if (start < 0) {
 				warn("Chromosome '" + chr + "' not found in database.");
 				return;
 			}
@@ -100,7 +100,7 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 			// Seek 
 			vcfDbFile.seek(start);
 			latestVcfDb = null;
-			if( verbose ) Timer.showStdErr("Chromosome: '" + chr + "'");
+			if (verbose) Timer.showStdErr("Chromosome: '" + chr + "'");
 		}
 		chrPrev = chr;
 
@@ -122,12 +122,12 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 	 */
 	protected String findAnnotation(VcfEntry vcf) {
 		readDb(vcf);
-		if( db.isEmpty() ) return null;
+		if (db.isEmpty()) return null;
 
-		for( int i = 0; i < vcf.getAlts().length; i++ ) {
+		for (int i = 0; i < vcf.getAlts().length; i++) {
 			String key = key(vcf, i);
 			String id = db.get(key);
-			if( id != null ) return id;
+			if (id != null) return id;
 		}
 		return null;
 	}
@@ -138,7 +138,7 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 	 * @return
 	 */
 	VcfFileIndexIntervals index(String fileName) {
-		if( verbose ) System.err.println("Index: " + fileName);
+		if (verbose) System.err.println("Index: " + fileName);
 		VcfFileIndexIntervals vcfFileIndexIntervals = new VcfFileIndexIntervals(fileName);
 		vcfFileIndexIntervals.setVerbose(verbose);
 		vcfFileIndexIntervals.open();
@@ -175,19 +175,19 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 	 */
 	@Override
 	public void parse(String[] args) {
-		if( args.length == 0 ) usage(null);
+		if (args.length == 0) usage(null);
 
-		for( String arg : args ) {
-			if( arg.equals("-q") ) verbose = false;
-			else if( arg.equals("-v") ) verbose = true;
-			else if( arg.equals("-h") || arg.equals("--help") ) usage(null);
-			else if( vcfDbFileName == null ) vcfDbFileName = arg;
-			else if( vcfFileName == null ) vcfFileName = arg;
+		for (String arg : args) {
+			if (arg.equals("-q")) verbose = false;
+			else if (arg.equals("-v")) verbose = true;
+			else if (arg.equals("-h") || arg.equals("--help")) usage(null);
+			else if (vcfDbFileName == null) vcfDbFileName = arg;
+			else if (vcfFileName == null) vcfFileName = arg;
 		}
 
 		// Sanity check
-		if( vcfDbFileName == null ) usage("Missing 'database.vcf'");
-		if( vcfFileName == null ) usage("Missing 'file.vcf'");
+		if (vcfDbFileName == null) usage("Missing 'database.vcf'");
+		if (vcfFileName == null) usage("Missing 'file.vcf'");
 	}
 
 	/**
@@ -199,24 +199,24 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 		db.clear();
 
 		// Add latest to db?
-		if( latestVcfDb != null ) {
-			if( latestVcfDb.getChromosomeName().equals(chr) ) {
-				if( vcf.getStart() < latestVcfDb.getStart() ) return;
-				if( vcf.getStart() == latestVcfDb.getStart() ) addDb(latestVcfDb);
+		if (latestVcfDb != null) {
+			if (latestVcfDb.getChromosomeName().equals(chr)) {
+				if (vcf.getStart() < latestVcfDb.getStart()) return;
+				if (vcf.getStart() == latestVcfDb.getStart()) addDb(latestVcfDb);
 			}
 		}
 
 		// Read more entries from db
-		for( VcfEntry vcfDb : vcfDbFile ) {
+		for (VcfEntry vcfDb : vcfDbFile) {
 			latestVcfDb = vcfDb;
 
 			String chrDb = vcfDb.getChromosomeName();
-			if( !chrDb.equals(chr) ) return;
+			if (!chrDb.equals(chr)) return;
 
-			if( vcf.getStart() < vcfDb.getStart() ) return;
-			if( vcf.getStart() == vcfDb.getStart() ) {
+			if (vcf.getStart() < vcfDb.getStart()) return;
+			if (vcf.getStart() == vcfDb.getStart()) {
 				// Sanity check: Check that references match
-				if( !vcf.getRef().equals(vcfDb.getRef()) ) {
+				if (!vcf.getRef().equals(vcfDb.getRef())) {
 					System.err.println("WARNING: Reference is '" + vcfDb.getRef() + "' instead of '" + vcf.getRef() + "' at " + chr + ":" + (vcf.getStart() + 1));
 					countBadRef++;
 				}
@@ -232,21 +232,21 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 	 */
 	@Override
 	public void run() {
-		if( verbose ) Timer.showStdErr("Annotating entries from: '" + vcfFile + "'");
+		if (verbose) Timer.showStdErr("Annotating entries from: '" + vcfFile + "'");
 
 		try {
 			initAnnotate();
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 
 		boolean showHeader = true;
-		for( VcfEntry vcfEntry : vcfFile ) {
+		for (VcfEntry vcfEntry : vcfFile) {
 			try {
 				// Show header?
-				if( showHeader ) {
+				if (showHeader) {
 					addHeader(vcfFile);
-					System.out.print(vcfFile.getHeader());
+					System.out.println(vcfFile.getHeader());
 					showHeader = false;
 				}
 
@@ -254,9 +254,9 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 				annotate(vcfEntry);
 
 				// Show
-				if( !suppressOutput ) System.out.println(vcfEntry);
+				if (!suppressOutput) System.out.println(vcfEntry);
 				count++;
-			} catch(Exception e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
@@ -264,7 +264,7 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 		endAnnotate();
 
 		// Show some stats
-		if( verbose ) {
+		if (verbose) {
 			double perc = (100.0 * countAnnotated) / count;
 			Timer.showStdErr("Done." //
 					+ "\n\tTotal annotated entries : " + countAnnotated //
@@ -285,7 +285,7 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 	 */
 	@Override
 	public void usage(String msg) {
-		if( msg != null ) {
+		if (msg != null) {
 			System.err.println("Error: " + msg);
 			showCmd();
 		}

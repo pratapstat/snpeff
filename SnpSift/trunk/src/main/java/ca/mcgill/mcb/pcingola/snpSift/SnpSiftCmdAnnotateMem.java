@@ -41,30 +41,30 @@ public class SnpSiftCmdAnnotateMem extends SnpSift {
 	 * Annotate entries
 	 */
 	public void annotate() {
-		if( verbose ) Timer.showStdErr("Annotating entries from: '" + vcfFile + "'");
+		if (verbose) Timer.showStdErr("Annotating entries from: '" + vcfFile + "'");
 
 		VcfFileIterator vcf = new VcfFileIterator(vcfFile);
 
 		int countAnnotated = 0, count = 0;
 		boolean showHeader = true;
-		for( VcfEntry vcfEntry : vcf ) {
+		for (VcfEntry vcfEntry : vcf) {
 
 			// Show header?
-			if( showHeader ) {
+			if (showHeader) {
 				addHeader(vcf);
-				System.out.print(vcf.getHeader());
+				System.out.println(vcf.getHeader());
 				showHeader = false;
 			}
 
 			// Anything found? => Annotate
 			boolean annotated = false;
-			for( int i = 0; i < vcfEntry.getAlts().length; i++ ) {
+			for (int i = 0; i < vcfEntry.getAlts().length; i++) {
 				String key = key(vcfEntry, i);
 				String id = db.get(key);
 
-				if( id != null ) {
+				if (id != null) {
 					// Add ID
-					if( !vcfEntry.getId().isEmpty() ) id = vcfEntry.getId() + ";" + id;
+					if (!vcfEntry.getId().isEmpty()) id = vcfEntry.getId() + ";" + id;
 					vcfEntry.setId(id);
 
 					annotated = true;
@@ -74,12 +74,12 @@ public class SnpSiftCmdAnnotateMem extends SnpSift {
 			// Show entry
 			System.out.println(vcfEntry);
 
-			if( annotated ) countAnnotated++;
+			if (annotated) countAnnotated++;
 			count++;
 		}
 
 		double perc = (100.0 * countAnnotated) / count;
-		if( verbose ) Timer.showStdErr("Done." //
+		if (verbose) Timer.showStdErr("Done." //
 				+ "\n\tTotal annotated entries : " + countAnnotated //
 				+ "\n\tTotal entries           : " + count //
 				+ "\n\tPercent                 : " + String.format("%.2f%%", perc) //
@@ -101,17 +101,17 @@ public class SnpSiftCmdAnnotateMem extends SnpSift {
 	@Override
 	public void parse(String[] args) {
 		int argNum = 0;
-		if( args.length == 0 ) usage(null);
+		if (args.length == 0) usage(null);
 
-		if( args[argNum].equals("-q") ) {
+		if (args[argNum].equals("-q")) {
 			verbose = false;
 			argNum++;
 		}
 
-		if( args.length >= argNum ) vcfDb = args[argNum++];
+		if (args.length >= argNum) vcfDb = args[argNum++];
 		else usage("Missing 'database.vcf'");
 
-		if( args.length >= argNum ) vcfFile = args[argNum++];
+		if (args.length >= argNum) vcfFile = args[argNum++];
 		else usage("Missing 'file.vcf'");
 	}
 
@@ -119,31 +119,31 @@ public class SnpSiftCmdAnnotateMem extends SnpSift {
 	 * Read database
 	 */
 	public void readDb() {
-		if( verbose ) Timer.showStdErr("Loading database: '" + vcfDb + "'");
+		if (verbose) Timer.showStdErr("Loading database: '" + vcfDb + "'");
 		VcfFileIterator dbFile = new VcfFileIterator(vcfDb);
 
 		int count = 1;
-		for( VcfEntry vcfEntry : dbFile ) {
+		for (VcfEntry vcfEntry : dbFile) {
 
-			for( int i = 0; i < vcfEntry.getAlts().length; i++ ) {
+			for (int i = 0; i < vcfEntry.getAlts().length; i++) {
 				String key = key(vcfEntry, i);
 
 				// Add ID
-				if( db.containsKey(key) ) {
+				if (db.containsKey(key)) {
 					String multipleId = db.get(key) + ";" + vcfEntry.getId();
 					db.put(key, multipleId);
 				} else db.put(key, vcfEntry.getId());
 			}
 
 			count++;
-			if( verbose ) {
-				if( count % SHOW_LINES == 0 ) System.err.print("\n" + count + "\t.");
-				else if( count % SHOW == 0 ) System.err.print('.');
+			if (verbose) {
+				if (count % SHOW_LINES == 0) System.err.print("\n" + count + "\t.");
+				else if (count % SHOW == 0) System.err.print('.');
 			}
 		}
 
 		// Show time
-		if( verbose ) {
+		if (verbose) {
 			System.err.println("");
 			Timer.showStdErr("Done. Database size: " + db.size());
 		}
@@ -155,7 +155,7 @@ public class SnpSiftCmdAnnotateMem extends SnpSift {
 	 */
 	@Override
 	public void usage(String msg) {
-		if( msg != null ) {
+		if (msg != null) {
 			System.err.println("Error: " + msg);
 			showCmd();
 		}

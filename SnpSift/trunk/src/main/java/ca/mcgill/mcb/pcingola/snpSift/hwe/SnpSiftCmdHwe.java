@@ -56,23 +56,23 @@ public class SnpSiftCmdHwe extends SnpSift {
 	 */
 	@Override
 	public void parse(String[] args) {
-		if( args.length == 0 ) usage(null);
+		if (args.length == 0) usage(null);
 
-		for( int argc = 0; argc < args.length; argc++ ) {
-			if( args[argc].startsWith("-") ) { // Argument starts with '-'?
+		for (int argc = 0; argc < args.length; argc++) {
+			if (args[argc].startsWith("-")) { // Argument starts with '-'?
 
-				if( args[argc].equals("-h") || args[argc].equalsIgnoreCase("-help") ) usage(null);
-				else if( args[argc].equals("-v") ) verbose = true;
-				else if( args[argc].equals("-q") ) verbose = false;
-				else if( args[argc].equals("-t") ) {
+				if (args[argc].equals("-h") || args[argc].equalsIgnoreCase("-help")) usage(null);
+				else if (args[argc].equals("-v")) verbose = true;
+				else if (args[argc].equals("-q")) verbose = false;
+				else if (args[argc].equals("-t")) {
 					numWorkers = Gpr.parseIntSafe(args[++argc]);
-					if( numWorkers <= 0 ) usage("Number of threads should be a positive number.");
+					if (numWorkers <= 0) usage("Number of threads should be a positive number.");
 				} else usage("Unknown option '" + args[argc] + "'");
 			} else vcfFileName = args[argc++];
 		}
 
 		// Sanity check
-		if( vcfFileName == null ) usage("Missing VCF file name");
+		if (vcfFileName == null) usage("Missing VCF file name");
 	}
 
 	/**
@@ -81,7 +81,7 @@ public class SnpSiftCmdHwe extends SnpSift {
 	@Override
 	public void run() {
 		// Run multi or single threaded versions
-		if( numWorkers == 1 ) runSingle();
+		if (numWorkers == 1) runSingle();
 		else runMulti();
 	}
 
@@ -123,10 +123,10 @@ public class SnpSiftCmdHwe extends SnpSift {
 
 		// Read all vcfEntries
 		int entryNum = 1;
-		for( VcfEntry vcfEntry : vcfFile ) {
-			if( entryNum == 1 ) {
+		for (VcfEntry vcfEntry : vcfFile) {
+			if (entryNum == 1) {
 				addHeader();
-				System.out.print(vcfFile.getHeader()); // Show header
+				System.out.println(vcfFile.getHeader()); // Show header
 			}
 
 			vcfHwe.hwe(vcfEntry, true);
@@ -144,7 +144,7 @@ public class SnpSiftCmdHwe extends SnpSift {
 	 */
 	@Override
 	public void usage(String errMsg) {
-		if( errMsg != null ) System.err.println("Error: " + errMsg);
+		if (errMsg != null) System.err.println("Error: " + errMsg);
 		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + "" + ".jar hwe [-v] [-q] [-p numThreads] file.vcf.");
 		System.err.println("\t-q       : Be quite");
 		System.err.println("\t-v       : Be verbose");

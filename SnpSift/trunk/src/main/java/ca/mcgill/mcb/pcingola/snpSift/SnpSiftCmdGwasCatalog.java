@@ -77,7 +77,7 @@ public class SnpSiftCmdGwasCatalog extends SnpSift {
 			// Show header?
 			if (showHeader) {
 				addHeader(vcf);
-				System.out.print(vcf.getHeader());
+				System.out.println(vcf.getHeader());
 				showHeader = false;
 			}
 

@@ -27,10 +27,11 @@ public class SnpSiftCmdRemoveReferenceGenotypes {
 		vcfSnpCompare.run();
 	}
 
-	public SnpSiftCmdRemoveReferenceGenotypes() {}
+	public SnpSiftCmdRemoveReferenceGenotypes() {
+	}
 
 	public SnpSiftCmdRemoveReferenceGenotypes(String[] args) {
-		if( args.length != 0 ) usage(null);
+		if (args.length != 0) usage(null);
 	}
 
 	/**
@@ -44,22 +45,20 @@ public class SnpSiftCmdRemoveReferenceGenotypes {
 
 		// Read all vcfEntries
 		int entryNum = 1;
-		for( VcfEntry vcfEntry : vcfFile ) {
+		for (VcfEntry vcfEntry : vcfFile) {
 			VcfGenotype nogenotype = null;
 
 			// Show header?
-			if( entryNum == 1 ) {
-				System.out.print(vcfFile.getHeader());
-			}
+			if (entryNum == 1) System.out.println(vcfFile.getHeader());
 
 			// Replace using 'nogenotype' if it is not a variant
 			List<VcfGenotype> genotypes = vcfEntry.getVcfGenotypes();
-			for( int i = 0; i < genotypes.size(); i++ ) {
+			for (int i = 0; i < genotypes.size(); i++) {
 				VcfGenotype genotype = genotypes.get(i);
 
 				// Not a variant? => Replace
-				if( !genotype.isVariant() ) {
-					if( nogenotype == null ) nogenotype = new VcfGenotype(vcfEntry, vcfEntry.getFormat(), VcfFileIterator.MISSING);
+				if (!genotype.isVariant()) {
+					if (nogenotype == null) nogenotype = new VcfGenotype(vcfEntry, vcfEntry.getFormat(), VcfFileIterator.MISSING);
 					genotypes.set(i, nogenotype);
 				}
 			}
@@ -68,8 +67,8 @@ public class SnpSiftCmdRemoveReferenceGenotypes {
 			System.out.println(vcfEntry);
 
 			// Show progress
-			if( entryNum % SHOW_EVERY == 0 ) {
-				if( entryNum % SHOW_EVERY_NL == 0 ) System.err.println('.');
+			if (entryNum % SHOW_EVERY == 0) {
+				if (entryNum % SHOW_EVERY_NL == 0) System.err.println('.');
 				else System.err.print('.');
 			}
 
@@ -83,7 +82,7 @@ public class SnpSiftCmdRemoveReferenceGenotypes {
 	 * Show usage and exit
 	 */
 	void usage(String errMsg) {
-		if( errMsg != null ) System.err.println("Error: " + errMsg);
+		if (errMsg != null) System.err.println("Error: " + errMsg);
 		System.err.println("Usage: cat file.vcf | java -jar " + SnpSift.class.getSimpleName() + "" + ".jar rmRefGen > file_noref.vcf");
 		System.exit(1);
 	}

@@ -274,7 +274,7 @@ public class SnpSiftCmdFilter extends SnpSift {
 			// Show header before first entry
 			if (entryNum == 0) {
 				addHeader();
-				if (!createList) System.out.print(vcfFile.getHeader());
+				if (!createList) System.out.println(vcfFile.getHeader());
 			}
 
 			// Does this entry pass the filter? => Show it

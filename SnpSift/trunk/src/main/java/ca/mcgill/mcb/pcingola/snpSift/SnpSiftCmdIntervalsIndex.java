@@ -59,14 +59,14 @@ public class SnpSiftCmdIntervalsIndex extends SnpSift {
 	 */
 	public void loadIntervals() {
 		// Read filter interval file
-		if( verbose ) Timer.showStdErr("Reading BED file '" + bedFile + "'");
+		if (verbose) Timer.showStdErr("Reading BED file '" + bedFile + "'");
 
 		SeqChangeBedFileIterator bf = new SeqChangeBedFileIterator(bedFile, genome, inOffset);
 		bf.setCreateChromos(true);
 
 		seqChanges = bf.load();
 		Collections.sort(seqChanges); // We want the result VCF file to be sorted
-		if( verbose ) Timer.showStdErr("Total " + seqChanges.size() + " intervals added.");
+		if (verbose) Timer.showStdErr("Total " + seqChanges.size() + " intervals added.");
 	}
 
 	/**
@@ -77,25 +77,25 @@ public class SnpSiftCmdIntervalsIndex extends SnpSift {
 	public void parse(String[] args) {
 		verbose = false;
 
-		for( int i = 0; i < args.length; i++ ) {
+		for (int i = 0; i < args.length; i++) {
 
 			// Argument starts with '-'?
-			if( args[i].startsWith("-") ) {
+			if (args[i].startsWith("-")) {
 
-				if( args[i].equals("-if") ) {
-					if( (i + 1) < args.length ) inOffset = Gpr.parseIntSafe(args[++i]);
-				} else if( args[i].equals("-v") ) verbose = true;
-				else if( args[i].equals("-c") ) {
+				if (args[i].equals("-if")) {
+					if ((i + 1) < args.length) inOffset = Gpr.parseIntSafe(args[++i]);
+				} else if (args[i].equals("-v")) verbose = true;
+				else if (args[i].equals("-c")) {
 					listCommandLine = true;
 					inOffset = 1;
 				}
 
 			} else {
-				if( vcfFile == null ) vcfFile = args[i];
+				if (vcfFile == null) vcfFile = args[i];
 				else {
 					// Last argument
-					if( bedFile == null ) {
-						if( listCommandLine ) seqChanges.add(parsePos(args[i])); // Genomic positions in command line?
+					if (bedFile == null) {
+						if (listCommandLine) seqChanges.add(parsePos(args[i])); // Genomic positions in command line?
 						else bedFile = args[i]; // Use BED file
 					}
 				}
@@ -103,9 +103,9 @@ public class SnpSiftCmdIntervalsIndex extends SnpSift {
 		}
 
 		// Sanity check
-		if( vcfFile == null ) usage("Missing BED file");
-		if( listCommandLine && (seqChanges.size() <= 0) ) usage("Missing intervals");
-		if( !listCommandLine && (bedFile == null) ) usage("Missing VCF file");
+		if (vcfFile == null) usage("Missing BED file");
+		if (listCommandLine && (seqChanges.size() <= 0)) usage("Missing intervals");
+		if (!listCommandLine && (bedFile == null)) usage("Missing VCF file");
 	}
 
 	/**
@@ -115,11 +115,11 @@ public class SnpSiftCmdIntervalsIndex extends SnpSift {
 	 */
 	SeqChange parsePos(String pos) {
 		String recs[] = pos.split(":");
-		if( recs.length != 2 ) usage("Invalid interval '" + pos + "'. Format 'chr:start-end'");
+		if (recs.length != 2) usage("Invalid interval '" + pos + "'. Format 'chr:start-end'");
 		String chr = recs[0];
 
 		String p[] = recs[1].split("-");
-		if( p.length != 2 ) usage("Invalid interval '" + pos + "'. Format 'chr:start-end'");
+		if (p.length != 2) usage("Invalid interval '" + pos + "'. Format 'chr:start-end'");
 		int start = Gpr.parseIntSafe(p[0]) - inOffset;
 		int end = Gpr.parseIntSafe(p[1]) - inOffset;
 
@@ -134,34 +134,34 @@ public class SnpSiftCmdIntervalsIndex extends SnpSift {
 	 */
 	@Override
 	public void run() {
-		if( !listCommandLine ) loadIntervals();
+		if (!listCommandLine) loadIntervals();
 
 		// Read and show header
 		VcfFileIterator vcfFileIt = new VcfFileIterator(vcfFile);
 		vcfFileIt.iterator().next(); // Read header (by reading first vcf entry)
 		addHeader(vcfFileIt);
-		System.out.print(vcfFileIt.getHeader());
+		System.out.println(vcfFileIt.getHeader());
 		vcfFileIt.close();
 
 		// Open and index file		
 		VcfFileIndexIntervals vf = new VcfFileIndexIntervals(vcfFile);
 
-		if( verbose ) Timer.showStdErr("Indexing file '" + vcfFile + "'");
+		if (verbose) Timer.showStdErr("Indexing file '" + vcfFile + "'");
 		vf.setVerbose(verbose);
 		vf.open();
 		vf.index();
-		if( verbose ) Timer.showStdErr("Done");
+		if (verbose) Timer.showStdErr("Done");
 
 		// Find all intervals
-		for( SeqChange sc : seqChanges ) {
+		for (SeqChange sc : seqChanges) {
 			try {
-				if( verbose ) Timer.showStdErr("Finding interval: " + sc);
+				if (verbose) Timer.showStdErr("Finding interval: " + sc);
 				vf.dump(sc.getChromosomeName(), sc.getStart(), sc.getEnd());
-			} catch(Throwable t) {
+			} catch (Throwable t) {
 				t.printStackTrace();
 			}
 		}
-		if( verbose ) Timer.showStdErr("Done");
+		if (verbose) Timer.showStdErr("Done");
 	}
 
 	public void setInOffset(int inOffset) {
@@ -174,7 +174,7 @@ public class SnpSiftCmdIntervalsIndex extends SnpSift {
 	 */
 	@Override
 	public void usage(String msg) {
-		if( msg != null ) {
+		if (msg != null) {
 			System.err.println("Error: " + msg);
 			showCmd();
 		}
