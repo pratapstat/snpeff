@@ -19,7 +19,7 @@ public class SnpSql implements CommandLine {
 	public static final String VERSION_MAJOR = "0.1";
 	public static final String REVISION = "";
 	public static final String VERSION_SHORT = VERSION_MAJOR + REVISION;
-	public static final String VERSION = VERSION_SHORT + " (build " + BUILD + "), by " + Pcingola.BY;
+	public static final String VERSION = "SnpSql " + VERSION_SHORT + " (build " + BUILD + "), by " + Pcingola.BY;
 
 	protected String command = "";
 	protected String[] args; // Arguments used to invoke this command
@@ -87,8 +87,8 @@ public class SnpSql implements CommandLine {
 			//---
 			// Create database
 			//---
-			//snpSql = new SnpSqlCmdCreate();
-			//snpSql.parseArgs(shiftArgs);
+			snpSql = new SnpSqlCmdCreate();
+			snpSql.parseArgs(shiftArgs);
 		} else if (command.equals("sql")) {
 			//---
 			// Query database
@@ -109,7 +109,7 @@ public class SnpSql implements CommandLine {
 		}
 
 		// Report to server (usage statistics) 
-		LogStats.report(ok, verbose, args, err, snpSql.reportValues());
+		if (log) LogStats.report(VERSION, ok, verbose, args, err, snpSql.reportValues());
 
 		return ok;
 	}
