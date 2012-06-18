@@ -230,7 +230,7 @@ public class SnpSiftCmdAnnotateSortedDbNSFP extends SnpSift {
       if(currentEntry == null) {
         currentEntry = dbNSFPFile.next();
         // Test for EOF, passed through chromosome without finding position, position not annotated
-        if (currentEntry == null || !currentEntry.getChromosomeName().equals(vcf.getChromosomeName()) || vcf.getStart() <= currentEntry.getStart()) {
+        if (currentEntry == null || !currentEntry.getChromosomeName().equals(vcf.getChromosomeName()) || vcf.getStart() < currentEntry.getStart()) {
           return;
         }
       }

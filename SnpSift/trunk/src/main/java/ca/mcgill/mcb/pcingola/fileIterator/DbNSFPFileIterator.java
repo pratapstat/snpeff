@@ -37,9 +37,14 @@ public class DbNSFPFileIterator extends MarkerFileIterator<DbNSFPEntry> {
 			values.put(entryValues.get("alt"), entryValues);
 		}
 
-		DbNSFPEntry entry = new DbNSFPEntry(getChromosome(chromosome), start,
-				values);
+		DbNSFPEntry entry = new DbNSFPEntry(getChromosome(chromosome), start, values);
 		return entry;
+	}
+
+	@Override
+	public void seek(long pos) throws IOException {
+		super.seek(pos);
+		nextLine = null;
 	}
 
 	@Override
