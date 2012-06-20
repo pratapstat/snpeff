@@ -32,11 +32,12 @@ public class FieldEff extends FieldSub {
 		if (name.equals("EFF.FUNCLASS")) return 2;
 		if (name.equals("EFF.CODON")) return 3;
 		if (name.equals("EFF.AA")) return 4;
-		if (name.equals("EFF.GENE")) return 5;
-		if (name.equals("EFF.BIOTYPE")) return 6;
-		if (name.equals("EFF.CODING")) return 7;
-		if (name.equals("EFF.TRID")) return 8;
-		if (name.equals("EFF.EXID")) return 9;
+		if (name.equals("EFF.AA_LEN")) return 5;
+		if (name.equals("EFF.GENE")) return 6;
+		if (name.equals("EFF.BIOTYPE")) return 7;
+		if (name.equals("EFF.CODING")) return 8;
+		if (name.equals("EFF.TRID")) return 9;
+		if (name.equals("EFF.EXID")) return 10;
 
 		return -1;
 	}

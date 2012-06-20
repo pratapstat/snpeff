@@ -2,9 +2,9 @@ package ca.mcgill.mcb.pcingola.snpSql;
 
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
 import ca.mcgill.mcb.pcingola.snpSql.db.HibernateUtil;
-import ca.mcgill.mcb.pcingola.snpSql.db.Tuple;
 import ca.mcgill.mcb.pcingola.snpSql.db.VcfEntryDb;
 import ca.mcgill.mcb.pcingola.util.Timer;
+import ca.mcgill.mcb.pcingola.vcf.VcfEffect;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 
 /**
@@ -46,17 +46,20 @@ public class SnpSqlCmdCreate extends SnpSql {
 
 		// Add info from VCF
 		VcfFileIterator vcfFile = new VcfFileIterator(vcfFileName);
-		for (VcfEntry ve : vcfFile) {
-			VcfEntryDb vdb = new VcfEntryDb(ve);
+		for (VcfEntry vcfEntry : vcfFile) {
+			VcfEntryDb vdb = new VcfEntryDb(vcfEntry);
 			vdb.save();
 
-			String eff = ve.getInfo("EFF");
-			if (eff != null) {
-				System.out.println(eff);
-				Tuple teff = new Tuple("EFF", eff.substring(0, 30));
-				vdb.add(teff);
-				teff.save();
+			for (VcfEffect veff : vcfEntry.parseEffects()) {
+				System.out.println(veff);
 			}
+			//			String eff = ve.getInfo("EFF");
+			//			if (eff != null) {
+			//				System.out.println(eff);
+			//				Tuple teff = new Tuple("EFF", eff.substring(0, 30));
+			//				vdb.add(teff);
+			//				teff.save();
+			//			}
 
 		}
 
