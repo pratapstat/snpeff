@@ -6,6 +6,8 @@ import java.util.HashMap;
 import ca.mcgill.mcb.pcingola.Pcingola;
 import ca.mcgill.mcb.pcingola.logStatsServer.LogStats;
 import ca.mcgill.mcb.pcingola.snpEffect.commandLine.CommandLine;
+import ca.mcgill.mcb.pcingola.snpSql.db.HsqlDbLocalServer;
+import ca.mcgill.mcb.pcingola.util.Gpr;
 
 /**
  * SNP SQL
@@ -35,11 +37,11 @@ public class SnpSql implements CommandLine {
 		SnpSql snpSql = new SnpSql();
 		snpSql.parseArgs(args);
 
-		// Run
+		// Run command
 		boolean ok = snpSql.run();
 		int retCode = ok ? 0 : -1;
 
-		// Exit
+		// Done.
 		System.exit(retCode);
 	}
 
@@ -83,6 +85,9 @@ public class SnpSql implements CommandLine {
 		boolean ok = false;
 		SnpSql snpSql = null;
 
+		//---
+		// Select command to run
+		//---
 		if (command.equals("create")) {
 			//---
 			// Create database
@@ -98,8 +103,13 @@ public class SnpSql implements CommandLine {
 		} else throw new RuntimeException("Unknown command '" + command + "'");
 
 		//---
-		// Run
+		// Run 
 		//---
+
+		// Run server
+		HsqlDbLocalServer hsql = new HsqlDbLocalServer("zzz", Gpr.HOME + "/snpSql/zzz", verbose);
+
+		// Run command
 		String err = "";
 		try {
 			ok = snpSql.run();
@@ -108,8 +118,11 @@ public class SnpSql implements CommandLine {
 			t.printStackTrace();
 		}
 
-		// Report to server (usage statistics) 
+		// Report usage statistics 
 		if (log) LogStats.report(VERSION, ok, verbose, args, err, snpSql.reportValues());
+
+		// Stop server
+		hsql.stop();
 
 		return ok;
 	}

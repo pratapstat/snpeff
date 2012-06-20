@@ -1,0 +1,63 @@
+<!DOCTYPE hibernate-configuration SYSTEM
+	"http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+	<session-factory>
+		<!-- Connection properties -->
+		
+		<!--  MySql driver -->
+		<!-- 
+    	<property name="hibernate.connection.driver_class"> com.mysql.jdbc.Driver </property>
+    	<property name="hibernate.connection.url"> jdbc:mysql://localhost/cloudDnaBio</property>
+    	<property name="hibernate.connection.username"> root </property>
+        <property name="dialect">org.hibernate.dialect.MySQL5Dialect</property>
+    	-->
+	
+		<!--  HSQL driver -->
+		<property name="dialect">org.hibernate.dialect.HSQLDialect</property>
+		<property name="connection.driver_class">org.hsqldb.jdbcDriver</property>
+		<property name="connection.url">jdbc:hsqldb:hsql://localhost/zzz</property>
+		<property name="connection.username">sa</property>
+		<property name="connection.password"></property>
+	
+        <!-- Enable Hibernate's automatic session context management -->
+        <property name="current_session_context_class">thread</property>
+
+        <!-- Disable the second-level cache  -->
+        <property name="cache.provider_class">org.hibernate.cache.NoCacheProvider</property>
+
+        <!-- Echo all executed SQL to stdout -->
+        <!-- <property name="show_sql">true</property> -->
+
+        <!-- Drop and re-create the database schema on startup -->
+        <property name="hbm2ddl.auto">create</property > 
+		  
+		<!-- Database Pool Connection -->
+		<!-- 		  
+		<property name="dbcp.maxActive">50</property>
+		<property name="dbcp.maxIdle">5</property>
+		<property name="dbcp.maxWait">120000</property>
+		<property name="dbcp.whenExhaustedAction">1</property>
+		<property name="dbcp.testOnBorrow">true</property>
+		<property name="dbcp.testOnReturn">true</property>
+		<property name="dbcp.validationQuery">
+		    select 1
+		</property>
+		<property name="dbcp.ps.maxActive">0</property>
+		<property name="dbcp.ps.maxIdle">0</property>
+		<property name="dbcp.ps.maxWait">-1</property>
+		<property name="dbcp.ps.whenExhaustedAction">2</property>
+ 		-->
+        
+		<!-- List of XML mapping files -->
+		<mapping class="ca.mcgill.mcb.pcingola.snpSql.db.VcfEntryDb"/>		
+		<mapping class="ca.mcgill.mcb.pcingola.snpSql.db.Tuple"/>		
+		<!-- 		  
+		<mapping class="com.clouddnabio.shared.pojo.Analysis"/>		
+		<mapping class="com.clouddnabio.shared.pojo.FileInfo"/>		
+		<mapping class="com.clouddnabio.shared.pojo.SessionInfo"/>		
+		<mapping class="com.clouddnabio.shared.pojo.User"/>
+		-->		
+		
+	</session-factory>
+</hibernate-configuration>

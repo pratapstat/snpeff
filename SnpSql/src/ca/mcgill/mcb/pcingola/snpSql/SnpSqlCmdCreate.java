@@ -1,7 +1,11 @@
 package ca.mcgill.mcb.pcingola.snpSql;
 
+import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
 import ca.mcgill.mcb.pcingola.snpSql.db.HibernateUtil;
+import ca.mcgill.mcb.pcingola.snpSql.db.Tuple;
+import ca.mcgill.mcb.pcingola.snpSql.db.VcfEntryDb;
 import ca.mcgill.mcb.pcingola.util.Timer;
+import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 
 /**
  * Create a database using a VCF file
@@ -37,7 +41,27 @@ public class SnpSqlCmdCreate extends SnpSql {
 		boolean ok = false;
 		Timer.showStdErr("Creating database from file: '" + vcfFileName + "'");
 
+		// Connect to database
 		HibernateUtil.beginTransaction();
+
+		// Add info from VCF
+		VcfFileIterator vcfFile = new VcfFileIterator(vcfFileName);
+		for (VcfEntry ve : vcfFile) {
+			VcfEntryDb vdb = new VcfEntryDb(ve);
+			vdb.save();
+
+			String eff = ve.getInfo("EFF");
+			if (eff != null) {
+				System.out.println(eff);
+				Tuple teff = new Tuple("EFF", eff.substring(0, 30));
+				vdb.add(teff);
+				teff.save();
+			}
+
+		}
+
+		// Close connection
+		HibernateUtil.commit();
 		HibernateUtil.close();
 
 		Timer.showStdErr("Done.");

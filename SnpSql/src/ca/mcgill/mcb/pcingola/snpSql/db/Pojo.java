@@ -17,10 +17,10 @@ public abstract class Pojo<T extends Pojo> implements Serializable, Comparable<P
 
 	private static final long serialVersionUID = 1L;
 
-	Long id;
+	//	Long id;
 
 	public Pojo() {
-		id = null;
+		// id = null;
 	}
 
 	/**
@@ -134,7 +134,7 @@ public abstract class Pojo<T extends Pojo> implements Serializable, Comparable<P
 		return (Long) HibernateUtil.getCurrentSession().save(this);
 	}
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+	//	public void setId(Long id) {
+	//		this.id = id;
+	//	}
 }
