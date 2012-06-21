@@ -128,7 +128,8 @@ public class SnpSqlCmdCreate extends SnpSql {
 		// Sanity checks
 		if (vcfFileName == null) usage("Missing vcf file.");
 		database = Gpr.baseName(vcfFileName);
-		databasePath = Gpr.dirName(vcfFileName) + "/" + database;
+		String dir = Gpr.dirName(vcfFileName);
+		databasePath = (dir == null ? "" : dir + "/") + database;
 	}
 
 	@Override
