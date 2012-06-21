@@ -1,8 +1,12 @@
 package ca.mcgill.mcb.pcingola.snpSql;
 
+import ca.mcgill.mcb.pcingola.snpSql.db.DbUtil;
+import ca.mcgill.mcb.pcingola.util.Gpr;
+import ca.mcgill.mcb.pcingola.util.Timer;
+
 public class SnpSqlCmdSql extends SnpSql {
 
-	String database;
+	String vcfFileName;
 	String query;
 
 	@Override
@@ -16,19 +20,49 @@ public class SnpSqlCmdSql extends SnpSql {
 					verbose = true;
 				}
 			} else {
-				if (database == null) database = args[i];
+				if (vcfFileName == null) vcfFileName = args[i];
 				else if (query == null) query = args[i];
 			}
 		}
 
 		// Sanity checks
-		if (database == null) usage("Missing database name");
+		if (vcfFileName == null) usage("Missing vcf file.");
 		if (query == null) usage("Missing query");
+
+		setDatabseFomVcf(vcfFileName);
+	}
+
+	boolean query() {
+
+		Gpr.debug(query);
+		return true;
 	}
 
 	@Override
 	public boolean run() {
 		boolean ok = false;
+		if (verbose) Timer.showStdErr("Opening database '" + database + "', path '" + databasePath + "'");
+
+		// Create and start a new server
+		DbUtil.create(database, databasePath, false, verbose);
+
+		try {
+			// Connect to database
+			DbUtil.beginTransaction();
+
+			// Add data
+			ok = query();
+
+			// Close connection
+			DbUtil.commit();
+		} catch (Throwable t) {
+			DbUtil.rollback();
+		}
+
+		// Stop server
+		if (verbose) Timer.showStdErr("Closing database.");
+		DbUtil.get().stop();
+		if (verbose) Timer.showStdErr("Done.");
 		return ok;
 	}
 

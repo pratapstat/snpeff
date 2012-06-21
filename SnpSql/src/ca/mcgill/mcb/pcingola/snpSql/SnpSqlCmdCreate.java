@@ -9,7 +9,6 @@ import ca.mcgill.mcb.pcingola.snpSql.db.Entry;
 import ca.mcgill.mcb.pcingola.snpSql.db.Tuple;
 import ca.mcgill.mcb.pcingola.snpSql.db.TupleFloat;
 import ca.mcgill.mcb.pcingola.snpSql.db.TupleInt;
-import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.util.Timer;
 import ca.mcgill.mcb.pcingola.vcf.VcfEffect;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
@@ -24,9 +23,52 @@ public class SnpSqlCmdCreate extends SnpSql {
 
 	public static int FLUSH_EVERY = 100;
 
-	String databasePath;
-	String database;
 	String vcfFileName;
+
+	/**
+	 * Add info fields
+	 */
+	void addInfo(Entry entry, VcfEntry vcfEntry, Collection<VcfInfo> vcfInfos) {
+		for (VcfInfo vcfInfo : vcfInfos) {
+			if (!vcfInfo.getId().startsWith("EFF")) {
+				String name = vcfInfo.getId();
+				String value = vcfEntry.getInfo(name);
+
+				switch (vcfInfo.getVcfInfoType()) {
+				case STRING:
+				case CHARACTER:
+					if (value != null) {
+						Tuple tuple = new Tuple(name, value);
+						entry.add(tuple);
+						tuple.save();
+					}
+					break;
+				case INTEGER:
+					if (value != null) {
+						long valInt = vcfEntry.getInfoInt(name);
+						TupleInt tuple = new TupleInt(name, valInt);
+						entry.add(tuple);
+						tuple.save();
+					}
+					break;
+				case FLOAT:
+					if (value != null) {
+						double valFloat = vcfEntry.getInfoFloat(name);
+						TupleFloat tuple = new TupleFloat(name, valFloat);
+						entry.add(tuple);
+						tuple.save();
+					}
+					break;
+				case FLAG:
+					value = "true";
+					Tuple tuple = new Tuple(name, value);
+					entry.add(tuple);
+					tuple.save();
+					break;
+				}
+			}
+		}
+	}
 
 	/**
 	 * Add the whole VCF file to the database
@@ -46,63 +88,25 @@ public class SnpSqlCmdCreate extends SnpSql {
 			}
 
 			// Add entry
-			Entry vdb = new Entry(vcfEntry);
-			vdb.save();
+			Entry entry = new Entry(vcfEntry);
+			entry.save();
 
 			// Add effects
 			for (VcfEffect veff : vcfEntry.parseEffects()) {
 				Effect effect = new Effect(veff);
-				vdb.add(effect);
+				entry.add(effect);
 				effect.save();
 			}
 
-			// Add info fields
-			for (VcfInfo vcfInfo : vcfInfos) {
-				if (!vcfInfo.getId().startsWith("EFF")) {
-					String name = vcfInfo.getId();
-					String value = vcfEntry.getInfo(name);
-
-					switch (vcfInfo.getVcfInfoType()) {
-					case STRING:
-					case CHARACTER:
-						if (value != null) {
-							Tuple tuple = new Tuple(name, value);
-							vdb.add(tuple);
-							tuple.save();
-						}
-						break;
-					case INTEGER:
-						if (value != null) {
-							long valInt = vcfEntry.getInfoInt(name);
-							TupleInt tuple = new TupleInt(name, valInt);
-							vdb.add(tuple);
-							tuple.save();
-						}
-						break;
-					case FLOAT:
-						if (value != null) {
-							double valFloat = vcfEntry.getInfoFloat(name);
-							TupleFloat tuple = new TupleFloat(name, valFloat);
-							vdb.add(tuple);
-							tuple.save();
-						}
-						break;
-					case FLAG:
-						value = "true";
-						Tuple tuple = new Tuple(name, value);
-						vdb.add(tuple);
-						tuple.save();
-						break;
-					}
-				}
-			}
+			// Add info field
+			//addInfo(entry, vcfEntry, vcfInfos);
 
 			// Commit every now and then
 			count++;
 			if (count % FLUSH_EVERY == 0) {
 				DbUtil.getCurrentSession().flush();
 				DbUtil.getCurrentSession().clear();
-				Timer.showStdErr("Commit: " + count + "\t" + vdb);
+				Timer.showStdErr("Commit: " + count + "\t" + entry);
 			}
 		}
 
@@ -127,9 +131,8 @@ public class SnpSqlCmdCreate extends SnpSql {
 
 		// Sanity checks
 		if (vcfFileName == null) usage("Missing vcf file.");
-		database = Gpr.baseName(vcfFileName);
-		String dir = Gpr.dirName(vcfFileName);
-		databasePath = (dir == null ? "" : dir + "/") + database;
+
+		setDatabseFomVcf(vcfFileName);
 	}
 
 	@Override
@@ -137,7 +140,8 @@ public class SnpSqlCmdCreate extends SnpSql {
 		boolean ok = false;
 
 		// Create and start a new server
-		DbUtil.create(database, databasePath, verbose);
+		if (verbose) Timer.showStdErr("Creating database '" + database + "', path '" + databasePath + "'");
+		DbUtil.create(database, databasePath, true, verbose);
 
 		try {
 			// Connect to database
@@ -153,7 +157,9 @@ public class SnpSqlCmdCreate extends SnpSql {
 		}
 
 		// Stop server
+		if (verbose) Timer.showStdErr("Closing database.");
 		DbUtil.get().stop();
+		if (verbose) Timer.showStdErr("Done.");
 		return ok;
 	}
 

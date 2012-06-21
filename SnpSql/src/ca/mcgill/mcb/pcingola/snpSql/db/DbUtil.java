@@ -34,6 +34,7 @@ public class DbUtil {
 	String dbName;
 	String dbPath;
 	boolean debug;
+	boolean create;
 	SessionFactory sessionFactory;
 	ServiceRegistry serviceRegistry;
 
@@ -74,8 +75,8 @@ public class DbUtil {
 	 * @param dbPath : Path to database file
 	 * @param debug : Use debug mode
 	 */
-	public static DbUtil create(String addr, int port, String dbName, String dbPath, boolean debug) {
-		dbUtil = new DbUtil(addr, port, dbName, dbPath, debug);
+	public static DbUtil create(String addr, int port, String dbName, String dbPath, boolean create, boolean debug) {
+		dbUtil = new DbUtil(addr, port, dbName, dbPath, create, debug);
 		return get();
 	}
 
@@ -85,8 +86,8 @@ public class DbUtil {
 	 * @param dbPath : Path to database file
 	 * @param debug : Use debug mode
 	 */
-	public static DbUtil create(String dbName, String dbPath, boolean debug) {
-		dbUtil = new DbUtil(null, -1, dbName, dbPath, debug);
+	public static DbUtil create(String dbName, String dbPath, boolean create, boolean debug) {
+		dbUtil = new DbUtil(null, -1, dbName, dbPath, create, debug);
 		return get();
 	}
 
@@ -180,12 +181,13 @@ public class DbUtil {
 		getSessionFactory().close();
 	}
 
-	private DbUtil(String addr, int port, String dbName, String dbPath, boolean debug) {
+	private DbUtil(String addr, int port, String dbName, String dbPath, boolean create, boolean debug) {
 		this.addr = addr;
 		this.port = port;
 		this.dbName = dbName;
 		this.dbPath = dbPath;
 		this.debug = debug;
+		this.create = create;
 
 		dbUtil = this;
 		init();
@@ -208,6 +210,7 @@ public class DbUtil {
 			Configuration configuration = new Configuration();
 			configuration.configure();
 			configuration.setProperty("hibernate.connection.url", JDBC + dbPath); // Set database URL here
+			if (create) configuration.setProperty("hibernate.hbm2ddl.auto", "create"); // Create database
 
 			// Create 
 			serviceRegistry = new ServiceRegistryBuilder().applySettings(configuration.getProperties()).buildServiceRegistry();

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import ca.mcgill.mcb.pcingola.Pcingola;
 import ca.mcgill.mcb.pcingola.logStatsServer.LogStats;
 import ca.mcgill.mcb.pcingola.snpEffect.commandLine.CommandLine;
+import ca.mcgill.mcb.pcingola.util.Gpr;
 
 /**
  * SNP SQL
@@ -26,6 +27,8 @@ public class SnpSql implements CommandLine {
 	protected String[] shiftArgs;
 	protected boolean verbose = false; // Be verbose
 	protected boolean log = true; // Log to server (statistics)
+	protected String databasePath;
+	protected String database;
 
 	/**
 	 * @param args
@@ -50,7 +53,7 @@ public class SnpSql implements CommandLine {
 
 		// Commands
 		if (args[0].equalsIgnoreCase("create") //
-				|| args[0].equalsIgnoreCase("sql") //
+				|| args[0].equalsIgnoreCase("query") //
 		) {
 			command = args[0].toLowerCase();
 
@@ -64,7 +67,7 @@ public class SnpSql implements CommandLine {
 			}
 			shiftArgs = argsList.toArray(new String[0]);
 		} else {
-			command = "sql"; // Default command is 'sql'
+			command = "query"; // Default command is 'query'
 			shiftArgs = args;
 		}
 	}
@@ -92,7 +95,7 @@ public class SnpSql implements CommandLine {
 			//---
 			snpSql = new SnpSqlCmdCreate();
 			snpSql.parseArgs(shiftArgs);
-		} else if (command.equals("sql")) {
+		} else if (command.equals("query")) {
 			//---
 			// Query database
 			//---
@@ -120,6 +123,12 @@ public class SnpSql implements CommandLine {
 		}
 
 		return ok;
+	}
+
+	public void setDatabseFomVcf(String vcfFile) {
+		database = Gpr.baseName(vcfFile);
+		String dir = Gpr.dirName(vcfFile);
+		databasePath = (dir == null ? "" : dir + "/") + database;
 	}
 
 	@Override
