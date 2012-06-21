@@ -46,7 +46,7 @@ public class Entry extends Pojo<Entry> {
 	 * @return
 	 */
 	public static Entry get(long id) {
-		return (Entry) HibernateUtil.getCurrentSession().get(Entry.class, id);
+		return (Entry) DbUtil.getCurrentSession().get(Entry.class, id);
 	}
 
 	public Entry() {

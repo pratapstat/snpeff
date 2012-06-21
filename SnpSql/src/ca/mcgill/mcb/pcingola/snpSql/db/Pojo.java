@@ -87,7 +87,7 @@ public abstract class Pojo<T extends Pojo> implements Serializable, Comparable<P
 	 * Delete from database and delete dependent objects too (if needed) 
 	 */
 	public void delete() {
-		Session s = HibernateUtil.getCurrentSession();
+		Session s = DbUtil.getCurrentSession();
 		s.delete(this);
 	}
 
@@ -102,7 +102,7 @@ public abstract class Pojo<T extends Pojo> implements Serializable, Comparable<P
 	 * List all objects
 	 */
 	public List findAll() {
-		Criteria criteria = HibernateUtil.getCurrentSession().createCriteria(this.getClass());
+		Criteria criteria = DbUtil.getCurrentSession().createCriteria(this.getClass());
 		List lr = criteria.list();
 		Collections.sort(lr);
 		return lr;
@@ -131,7 +131,7 @@ public abstract class Pojo<T extends Pojo> implements Serializable, Comparable<P
 	 * Save to database
 	 */
 	public Long save() {
-		return (Long) HibernateUtil.getCurrentSession().save(this);
+		return (Long) DbUtil.getCurrentSession().save(this);
 	}
 
 	//	public void setId(Long id) {

@@ -3,12 +3,13 @@ package ca.mcgill.mcb.pcingola.snpSql;
 import java.util.Collection;
 
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
+import ca.mcgill.mcb.pcingola.snpSql.db.DbUtil;
 import ca.mcgill.mcb.pcingola.snpSql.db.Effect;
 import ca.mcgill.mcb.pcingola.snpSql.db.Entry;
-import ca.mcgill.mcb.pcingola.snpSql.db.HibernateUtil;
 import ca.mcgill.mcb.pcingola.snpSql.db.Tuple;
 import ca.mcgill.mcb.pcingola.snpSql.db.TupleFloat;
 import ca.mcgill.mcb.pcingola.snpSql.db.TupleInt;
+import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.util.Timer;
 import ca.mcgill.mcb.pcingola.vcf.VcfEffect;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
@@ -21,37 +22,19 @@ import ca.mcgill.mcb.pcingola.vcf.VcfInfo;
  */
 public class SnpSqlCmdCreate extends SnpSql {
 
-	public static int COMMIT_EVERY = 100;
+	public static int FLUSH_EVERY = 100;
 
+	String databasePath;
 	String database;
 	String vcfFileName;
 
-	@Override
-	public void parseArgs(String[] args) {
-		this.args = args;
-		for (int i = 0; i < args.length; i++) {
-
-			// Argument starts with '-'?
-			if (args[i].startsWith("-")) {
-				if (args[i].equals("-v") || args[i].equalsIgnoreCase("-verbose")) {
-					verbose = true;
-				}
-			} else {
-				if (vcfFileName == null) vcfFileName = args[i];
-			}
-		}
-
-		// Sanity checks
-		if (vcfFileName == null) usage("Missing vcf file.");
-	}
-
-	@Override
-	public boolean run() {
+	/**
+	 * Add the whole VCF file to the database
+	 * @return
+	 */
+	boolean addVcfFile() {
 		boolean ok = false;
-		Timer.showStdErr("Creating database from file: '" + vcfFileName + "'");
-
-		// Connect to database
-		HibernateUtil.beginTransaction();
+		Timer.showStdErr("Reading data from file: '" + vcfFileName + "', database name '" + database + "', databse path: '" + databasePath + "'");
 
 		// Add info from VCF
 		VcfFileIterator vcfFile = new VcfFileIterator(vcfFileName);
@@ -116,18 +99,60 @@ public class SnpSqlCmdCreate extends SnpSql {
 
 			// Commit every now and then
 			count++;
-			if (count % COMMIT_EVERY == 0) {
+			if (count % FLUSH_EVERY == 0) {
+				DbUtil.getCurrentSession().flush();
+				DbUtil.getCurrentSession().clear();
 				Timer.showStdErr("Commit: " + count + "\t" + vdb);
-				HibernateUtil.commit();
-				HibernateUtil.beginTransaction();
 			}
 		}
 
-		// Close connection
-		HibernateUtil.commit();
-		HibernateUtil.close();
-
 		Timer.showStdErr("Done.");
+		return ok;
+	}
+
+	@Override
+	public void parseArgs(String[] args) {
+		this.args = args;
+		for (int i = 0; i < args.length; i++) {
+
+			// Argument starts with '-'?
+			if (args[i].startsWith("-")) {
+				if (args[i].equals("-v") || args[i].equalsIgnoreCase("-verbose")) {
+					verbose = true;
+				}
+			} else {
+				if (vcfFileName == null) vcfFileName = args[i];
+			}
+		}
+
+		// Sanity checks
+		if (vcfFileName == null) usage("Missing vcf file.");
+		database = Gpr.baseName(vcfFileName);
+		databasePath = Gpr.dirName(vcfFileName) + "/" + database;
+	}
+
+	@Override
+	public boolean run() {
+		boolean ok = false;
+
+		// Create and start a new server
+		DbUtil.create(database, databasePath, verbose);
+
+		try {
+			// Connect to database
+			DbUtil.beginTransaction();
+
+			// Add data
+			ok = addVcfFile();
+
+			// Close connection
+			DbUtil.commit();
+		} catch (Throwable t) {
+			DbUtil.rollback();
+		}
+
+		// Stop server
+		DbUtil.get().stop();
 		return ok;
 	}
 

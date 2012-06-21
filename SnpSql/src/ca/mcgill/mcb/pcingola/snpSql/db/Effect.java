@@ -39,7 +39,7 @@ public class Effect extends Pojo<Effect> {
 	 * @return
 	 */
 	public static Effect get(long id) {
-		return (Effect) HibernateUtil.getCurrentSession().get(Effect.class, id);
+		return (Effect) DbUtil.getCurrentSession().get(Effect.class, id);
 	}
 
 	public Effect() {

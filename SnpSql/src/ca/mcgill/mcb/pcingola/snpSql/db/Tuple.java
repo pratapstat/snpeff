@@ -28,7 +28,7 @@ public class Tuple extends Pojo<Tuple> {
 	 * @return
 	 */
 	public static Tuple get(long id) {
-		return (Tuple) HibernateUtil.getCurrentSession().get(Tuple.class, id);
+		return (Tuple) DbUtil.getCurrentSession().get(Tuple.class, id);
 	}
 
 	public Tuple() {

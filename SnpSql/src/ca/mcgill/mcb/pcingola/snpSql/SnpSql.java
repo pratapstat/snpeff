@@ -6,8 +6,6 @@ import java.util.HashMap;
 import ca.mcgill.mcb.pcingola.Pcingola;
 import ca.mcgill.mcb.pcingola.logStatsServer.LogStats;
 import ca.mcgill.mcb.pcingola.snpEffect.commandLine.CommandLine;
-import ca.mcgill.mcb.pcingola.snpSql.db.HsqlDbLocalServer;
-import ca.mcgill.mcb.pcingola.util.Gpr;
 
 /**
  * SNP SQL
@@ -103,26 +101,23 @@ public class SnpSql implements CommandLine {
 		} else throw new RuntimeException("Unknown command '" + command + "'");
 
 		//---
-		// Run 
+		// Run command 
 		//---
-
-		// Run server
-		HsqlDbLocalServer hsql = new HsqlDbLocalServer("zzz", Gpr.HOME + "/snpSql/zzz", verbose);
-
-		// Run command
-		String err = "";
 		try {
-			ok = snpSql.run();
+			// Run command
+			String err = "";
+			try {
+				ok = snpSql.run();
+			} catch (Throwable t) {
+				err = t.getMessage();
+				t.printStackTrace();
+			}
+
+			// Report usage statistics 
+			if (log) LogStats.report(VERSION, ok, verbose, args, err, snpSql.reportValues());
+
 		} catch (Throwable t) {
-			err = t.getMessage();
-			t.printStackTrace();
 		}
-
-		// Report usage statistics 
-		if (log) LogStats.report(VERSION, ok, verbose, args, err, snpSql.reportValues());
-
-		// Stop server
-		hsql.stop();
 
 		return ok;
 	}

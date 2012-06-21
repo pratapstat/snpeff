@@ -28,7 +28,7 @@ public class TupleFloat extends Pojo<TupleFloat> {
 	 * @return
 	 */
 	public static TupleFloat get(long id) {
-		return (TupleFloat) HibernateUtil.getCurrentSession().get(TupleFloat.class, id);
+		return (TupleFloat) DbUtil.getCurrentSession().get(TupleFloat.class, id);
 	}
 
 	public TupleFloat() {

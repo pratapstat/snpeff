@@ -28,7 +28,7 @@ public class TupleInt extends Pojo<TupleInt> {
 	 * @return
 	 */
 	public static TupleInt get(long id) {
-		return (TupleInt) HibernateUtil.getCurrentSession().get(TupleInt.class, id);
+		return (TupleInt) DbUtil.getCurrentSession().get(TupleInt.class, id);
 	}
 
 	public TupleInt() {
