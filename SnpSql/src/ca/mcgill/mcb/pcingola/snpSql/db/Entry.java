@@ -12,7 +12,7 @@ import javax.persistence.OneToMany;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 
 @Entity
-public class VcfEntryDb extends Pojo<VcfEntryDb> {
+public class Entry extends Pojo<Entry> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -27,8 +27,17 @@ public class VcfEntryDb extends Pojo<VcfEntryDb> {
 	double qual;
 	String filter;
 
-	@OneToMany(mappedBy = "vcfEntryDb")
+	@OneToMany(mappedBy = "entry")
 	Set<Tuple> tuples;
+
+	@OneToMany(mappedBy = "entry")
+	Set<TupleInt> tuplesInt;
+
+	@OneToMany(mappedBy = "entry")
+	Set<TupleFloat> tuplesDouble;
+
+	@OneToMany(mappedBy = "entry")
+	Set<Effect> effects;
 
 	/**
 	 * Load (do it right now, not lazy)
@@ -36,16 +45,19 @@ public class VcfEntryDb extends Pojo<VcfEntryDb> {
 	 * @param id
 	 * @return
 	 */
-	public static VcfEntryDb get(long id) {
-		return (VcfEntryDb) HibernateUtil.getCurrentSession().get(VcfEntryDb.class, id);
+	public static Entry get(long id) {
+		return (Entry) HibernateUtil.getCurrentSession().get(Entry.class, id);
 	}
 
-	public VcfEntryDb() {
+	public Entry() {
 		id = null;
 		tuples = new HashSet<Tuple>();
+		tuplesInt = new HashSet<TupleInt>();
+		tuplesDouble = new HashSet<TupleFloat>();
+		effects = new HashSet<Effect>();
 	}
 
-	public VcfEntryDb(VcfEntry vcfEntry) {
+	public Entry(VcfEntry vcfEntry) {
 		chr = vcfEntry.getChromosomeName();
 		pos = vcfEntry.getStart();
 		vcfId = vcfEntry.getId();
@@ -54,6 +66,14 @@ public class VcfEntryDb extends Pojo<VcfEntryDb> {
 		qual = vcfEntry.getQuality();
 		filter = vcfEntry.getFilterPass();
 		tuples = new HashSet<Tuple>();
+		tuplesInt = new HashSet<TupleInt>();
+		tuplesDouble = new HashSet<TupleFloat>();
+		effects = new HashSet<Effect>();
+	}
+
+	public void add(Effect e) {
+		if (!effects.contains(e)) effects.add(e);
+		e.setVcfEntryDb(this);
 	}
 
 	/**
@@ -62,6 +82,24 @@ public class VcfEntryDb extends Pojo<VcfEntryDb> {
 	 */
 	public void add(Tuple t) {
 		if (!tuples.contains(t)) tuples.add(t);
+		t.setVcfEntryDb(this);
+	}
+
+	/**
+	 * Add a tupleDouble
+	 * @param t
+	 */
+	public void add(TupleFloat t) {
+		if (!tuplesDouble.contains(t)) tuplesDouble.add(t);
+		t.setVcfEntryDb(this);
+	}
+
+	/**
+	 * Add a tupleInt
+	 * @param t
+	 */
+	public void add(TupleInt t) {
+		if (!tuplesInt.contains(t)) tuplesInt.add(t);
 		t.setVcfEntryDb(this);
 	}
 
@@ -76,6 +114,10 @@ public class VcfEntryDb extends Pojo<VcfEntryDb> {
 
 	public String getChr() {
 		return chr;
+	}
+
+	public Set<Effect> getEffects() {
+		return effects;
 	}
 
 	public String getFilter() {
@@ -103,6 +145,14 @@ public class VcfEntryDb extends Pojo<VcfEntryDb> {
 		return tuples;
 	}
 
+	public Set<TupleFloat> getTuplesDouble() {
+		return tuplesDouble;
+	}
+
+	public Set<TupleInt> getTuplesInt() {
+		return tuplesInt;
+	}
+
 	public String getVcfId() {
 		return vcfId;
 	}
@@ -113,6 +163,10 @@ public class VcfEntryDb extends Pojo<VcfEntryDb> {
 
 	public void setChr(String chr) {
 		this.chr = chr;
+	}
+
+	public void setEffects(Set<Effect> effects) {
+		this.effects = effects;
 	}
 
 	public void setFilter(String filter) {
@@ -137,6 +191,14 @@ public class VcfEntryDb extends Pojo<VcfEntryDb> {
 
 	public void setTuples(Set<Tuple> tuples) {
 		this.tuples = tuples;
+	}
+
+	public void setTuplesDouble(Set<TupleFloat> tuplesDouble) {
+		this.tuplesDouble = tuplesDouble;
+	}
+
+	public void setTuplesInt(Set<TupleInt> tuplesInt) {
+		this.tuplesInt = tuplesInt;
 	}
 
 	public void setVcfId(String vcfId) {

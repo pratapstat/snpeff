@@ -7,7 +7,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class Tuple extends Pojo<Tuple> {
+public class TupleInt extends Pojo<TupleInt> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -16,7 +16,7 @@ public class Tuple extends Pojo<Tuple> {
 	Long id;
 
 	String name;
-	String value;
+	long value;
 
 	@ManyToOne
 	Entry entry;
@@ -27,22 +27,22 @@ public class Tuple extends Pojo<Tuple> {
 	 * @param id
 	 * @return
 	 */
-	public static Tuple get(long id) {
-		return (Tuple) HibernateUtil.getCurrentSession().get(Tuple.class, id);
+	public static TupleInt get(long id) {
+		return (TupleInt) HibernateUtil.getCurrentSession().get(TupleInt.class, id);
 	}
 
-	public Tuple() {
+	public TupleInt() {
 		id = null;
 	}
 
-	public Tuple(String name, String value) {
+	public TupleInt(String name, long value) {
 		this.name = name;
 		this.value = value;
 	}
 
 	@Override
 	public void copySimpleValues(Pojo c) {
-		Tuple t = (Tuple) c;
+		TupleInt t = (TupleInt) c;
 		name = t.name;
 		value = t.value;
 	}
@@ -56,12 +56,12 @@ public class Tuple extends Pojo<Tuple> {
 		return name;
 	}
 
-	public String getValue() {
+	public long getValue() {
 		return value;
 	}
 
 	public String getValueStr() {
-		return value;
+		return value + "";
 	}
 
 	public Entry getVcfEntryDb() {
@@ -76,7 +76,7 @@ public class Tuple extends Pojo<Tuple> {
 		this.name = name;
 	}
 
-	public void setValue(String value) {
+	public void setValue(long value) {
 		this.value = value;
 	}
 
@@ -86,6 +86,6 @@ public class Tuple extends Pojo<Tuple> {
 
 	@Override
 	public String toString() {
-		return "Tuple[" + id + "] :\t" + name + " = " + value;
+		return "TupleInt[" + id + "] :\t" + name + " = " + value;
 	}
 }

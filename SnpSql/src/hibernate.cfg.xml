@@ -49,15 +49,12 @@
 		<property name="dbcp.ps.whenExhaustedAction">2</property>
  		-->
         
-		<!-- List of XML mapping files -->
-		<mapping class="ca.mcgill.mcb.pcingola.snpSql.db.VcfEntryDb"/>		
+		<!-- List mappings -->
+		<mapping class="ca.mcgill.mcb.pcingola.snpSql.db.Entry"/>		
+		<mapping class="ca.mcgill.mcb.pcingola.snpSql.db.Effect"/>		
 		<mapping class="ca.mcgill.mcb.pcingola.snpSql.db.Tuple"/>		
-		<!-- 		  
-		<mapping class="com.clouddnabio.shared.pojo.Analysis"/>		
-		<mapping class="com.clouddnabio.shared.pojo.FileInfo"/>		
-		<mapping class="com.clouddnabio.shared.pojo.SessionInfo"/>		
-		<mapping class="com.clouddnabio.shared.pojo.User"/>
-		-->		
+		<mapping class="ca.mcgill.mcb.pcingola.snpSql.db.TupleInt"/>		
+		<mapping class="ca.mcgill.mcb.pcingola.snpSql.db.TupleFloat"/>		
 		
 	</session-factory>
 </hibernate-configuration>
