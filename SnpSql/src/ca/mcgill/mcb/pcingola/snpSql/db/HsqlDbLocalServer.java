@@ -3,6 +3,7 @@ package ca.mcgill.mcb.pcingola.snpSql.db;
 import java.io.PrintWriter;
 
 import org.hsqldb.Server;
+import org.hsqldb.persist.HsqlProperties;
 
 /**
  * HSQLDB utility class
@@ -56,6 +57,16 @@ public class HsqlDbLocalServer {
 		server.setAddress(addr);
 		if (port > 0) server.setPort(port); // Use non-default port?
 
+		// Use cached tables (instead of default memory ones)
+		HsqlProperties props = new HsqlProperties();
+		props.setProperty("hsqldb.default_table_type", "cached");
+		try {
+			server.setProperties(props);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
+		// Start server
 		server.start();
 	}
 

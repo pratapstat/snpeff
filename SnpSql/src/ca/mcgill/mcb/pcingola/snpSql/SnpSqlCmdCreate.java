@@ -21,6 +21,8 @@ import ca.mcgill.mcb.pcingola.vcf.VcfInfo;
  */
 public class SnpSqlCmdCreate extends SnpSql {
 
+	public static int COMMIT_EVERY = 100;
+
 	String database;
 	String vcfFileName;
 
@@ -54,6 +56,7 @@ public class SnpSqlCmdCreate extends SnpSql {
 		// Add info from VCF
 		VcfFileIterator vcfFile = new VcfFileIterator(vcfFileName);
 		Collection<VcfInfo> vcfInfos = null;
+		int count = 1;
 		for (VcfEntry vcfEntry : vcfFile) {
 			if (vcfInfos == null) {
 				vcfInfos = vcfFile.getVcfInfo();
@@ -62,11 +65,9 @@ public class SnpSqlCmdCreate extends SnpSql {
 			// Add entry
 			Entry vdb = new Entry(vcfEntry);
 			vdb.save();
-			System.out.println(vdb);
 
 			// Add effects
 			for (VcfEffect veff : vcfEntry.parseEffects()) {
-				System.out.println("\t" + veff);
 				Effect effect = new Effect(veff);
 				vdb.add(effect);
 				effect.save();
@@ -85,7 +86,6 @@ public class SnpSqlCmdCreate extends SnpSql {
 							Tuple tuple = new Tuple(name, value);
 							vdb.add(tuple);
 							tuple.save();
-							System.out.println("\t" + tuple);
 						}
 						break;
 					case INTEGER:
@@ -94,7 +94,6 @@ public class SnpSqlCmdCreate extends SnpSql {
 							TupleInt tuple = new TupleInt(name, valInt);
 							vdb.add(tuple);
 							tuple.save();
-							System.out.println("\t" + tuple);
 						}
 						break;
 					case FLOAT:
@@ -103,7 +102,6 @@ public class SnpSqlCmdCreate extends SnpSql {
 							TupleFloat tuple = new TupleFloat(name, valFloat);
 							vdb.add(tuple);
 							tuple.save();
-							System.out.println("\t" + tuple);
 						}
 						break;
 					case FLAG:
@@ -111,10 +109,17 @@ public class SnpSqlCmdCreate extends SnpSql {
 						Tuple tuple = new Tuple(name, value);
 						vdb.add(tuple);
 						tuple.save();
-						System.out.println("\t" + tuple);
 						break;
 					}
 				}
+			}
+
+			// Commit every now and then
+			count++;
+			if (count % COMMIT_EVERY == 0) {
+				Timer.showStdErr("Commit: " + count + "\t" + vdb);
+				HibernateUtil.commit();
+				HibernateUtil.beginTransaction();
 			}
 		}
 

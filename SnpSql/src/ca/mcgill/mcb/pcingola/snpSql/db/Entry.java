@@ -207,6 +207,6 @@ public class Entry extends Pojo<Entry> {
 
 	@Override
 	public String toString() {
-		return "Position[" + id + "]=" + chr + ":" + pos + "\t" + vcfId + "\t" + ref + "\t" + alt + "\t" + filter;
+		return "Entry[" + id + "]=" + chr + ":" + pos + "\t" + vcfId + "\t" + ref + "\t" + alt + "\t" + filter;
 	}
 }
