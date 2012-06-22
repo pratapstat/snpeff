@@ -28,15 +28,17 @@ public class DbUtil {
 
 	private static DbUtil dbUtil;
 
-	Server server;
-	String addr;
-	int port;
+	boolean debug = false;
+	boolean create = false;
+	boolean cached = true;
+	Server server; // HSQLDB dataabse server process
+	String addr; // Connection IP address
+	int port; // Connection Port
 	String dbName;
-	String dbPath;
-	boolean debug;
-	boolean create;
-	SessionFactory sessionFactory;
-	ServiceRegistry serviceRegistry;
+	String dbPath; // Path to data
+	Connection connection; // Direct connection to server
+	SessionFactory sessionFactory; // Hibernate session
+	ServiceRegistry serviceRegistry; // Hibernate session
 
 	/**
 	 * Begin a database transaction
@@ -75,8 +77,8 @@ public class DbUtil {
 	 * @param dbPath : Path to database file
 	 * @param debug : Use debug mode
 	 */
-	public static DbUtil create(String addr, int port, String dbName, String dbPath, boolean create, boolean debug) {
-		dbUtil = new DbUtil(addr, port, dbName, dbPath, create, debug);
+	public static DbUtil create(String addr, int port, String dbName, String dbPath, boolean create, boolean cached, boolean debug) {
+		dbUtil = new DbUtil(addr, port, dbName, dbPath, create, cached, debug);
 		return get();
 	}
 
@@ -86,8 +88,8 @@ public class DbUtil {
 	 * @param dbPath : Path to database file
 	 * @param debug : Use debug mode
 	 */
-	public static DbUtil create(String dbName, String dbPath, boolean create, boolean debug) {
-		dbUtil = new DbUtil(null, -1, dbName, dbPath, create, debug);
+	public static DbUtil create(String dbName, String dbPath, boolean create, boolean cached, boolean debug) {
+		dbUtil = new DbUtil(null, -1, dbName, dbPath, create, cached, debug);
 		return get();
 	}
 
@@ -181,16 +183,21 @@ public class DbUtil {
 		getSessionFactory().close();
 	}
 
-	private DbUtil(String addr, int port, String dbName, String dbPath, boolean create, boolean debug) {
+	private DbUtil(String addr, int port, String dbName, String dbPath, boolean create, boolean cached, boolean debug) {
 		this.addr = addr;
 		this.port = port;
 		this.dbName = dbName;
 		this.dbPath = dbPath;
-		this.debug = debug;
 		this.create = create;
+		this.cached = cached;
+		this.debug = debug;
 
 		dbUtil = this;
 		init();
+	}
+
+	public Connection getConnection() {
+		return connection;
 	}
 
 	/**
@@ -199,6 +206,28 @@ public class DbUtil {
 	public void init() {
 		initServer();
 		initHibernate();
+	}
+
+	/**
+	 * Initialize connection and set some server defaults
+	 */
+	void initConnection() {
+		try {
+			//---
+			// Connect to server
+			//---
+			connection = DriverManager.getConnection("jdbc:hsqldb:file:" + dbPath, "SA", "");
+
+			//---
+			// Set default tables as cached (otherwise it is memory and all info is lost after server is stopped)
+			//---
+			if (cached) {
+				connection.createStatement().executeUpdate("SET DATABASE DEFAULT TABLE TYPE CACHED;");
+				connection.createStatement().executeUpdate("SET FILES LOG FALSE");
+			}
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**
@@ -244,24 +273,7 @@ public class DbUtil {
 		server.start();
 
 		// Set some server defaults
-		serverSetDefaults();
-	}
-
-	/**
-	 * Set server defaults
-	 */
-	void serverSetDefaults() {
-		try {
-			// Connect to server
-			// Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql:" + dbName, "SA", "");
-			Connection con = DriverManager.getConnection("jdbc:hsqldb:file:" + dbPath, "SA", "");
-
-			// Set default tables as cached (otherwise it is memory and all info is lost after server is stopped)
-			con.createStatement().executeUpdate("SET DATABASE DEFAULT TABLE TYPE CACHED;");
-			con.createStatement().executeUpdate("SET FILES LOG FALSE");
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		initConnection();
 	}
 
 	/**

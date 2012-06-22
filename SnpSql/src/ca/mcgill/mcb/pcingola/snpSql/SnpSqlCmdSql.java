@@ -44,7 +44,7 @@ public class SnpSqlCmdSql extends SnpSql {
 		if (verbose) Timer.showStdErr("Opening database '" + database + "', path '" + databasePath + "'");
 
 		// Create and start a new server
-		DbUtil.create(database, databasePath, false, verbose);
+		DbUtil.create(database, databasePath, false, true, verbose);
 
 		try {
 			// Connect to database

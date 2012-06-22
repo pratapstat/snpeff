@@ -1,5 +1,8 @@
 package ca.mcgill.mcb.pcingola.snpSql;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Collection;
 
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
@@ -9,6 +12,7 @@ import ca.mcgill.mcb.pcingola.snpSql.db.Entry;
 import ca.mcgill.mcb.pcingola.snpSql.db.Tuple;
 import ca.mcgill.mcb.pcingola.snpSql.db.TupleFloat;
 import ca.mcgill.mcb.pcingola.snpSql.db.TupleInt;
+import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.util.Timer;
 import ca.mcgill.mcb.pcingola.vcf.VcfEffect;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
@@ -21,9 +25,70 @@ import ca.mcgill.mcb.pcingola.vcf.VcfInfo;
  */
 public class SnpSqlCmdCreate extends SnpSql {
 
-	public static int FLUSH_EVERY = 100;
+	public static boolean debug = false;
+	public static int BATCH_SIZE = 100;
+	public static int SHOW_EVERY = 100 * BATCH_SIZE;
 
+	long entryId = 0, effectId = 0;
 	String vcfFileName;
+	PreparedStatement pstmtEntry, pstmtEff;
+
+	/**
+	 * Add VCF effect
+	 * @param vcfEffect
+	 */
+	void addEffect(VcfEffect veff) {
+		if (debug) Gpr.debug("Add Effect: " + veff);
+
+		// Prepapre statement
+		try {
+			Effect eff = new Effect(veff);
+
+			pstmtEff.setLong(1, effectId);
+			pstmtEff.setString(2, eff.getEffect());
+			pstmtEff.setString(3, eff.getImpact());
+			pstmtEff.setString(4, eff.getFunClass());
+			pstmtEff.setString(5, eff.getCodon());
+			pstmtEff.setString(6, eff.getAa());
+			pstmtEff.setInt(7, eff.getAaLen());
+			pstmtEff.setString(8, eff.getGene());
+			pstmtEff.setString(9, eff.getBioType());
+			pstmtEff.setString(10, eff.getCoding());
+			pstmtEff.setString(11, eff.getTranscriptId());
+			pstmtEff.setString(12, eff.getExonId());
+
+			pstmtEff.addBatch();
+			effectId++;
+		} catch (SQLException e) {
+			throw new RuntimeException("Error trying to insert Effect\n\tRecord number " + effectId + "\n\rEffect:\t" + veff, e);
+		}
+	}
+
+	/**
+	 * Add VCF entry
+	 * @param id
+	 * @param vcfEntry
+	 */
+	void addEntry(VcfEntry vcfEntry) {
+		if (debug) Gpr.debug("Add Entry: " + vcfEntry);
+
+		// Prepapre statement
+		try {
+			pstmtEntry.setLong(1, entryId);
+			pstmtEntry.setString(2, vcfEntry.getChromosomeName());
+			pstmtEntry.setInt(3, vcfEntry.getStart());
+			pstmtEntry.setString(4, vcfEntry.getId());
+			pstmtEntry.setString(5, vcfEntry.getRef());
+			pstmtEntry.setString(6, vcfEntry.getAltsStr());
+			pstmtEntry.setDouble(7, vcfEntry.getQuality());
+			pstmtEntry.setString(8, vcfEntry.getFilterPass());
+
+			entryId++;
+			pstmtEntry.addBatch();
+		} catch (SQLException e) {
+			throw new RuntimeException("Error trying to insert Entry.\n\tRecord number " + entryId + "\n\tVcfEntry:\t" + vcfEntry, e);
+		}
+	}
 
 	/**
 	 * Add info fields
@@ -78,36 +143,67 @@ public class SnpSqlCmdCreate extends SnpSql {
 		boolean ok = false;
 		Timer.showStdErr("Reading data from file: '" + vcfFileName + "', database name '" + database + "', databse path: '" + databasePath + "'");
 
-		// Add info from VCF
+		//---
+		// Prepapre statements
+		//---
+		Connection con = DbUtil.get().getConnection();
+		prepareStetements(con);
+
+		//---
+		// Parse VCF file and add to database
+		//---
 		VcfFileIterator vcfFile = new VcfFileIterator(vcfFileName);
 		Collection<VcfInfo> vcfInfos = null;
-		int count = 1;
+		Timer t = new Timer();
+		boolean batchPrepapred = false;
 		for (VcfEntry vcfEntry : vcfFile) {
-			if (vcfInfos == null) {
-				vcfInfos = vcfFile.getVcfInfo();
-			}
+			if (debug) Gpr.debug(vcfEntry);
+			if (vcfInfos == null) vcfInfos = vcfFile.getVcfInfo();
 
-			// Add entry
-			Entry entry = new Entry(vcfEntry);
-			entry.save();
+			// Add VcfEntry
+			addEntry(vcfEntry);
 
 			// Add effects
-			for (VcfEffect veff : vcfEntry.parseEffects()) {
-				Effect effect = new Effect(veff);
-				entry.add(effect);
-				effect.save();
+			for (VcfEffect veff : vcfEntry.parseEffects())
+				addEffect(veff);
+
+			batchPrepapred = true;
+
+			//---
+			// Send batch
+			//---
+			try {
+				if (entryId % BATCH_SIZE == 0) {
+					// Timer.showStdErr("Batch:" + id);
+					pstmtEntry.executeBatch();
+					pstmtEff.executeBatch();
+					batchPrepapred = false;
+				}
+			} catch (SQLException e) {
+				throw new RuntimeException("Error sending batch to database: " + entryId, e);
 			}
 
-			// Add info field
-			//addInfo(entry, vcfEntry, vcfInfos);
-
-			// Commit every now and then
-			count++;
-			if (count % FLUSH_EVERY == 0) {
-				DbUtil.getCurrentSession().flush();
-				DbUtil.getCurrentSession().clear();
-				Timer.showStdErr("Commit: " + count + "\t" + entry);
+			//---
+			// Show timer
+			//---
+			if (entryId % SHOW_EVERY == 0) {
+				Timer.showStdErr("EntryId: " + entryId + "\tEffectId: " + effectId + "\tElapsed: " + t);
+				t.start();
 			}
+		}
+
+		//---
+		// Send last batch
+		//---
+		try {
+			if (batchPrepapred) {
+				Timer.showStdErr("EntryId: " + entryId + "\tEffectId: " + effectId + "\tElapsed: " + t);
+				pstmtEntry.executeBatch();
+				pstmtEff.executeBatch();
+				batchPrepapred = false;
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException("Error sending batch to database: " + entryId, e);
 		}
 
 		Timer.showStdErr("Done.");
@@ -135,22 +231,39 @@ public class SnpSqlCmdCreate extends SnpSql {
 		setDatabseFomVcf(vcfFileName);
 	}
 
+	/**
+	 * Prepare insert statements
+	 * @param con
+	 */
+	void prepareStetements(Connection con) {
+		try {
+			pstmtEntry = con.prepareStatement("INSERT INTO Entry (id, chr, pos, vcfId, ref, alt, qual, filter) VALUES " //
+					+ "                                          ( ?,   ?,   ?,     ?,   ?,   ?,    ?,      ?);" //
+			);
+			pstmtEff = con.prepareStatement("INSERT INTO Effect (id, effect, impact, funClass, codon, aa, aaLen, gene, bioType, coding, transcriptId, exonId) VALUES " //
+					+ "                                         (?,       ?,      ?,        ?,     ?,  ?,     ?,    ?,       ?,      ?,            ?,      ?);" //
+			);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Error preparing statement", e);
+		}
+	}
+
 	@Override
 	public boolean run() {
 		boolean ok = false;
 
 		// Create and start a new server
 		if (verbose) Timer.showStdErr("Creating database '" + database + "', path '" + databasePath + "'");
-		DbUtil.create(database, databasePath, true, verbose);
+		DbUtil.create(database, databasePath, true, true, verbose);
 
 		try {
-			// Connect to database
+			// Connect to database. Even if we don't use Hibernate, this is done in order to get the database created.
 			DbUtil.beginTransaction();
 
 			// Add data
 			ok = addVcfFile();
 
-			// Close connection
 			DbUtil.commit();
 		} catch (Throwable t) {
 			DbUtil.rollback();
