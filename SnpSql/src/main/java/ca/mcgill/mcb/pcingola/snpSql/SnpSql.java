@@ -46,7 +46,6 @@ public class SnpSql implements CommandLine {
 		System.exit(retCode);
 	}
 
-	@Override
 	public void parseArgs(String[] args) {
 		this.args = args;
 		if (args.length <= 0) usage("Missing command");
@@ -81,7 +80,6 @@ public class SnpSql implements CommandLine {
 		return reportValues;
 	}
 
-	@Override
 	public boolean run() {
 		boolean ok = false;
 		SnpSql snpSql = null;
@@ -131,7 +129,6 @@ public class SnpSql implements CommandLine {
 		databasePath = (dir == null ? "" : dir + "/") + database;
 	}
 
-	@Override
 	public void usage(String message) {
 		if (message != null) System.err.println("Error: " + message + "\n");
 		System.err.println("SnpSql version " + VERSION);

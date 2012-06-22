@@ -1,5 +1,7 @@
 package ca.mcgill.mcb.pcingola.snpSql;
 
+import ca.mcgill.mcb.pcingola.snpSift.SnpSiftCmdFilter;
+import ca.mcgill.mcb.pcingola.snpSift.lang.condition.Condition;
 import ca.mcgill.mcb.pcingola.snpSql.db.DbUtil;
 import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.util.Timer;
@@ -33,8 +35,15 @@ public class SnpSqlCmdSql extends SnpSql {
 	}
 
 	boolean query() {
-
-		Gpr.debug(query);
+		Gpr.debug("QUERY:" + query);
+		try {
+			SnpSiftCmdFilter ssfilter = new SnpSiftCmdFilter();
+			Condition condition = ssfilter.parseExpression(query);
+			Gpr.debug("Condition: " + condition);
+		} catch (Exception e) {
+			System.err.println("Error parsing query: " + query);
+			throw new RuntimeException(e);
+		}
 		return true;
 	}
 
@@ -56,6 +65,7 @@ public class SnpSqlCmdSql extends SnpSql {
 			// Close connection
 			DbUtil.commit();
 		} catch (Throwable t) {
+			t.printStackTrace();
 			DbUtil.rollback();
 		}
 

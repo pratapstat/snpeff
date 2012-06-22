@@ -67,7 +67,7 @@ public class SnpSiftCmdFilter extends SnpSift {
 	boolean usePassField;
 	String inputFile;
 	String expression;
-	Condition vcfExpression;
+	Condition condition;
 	String filterId = this.getClass().getSimpleName();
 	ArrayList<HashSet<String>> sets;
 
@@ -155,7 +155,7 @@ public class SnpSiftCmdFilter extends SnpSift {
 
 		boolean all = true, any = false;
 		do {
-			boolean eval = vcfExpression.eval(vcfEntry);
+			boolean eval = condition.eval(vcfEntry);
 
 			all &= eval;
 			any |= eval;
@@ -228,21 +228,22 @@ public class SnpSiftCmdFilter extends SnpSift {
 	 * Parse expression
 	 * @throws Exception
 	 */
-	void parseExpression() throws Exception {
+	public Condition parseExpression(String expression) throws Exception {
 		if (debug) Gpr.debug("Parse expression: \"" + expression + "\"");
 
 		// Parse string (lexer first, then parser)
 		VcfFilterLexer lexer = new VcfFilterLexer(new ANTLRStringStream(expression));
 
 		// Parse tree and create expression
-		vcfExpression = createFromLexer(lexer, true);
+		condition = createFromLexer(lexer, true);
 
-		if (vcfExpression == null) {
+		if (condition == null) {
 			System.err.println("Fatal error: Cannot build expression tree.");
 			System.exit(-1);
 		}
 
-		if (debug) Gpr.debug("VcfExpression: " + vcfExpression);
+		if (debug) Gpr.debug("Condition: " + condition);
+		return condition;
 	}
 
 	@Override
@@ -258,7 +259,7 @@ public class SnpSiftCmdFilter extends SnpSift {
 	public List<VcfEntry> run(boolean createList) {
 		// Parse expression
 		try {
-			parseExpression();
+			parseExpression(expression);
 		} catch (Exception e) {
 			e.printStackTrace();
 			usage("Error parsing expression: '" + expression + "'");

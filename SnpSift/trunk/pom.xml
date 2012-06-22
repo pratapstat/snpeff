@@ -16,8 +16,8 @@
     </license>
   </licenses>
   <scm>
-    <url>https://snpeff.svn.sourceforge.net/svnroot/snpeff/SnpEffect/</url>
-    <connection>https://snpeff.svn.sourceforge.net/svnroot/snpeff/SnpEffect/</connection>
+    <url>https://snpeff.svn.sourceforge.net/svnroot/snpeff/SnpSift/</url>
+    <connection>https://snpeff.svn.sourceforge.net/svnroot/snpeff/SnpSift/</connection>
   </scm>
   <developers>
     <developer>

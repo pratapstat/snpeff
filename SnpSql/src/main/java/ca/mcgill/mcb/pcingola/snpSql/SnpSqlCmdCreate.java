@@ -8,10 +8,6 @@ import java.util.Collection;
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
 import ca.mcgill.mcb.pcingola.snpSql.db.DbUtil;
 import ca.mcgill.mcb.pcingola.snpSql.db.Effect;
-import ca.mcgill.mcb.pcingola.snpSql.db.Entry;
-import ca.mcgill.mcb.pcingola.snpSql.db.Tuple;
-import ca.mcgill.mcb.pcingola.snpSql.db.TupleFloat;
-import ca.mcgill.mcb.pcingola.snpSql.db.TupleInt;
 import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.util.Timer;
 import ca.mcgill.mcb.pcingola.vcf.VcfEffect;
@@ -29,15 +25,15 @@ public class SnpSqlCmdCreate extends SnpSql {
 	public static int BATCH_SIZE = 100;
 	public static int SHOW_EVERY = 100 * BATCH_SIZE;
 
-	long entryId = 0, effectId = 0;
+	long entryId = 0, effectId = 0, tupleId = 0, tupleIntId = 0, tupleFloatId = 0;
 	String vcfFileName;
-	PreparedStatement pstmtEntry, pstmtEff;
+	PreparedStatement pstmtEntry, pstmtEff, pstmtTuple, pstmtTupleInt, pstmtTupleFloat;
 
 	/**
 	 * Add VCF effect
 	 * @param vcfEffect
 	 */
-	void addEffect(VcfEffect veff) {
+	void addEffect(long entryId, VcfEffect veff) {
 		if (debug) Gpr.debug("Add Effect: " + veff);
 
 		// Prepapre statement
@@ -56,6 +52,7 @@ public class SnpSqlCmdCreate extends SnpSql {
 			pstmtEff.setString(10, eff.getCoding());
 			pstmtEff.setString(11, eff.getTranscriptId());
 			pstmtEff.setString(12, eff.getExonId());
+			pstmtEff.setLong(13, entryId);
 
 			pstmtEff.addBatch();
 			effectId++;
@@ -93,45 +90,58 @@ public class SnpSqlCmdCreate extends SnpSql {
 	/**
 	 * Add info fields
 	 */
-	void addInfo(Entry entry, VcfEntry vcfEntry, Collection<VcfInfo> vcfInfos) {
-		for (VcfInfo vcfInfo : vcfInfos) {
-			if (!vcfInfo.getId().startsWith("EFF")) {
-				String name = vcfInfo.getId();
-				String value = vcfEntry.getInfo(name);
+	void addInfo(long entryId, VcfEntry vcfEntry, Collection<VcfInfo> vcfInfos) {
+		try {
+			for (VcfInfo vcfInfo : vcfInfos) {
+				if (!vcfInfo.getId().startsWith("EFF")) {
+					String name = vcfInfo.getId();
+					String value = vcfEntry.getInfo(name);
 
-				switch (vcfInfo.getVcfInfoType()) {
-				case STRING:
-				case CHARACTER:
-					if (value != null) {
-						Tuple tuple = new Tuple(name, value);
-						entry.add(tuple);
-						tuple.save();
+					switch (vcfInfo.getVcfInfoType()) {
+					case FLAG:
+						value = "true";
+					case STRING:
+					case CHARACTER:
+						if (value != null) {
+							if (debug) Gpr.debug("Add Tuple: " + name + " = " + value);
+							pstmtTuple.setLong(1, tupleId++);
+							pstmtTuple.setString(2, name);
+							pstmtTuple.setString(3, value);
+							pstmtTuple.setLong(4, entryId);
+
+							pstmtTuple.addBatch();
+						}
+						break;
+					case INTEGER:
+						if (value != null) {
+							long valInt = vcfEntry.getInfoInt(name);
+							if (debug) Gpr.debug("Add TupleInt: " + name + " = " + valInt);
+							pstmtTupleInt.setLong(1, tupleIntId++);
+							pstmtTupleInt.setString(2, name);
+							pstmtTupleInt.setLong(3, valInt);
+							pstmtTupleInt.setLong(4, entryId);
+							pstmtTupleInt.addBatch();
+						}
+						break;
+					case FLOAT:
+						if (value != null) {
+							double valFloat = vcfEntry.getInfoFloat(name);
+							if (debug) Gpr.debug("Add TupleFloat: " + name + " = " + valFloat);
+							pstmtTupleFloat.setLong(1, tupleFloatId++);
+							pstmtTupleFloat.setString(2, name);
+							pstmtTupleFloat.setDouble(3, valFloat);
+							pstmtTupleFloat.setLong(4, entryId);
+							pstmtTupleFloat.addBatch();
+						}
+						break;
+					default:
+						Gpr.debug("Unknonw type: " + vcfInfo.getVcfInfoType());
 					}
-					break;
-				case INTEGER:
-					if (value != null) {
-						long valInt = vcfEntry.getInfoInt(name);
-						TupleInt tuple = new TupleInt(name, valInt);
-						entry.add(tuple);
-						tuple.save();
-					}
-					break;
-				case FLOAT:
-					if (value != null) {
-						double valFloat = vcfEntry.getInfoFloat(name);
-						TupleFloat tuple = new TupleFloat(name, valFloat);
-						entry.add(tuple);
-						tuple.save();
-					}
-					break;
-				case FLAG:
-					value = "true";
-					Tuple tuple = new Tuple(name, value);
-					entry.add(tuple);
-					tuple.save();
-					break;
 				}
 			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Error trying to insert Info.\n\tVcfEntry:\t" + vcfEntry, e);
 		}
 	}
 
@@ -161,11 +171,15 @@ public class SnpSqlCmdCreate extends SnpSql {
 			if (vcfInfos == null) vcfInfos = vcfFile.getVcfInfo();
 
 			// Add VcfEntry
+			long eid = entryId; // It is incremented after the insert operation
 			addEntry(vcfEntry);
 
 			// Add effects
 			for (VcfEffect veff : vcfEntry.parseEffects())
-				addEffect(veff);
+				addEffect(eid, veff);
+
+			// Add Info fields
+			addInfo(eid, vcfEntry, vcfInfos);
 
 			batchPrepapred = true;
 
@@ -177,6 +191,9 @@ public class SnpSqlCmdCreate extends SnpSql {
 					// Timer.showStdErr("Batch:" + id);
 					pstmtEntry.executeBatch();
 					pstmtEff.executeBatch();
+					pstmtTuple.executeBatch();
+					pstmtTupleInt.executeBatch();
+					pstmtTupleFloat.executeBatch();
 					batchPrepapred = false;
 				}
 			} catch (SQLException e) {
@@ -187,7 +204,7 @@ public class SnpSqlCmdCreate extends SnpSql {
 			// Show timer
 			//---
 			if (entryId % SHOW_EVERY == 0) {
-				Timer.showStdErr("EntryId: " + entryId + "\tEffectId: " + effectId + "\tElapsed: " + t);
+				Timer.showStdErr("VCF entries: " + entryId + "\tEffects: " + effectId + "\tInfo fields: " + (tupleId + tupleIntId + tupleFloatId) + "\tElapsed: " + t);
 				t.start();
 			}
 		}
@@ -197,10 +214,12 @@ public class SnpSqlCmdCreate extends SnpSql {
 		//---
 		try {
 			if (batchPrepapred) {
-				Timer.showStdErr("EntryId: " + entryId + "\tEffectId: " + effectId + "\tElapsed: " + t);
+				Timer.showStdErr("VCF entries: " + entryId + "\tEffects: " + effectId + "\tInfo fields: " + (tupleId + tupleIntId + tupleFloatId) + "\tElapsed: " + t);
 				pstmtEntry.executeBatch();
 				pstmtEff.executeBatch();
-				batchPrepapred = false;
+				pstmtTuple.executeBatch();
+				pstmtTupleInt.executeBatch();
+				pstmtTupleFloat.executeBatch();
 			}
 		} catch (SQLException e) {
 			throw new RuntimeException("Error sending batch to database: " + entryId, e);
@@ -240,8 +259,17 @@ public class SnpSqlCmdCreate extends SnpSql {
 			pstmtEntry = con.prepareStatement("INSERT INTO Entry (id, chr, pos, vcfId, ref, alt, qual, filter) VALUES " //
 					+ "                                          ( ?,   ?,   ?,     ?,   ?,   ?,    ?,      ?);" //
 			);
-			pstmtEff = con.prepareStatement("INSERT INTO Effect (id, effect, impact, funClass, codon, aa, aaLen, gene, bioType, coding, transcriptId, exonId) VALUES " //
-					+ "                                         (?,       ?,      ?,        ?,     ?,  ?,     ?,    ?,       ?,      ?,            ?,      ?);" //
+			pstmtEff = con.prepareStatement("INSERT INTO Effect (id, effect, impact, funClass, codon, aa, aaLen, gene, bioType, coding, transcriptId, exonId, entry_id) VALUES " //
+					+ "                                         (?,       ?,      ?,        ?,     ?,  ?,     ?,    ?,       ?,      ?,            ?,      ?,        ?);" //
+			);
+			pstmtTuple = con.prepareStatement("INSERT INTO Tuple (id, name, value, entry_id) VALUES " //
+					+ "                                          ( ?,    ?,     ?,        ?);" //
+			);
+			pstmtTupleInt = con.prepareStatement("INSERT INTO TupleInt (id, name, value, entry_id) VALUES " //
+					+ "                                             ( ?,    ?,     ?,        ?);" //
+			);
+			pstmtTupleFloat = con.prepareStatement("INSERT INTO TupleFloat (id, name, value, entry_id) VALUES " //
+					+ "                                               ( ?,    ?,     ?,        ?);" //
 			);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -266,6 +294,7 @@ public class SnpSqlCmdCreate extends SnpSql {
 
 			DbUtil.commit();
 		} catch (Throwable t) {
+			t.printStackTrace();
 			DbUtil.rollback();
 		}
 

@@ -81,7 +81,7 @@ public class Tuple extends Pojo<Tuple> {
 	}
 
 	public void setVcfEntryDb(Entry vcfEntryDb) {
-		this.entry = vcfEntryDb;
+		entry = vcfEntryDb;
 	}
 
 	@Override

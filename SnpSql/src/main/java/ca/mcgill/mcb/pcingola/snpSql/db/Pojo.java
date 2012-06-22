@@ -59,7 +59,6 @@ public abstract class Pojo<T extends Pojo> implements Serializable, Comparable<P
 	/**
 	 * Compare by Id
 	 */
-	@Override
 	public int compareTo(Pojo o) {
 		return compareId(o);
 	}
