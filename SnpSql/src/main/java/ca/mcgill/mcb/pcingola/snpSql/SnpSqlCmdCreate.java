@@ -26,6 +26,7 @@ public class SnpSqlCmdCreate extends SnpSql {
 	public static int SHOW_EVERY = 100 * BATCH_SIZE;
 
 	long entryId = 0, effectId = 0, tupleId = 0, tupleIntId = 0, tupleFloatId = 0;
+	int batchSizeEntry = 0, batchSizeEff = 0, batchSizeTuple = 0, batchSizeTupleInt = 0, batchSizeTupleFloat = 0;
 	String vcfFileName;
 	PreparedStatement pstmtEntry, pstmtEff, pstmtTuple, pstmtTupleInt, pstmtTupleFloat;
 
@@ -54,8 +55,9 @@ public class SnpSqlCmdCreate extends SnpSql {
 			pstmtEff.setString(12, eff.getExonId());
 			pstmtEff.setLong(13, entryId);
 
-			pstmtEff.addBatch();
+			batchSizeEff++;
 			effectId++;
+			pstmtEff.addBatch();
 		} catch (SQLException e) {
 			throw new RuntimeException("Error trying to insert Effect\n\tRecord number " + effectId + "\n\rEffect:\t" + veff, e);
 		}
@@ -80,6 +82,7 @@ public class SnpSqlCmdCreate extends SnpSql {
 			pstmtEntry.setDouble(7, vcfEntry.getQuality());
 			pstmtEntry.setString(8, vcfEntry.getFilterPass());
 
+			batchSizeEntry++;
 			entryId++;
 			pstmtEntry.addBatch();
 		} catch (SQLException e) {
@@ -109,6 +112,7 @@ public class SnpSqlCmdCreate extends SnpSql {
 							pstmtTuple.setString(3, value);
 							pstmtTuple.setLong(4, entryId);
 
+							batchSizeTuple++;
 							pstmtTuple.addBatch();
 						}
 						break;
@@ -120,6 +124,8 @@ public class SnpSqlCmdCreate extends SnpSql {
 							pstmtTupleInt.setString(2, name);
 							pstmtTupleInt.setLong(3, valInt);
 							pstmtTupleInt.setLong(4, entryId);
+
+							batchSizeTupleInt++;
 							pstmtTupleInt.addBatch();
 						}
 						break;
@@ -131,6 +137,8 @@ public class SnpSqlCmdCreate extends SnpSql {
 							pstmtTupleFloat.setString(2, name);
 							pstmtTupleFloat.setDouble(3, valFloat);
 							pstmtTupleFloat.setLong(4, entryId);
+
+							batchSizeTupleFloat++;
 							pstmtTupleFloat.addBatch();
 						}
 						break;
@@ -165,7 +173,6 @@ public class SnpSqlCmdCreate extends SnpSql {
 		VcfFileIterator vcfFile = new VcfFileIterator(vcfFileName);
 		Collection<VcfInfo> vcfInfos = null;
 		Timer t = new Timer();
-		boolean batchPrepapred = false;
 		for (VcfEntry vcfEntry : vcfFile) {
 			if (debug) Gpr.debug(vcfEntry);
 			if (vcfInfos == null) vcfInfos = vcfFile.getVcfInfo();
@@ -181,24 +188,8 @@ public class SnpSqlCmdCreate extends SnpSql {
 			// Add Info fields
 			addInfo(eid, vcfEntry, vcfInfos);
 
-			batchPrepapred = true;
-
-			//---
-			// Send batch
-			//---
-			try {
-				if (entryId % BATCH_SIZE == 0) {
-					// Timer.showStdErr("Batch:" + id);
-					pstmtEntry.executeBatch();
-					pstmtEff.executeBatch();
-					pstmtTuple.executeBatch();
-					pstmtTupleInt.executeBatch();
-					pstmtTupleFloat.executeBatch();
-					batchPrepapred = false;
-				}
-			} catch (SQLException e) {
-				throw new RuntimeException("Error sending batch to database: " + entryId, e);
-			}
+			// Send batch every now and then
+			if (entryId % BATCH_SIZE == 0) sendBatch();
 
 			//---
 			// Show timer
@@ -209,21 +200,8 @@ public class SnpSqlCmdCreate extends SnpSql {
 			}
 		}
 
-		//---
-		// Send last batch
-		//---
-		try {
-			if (batchPrepapred) {
-				Timer.showStdErr("VCF entries: " + entryId + "\tEffects: " + effectId + "\tInfo fields: " + (tupleId + tupleIntId + tupleFloatId) + "\tElapsed: " + t);
-				pstmtEntry.executeBatch();
-				pstmtEff.executeBatch();
-				pstmtTuple.executeBatch();
-				pstmtTupleInt.executeBatch();
-				pstmtTupleFloat.executeBatch();
-			}
-		} catch (SQLException e) {
-			throw new RuntimeException("Error sending batch to database: " + entryId, e);
-		}
+		Timer.showStdErr("VCF entries: " + entryId + "\tEffects: " + effectId + "\tInfo fields: " + (tupleId + tupleIntId + tupleFloatId) + "\tElapsed: " + t);
+		sendBatch(); // Send last batch
 
 		Timer.showStdErr("Done.");
 		return ok;
@@ -256,21 +234,11 @@ public class SnpSqlCmdCreate extends SnpSql {
 	 */
 	void prepareStetements(Connection con) {
 		try {
-			pstmtEntry = con.prepareStatement("INSERT INTO Entry (id, chr, pos, vcfId, ref, alt, qual, filter) VALUES " //
-					+ "                                          ( ?,   ?,   ?,     ?,   ?,   ?,    ?,      ?);" //
-			);
-			pstmtEff = con.prepareStatement("INSERT INTO Effect (id, effect, impact, funClass, codon, aa, aaLen, gene, bioType, coding, transcriptId, exonId, entry_id) VALUES " //
-					+ "                                         (?,       ?,      ?,        ?,     ?,  ?,     ?,    ?,       ?,      ?,            ?,      ?,        ?);" //
-			);
-			pstmtTuple = con.prepareStatement("INSERT INTO Tuple (id, name, value, entry_id) VALUES " //
-					+ "                                          ( ?,    ?,     ?,        ?);" //
-			);
-			pstmtTupleInt = con.prepareStatement("INSERT INTO TupleInt (id, name, value, entry_id) VALUES " //
-					+ "                                             ( ?,    ?,     ?,        ?);" //
-			);
-			pstmtTupleFloat = con.prepareStatement("INSERT INTO TupleFloat (id, name, value, entry_id) VALUES " //
-					+ "                                               ( ?,    ?,     ?,        ?);" //
-			);
+			pstmtEntry = con.prepareStatement("INSERT INTO Entry (id, chr, pos, vcfId, ref, alt, qual, filter) VALUES ( ?,   ?,   ?,     ?,   ?,   ?,    ?,      ?);");
+			pstmtEff = con.prepareStatement("INSERT INTO Effect (id, effect, impact, funClass, codon, aa, aaLen, gene, bioType, coding, transcriptId, exonId, entry_id) VALUES (?,       ?,      ?,        ?,     ?,  ?,     ?,    ?,       ?,      ?,            ?,      ?,        ?);");
+			pstmtTuple = con.prepareStatement("INSERT INTO Tuple (id, name, value, entry_id) VALUES ( ?,    ?,     ?,        ?);");
+			pstmtTupleInt = con.prepareStatement("INSERT INTO TupleInt (id, name, value, entry_id) VALUES ( ?,    ?,     ?,        ?);");
+			pstmtTupleFloat = con.prepareStatement("INSERT INTO TupleFloat (id, name, value, entry_id) VALUES ( ?,    ?,     ?,        ?);");
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new RuntimeException("Error preparing statement", e);
@@ -303,6 +271,22 @@ public class SnpSqlCmdCreate extends SnpSql {
 		DbUtil.get().stop();
 		if (verbose) Timer.showStdErr("Done.");
 		return ok;
+	}
+
+	void sendBatch() {
+		try {
+			// Timer.showStdErr("Batch:" + id);
+			if (batchSizeEntry > 0) pstmtEntry.executeBatch();
+			if (batchSizeEff > 0) pstmtEff.executeBatch();
+			if (batchSizeTuple > 0) pstmtTuple.executeBatch();
+			if (batchSizeTupleInt > 0) pstmtTupleInt.executeBatch();
+			if (batchSizeTupleFloat > 0) pstmtTupleFloat.executeBatch();
+
+			batchSizeEntry = batchSizeEff = batchSizeTuple = batchSizeTupleInt = batchSizeTupleFloat = 0;
+		} catch (SQLException e) {
+			throw new RuntimeException("Error sending batch to database: " + entryId, e);
+		}
+
 	}
 
 	@Override
