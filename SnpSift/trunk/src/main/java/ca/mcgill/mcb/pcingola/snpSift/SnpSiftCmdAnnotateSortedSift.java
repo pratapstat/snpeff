@@ -46,7 +46,7 @@ public class SnpSiftCmdAnnotateSortedSift extends SnpSiftCmdAnnotateSorted {
 	@Override
 	protected void addAnnotation(VcfEntry vcf) {
 		// Is this change in db?
-		String infoAnnotation = findAnnotation(vcf);
+		String infoAnnotation = findDbId(vcf);
 		if( infoAnnotation != null ) {
 			countAnnotated++;
 			vcf.addInfo(infoAnnotation);
@@ -78,7 +78,7 @@ public class SnpSiftCmdAnnotateSortedSift extends SnpSiftCmdAnnotateSorted {
 				// Is it low confidence? => Add flag
 				if( cons > LOW_CONFIDENCE ) annotation += ";SIFT_LOW_CONFIDENCE";
 
-				db.put(key, annotation);
+				dbId.put(key, annotation);
 			}
 		}
 	}
@@ -101,13 +101,13 @@ public class SnpSiftCmdAnnotateSortedSift extends SnpSiftCmdAnnotateSorted {
 	 * @return
 	 */
 	@Override
-	protected String findAnnotation(VcfEntry vcf) {
+	protected String findDbId(VcfEntry vcf) {
 		readDb(vcf);
-		if( db.isEmpty() ) return null;
+		if( dbId.isEmpty() ) return null;
 
 		for( int i = 0; i < vcf.getAlts().length; i++ ) {
 			String key = key(vcf, i);
-			String id = db.get(key);
+			String id = dbId.get(key);
 			if( id != null ) return id;
 		}
 
