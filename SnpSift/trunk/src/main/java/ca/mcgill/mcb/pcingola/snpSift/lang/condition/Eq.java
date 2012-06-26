@@ -1,6 +1,7 @@
 package ca.mcgill.mcb.pcingola.snpSift.lang.condition;
 
 import ca.mcgill.mcb.pcingola.snpSift.lang.expression.Expression;
+import ca.mcgill.mcb.pcingola.snpSift.lang.expression.Literal;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 
 /**
@@ -20,4 +21,10 @@ public class Eq extends OpBinary {
 		return negated ? !retVal : retVal;
 	}
 
+	protected String fieldOrLiteral(Expression e) {
+		if (e instanceof Literal) return ((Literal) e).getStr();
+
+		// We should map fields to appropriate classes
+		return e.toString();
+	}
 }

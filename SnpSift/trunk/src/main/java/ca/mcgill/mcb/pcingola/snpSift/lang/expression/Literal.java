@@ -42,6 +42,20 @@ public class Literal extends Expression {
 		}
 	}
 
+	public String getStr() {
+		switch (returnType) {
+		case STRING:
+			return str;
+		case FLOAT:
+			return "" + d;
+		case INTEGER:
+			return "" + l;
+		default:
+			throw new RuntimeException("Unknown type '" + returnType + "'");
+		}
+
+	}
+
 	@Override
 	public String toString() {
 		switch (returnType) {
