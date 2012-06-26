@@ -1,5 +1,9 @@
 package ca.mcgill.mcb.pcingola.snpSql;
 
+import java.util.List;
+
+import org.hibernate.Query;
+
 import ca.mcgill.mcb.pcingola.snpSift.SnpSiftCmdFilter;
 import ca.mcgill.mcb.pcingola.snpSift.lang.condition.Condition;
 import ca.mcgill.mcb.pcingola.snpSql.db.DbUtil;
@@ -8,8 +12,12 @@ import ca.mcgill.mcb.pcingola.util.Timer;
 
 public class SnpSqlCmdSql extends SnpSql {
 
+	public static final int TEST_LIMIT = 100;
+
+	boolean testQuery;
 	String vcfFileName;
 	String query;
+	Condition condition;
 
 	@Override
 	public void parseArgs(String[] args) {
@@ -18,9 +26,8 @@ public class SnpSqlCmdSql extends SnpSql {
 
 			// Argument starts with '-'?
 			if (args[i].startsWith("-")) {
-				if (args[i].equals("-v") || args[i].equalsIgnoreCase("-verbose")) {
-					verbose = true;
-				}
+				if (args[i].equals("-v") || args[i].equalsIgnoreCase("-verbose")) verbose = true;
+				if (args[i].equals("-t") || args[i].equalsIgnoreCase("-test")) testQuery = true;
 			} else {
 				if (vcfFileName == null) vcfFileName = args[i];
 				else if (query == null) query = args[i];
@@ -34,16 +41,53 @@ public class SnpSqlCmdSql extends SnpSql {
 		setDatabseFomVcf(vcfFileName);
 	}
 
-	boolean query() {
+	/**
+	 * Parse query
+	 * @return
+	 */
+	Condition parseQuery(String query) {
 		Gpr.debug("QUERY:" + query);
 		try {
 			SnpSiftCmdFilter ssfilter = new SnpSiftCmdFilter();
 			Condition condition = ssfilter.parseExpression(query);
 			Gpr.debug("Condition: " + condition);
+			return condition;
 		} catch (Exception e) {
 			System.err.println("Error parsing query: " + query);
 			throw new RuntimeException(e);
 		}
+	}
+
+	/**
+	 * Run query
+	 * @return
+	 */
+	boolean query() {
+		// Build query string
+		query = query.replace('\t', ' ');
+		query = query.replace('\n', ' ');
+		if (query.toLowerCase().indexOf("where ") < 0) query = "where " + query;
+		if (query.toLowerCase().indexOf("from ") < 0) query = "from Entry " + query;
+
+		// Create query
+		Query q = DbUtil.getCurrentSession().createQuery(query);
+
+		// Limit to a few results
+		if (testQuery) q.setMaxResults(TEST_LIMIT);
+
+		List list = q.list();
+		Gpr.debug("Number of results: " + list.size());
+		Gpr.debug("Class: " + list.get(0).getClass().getCanonicalName());
+		for (Object o : list) {
+			if (o.getClass().isArray()) {
+				Object array[] = (Object[]) o;
+				for (Object oo : array)
+					System.out.print(oo + "\t");
+
+				System.out.println("");
+			} else System.out.println(o);
+		}
+
 		return true;
 	}
 

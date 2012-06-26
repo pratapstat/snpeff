@@ -46,6 +46,9 @@ public class SnpSql implements CommandLine {
 		System.exit(retCode);
 	}
 
+	/**
+	 * Parse command line arguments
+	 */
 	public void parseArgs(String[] args) {
 		this.args = args;
 		if (args.length <= 0) usage("Missing command");
@@ -59,7 +62,7 @@ public class SnpSql implements CommandLine {
 			// Copy all args except initial 'command'
 			ArrayList<String> argsList = new ArrayList<String>();
 			for (int i = 1; i < args.length; i++) {
-				if (args[i].equals("-noLog")) log = false; // This option is always available (to allow privacy in all commands)
+				if (args[i].equalsIgnoreCase("-noLog")) log = false; // This option is always available (to allow privacy in all commands)
 				else argsList.add(args[i]);
 
 				if (args[i].equals("-v")) verbose = true; // Make this option availabe here as well

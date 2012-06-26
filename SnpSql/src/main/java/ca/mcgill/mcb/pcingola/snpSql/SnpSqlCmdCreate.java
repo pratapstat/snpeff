@@ -234,7 +234,7 @@ public class SnpSqlCmdCreate extends SnpSql {
 	 */
 	void prepareStetements(Connection con) {
 		try {
-			pstmtEntry = con.prepareStatement("INSERT INTO Entry (id, chr, pos, vcfId, ref, alt, qual, filter) VALUES ( ?,   ?,   ?,     ?,   ?,   ?,    ?,      ?);");
+			pstmtEntry = con.prepareStatement("INSERT INTO Entry (id, chrom, pos, vcfId, ref, alt, qual, filter) VALUES ( ?,   ?,   ?,     ?,   ?,   ?,    ?,      ?);");
 			pstmtEff = con.prepareStatement("INSERT INTO Effect (id, effect, impact, funClass, codon, aa, aaLen, gene, bioType, coding, transcriptId, exonId, entry_id) VALUES (?,       ?,      ?,        ?,     ?,  ?,     ?,    ?,       ?,      ?,            ?,      ?,        ?);");
 			pstmtTuple = con.prepareStatement("INSERT INTO Tuple (id, name, value, entry_id) VALUES ( ?,    ?,     ?,        ?);");
 			pstmtTupleInt = con.prepareStatement("INSERT INTO TupleInt (id, name, value, entry_id) VALUES ( ?,    ?,     ?,        ?);");
