@@ -25,9 +25,9 @@ public class SnpSqlCmdCreate extends SnpSql {
 	public static int BATCH_SIZE = 100;
 	public static int SHOW_EVERY = 100 * BATCH_SIZE;
 
+	String vcfFileName;
 	long entryId = 0, effectId = 0, tupleId = 0, tupleIntId = 0, tupleFloatId = 0;
 	int batchSizeEntry = 0, batchSizeEff = 0, batchSizeTuple = 0, batchSizeTupleInt = 0, batchSizeTupleFloat = 0;
-	String vcfFileName;
 	PreparedStatement pstmtEntry, pstmtEff, pstmtTuple, pstmtTupleInt, pstmtTupleFloat;
 
 	/**
@@ -271,6 +271,16 @@ public class SnpSqlCmdCreate extends SnpSql {
 		DbUtil.get().stop();
 		if (verbose) Timer.showStdErr("Done.");
 		return ok;
+	}
+
+	/**
+	 * Build database
+	 * @param vcStringfFielName
+	 * @return
+	 */
+	public boolean run(String vcStringfFielName) {
+		this.vcfFileName = vcStringfFielName;
+		return run();
 	}
 
 	void sendBatch() {
