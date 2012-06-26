@@ -161,49 +161,55 @@ public class SnpSqlCmdCreate extends SnpSql {
 		boolean ok = false;
 		Timer.showStdErr("Reading data from file: '" + vcfFileName + "', database name '" + database + "', databse path: '" + databasePath + "'");
 
-		//---
-		// Prepapre statements
-		//---
-		Connection con = DbUtil.get().getConnection();
-		prepareStetements(con);
-
-		//---
-		// Parse VCF file and add to database
-		//---
-		VcfFileIterator vcfFile = new VcfFileIterator(vcfFileName);
-		Collection<VcfInfo> vcfInfos = null;
-		Timer t = new Timer();
-		for (VcfEntry vcfEntry : vcfFile) {
-			if (debug) Gpr.debug(vcfEntry);
-			if (vcfInfos == null) vcfInfos = vcfFile.getVcfInfo();
-
-			// Add VcfEntry
-			long eid = entryId; // It is incremented after the insert operation
-			addEntry(vcfEntry);
-
-			// Add effects
-			for (VcfEffect veff : vcfEntry.parseEffects())
-				addEffect(eid, veff);
-
-			// Add Info fields
-			addInfo(eid, vcfEntry, vcfInfos);
-
-			// Send batch every now and then
-			if (entryId % BATCH_SIZE == 0) sendBatch();
+		try {
+			//---
+			// Prepapre statements
+			//---
+			Connection con = DbUtil.get().getConnection();
+			prepareStetements(con);
 
 			//---
-			// Show timer
+			// Parse VCF file and add to database
 			//---
-			if (entryId % SHOW_EVERY == 0) {
-				Timer.showStdErr("VCF entries: " + entryId + "\tEffects: " + effectId + "\tInfo fields: " + (tupleId + tupleIntId + tupleFloatId) + "\tElapsed: " + t);
-				t.start();
+			VcfFileIterator vcfFile = new VcfFileIterator(vcfFileName);
+			Collection<VcfInfo> vcfInfos = null;
+			Timer t = new Timer();
+			for (VcfEntry vcfEntry : vcfFile) {
+				if (debug) Gpr.debug(vcfEntry);
+				if (vcfInfos == null) vcfInfos = vcfFile.getVcfInfo();
+
+				// Add VcfEntry
+				long eid = entryId; // It is incremented after the insert operation
+				addEntry(vcfEntry);
+
+				// Add effects
+				for (VcfEffect veff : vcfEntry.parseEffects())
+					addEffect(eid, veff);
+
+				// Add Info fields
+				addInfo(eid, vcfEntry, vcfInfos);
+
+				// Send batch every now and then
+				if (entryId % BATCH_SIZE == 0) sendBatch();
+
+				//---
+				// Show timer
+				//---
+				if (entryId % SHOW_EVERY == 0) {
+					Timer.showStdErr("VCF entries: " + entryId + "\tEffects: " + effectId + "\tInfo fields: " + (tupleId + tupleIntId + tupleFloatId) + "\tElapsed: " + t);
+					t.start();
+				}
 			}
+
+			Timer.showStdErr("VCF entries: " + entryId + "\tEffects: " + effectId + "\tInfo fields: " + (tupleId + tupleIntId + tupleFloatId) + "\tElapsed: " + t);
+			sendBatch(); // Send last batch
+
+			Timer.showStdErr("Done.");
+			ok = true;
+		} catch (Exception e) {
+			ok = false;
+			e.printStackTrace();
 		}
-
-		Timer.showStdErr("VCF entries: " + entryId + "\tEffects: " + effectId + "\tInfo fields: " + (tupleId + tupleIntId + tupleFloatId) + "\tElapsed: " + t);
-		sendBatch(); // Send last batch
-
-		Timer.showStdErr("Done.");
 		return ok;
 	}
 
@@ -264,6 +270,7 @@ public class SnpSqlCmdCreate extends SnpSql {
 		} catch (Throwable t) {
 			t.printStackTrace();
 			DbUtil.rollback();
+			ok = false;
 		}
 
 		// Stop server
@@ -280,6 +287,7 @@ public class SnpSqlCmdCreate extends SnpSql {
 	 */
 	public boolean run(String vcStringfFielName) {
 		this.vcfFileName = vcStringfFielName;
+		setDatabseFomVcf(vcfFileName);
 		return run();
 	}
 
