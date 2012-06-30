@@ -19,9 +19,11 @@ public class SnpSiftCmdAnnotateMem extends SnpSift {
 	public static final int SHOW = 10000;
 	public static final int SHOW_LINES = 100 * SHOW;
 
+	protected boolean useInfoField; // Use all info fields
 	String vcfDb;
 	String vcfFile;
-	HashMap<String, String> db = new HashMap<String, String>();
+	HashMap<String, String> dbId = new HashMap<String, String>();
+	HashMap<String, String> dbInfo = new HashMap<String, String>();
 
 	/**
 	 * Main
@@ -60,13 +62,20 @@ public class SnpSiftCmdAnnotateMem extends SnpSift {
 			boolean annotated = false;
 			for (int i = 0; i < vcfEntry.getAlts().length; i++) {
 				String key = key(vcfEntry, i);
-				String id = db.get(key);
+				String id = dbId.get(key);
 
+				String info = (useInfoField ? dbInfo.get(key) : null);
+
+				// Add ID
 				if (id != null) {
-					// Add ID
-					if (!vcfEntry.getId().isEmpty()) id = vcfEntry.getId() + ";" + id;
+					if (!vcfEntry.getId().isEmpty()) id = vcfEntry.getId() + ";" + id; // Append if there is already an entry
 					vcfEntry.setId(id);
+					annotated = true;
+				}
 
+				// Add INFO strings
+				if (info != null) {
+					vcfEntry.addInfo(info);
 					annotated = true;
 				}
 			}
@@ -87,6 +96,14 @@ public class SnpSiftCmdAnnotateMem extends SnpSift {
 	}
 
 	/**
+	 * Initialize default values
+	 */
+	@Override
+	public void init() {
+		useInfoField = true; // Default: Use INFO fields
+	}
+
+	/**
 	 * Create a key for a hash
 	 * @param vcfEntry
 	 * @return
@@ -103,16 +120,20 @@ public class SnpSiftCmdAnnotateMem extends SnpSift {
 		int argNum = 0;
 		if (args.length == 0) usage(null);
 
-		if (args[argNum].equals("-q")) {
-			verbose = false;
+		for (String arg : args) {
+			if (args[argNum].startsWith("-")) {
+				if (args[argNum].equals("-q")) verbose = false;
+				else if (args[argNum].equals("-v")) verbose = true;
+				else if (arg.equals("-id")) useInfoField = false;
+			} else if (vcfDb == null) vcfDb = args[argNum];
+			else if (vcfFile == null) vcfFile = args[argNum];
+
 			argNum++;
 		}
 
-		if (args.length >= argNum) vcfDb = args[argNum++];
-		else usage("Missing 'database.vcf'");
-
-		if (args.length >= argNum) vcfFile = args[argNum++];
-		else usage("Missing 'file.vcf'");
+		// Sanity check
+		if (vcfDb == null) usage("Missing 'database.vcf'");
+		if (vcfFile == null) usage("Missing 'file.vcf'");
 	}
 
 	/**
@@ -129,10 +150,13 @@ public class SnpSiftCmdAnnotateMem extends SnpSift {
 				String key = key(vcfEntry, i);
 
 				// Add ID
-				if (db.containsKey(key)) {
-					String multipleId = db.get(key) + ";" + vcfEntry.getId();
-					db.put(key, multipleId);
-				} else db.put(key, vcfEntry.getId());
+				if (dbId.containsKey(key)) {
+					String multipleId = dbId.get(key) + ";" + vcfEntry.getId();
+					dbId.put(key, multipleId);
+				} else dbId.put(key, vcfEntry.getId());
+
+				// Add INFO fields
+				if (useInfoField) dbInfo.put(key, vcfEntry.getInfoStr());
 			}
 
 			count++;
@@ -145,7 +169,7 @@ public class SnpSiftCmdAnnotateMem extends SnpSift {
 		// Show time
 		if (verbose) {
 			System.err.println("");
-			Timer.showStdErr("Done. Database size: " + db.size());
+			Timer.showStdErr("Done. Database size: " + dbId.size());
 		}
 	}
 
@@ -162,7 +186,13 @@ public class SnpSiftCmdAnnotateMem extends SnpSift {
 
 		showVersion();
 
-		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar annotate [-q] database.vcf file.vcf > newFile.vcf\nNote: It is assumed that both files fit in memory.");
+		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar annotate [-q] database.vcf file.vcf > newFile.vcf\n"//
+				+ "Options:\n" //
+				+ "\t-id\t:\tOnly annotate ID field (do not add INFO field).\n" //
+				+ "\t-q\t:\tBe quiet.\n" //
+				+ "\t-v\t:\tBe verbose.\n" //
+				+ "Note: It is assumed that both files fit in memory." //
+		);
 		System.exit(1);
 	}
 }
