@@ -1,6 +1,7 @@
 package ca.mcgill.mcb.pcingola.snpSift.lang.expression;
 
 import ca.mcgill.mcb.pcingola.snpSift.lang.expression.FieldIterator.IteratorType;
+import ca.mcgill.mcb.pcingola.vcf.VcfEffect;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 
 /**
@@ -13,9 +14,11 @@ import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 public class FieldEff extends FieldSub {
 
 	int fieldNum = -1;
+	VcfEffect.FormatVersion formatVersion;
 
-	public FieldEff(String name, int index) {
+	public FieldEff(String name, int index, VcfEffect.FormatVersion formatVersion) {
 		super("EFF." + name, index); // Add an 'EFF.' at the beginning
+		this.formatVersion = formatVersion;
 		fieldNum = fieldNum(this.name);
 		if (fieldNum < 0) throw new RuntimeException("No such EFF subfield '" + name + "'");
 	}
@@ -26,20 +29,7 @@ public class FieldEff extends FieldSub {
 	 * @return
 	 */
 	int fieldNum(String name) {
-		// TODO: It's probably faster to use a hash...
-		if (name.equals("EFF.EFFECT")) return 0;
-		if (name.equals("EFF.IMPACT")) return 1;
-		if (name.equals("EFF.FUNCLASS")) return 2;
-		if (name.equals("EFF.CODON")) return 3;
-		if (name.equals("EFF.AA")) return 4;
-		if (name.equals("EFF.AA_LEN")) return 5;
-		if (name.equals("EFF.GENE")) return 6;
-		if (name.equals("EFF.BIOTYPE")) return 7;
-		if (name.equals("EFF.CODING")) return 8;
-		if (name.equals("EFF.TRID")) return 9;
-		if (name.equals("EFF.EXID")) return 10;
-
-		return -1;
+		return VcfEffect.fieldNum(name, formatVersion);
 	}
 
 	/**

@@ -38,6 +38,7 @@ import ca.mcgill.mcb.pcingola.snpSift.lang.function.IsHom;
 import ca.mcgill.mcb.pcingola.snpSift.lang.function.IsRef;
 import ca.mcgill.mcb.pcingola.snpSift.lang.function.IsVariant;
 import ca.mcgill.mcb.pcingola.util.Gpr;
+import ca.mcgill.mcb.pcingola.vcf.VcfEffect;
 
 /**
  * Creates objects from an AST
@@ -48,9 +49,11 @@ public class LangFactory {
 
 	protected static boolean debug = false;
 	ArrayList<HashSet<String>> sets = new ArrayList<HashSet<String>>();
+	VcfEffect.FormatVersion formatVersion;
 
-	public LangFactory(ArrayList<HashSet<String>> sets) {
+	public LangFactory(ArrayList<HashSet<String>> sets, VcfEffect.FormatVersion formatVersion) {
 		this.sets = sets;
+		this.formatVersion = formatVersion;
 	}
 
 	/**
@@ -138,7 +141,7 @@ public class LangFactory {
 		} else if (leaveName.equalsIgnoreCase("VAR_EFF_SUB")) {
 			int effIndex = parseIndexField(tree.getChild(0).getText(), IteratorType.EFFECT);
 			String name = tree.getChild(1).getText();
-			expr = new FieldEff(name, effIndex);
+			expr = new FieldEff(name, effIndex, formatVersion);
 		} else if (leaveName.equalsIgnoreCase("VAR_GENOTYPE_SUB_ARRAY")) {
 			int genotypeIndex = parseIndexField(tree.getChild(0).getText(), IteratorType.GENOTYPE);
 			String name = tree.getChild(1).getText();

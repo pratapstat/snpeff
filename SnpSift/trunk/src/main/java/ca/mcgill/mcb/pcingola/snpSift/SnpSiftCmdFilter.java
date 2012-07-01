@@ -18,6 +18,8 @@ import ca.mcgill.mcb.pcingola.snpSift.lang.condition.Condition;
 import ca.mcgill.mcb.pcingola.snpSift.lang.expression.Field;
 import ca.mcgill.mcb.pcingola.snpSift.lang.expression.FieldIterator;
 import ca.mcgill.mcb.pcingola.util.Gpr;
+import ca.mcgill.mcb.pcingola.vcf.VcfEffect;
+import ca.mcgill.mcb.pcingola.vcf.VcfEffect.FormatVersion;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 
 /**
@@ -70,6 +72,7 @@ public class SnpSiftCmdFilter extends SnpSift {
 	Condition condition;
 	String filterId = this.getClass().getSimpleName();
 	ArrayList<HashSet<String>> sets;
+	VcfEffect.FormatVersion formatVersion;
 
 	/**
 	 * Main
@@ -140,7 +143,7 @@ public class SnpSiftCmdFilter extends SnpSift {
 		if (debug) Gpr.debug("Tree: " + parseTree.toStringTree());
 
 		// Create a language factory
-		LangFactory langFactory = new LangFactory(sets);
+		LangFactory langFactory = new LangFactory(sets, formatVersion);
 		return langFactory.conditionFactory(parseTree);
 	}
 
@@ -194,6 +197,7 @@ public class SnpSiftCmdFilter extends SnpSift {
 		inputFile = "-";
 		filterId = this.getClass().getSimpleName();
 		sets = new ArrayList<HashSet<String>>();
+		formatVersion = VcfEffect.FormatVersion.FORMAT_3;
 	}
 
 	/**
@@ -212,7 +216,12 @@ public class SnpSiftCmdFilter extends SnpSift {
 				else if (args[i].equals("-v")) verbose = true;
 				else if (args[i].equals("-q")) verbose = false;
 				else if (args[i].equals("-i") || args[i].equalsIgnoreCase("--filterId")) filterId = args[++i];
-				else if (args[i].equals("-e") || args[i].equalsIgnoreCase("--exprfile")) {
+				else if (args[i].equalsIgnoreCase("--format")) {
+					String formatVer = args[++i];
+					if (formatVer.equals("2")) formatVersion = FormatVersion.FORMAT_2;
+					else if (formatVer.equals("3")) formatVersion = FormatVersion.FORMAT_3;
+					else usage("Unknown format version '" + formatVer + "'");
+				} else if (args[i].equals("-e") || args[i].equalsIgnoreCase("--exprfile")) {
 					String exprFile = args[++i];
 					if (verbose) System.err.println("Reading expression from file '" + exprFile + "'");
 					expression = Gpr.readFile(exprFile);
@@ -333,6 +342,7 @@ public class SnpSiftCmdFilter extends SnpSift {
 		System.err.println("\t-e|--exprFile <file>  : Read expression from a file");
 		System.err.println("\t-h|--help             : Show this help message");
 		System.err.println("\t-p|--pass             : Use 'PASS' field instead of filtering out VCF entries");
+		System.err.println("\t--format <format>     : SnpEff format version: {2, 3}. Default: 3");
 		System.err.println("\t--galaxy              : Used from Galaxy (expressions have been sanitized).");
 		System.err.println("\t-i|--filterId         : ID for this filter (##FILTER tag in header). Default: " + this.getClass().getSimpleName());
 		System.exit(-1);
