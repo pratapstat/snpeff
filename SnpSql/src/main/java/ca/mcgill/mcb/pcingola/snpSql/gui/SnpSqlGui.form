@@ -61,50 +61,20 @@
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jSplitPane1" alignment="0" pref="771" max="32767" attributes="0"/>
+          <Component id="jSplitPane1" alignment="0" pref="601" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
   </Layout>
   <SubComponents>
     <Container class="javax.swing.JSplitPane" name="jSplitPane1">
       <Properties>
+        <Property name="dividerSize" type="int" value="1"/>
         <Property name="orientation" type="int" value="0"/>
-        <Property name="resizeWeight" type="double" value="0.5"/>
+        <Property name="resizeWeight" type="double" value="1.0"/>
       </Properties>
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout"/>
       <SubComponents>
-        <Container class="javax.swing.JScrollPane" name="jScrollPane1">
-          <AuxValues>
-            <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
-          </AuxValues>
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout$JSplitPaneConstraintsDescription">
-              <JSplitPaneConstraints position="bottom"/>
-            </Constraint>
-          </Constraints>
-
-          <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
-          <SubComponents>
-            <Component class="javax.swing.JTable" name="jTable1">
-              <Properties>
-                <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
-                  <Table columnCount="9" rowCount="100">
-                    <Column editable="false" title="CHROM" type="java.lang.String"/>
-                    <Column editable="false" title="POS" type="java.lang.String"/>
-                    <Column editable="false" title="ID" type="java.lang.String"/>
-                    <Column editable="false" title="REF" type="java.lang.String"/>
-                    <Column editable="false" title="ALT" type="java.lang.String"/>
-                    <Column editable="false" title="QUAL" type="java.lang.String"/>
-                    <Column editable="false" title="FILTER" type="java.lang.String"/>
-                    <Column editable="false" title="INFO" type="java.lang.String"/>
-                    <Column editable="false" title="..." type="java.lang.String"/>
-                  </Table>
-                </Property>
-              </Properties>
-            </Component>
-          </SubComponents>
-        </Container>
         <Container class="javax.swing.JPanel" name="jPanel1">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout$JSplitPaneConstraintsDescription">
@@ -136,7 +106,7 @@
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="jTextFieldValue" max="32767" attributes="0"/>
+                                  <Component id="jTextFieldValue" pref="498" max="32767" attributes="0"/>
                                   <Component id="jTextFieldValue1" max="32767" attributes="0"/>
                               </Group>
                           </Group>
@@ -147,7 +117,7 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="jComboBoxOp2" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jTextFieldValue2" pref="517" max="32767" attributes="0"/>
+                              <Component id="jTextFieldValue2" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jComboBoxRel3" min="-2" max="-2" attributes="0"/>
@@ -156,7 +126,7 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="jComboBoxOp3" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jTextFieldValue3" pref="517" max="32767" attributes="0"/>
+                              <Component id="jTextFieldValue3" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="1" attributes="0">
                               <Component id="jComboBoxRel4" min="-2" max="-2" attributes="0"/>
@@ -165,7 +135,7 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="jComboBoxOp4" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jTextFieldValue4" pref="517" max="32767" attributes="0"/>
+                              <Component id="jTextFieldValue4" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jComboBoxRel5" min="-2" max="-2" attributes="0"/>
@@ -174,7 +144,7 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="jComboBoxOp5" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jTextFieldValue5" pref="517" max="32767" attributes="0"/>
+                              <Component id="jTextFieldValue5" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jComboBoxRel6" min="-2" max="-2" attributes="0"/>
@@ -183,11 +153,12 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="jComboBoxOp6" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jTextFieldValue6" pref="517" max="32767" attributes="0"/>
+                              <Component id="jTextFieldValue6" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
+                  <Component id="jScrollPane2" alignment="0" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
@@ -242,7 +213,8 @@
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jButtonQuery" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="41" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="jScrollPane2" pref="288" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -574,8 +546,35 @@
             </Component>
             <Component class="javax.swing.JTextField" name="jTextFieldValue6">
             </Component>
+            <Container class="javax.swing.JScrollPane" name="jScrollPane2">
+              <AuxValues>
+                <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
+              </AuxValues>
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+              <SubComponents>
+                <Component class="javax.swing.JTextArea" name="jTextAreaResults">
+                  <Properties>
+                    <Property name="columns" type="int" value="20"/>
+                    <Property name="editable" type="boolean" value="false"/>
+                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                      <Font name="Monotype Sorts" size="12" style="0"/>
+                    </Property>
+                    <Property name="rows" type="int" value="5"/>
+                    <Property name="tabSize" type="int" value="4"/>
+                  </Properties>
+                </Component>
+              </SubComponents>
+            </Container>
           </SubComponents>
         </Container>
+        <Component class="javax.swing.JProgressBar" name="jProgressBar1">
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout$JSplitPaneConstraintsDescription">
+              <JSplitPaneConstraints position="right"/>
+            </Constraint>
+          </Constraints>
+        </Component>
       </SubComponents>
     </Container>
   </SubComponents>

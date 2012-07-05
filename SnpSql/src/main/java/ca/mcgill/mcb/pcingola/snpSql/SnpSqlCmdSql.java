@@ -18,6 +18,27 @@ public class SnpSqlCmdSql extends SnpSql {
 	String vcfFileName;
 	String query;
 	Condition condition;
+	@SuppressWarnings("rawtypes")
+	List results;
+	StringBuilder resulsTxt;
+
+	public SnpSqlCmdSql() {
+	}
+
+	public SnpSqlCmdSql(String vcfFileName, String query) {
+		this.vcfFileName = vcfFileName;
+		this.query = query;
+		setDatabseFomVcf(vcfFileName);
+	}
+
+	@SuppressWarnings("rawtypes")
+	public List getResults() {
+		return results;
+	}
+
+	public String getResultsTxt() {
+		return resulsTxt.toString();
+	}
 
 	@Override
 	public void parseArgs(String[] args) {
@@ -68,6 +89,7 @@ public class SnpSqlCmdSql extends SnpSql {
 		query = query.replace('\n', ' ');
 		if (query.toLowerCase().indexOf("where ") < 0) query = "where " + query;
 		if (query.toLowerCase().indexOf("from ") < 0) query = "from Entry " + query;
+		Gpr.debug("Query: " + query);
 
 		// Create query
 		Query q = DbUtil.getCurrentSession().createQuery(query);
@@ -75,17 +97,26 @@ public class SnpSqlCmdSql extends SnpSql {
 		// Limit to a few results
 		if (testQuery) q.setMaxResults(TEST_LIMIT);
 
-		List list = q.list();
-		Gpr.debug("Number of results: " + list.size());
-		Gpr.debug("Class: " + list.get(0).getClass().getCanonicalName());
-		for (Object o : list) {
-			if (o.getClass().isArray()) {
-				Object array[] = (Object[]) o;
-				for (Object oo : array)
-					System.out.print(oo + "\t");
+		// Show results
+		results = q.list();
+		resulsTxt = new StringBuilder();
+		System.out.println("Number of results: " + results.size());
+		if (results.size() > 0) {
+			for (Object o : results) {
+				if (o.getClass().isArray()) {
+					Object array[] = (Object[]) o;
+					for (Object oo : array) {
+						System.out.print(oo + "\t");
+						resulsTxt.append(oo + "\t");
+					}
 
-				System.out.println("");
-			} else System.out.println(o);
+					System.out.println("");
+					resulsTxt.append("\n");
+				} else {
+					System.out.println(o);
+					resulsTxt.append(o + "\n");
+				}
+			}
 		}
 
 		return true;

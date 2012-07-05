@@ -6,6 +6,7 @@ package ca.mcgill.mcb.pcingola.snpSql.gui;
 
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
 import ca.mcgill.mcb.pcingola.snpSql.SnpSqlCmdCreate;
+import ca.mcgill.mcb.pcingola.snpSql.SnpSqlCmdSql;
 import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 import java.io.File;
@@ -29,6 +30,17 @@ public class SnpSqlGui extends javax.swing.JFrame {
      */
     public SnpSqlGui() {
         initComponents();
+        
+        JComboBox vars[] = {jComboBoxVar, jComboBoxVar1, jComboBoxVar2, jComboBoxVar3, jComboBoxVar4, jComboBoxVar5, jComboBoxVar6 };
+        JTextField vals[] = {jTextFieldValue, jTextFieldValue1, jTextFieldValue2, jTextFieldValue3, jTextFieldValue4, jTextFieldValue5, jTextFieldValue6 };
+        JComboBox rel[] = {null, jComboBoxRel1, jComboBoxRel2, jComboBoxRel3, jComboBoxRel4, jComboBoxRel5, jComboBoxRel6 };
+        JComboBox ops[] = {jComboBoxOp, jComboBoxOp1, jComboBoxOp2, jComboBoxOp3, jComboBoxOp4, jComboBoxOp5, jComboBoxOp6};
+        
+        this.vars = vars;
+        this.vals=vals;
+        this.rel=rel;
+        this.ops=ops;
+
         jButtonQuery.setEnabled(false);
 
     }
@@ -43,8 +55,6 @@ public class SnpSqlGui extends javax.swing.JFrame {
     private void initComponents() {
 
         jSplitPane1 = new javax.swing.JSplitPane();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
         jButtonQuery = new javax.swing.JButton();
         jComboBoxVar = new javax.swing.JComboBox();
@@ -74,6 +84,9 @@ public class SnpSqlGui extends javax.swing.JFrame {
         jComboBoxVar6 = new javax.swing.JComboBox();
         jComboBoxOp6 = new javax.swing.JComboBox();
         jTextFieldValue6 = new javax.swing.JTextField();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTextAreaResults = new javax.swing.JTextArea();
+        jProgressBar1 = new javax.swing.JProgressBar();
         menuBar = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         openMenuItem = new javax.swing.JMenuItem();
@@ -81,136 +94,10 @@ public class SnpSqlGui extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("SnpSql");
-        setPreferredSize(new java.awt.Dimension(800, 800));
 
+        jSplitPane1.setDividerSize(1);
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
-        jSplitPane1.setResizeWeight(0.5);
-
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null}
-            },
-            new String [] {
-                "CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO", "..."
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
-            };
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        jScrollPane1.setViewportView(jTable1);
-
-        jSplitPane1.setBottomComponent(jScrollPane1);
+        jSplitPane1.setResizeWeight(1.0);
 
         jButtonQuery.setText("Query");
         jButtonQuery.addActionListener(new java.awt.event.ActionListener() {
@@ -259,6 +146,13 @@ public class SnpSqlGui extends javax.swing.JFrame {
 
         jComboBoxOp6.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "---", "=", "!=", "<", "<=", ">", ">=", "LIKE", " " }));
 
+        jTextAreaResults.setColumns(20);
+        jTextAreaResults.setEditable(false);
+        jTextAreaResults.setFont(new java.awt.Font("Monotype Sorts", 0, 12)); // NOI18N
+        jTextAreaResults.setRows(5);
+        jTextAreaResults.setTabSize(4);
+        jScrollPane2.setViewportView(jTextAreaResults);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -281,7 +175,7 @@ public class SnpSqlGui extends javax.swing.JFrame {
                                 .addComponent(jComboBoxOp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTextFieldValue)
+                            .addComponent(jTextFieldValue, javax.swing.GroupLayout.DEFAULT_SIZE, 498, Short.MAX_VALUE)
                             .addComponent(jTextFieldValue1)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addComponent(jComboBoxRel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -290,7 +184,7 @@ public class SnpSqlGui extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jComboBoxOp2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextFieldValue2, javax.swing.GroupLayout.DEFAULT_SIZE, 517, Short.MAX_VALUE))
+                        .addComponent(jTextFieldValue2))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jComboBoxRel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -298,7 +192,7 @@ public class SnpSqlGui extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jComboBoxOp3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextFieldValue3, javax.swing.GroupLayout.DEFAULT_SIZE, 517, Short.MAX_VALUE))
+                        .addComponent(jTextFieldValue3))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addComponent(jComboBoxRel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -306,7 +200,7 @@ public class SnpSqlGui extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jComboBoxOp4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextFieldValue4, javax.swing.GroupLayout.DEFAULT_SIZE, 517, Short.MAX_VALUE))
+                        .addComponent(jTextFieldValue4))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jComboBoxRel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -314,7 +208,7 @@ public class SnpSqlGui extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jComboBoxOp5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextFieldValue5, javax.swing.GroupLayout.DEFAULT_SIZE, 517, Short.MAX_VALUE))
+                        .addComponent(jTextFieldValue5))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jComboBoxRel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -322,8 +216,9 @@ public class SnpSqlGui extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jComboBoxOp6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextFieldValue6, javax.swing.GroupLayout.DEFAULT_SIZE, 517, Short.MAX_VALUE)))
+                        .addComponent(jTextFieldValue6)))
                 .addContainerGap())
+            .addComponent(jScrollPane2)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -370,10 +265,12 @@ public class SnpSqlGui extends javax.swing.JFrame {
                     .addComponent(jComboBoxRel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButtonQuery)
-                .addContainerGap(41, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 288, Short.MAX_VALUE))
         );
 
         jSplitPane1.setLeftComponent(jPanel1);
+        jSplitPane1.setRightComponent(jProgressBar1);
 
         fileMenu.setMnemonic('f');
         fileMenu.setText("File");
@@ -408,7 +305,7 @@ public class SnpSqlGui extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 771, Short.MAX_VALUE)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 601, Short.MAX_VALUE)
         );
 
         pack();
@@ -420,11 +317,31 @@ public class SnpSqlGui extends javax.swing.JFrame {
 
     private void jButtonQueryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonQueryActionPerformed
         Gpr.debug("Query database!");
+
+        // Build query 
+        String query = "";
+        for( int i =0 ; i < vars.length ; i++ ) {
+            String relStr = (rel[i] != null ? "" + rel[i].getSelectedItem() : "");
+            String var = vars[i].getSelectedItem().toString();
+            String op = ops[i].getSelectedItem().toString();
+            String val = vals[i].getText();
+            
+            if( ! relStr.startsWith("---") && !var.startsWith("---") && !op.startsWith("---") && !val.isEmpty() ) 
+                query +=  "\t" + relStr + " ( " + vars[i].getSelectedItem() + " " + ops[i].getSelectedItem() + " '" + vals[i].getText() + "' ) ";
+        }
+        
+        Gpr.debug("Query database:\n" + query);
+        
+        // Query database
+        SnpSqlCmdSql snpSqlCmdSql = new SnpSqlCmdSql(vcfFileName, query);
+        snpSqlCmdSql.run();
+        Gpr.debug(snpSqlCmdSql.getResultsTxt());
+        jTextAreaResults.setText(snpSqlCmdSql.getResultsTxt());
+        jTextAreaResults.setCaretPosition(0);
+
     }//GEN-LAST:event_jButtonQueryActionPerformed
 
     private void openMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openMenuItemActionPerformed
-        Gpr.debug("Open menu!");
-        
         // Open file chooser
         final JFileChooser fc = new JFileChooser();
         
@@ -476,8 +393,6 @@ public class SnpSqlGui extends javax.swing.JFrame {
         String dbDataFileName = vcfFileName + ".data";
         File dbFile = new File(dbDataFileName);
         if( ! dbFile.exists() ) {
-            Gpr.debug("NO DATA FILE: " + dbDataFileName);
-            
              int result = JOptionPane.showConfirmDialog(this, "Database not found!\nPress OK to build databse for this file", "Need to build database", JOptionPane.OK_CANCEL_OPTION);
              if( result == JOptionPane.OK_OPTION ) {
                  // OK, try to build database
@@ -491,7 +406,6 @@ public class SnpSqlGui extends javax.swing.JFrame {
                 }
              } else vcfFileName = null;
         }
-        Gpr.debug("VCF FILE: " + vcfFileName);
     }
 
     /**
@@ -523,46 +437,41 @@ public class SnpSqlGui extends javax.swing.JFrame {
         // Show dialog while executing worker
         dialog.setVisible(true);
 
-        boolean ok = true;
         try{
-        Gpr.debug("GET: " + sw.get() + "\t" + sw.get().getClass().getCanonicalName());}catch(Exception e){;}
+            boolean ok = (Boolean) sw.get(); // Get return value from database build
+            return ok;
+        } catch(Exception e){;}
         
-        return ok;
+        return false;        
     }
     
     /**
      * Read VCF file and show it in table
      */
     void readVcfFile() {
-        // Update table
-        DefaultTableModel model = new DefaultTableModel();
-        model.setColumnIdentifiers(TABLE_TITLE);
+        StringBuilder sb = new StringBuilder();
         
-        int rowCount=0;
         if( vcfFileName != null ) {
+            int rowCount = 1;
             VcfFileIterator vfi = new VcfFileIterator(vcfFileName);
+            boolean header = true;
             for( VcfEntry ve : vfi) {
-                String data[] = new String[8];
-                data[0] = ve.getChromosomeName();
-                data[1] = "" + (ve.getStart() + 1);
-                data[2] = ve.getId();
-                data[3] = ve.getRef();
-                data[4] = ve.getAltsStr();
-                data[5] = ve.getQuality() + "";
-                data[6] = ve.getFilterPass();
-                data[7] = ve.getInfoStr();
-                model.addRow(data);
+                if( header ) {
+                    header = false;
+                    sb.append(vfi.getHeader() + "\n");
+                }
                 
-                if( rowCount++ >= TABLE_ROWS )   break;
+                sb.append(ve + "\n");
+                if( rowCount++ >= TABLE_ROWS )   {
+                    sb.append("--- WARNING: Only first " + TABLE_ROWS + " rows are shown --- " );
+                    break;
+                }
             }
         }
 
         // Show 'truncatd" warning
-        String data[] = new String[8];
-        for(int i=0;i< data.length; i++)data[i]="Only first " + TABLE_ROWS + " rows are shown";
-            model.addRow(data);
-
-        jTable1.setModel(model);
+        jTextAreaResults.setText(sb.toString());
+        jTextAreaResults.setCaretPosition(0);
     }
     
     /**
@@ -631,9 +540,10 @@ public class SnpSqlGui extends javax.swing.JFrame {
     private javax.swing.JComboBox jComboBoxVar5;
     private javax.swing.JComboBox jComboBoxVar6;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JProgressBar jProgressBar1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSplitPane jSplitPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTextArea jTextAreaResults;
     private javax.swing.JTextField jTextFieldValue;
     private javax.swing.JTextField jTextFieldValue1;
     private javax.swing.JTextField jTextFieldValue2;
@@ -645,8 +555,8 @@ public class SnpSqlGui extends javax.swing.JFrame {
     private javax.swing.JMenuItem openMenuItem;
     // End of variables declaration//GEN-END:variables
 
-    JComboBox vars[] = {jComboBoxVar, jComboBoxVar1, jComboBoxVar2, jComboBoxVar3, jComboBoxVar4, jComboBoxVar5, jComboBoxVar6 };
-    JTextField vals[] = {jTextFieldValue, jTextFieldValue1, jTextFieldValue2, jTextFieldValue3, jTextFieldValue4, jTextFieldValue5, jTextFieldValue6 };
-    JComboBox rel[] = {null, jComboBoxRel1, jComboBoxRel2, jComboBoxRel3, jComboBoxRel4, jComboBoxRel5, jComboBoxRel6 };
+    JComboBox vars[], ops[];
+    JTextField vals[]; 
+    JComboBox rel[];
 
 }
