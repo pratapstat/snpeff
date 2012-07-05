@@ -15,13 +15,14 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
 
 /**
- *
+ * SnpSql GUI
+ * 
+ * 
  * @author pcingola
  */
 public class SnpSqlGui extends javax.swing.JFrame {
 
     static  final int TABLE_ROWS = 1000;
-    static final String TABLE_TITLE[] = {"CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO"};
     
     String vcfFileName;
     
@@ -106,11 +107,11 @@ public class SnpSqlGui extends javax.swing.JFrame {
             }
         });
 
-        jComboBoxVar.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "---", "CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO" }));
+        jComboBoxVar.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "---", "entry.chrom", "entry.pos", "entry.id", "entry.ref", "entry.alt", "entry.qual", "entry.filter", "entry.info", "eff.effect", "eff.impact", "eff.funClass", "eff.codon", "eff.aa", "eff.aaLen", "eff.gene", "eff.bioType", "eff.coding", "eff.transcriptId", "eff.exonId" }));
 
         jComboBoxOp.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "---", "=", "!=", "<", "<=", ">", ">=", "LIKE", " " }));
 
-        jComboBoxVar1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "---", "CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO" }));
+        jComboBoxVar1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "---", "entry.chrom", "entry.pos", "entry.id", "entry.ref", "entry.alt", "entry.qual", "entry.filter", "entry.info", "eff.effect", "eff.impact", "eff.funClass", "eff.codon", "eff.aa", "eff.aaLen", "eff.gene", "eff.bioType", "eff.coding", "eff.transcriptId", "eff.exonId" }));
 
         jComboBoxOp1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "---", "=", "!=", "<", "<=", ">", ">=", "LIKE", " " }));
 
@@ -118,31 +119,31 @@ public class SnpSqlGui extends javax.swing.JFrame {
 
         jComboBoxRel2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "---", "AND", "OR" }));
 
-        jComboBoxVar2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "---", "CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO" }));
+        jComboBoxVar2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "---", "entry.chrom", "entry.pos", "entry.id", "entry.ref", "entry.alt", "entry.qual", "entry.filter", "entry.info", "eff.effect", "eff.impact", "eff.funClass", "eff.codon", "eff.aa", "eff.aaLen", "eff.gene", "eff.bioType", "eff.coding", "eff.transcriptId", "eff.exonId" }));
 
         jComboBoxOp2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "---", "=", "!=", "<", "<=", ">", ">=", "LIKE", " " }));
 
         jComboBoxRel3.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "---", "AND", "OR" }));
 
-        jComboBoxVar3.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "---", "CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO" }));
+        jComboBoxVar3.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "---", "entry.chrom", "entry.pos", "entry.id", "entry.ref", "entry.alt", "entry.qual", "entry.filter", "entry.info", "eff.effect", "eff.impact", "eff.funClass", "eff.codon", "eff.aa", "eff.aaLen", "eff.gene", "eff.bioType", "eff.coding", "eff.transcriptId", "eff.exonId" }));
 
         jComboBoxOp3.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "---", "=", "!=", "<", "<=", ">", ">=", "LIKE", " " }));
 
         jComboBoxRel4.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "---", "AND", "OR" }));
 
-        jComboBoxVar4.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "---", "CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO" }));
+        jComboBoxVar4.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "---", "entry.chrom", "entry.pos", "entry.id", "entry.ref", "entry.alt", "entry.qual", "entry.filter", "entry.info", "eff.effect", "eff.impact", "eff.funClass", "eff.codon", "eff.aa", "eff.aaLen", "eff.gene", "eff.bioType", "eff.coding", "eff.transcriptId", "eff.exonId" }));
 
         jComboBoxOp4.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "---", "=", "!=", "<", "<=", ">", ">=", "LIKE", " " }));
 
         jComboBoxRel5.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "---", "AND", "OR" }));
 
-        jComboBoxVar5.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "---", "CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO" }));
+        jComboBoxVar5.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "---", "entry.chrom", "entry.pos", "entry.id", "entry.ref", "entry.alt", "entry.qual", "entry.filter", "entry.info", "eff.effect", "eff.impact", "eff.funClass", "eff.codon", "eff.aa", "eff.aaLen", "eff.gene", "eff.bioType", "eff.coding", "eff.transcriptId", "eff.exonId" }));
 
         jComboBoxOp5.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "---", "=", "!=", "<", "<=", ">", ">=", "LIKE", " " }));
 
         jComboBoxRel6.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "---", "AND", "OR" }));
 
-        jComboBoxVar6.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "---", "CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO" }));
+        jComboBoxVar6.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "---", "entry.chrom", "entry.pos", "entry.id", "entry.ref", "entry.alt", "entry.qual", "entry.filter", "entry.info", "eff.effect", "eff.impact", "eff.funClass", "eff.codon", "eff.aa", "eff.aaLen", "eff.gene", "eff.bioType", "eff.coding", "eff.transcriptId", "eff.exonId" }));
 
         jComboBoxOp6.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "---", "=", "!=", "<", "<=", ">", ">=", "LIKE", " " }));
 
@@ -175,7 +176,7 @@ public class SnpSqlGui extends javax.swing.JFrame {
                                 .addComponent(jComboBoxOp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTextFieldValue, javax.swing.GroupLayout.DEFAULT_SIZE, 498, Short.MAX_VALUE)
+                            .addComponent(jTextFieldValue, javax.swing.GroupLayout.DEFAULT_SIZE, 452, Short.MAX_VALUE)
                             .addComponent(jTextFieldValue1)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addComponent(jComboBoxRel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -266,7 +267,7 @@ public class SnpSqlGui extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButtonQuery)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 288, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 296, Short.MAX_VALUE))
         );
 
         jSplitPane1.setLeftComponent(jPanel1);
@@ -305,7 +306,7 @@ public class SnpSqlGui extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 601, Short.MAX_VALUE)
+            .addComponent(jSplitPane1)
         );
 
         pack();
@@ -316,8 +317,6 @@ public class SnpSqlGui extends javax.swing.JFrame {
     }//GEN-LAST:event_exitMenuItemActionPerformed
 
     private void jButtonQueryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonQueryActionPerformed
-        Gpr.debug("Query database!");
-
         // Build query 
         String query = "";
         for( int i =0 ; i < vars.length ; i++ ) {
@@ -329,13 +328,10 @@ public class SnpSqlGui extends javax.swing.JFrame {
             if( ! relStr.startsWith("---") && !var.startsWith("---") && !op.startsWith("---") && !val.isEmpty() ) 
                 query +=  "\t" + relStr + " ( " + vars[i].getSelectedItem() + " " + ops[i].getSelectedItem() + " '" + vals[i].getText() + "' ) ";
         }
-        
-        Gpr.debug("Query database:\n" + query);
-        
+
         // Query database
         SnpSqlCmdSql snpSqlCmdSql = new SnpSqlCmdSql(vcfFileName, query);
         snpSqlCmdSql.run();
-        Gpr.debug(snpSqlCmdSql.getResultsTxt());
         jTextAreaResults.setText(snpSqlCmdSql.getResultsTxt());
         jTextAreaResults.setCaretPosition(0);
 

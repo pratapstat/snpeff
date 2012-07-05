@@ -87,8 +87,19 @@ public class SnpSqlCmdSql extends SnpSql {
 		// Build query string
 		query = query.replace('\t', ' ');
 		query = query.replace('\n', ' ');
+
 		if (query.toLowerCase().indexOf("where ") < 0) query = "where " + query;
-		if (query.toLowerCase().indexOf("from ") < 0) query = "from Entry " + query;
+		if (query.toLowerCase().indexOf("from ") < 0) {
+			String where = query;
+			query = "from Entry entry";
+
+			if (where.indexOf("eff.") > 0) {
+				query += ", Effect eff";
+				where += " and (eff.id = entry.id) ";
+			}
+
+			query = query + " " + where;
+		}
 		Gpr.debug("Query: " + query);
 
 		// Create query

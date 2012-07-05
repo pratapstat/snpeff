@@ -187,28 +187,28 @@ public class Effect extends Pojo<Effect> {
 		if (funClass != null) sb.append(funClass);
 		sb.append("|");
 
-		sb.append(codon);
+		if (codon != null) sb.append(codon);
 		sb.append("|");
 
-		sb.append(aa);
+		if (aa != null) sb.append(aa);
 		sb.append("|");
 
 		if (aaLen > 0) sb.append(aaLen);
 		sb.append("|");
 
-		sb.append(gene);
+		if (gene != null) sb.append(gene);
 		sb.append("|");
 
-		sb.append(bioType);
+		if (bioType != null) sb.append(bioType);
 		sb.append("|");
 
 		if (coding != null) sb.append(coding);
 		sb.append("|");
 
-		sb.append(transcriptId);
+		if (transcriptId != null) sb.append(transcriptId);
 		sb.append("|");
 
-		sb.append(exonId);
+		if (exonId != null) sb.append(exonId);
 
 		sb.append(")");
 
