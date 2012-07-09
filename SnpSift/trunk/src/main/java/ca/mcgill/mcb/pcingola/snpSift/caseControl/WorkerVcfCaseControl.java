@@ -12,9 +12,9 @@ public class WorkerVcfCaseControl extends WorkerVcfStr {
 
 	VcfCaseControl vcfCaseControl;
 
-	public WorkerVcfCaseControl(String groups) {
+	public WorkerVcfCaseControl(String groups, Boolean homozygousCase, Boolean homozygousControl) {
 		super();
-		vcfCaseControl = new VcfCaseControl(groups);
+		vcfCaseControl = new VcfCaseControl(groups, homozygousCase, homozygousControl);
 	}
 
 	@Override

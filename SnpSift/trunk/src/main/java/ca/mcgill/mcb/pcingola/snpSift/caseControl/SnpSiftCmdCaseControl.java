@@ -27,6 +27,8 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 	boolean addFisherInfo = false; // Used only for debugging purposes
 
 	double minPvalue = 1.0;
+	Boolean homozygousCase;
+	Boolean homozygousControl;
 	String groups;
 	String fileName;
 	FisherExactTest fisherExactTest = FisherExactTest.get();
@@ -42,7 +44,7 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 
 	public SnpSiftCmdCaseControl(String args[]) {
 		super(args, "casecontrol");
-		vcfCaseControl = new VcfCaseControl(groups);
+		vcfCaseControl = new VcfCaseControl(groups, homozygousCase, homozygousControl);
 	}
 
 	/**
@@ -87,9 +89,15 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 
 				switch (nonOpts) {
 				case 0:
-					groups = args[argc];
+					homozygousCase = parseHomHet(args[argc]);
 					break;
 				case 1:
+					homozygousControl = parseHomHet(args[argc]);
+					break;
+				case 2:
+					groups = args[argc];
+					break;
+				case 3:
 					fileName = args[argc];
 					break;
 				default:
@@ -104,6 +112,22 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		if (groups == null) usage("Missing paramter 'groups'");
 		if (fileName == null) usage("Missing paramter 'fileName'");
 		if (!isGroupString(groups)) usage("Expecting a sequence of {'+' , '-', '0'} , but got '" + groups + "'");
+	}
+
+	/**
+	 *  Parse a string having indicatinf 'hom' or 'het'
+	 * @param homStr
+	 * @return
+	 */
+	Boolean parseHomHet(String homStr) {
+		homStr = homStr.toUpperCase();
+		// You can write 'ho*' instead of homozygous
+		if (homStr.startsWith("HO")) return true;
+		if (homStr.toUpperCase().startsWith("HE")) return false;
+		if (homStr.toUpperCase().startsWith("AN")) return null;
+
+		usage("Expecting 'hom', 'het' or 'any', but got '" + homStr + "'");
+		return null;
 	}
 
 	/**
@@ -131,9 +155,14 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		// Master factory 
 		Props props = new Props(new UntypedActorFactory() {
 
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public Actor create() {
-				MasterVcfCaseControl master = new MasterVcfCaseControl(numWorkers, groups);
+				MasterVcfCaseControl master = new MasterVcfCaseControl(numWorkers, groups, homozygousCase, homozygousControl);
 				master.setAddHeader(addHeader);
 				return master;
 			}

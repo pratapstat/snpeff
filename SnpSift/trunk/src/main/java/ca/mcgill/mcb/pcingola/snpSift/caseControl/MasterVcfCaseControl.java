@@ -12,14 +12,14 @@ import ca.mcgill.mcb.pcingola.akka.vcf.MasterVcf;
  */
 public class MasterVcfCaseControl extends MasterVcf<String> {
 
-	public MasterVcfCaseControl(int numWorkers, final String groups) {
+	public MasterVcfCaseControl(int numWorkers, final String groups, final Boolean homozygousCase, final Boolean homozygousControl) {
 		super(new Props( //
 				// Create a factory
 				new UntypedActorFactory() {
 
 					@Override
 					public Actor create() {
-						return new WorkerVcfCaseControl(groups);
+						return new WorkerVcfCaseControl(groups, homozygousCase, homozygousControl);
 					}
 
 				}) //

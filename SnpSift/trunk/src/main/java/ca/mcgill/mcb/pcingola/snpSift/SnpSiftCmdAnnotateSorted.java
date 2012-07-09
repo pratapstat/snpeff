@@ -257,7 +257,10 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 			if (vcf.getStart() < vcfDb.getStart()) return;
 			if (vcf.getStart() == vcfDb.getStart()) {
 				// Sanity check: Check that references match
-				if (!vcf.getRef().equals(vcfDb.getRef())) {
+				if (!vcf.getRef().equals(vcfDb.getRef()) //
+						&& !vcf.getRef().startsWith(vcfDb.getRef()) //  
+						&& !vcfDb.getRef().startsWith(vcf.getRef()) //
+				) {
 					System.err.println("WARNING: Reference is '" + vcfDb.getRef() + "' instead of '" + vcf.getRef() + "' at " + chr + ":" + (vcf.getStart() + 1));
 					countBadRef++;
 				}
