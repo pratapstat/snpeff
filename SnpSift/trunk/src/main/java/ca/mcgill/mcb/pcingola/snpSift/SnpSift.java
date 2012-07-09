@@ -10,6 +10,7 @@ import ca.mcgill.mcb.pcingola.snpSift.caseControl.SnpSiftCmdCaseControl;
 import ca.mcgill.mcb.pcingola.snpSift.hwe.SnpSiftCmdHwe;
 import ca.mcgill.mcb.pcingola.snpSift.matrix.SnpSiftCmdAlleleMatrix;
 import ca.mcgill.mcb.pcingola.snpSift.matrix.SnpSiftCmdCovarianceMatrix;
+import ca.mcgill.mcb.pcingola.snpSift.phatsCons.SnpSiftCmdConservation;
 import ca.mcgill.mcb.pcingola.util.Gpr;
 import flanagan.analysis.Stat;
 
@@ -131,6 +132,7 @@ public class SnpSift {
 		else if (command.startsWith("ANNM")) SnpSiftCmdAnnotateMem.main(args);
 		else if (command.startsWith("ANN")) SnpSiftCmdAnnotateSorted.main(args);
 		else if (command.startsWith("CA")) SnpSiftCmdCaseControl.main(args);
+		else if (command.startsWith("CONS")) SnpSiftCmdConservation.main(args);
 		else if (command.startsWith("COVMAT")) SnpSiftCmdCovarianceMatrix.main(args);
 		else if (command.startsWith("DBNSFP")) SnpSiftCmdAnnotateSortedDbNSFP.main(args);
 		else if (command.startsWith("EX")) SnpSiftCmdExtractFields.main(args);
@@ -206,6 +208,7 @@ public class SnpSift {
 				+ "\n\tannotate      : Annotate 'ID' from a database (e.g. dbSnp). Assumes entries are sorted." //
 				+ "\n\tannMem        : Annotate 'ID' from a database (e.g. dbSnp). Loads db in memory. Does not assume sorted entries." //
 				+ "\n\tcaseControl   : Compare how many variants are in 'case' and in 'control' groups. Also calculates p-values (Fisher exact test and Cochran-Armitage test)" //
+				+ "\n\tcons t        : Annotate using conservation scores (phastCons)." //
 				+ "\n\tcovMat        : Create an covariance matrix output (allele matrix as input)." //
 				+ "\n\tdbnsfp        : Annotate with multiple entries from dbNSFP. <EXPERIMENTAL>" //
 				+ "\n\textractFields : Extract fields from VCF file into tab separated format." //

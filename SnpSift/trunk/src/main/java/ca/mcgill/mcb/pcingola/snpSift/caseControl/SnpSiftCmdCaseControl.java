@@ -133,7 +133,7 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 	/**
 	 * Load a file compare calls
 	 * 
-	 * @param fileName
+	 * @param vcfFile
 	 */
 	@Override
 	public void run() {
