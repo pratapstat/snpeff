@@ -22,6 +22,7 @@ public class PhastCons {
 
 	public final static int SCALE = 1000;
 
+	boolean verbose;
 	Genome genome;
 	HashMap<String, PhastConsChromo> phastConsChromoById;
 
@@ -53,7 +54,7 @@ public class PhastCons {
 	}
 
 	public PhastCons() {
-		this.genome = new Genome();
+		genome = new Genome();
 		phastConsChromoById = new HashMap<String, PhastConsChromo>();
 	}
 
@@ -130,11 +131,13 @@ public class PhastCons {
 		TShortArrayList cons = new TShortArrayList();
 
 		for (String line : lfi) {
-
 			// Parse 'step' lines
 			if (line.startsWith("fixedStep")) {
 				// Add old list
-				if (!chrom.isEmpty()) add(chrom, start, cons);
+				if (!chrom.isEmpty()) {
+					add(chrom, start, cons);
+					if (verbose) Timer.showStdErr("Added: " + chrom + ":" + start + "\t" + cons.size() + " scores.");
+				}
 
 				// Parse line
 				String recs[] = line.split("\\s+");
@@ -170,6 +173,10 @@ public class PhastCons {
 		// Add last 
 		if (!chrom.isEmpty()) add(chrom, start, cons);
 
+	}
+
+	public void setVerbose(boolean verbose) {
+		this.verbose = verbose;
 	}
 
 	@Override

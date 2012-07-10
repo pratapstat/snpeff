@@ -68,6 +68,7 @@ public class SnpSiftCmdConservation extends SnpSift {
 		// Read Wig file
 		Timer.showStdErr("Reading wig file: " + wigFile);
 		PhastCons phastCons = new PhastCons();
+		phastCons.setVerbose(verbose);
 		phastCons.readWigFile(wigFile);
 		Timer.showStdErr("done");
 
@@ -78,7 +79,8 @@ public class SnpSiftCmdConservation extends SnpSift {
 			// Show header before first entry
 			if (entryNum == 0) {
 				addHeader();
-				System.out.println(vcf.getHeader());
+				String header = vcf.getHeader();
+				if (!header.isEmpty()) System.out.println(vcf.getHeader());
 			}
 
 			// Get score and add it to INFO
