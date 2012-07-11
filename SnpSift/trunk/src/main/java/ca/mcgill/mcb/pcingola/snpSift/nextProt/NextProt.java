@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -27,17 +28,35 @@ import ca.mcgill.mcb.pcingola.util.Timer;
  */
 public class NextProt {
 
-	public static boolean verbose = true;
+	public static boolean verbose = false;
+
+	// We don't care about these categories
+	public static final String CATAGORY_BLACK_LIST_STR[] = { "sequence variant", "sequence conflict", "mature protein" };
 
 	public static final String NODE_NAME_PROTEIN = "protein";
 	public static final String NODE_NAME_GENE = "gene";
 	public static final String NODE_NAME_TRANSCRIPT = "transcript";
+	public static final String NODE_NAME_ANNOTATION = "annotation";
+	public static final String NODE_NAME_ANNOTATION_LIST = "annotationList";
+	public static final String NODE_NAME_POSITION = "position";
+	public static final String NODE_NAME_DESCRIPTION = "description";
+	public static final String NODE_NAME_CVNAME = "cvName";
+	public static final String NODE_NAME_SEQUENCE = "sequence";
+
 	public static final String ATTR_NAME_UNIQUE_NAME = "uniqueName";
 	public static final String ATTR_NAME_DATABASE = "database";
-	public static final String ATTR_VALUE_ENSEMBL = "Ensembl";
 	public static final String ATTR_NAME_ACCESSION = "accession";
 	public static final String ATTR_NAME_ANNOTATION_LIST = "annotationList";
+	public static final String ATTR_NAME_CATAGORY = "category";
+	public static final String ATTR_NAME_FIRST = "first";
+	public static final String ATTR_NAME_LAST = "last";
+	public static final String ATTR_NAME_ISOFORM_REF = "isoformRef";
 
+	public static final String ATTR_VALUE_ENSEMBL = "Ensembl";
+
+	HashSet<String> categoryBlackList;
+	HashMap<String, String> trIdMap;
+	HashMap<String, String> seqById;
 	boolean write = true;
 	BufferedWriter outFile;
 
@@ -46,12 +65,44 @@ public class NextProt {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		//String xmlFileName = Gpr.HOME + "/y.xml";
-		String xmlFileName = Gpr.HOME + "/snpEff/nextProt/xml/nextprot_chromosome_22.xml";
+		Timer.showStdErr("Start");
+
+		//String chrs[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "X", "Y", "MT" };
+		String chrs[] = { "22", "Y", "MT" };
+
 		String outputFileName = Gpr.HOME + "/snpEff/nextProt/zzz.txt";
 
+		// Create nextprot
 		NextProt nextProt = new NextProt();
-		nextProt.parse(xmlFileName, outputFileName);
+		nextProt.openOut(outputFileName);
+		nextProt.out("Gene Id\tID\tCategory\tDescription\tControlled Vocabulary\tFirst\tLast\tSequence"); // Title
+
+		// Parse all files
+		for (String chr : chrs) {
+			String xmlFileName = Gpr.HOME + "/snpEff/nextProt/xml/nextprot_chromosome_" + chr + ".xml";
+			nextProt.parse(xmlFileName);
+		}
+
+		nextProt.closeOut();
+		Timer.showStdErr("Done!");
+	}
+
+	public NextProt() {
+		trIdMap = new HashMap<String, String>();
+		seqById = new HashMap<String, String>();
+
+		// Create and populate black list
+		categoryBlackList = new HashSet<String>();
+		for (String cat : CATAGORY_BLACK_LIST_STR)
+			categoryBlackList.add(cat);
+	}
+
+	void closeOut() {
+		try {
+			outFile.close();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**
@@ -59,7 +110,7 @@ public class NextProt {
 	 * @param tabs
 	 * @param node
 	 */
-	ArrayList<Node> findNodes(String tabs, Node node, String nodeName, String nodeValue, String attrName, String attrValue) {
+	ArrayList<Node> findNodes(Node node, String nodeName, String nodeValue, String attrName, String attrValue) {
 		ArrayList<Node> resulstsList = new ArrayList<Node>();
 
 		while (node != null) {
@@ -96,7 +147,6 @@ public class NextProt {
 					}
 				}
 			} else {
-				//				Gpr.debug("name: '" + name + "'\tvalue: '" + value + "'");
 				if (((nodeName == null) || ((name != null) && name.equals(nodeName))) //
 						&& ((nodeValue == null) || ((value != null) && value.equals(nodeValue))) //
 				) {
@@ -106,7 +156,7 @@ public class NextProt {
 
 			if (found) {
 				resulstsList.add(node);
-				if (verbose) Timer.showStdErr("Found: " + toString(node, ""));
+				if (verbose) Timer.showStdErr("Found: " + toString(node));
 			}
 
 			//---
@@ -114,23 +164,17 @@ public class NextProt {
 			//---
 			switch (type) {
 			case Node.ELEMENT_NODE:
-				if (!tabs.isEmpty()) tabs += "->";
-				tabs += name + (attrSb.length() > 0 ? "( " + attrSb + " )" : "");
-				out(tabs);
 				NodeList nodeList = node.getChildNodes();
-				resulstsList.addAll(findNodes(tabs, nodeList, nodeName, nodeValue, attrName, attrValue));
+				resulstsList.addAll(findNodes(nodeList, nodeName, nodeValue, attrName, attrValue));
 				node = node.getNextSibling();
 				break;
 			case Node.TEXT_NODE:
-				if (!value.isEmpty()) out(tabs + " = '" + value + "'");
 				node = null;
 				break;
 			case Node.CDATA_SECTION_NODE:
-				if (!value.isEmpty()) out(tabs + " = '" + value + "'");
 				node = null;
 				break;
 			default:
-				Gpr.debug(tabs + "Node type: " + nodeType(type) + ", Name: " + node.getNodeName() + ", Value: " + node.getNodeValue());
 				node = null;
 			}
 		}
@@ -143,56 +187,57 @@ public class NextProt {
 	 * @param tabs
 	 * @param nodeList
 	 */
-	List<Node> findNodes(String tabs, NodeList nodeList, String nodeName, String nodeValue, String attrName, String attrValue) {
+	List<Node> findNodes(NodeList nodeList, String nodeName, String nodeValue, String attrName, String attrValue) {
 		ArrayList<Node> resulstsList = new ArrayList<Node>();
 
 		for (int temp = 0; temp < nodeList.getLength(); temp++) {
 			Node node = nodeList.item(temp);
-			resulstsList.addAll(findNodes(tabs, node, nodeName, nodeValue, attrName, attrValue));
+			resulstsList.addAll(findNodes(node, nodeName, nodeValue, attrName, attrValue));
 		}
 
 		return resulstsList;
 	}
 
 	/**
-	 * Get an attribute from a node
+	 * Find only one node
 	 * @param node
+	 * @param nodeName
+	 * @param nodeValue
 	 * @param attrName
+	 * @param attrValue
 	 * @return
 	 */
-	String getAttribute(Node node, String attrName) {
-		NamedNodeMap map = node.getAttributes();
-		if (map == null) return null;
-
-		Node attrNode = map.getNamedItem(attrName);
-		if (attrNode == null) return null;
-
-		return attrNode.getNodeValue();
+	Node findOneNode(Node node, String nodeName, String nodeValue, String attrName, String attrValue) {
+		ArrayList<Node> resulstsList = findNodes(node, nodeName, nodeValue, attrName, attrValue);
+		if (resulstsList.isEmpty()) return null;
+		return resulstsList.get(0);
 	}
 
-	String getGeneId(Node node, String uniqueName) {
-		// Find Ensembl gene ID
-		String geneId = null;
-		List<Node> ensemblGeneIds = findNodes("", node, NODE_NAME_GENE, null, ATTR_NAME_DATABASE, ATTR_VALUE_ENSEMBL);
-		if (ensemblGeneIds.size() > 1) throw new RuntimeException("Multiple Ensembl Gene IDs found for protein '" + uniqueName + "'!");
-		for (Node geneNode : ensemblGeneIds) {
-			geneId = getAttribute(geneNode, ATTR_NAME_ACCESSION);
-			Gpr.debug("\tGene:\t" + geneId);
-			return geneId;
+	/**
+	 * Find sequences for a node
+	 * @param node
+	 */
+	void findSequences(Node node) {
+		// Get sequences
+		List<Node> seqNodes = findNodes(node, NODE_NAME_SEQUENCE, null, null, null);
+		for (Node seq : seqNodes) {
+			String seqStr = getText(seq);
+			Node iso = seq.getParentNode();
+			String uniq = getAttribute(iso, ATTR_NAME_UNIQUE_NAME);
+			seqById.put(uniq, seqStr);
 		}
-		return null;
 	}
 
 	/**
 	 * Get uniqueId -> EnsemblId mapping for transcripts
 	 * @param node
-	 * @return
+	 * @return true if any was found
 	 */
-	HashMap<String, String> getTrIds(Node node) {
-		HashMap<String, String> trIdMap = new HashMap<String, String>();
+	boolean findTrIds(Node node) {
+		boolean added = false;
 
 		// Find Ensembl transcript ID
-		List<Node> ensemblTrIds = findNodes("", node, NODE_NAME_TRANSCRIPT, null, ATTR_NAME_DATABASE, ATTR_VALUE_ENSEMBL);
+		List<Node> ensemblTrIds = findNodes(node, NODE_NAME_TRANSCRIPT, null, ATTR_NAME_DATABASE, ATTR_VALUE_ENSEMBL);
 		for (Node trNode : ensemblTrIds) {
 			// Get Ensembl ID
 			String trId = getAttribute(trNode, ATTR_NAME_ACCESSION);
@@ -203,10 +248,49 @@ public class NextProt {
 
 			// Add to map
 			trIdMap.put(trUniqName, trId);
-			Gpr.debug("\tTr:\t" + trId + "\t <-> " + trUniqName);
+			added = true;
 		}
 
-		return trIdMap;
+		return added;
+	}
+
+	/**
+	 * Get an attribute from a node
+	 * @param node
+	 * @param attrName
+	 * @return
+	 */
+	String getAttribute(Node node, String attrName) {
+		if (node == null) return null;
+
+		NamedNodeMap map = node.getAttributes();
+		if (map == null) return null;
+
+		Node attrNode = map.getNamedItem(attrName);
+		if (attrNode == null) return null;
+
+		return attrNode.getNodeValue();
+	}
+
+	/**
+	 * Get Ensembl gene ID
+	 * @param node
+	 * @param uniqueName
+	 * @return
+	 */
+	String getGeneId(Node node, String uniqueName) {
+		Node geneNode = findOneNode(node, NODE_NAME_GENE, null, ATTR_NAME_DATABASE, ATTR_VALUE_ENSEMBL);
+		return getAttribute(geneNode, ATTR_NAME_ACCESSION);
+	}
+
+	/**
+	 * Get text form a node
+	 * @param n
+	 * @return
+	 */
+	String getText(Node n) {
+		if (n == null) return null;
+		return n.getTextContent().replace('\n', ' ').trim();
 	}
 
 	/**
@@ -247,11 +331,20 @@ public class NextProt {
 		}
 	}
 
+	void openOut(String outFileName) {
+		try {
+			Timer.showStdErr("Data written to " + outFileName);
+			outFile = new BufferedWriter(new FileWriter(outFileName));
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	void out(String s) {
 		if (!write) return;
 
 		try {
-			//System.out.println(s);
+			// System.out.println(s);
 			if (outFile != null) outFile.write(s + "\n");
 		} catch (IOException e) {
 			throw new RuntimeException(e);
@@ -262,7 +355,7 @@ public class NextProt {
 	 * Parse an XML file
 	 * @param xmlFileName
 	 */
-	void parse(String xmlFileName, String outFileName) {
+	void parse(String xmlFileName) {
 		try {
 			//---
 			// Load document
@@ -276,33 +369,93 @@ public class NextProt {
 			// Parse nodes
 			//---
 			Timer.showStdErr("Parsing XML data.");
-			outFile = new BufferedWriter(new FileWriter(outFileName));
-
-			List<Node> nodeList = findNodes("", doc.getChildNodes(), NODE_NAME_PROTEIN, null, null, null);
+			List<Node> nodeList = findNodes(doc.getChildNodes(), NODE_NAME_PROTEIN, null, null, null);
 			Timer.showStdErr("Found " + nodeList.size() + " protein nodes");
 			verbose = false;
 
 			// Parse each node
-			for (Node node : nodeList) {
-				String uniqueName = getAttribute(node, ATTR_NAME_UNIQUE_NAME);
-				Gpr.debug("Protein: " + uniqueName);
+			for (Node node : nodeList)
+				parseProteinNode(node);
 
-				// Find Ensembl gene ID
-				String geneId = getGeneId(node, uniqueName);
-				if (geneId != null) {
-					HashMap<String, String> trIdMap = getTrIds(node);
-
-					// Get attributes
-					if (!trIdMap.isEmpty()) {
-
-					}
-				}
-			}
-
-			outFile.close();
-			Timer.showStdErr("Done. Data written to " + outFileName);
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * Parse a protein node
+	 * @param node
+	 */
+	void parseAnnotation(Node ann, String geneId, String category) {
+		Node descr = findOneNode(ann, NODE_NAME_DESCRIPTION, null, null, null);
+		String description = getText(descr);
+
+		// Controlled vocabulary
+		Node cv = findOneNode(ann, NODE_NAME_DESCRIPTION, null, null, null);
+		String contrVoc = getText(cv);
+
+		List<Node> posNodes = findNodes(ann, NODE_NAME_POSITION, null, null, null);
+
+		for (Node pos : posNodes) {
+			// Get first & last position
+			String first = getAttribute(pos, ATTR_NAME_FIRST);
+			String last = getAttribute(pos, ATTR_NAME_LAST);
+			int start = Gpr.parseIntSafe(first) - 1;
+			int end = Gpr.parseIntSafe(last) - 1;
+
+			Node isoAnn = pos.getParentNode().getParentNode();
+			String isoformRef = getAttribute(isoAnn, ATTR_NAME_ISOFORM_REF);
+
+			// Find sequence
+			String sequence = seqById.get(isoformRef);
+			if ((sequence != null) && (start >= 0) && (end >= start)) sequence = sequence.substring(start, end + 1);
+
+			out(geneId //
+					+ "\t" + isoformRef //
+					+ "\t" + category //
+					+ "\t" + (description != null ? description : "")//
+					+ "\t" + (contrVoc != null ? contrVoc : "")//
+					+ "\t" + first //
+					+ "\t" + last //
+					+ "\t" + sequence //
+			);
+		}
+	}
+
+	/**
+	 * Parse annotations list
+	 * @param node
+	 * @param geneId
+	 */
+	void parseAnnotationList(Node node, String geneId) {
+		// Get annotation lists
+		List<Node> annListNodes = findNodes(node, NODE_NAME_ANNOTATION_LIST, null, null, null);
+		for (Node annList : annListNodes) {
+			// Parse each annotation in the list
+			String category = getAttribute(annList, ATTR_NAME_CATAGORY);
+			List<Node> annNodes = findNodes(annList, NODE_NAME_ANNOTATION, null, null, null);
+
+			// Analyze the ones not in the blacklist
+			for (Node ann : annNodes)
+				if (!categoryBlackList.contains(category)) parseAnnotation(ann, geneId, category);
+		}
+	}
+
+	/**
+	 * Parse a protein node
+	 * @param node
+	 */
+	void parseProteinNode(Node node) {
+		String uniqueName = getAttribute(node, ATTR_NAME_UNIQUE_NAME);
+
+		// Find Ensembl gene ID
+		String geneId = getGeneId(node, uniqueName);
+		if (geneId != null) {
+			// Get transcript IDs
+			if (findTrIds(node)) {
+				findSequences(node); // Find sequences
+				parseAnnotationList(node, geneId); // Parse annotation list
+			}
 		}
 	}
 
@@ -312,7 +465,7 @@ public class NextProt {
 	 * @param tabs
 	 * @return
 	 */
-	String toString(Node node, String tabs) {
+	String toString(Node node) {
 		StringBuilder sb = new StringBuilder();
 
 		//---
@@ -321,7 +474,7 @@ public class NextProt {
 		String name = node.getNodeName();
 		String value = node.getNodeValue();
 		if (value != null) value = value.replace('\n', ' ').trim();
-		sb.append(tabs + name);
+		sb.append(name);
 
 		//---
 		// Get attributes
