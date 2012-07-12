@@ -64,8 +64,8 @@ public class NextProt {
 
 	public static final String ATTR_VALUE_ENSEMBL = "Ensembl";
 
-	//public static final String OUT_TYPE = "TXT";
-	public static final String OUT_TYPE = "BED";
+	public static final String OUT_TYPE = "TXT";
+	//	public static final String OUT_TYPE = "BED";
 
 	String xmlDirName;
 	Config config;
@@ -546,10 +546,12 @@ public class NextProt {
 			TranscriptData trData = transcriptData(isoformRef, start, end, sequence, subSeq);
 
 			// Create output
-			if (trData.ok && (len == 1)) {
+			//if (trData.ok && (len == 1)) {
+			if (trData.ok && (len > 1)) {
 				if (OUT_TYPE.equals("TXT")) {
 					out(geneId //
 							+ "\t" + isoformRef //
+							+ "\t" + trData.tr.getId() //
 							+ "\t" + category //
 							+ "\t" + (description != null ? description : "")//
 							+ "\t" + contrVoc //
@@ -633,7 +635,7 @@ public class NextProt {
 		// Open output and create title
 		String outputFileName = Gpr.HOME + "/snpEff/nextProt/nextProt_categories.txt";
 		openOut(outputFileName);
-		if (OUT_TYPE.equals("TXT")) out("Gene Id\tID\tCategory\tDescription\tControlled Vocabulary (Main)\tControlled Vocabulary (other)\tFirst\tLast\tlen\tchr\tchrStart\tchrEnd\tSequence\ttr.Codon\ttr.AA"); // Title
+		if (OUT_TYPE.equals("TXT")) out("Gene Id\tID\tTranscript ID\tCategory\tDescription\tControlled Vocabulary (Main)\tControlled Vocabulary (other)\tFirst\tLast\tlen\tchr\tchrStart\tchrEnd\tSequence\ttr.Codon\ttr.AA"); // Title
 
 		// Parse all XML files in directory
 		String files[] = (new File(xmlDirName)).list();
