@@ -38,7 +38,7 @@ import ca.mcgill.mcb.pcingola.util.Timer;
  */
 public class NextProt {
 
-	public static boolean verbose = false;
+	public static boolean debug = true;
 
 	// We don't care about these categories
 	public static final String CATAGORY_BLACK_LIST_STR[] = { "sequence variant", "sequence conflict", "mature protein", "mutagenesis site" };
@@ -64,6 +64,9 @@ public class NextProt {
 
 	public static final String ATTR_VALUE_ENSEMBL = "Ensembl";
 
+	//public static final String OUT_TYPE = "TXT";
+	public static final String OUT_TYPE = "BED";
+
 	String xmlDirName;
 	Config config;
 	SnpEffectPredictor snpEffectPredictor;
@@ -86,8 +89,9 @@ public class NextProt {
 	 */
 	public static void main(String[] args) {
 		Timer.showStdErr("Start");
-		// String genome = "testHg3765Chr22";
 		String genome = "GRCh37.66";
+		if (debug) genome = "testHg3765Chr22";
+
 		String xmlDirName = Gpr.HOME + "/snpEff/nextProt/xml";
 
 		// Create nextprot
@@ -118,6 +122,66 @@ public class NextProt {
 		String key = category + "\t" + contrVoc;
 		CountByType cbt = annotationsByType.getOrCreate(key);
 		cbt.inc(sequence);
+	}
+
+	/**
+	 * Gather data from transcript
+	 * @param isoformRef
+	 * @param start
+	 * @param end
+	 * @param sequence
+	 * @param subSeq
+	 * @return
+	 */
+	TranscriptData transcriptData(String isoformRef, int start, int end, String sequence, String subSeq) {
+		String trId = trIdByUniqueName.get(isoformRef);
+		TranscriptData trData = new TranscriptData();
+		if (trId != null) {
+			Transcript tr = trById.get(trId);
+			if (tr != null) {
+				trData.tr = tr;
+				String protein = tr.protein();
+
+				// Remove trailing stop codon ('*')
+				if (protein.charAt(protein.length() - 1) == '*') protein = protein.substring(0, protein.length() - 1);
+
+				// Sanity check: Do protein sequences match?
+				if (protein.equals(sequence)) {
+					proteinOk.add(trId);
+
+					if ((start >= 0) && (end >= start)) {
+						// Try to map to chromosome position
+						int cdsBase2Pos[] = tr.cdsBaseNumber2ChrPos();
+						int codonStart = start * 3;
+						int codonEnd = (end + 1) * 3 - 1;
+						trData.chrPosStart = cdsBase2Pos[codonStart];
+						trData.chrPosEnd = cdsBase2Pos[codonEnd];
+						trData.chrName = tr.getChromosomeName();
+
+						// More sanity checks
+						trData.codon = tr.cds().substring(codonStart, codonEnd + 1);
+						trData.aa = CodonTables.getInstance().aa(trData.codon, genome, trData.chrName);
+						if (!subSeq.equals(trData.aa)) Timer.showStdErr("WARNING: AA differ: " //
+								+ "\tUniqueName" + isoformRef //
+								+ "\tEnsembl ID: " + trId //
+								+ "\tEnsembl  AA: " + trData.aa//
+								+ "\tNextProt AA:" + subSeq//
+								+ "\n");
+						else trData.ok = true; // All sanity checks passed
+					}
+				} else {
+					if (!proteinDifferences.contains(trId)) Timer.showStdErr("WARNING: Protein sequences differ: " //
+							+ "\tUniqueName" + isoformRef //
+							+ "\tEnsembl ID: " + trId //
+							+ "\n\tEnsembl  (" + protein.length() + "): " + protein //
+							+ "\n\tNextProt (" + sequence.length() + "): " + sequence //
+							+ "\n");
+					proteinDifferences.add(trId);
+				}
+			}
+		}
+
+		return trData;
 	}
 
 	void closeOut() {
@@ -177,10 +241,7 @@ public class NextProt {
 				}
 			}
 
-			if (found) {
-				resulstsList.add(node);
-				if (verbose) Timer.showStdErr("Found: " + toString(node));
-			}
+			if (found) resulstsList.add(node);
 
 			//---
 			// Show node
@@ -375,6 +436,43 @@ public class NextProt {
 	}
 
 	/**
+	 * Show annotations counters in a table
+	 */
+	void outAnnotationTable() {
+		ArrayList<String> keys = new ArrayList<String>();
+		keys.addAll(annotationsByType.keySet());
+		Collections.sort(keys);
+
+		// Show title
+		StringBuilder title = new StringBuilder();
+		for (char aa : GprSeq.AMINO_ACIDS)
+			title.append(aa + "\t");
+		title.append("\t" + title);
+		out("Catergory\tControlled Vocabulary\tTotal\t" + title);
+
+		for (String key : keys) {
+			CountByType cbt = annotationsByType.get(key);
+			long total = cbt.sum();
+			if (total > 100) {
+				StringBuilder sb = new StringBuilder();
+				StringBuilder sbPerc = new StringBuilder();
+				sb.append(key + "\t" + total + "\t");
+				for (char aa : GprSeq.AMINO_ACIDS) {
+					long count = cbt.get("" + aa);
+					if (count > 0) {
+						sb.append(count);
+						double perc = ((double) count) / total;
+						sbPerc.append(String.format("%1.2f", perc));
+					}
+					sb.append("\t");
+					sbPerc.append("\t");
+				}
+				out(sb + "\t" + sbPerc);
+			}
+		}
+	}
+
+	/**
 	 * Parse an XML file
 	 * @param xmlFileName
 	 */
@@ -394,7 +492,6 @@ public class NextProt {
 			Timer.showStdErr("Parsing XML data.");
 			List<Node> nodeList = findNodes(doc.getChildNodes(), NODE_NAME_PROTEIN, null, null, null);
 			Timer.showStdErr("Found " + nodeList.size() + " protein nodes");
-			verbose = false;
 
 			// Parse each node
 			for (Node node : nodeList)
@@ -445,72 +542,37 @@ public class NextProt {
 			String subSeq = "";
 			if ((sequence != null) && (start >= 0) && (end >= start)) subSeq = sequence.substring(start, end + 1);
 
-			// Get Ensembl transcript ID
-			String trId = trIdByUniqueName.get(isoformRef);
-			int chrPosStart = -1, chrPosEnd = -1;
-			String chrName = "";
-			String codon = "";
-			String aa = "";
-			if (trId != null) {
-				Transcript tr = trById.get(trId);
-				if (tr != null) {
-					String protein = tr.protein();
+			// Check transcript 
+			TranscriptData trData = transcriptData(isoformRef, start, end, sequence, subSeq);
 
-					// Remove trailing stop codon ('*')
-					if (protein.charAt(protein.length() - 1) == '*') protein = protein.substring(0, protein.length() - 1);
+			// Create output
+			if (trData.ok && (len == 1)) {
+				if (OUT_TYPE.equals("TXT")) {
+					out(geneId //
+							+ "\t" + isoformRef //
+							+ "\t" + category //
+							+ "\t" + (description != null ? description : "")//
+							+ "\t" + contrVoc //
+							+ "\t" + contrVoc2 //
+							+ "\t" + first //
+							+ "\t" + last //
+							+ "\t" + len //
+							+ "\t" + trData.chrName //
+							+ "\t" + trData.chrPosStart //
+							+ "\t" + trData.chrPosEnd //
+							+ "\t" + subSeq //
+							+ "\t" + trData.codon //
+							+ "\t" + trData.aa//
+					);
+				} else {
+					String info = trData.tr.getId() + ";" + category.trim().replace(' ', '_') + ";" + contrVoc.trim().replace(' ', '_');
 
-					// Sanity check: Do protein sequences match?
-					if (protein.equals(sequence)) {
-						proteinOk.add(trId);
+					// Transform coordinates to zero-based, right-open
+					int left = Math.min(trData.chrPosStart, trData.chrPosEnd);
+					int right = Math.max(trData.chrPosStart, trData.chrPosEnd) + 1;
 
-						if ((start >= 0) && (end >= start)) {
-							// Try to map to chromosome position
-							int cdsBase2Pos[] = tr.cdsBaseNumber2ChrPos();
-							int codonStart = start * 3;
-							int codonEnd = (end + 1) * 3 - 1;
-							chrPosStart = cdsBase2Pos[codonStart];
-							chrPosEnd = cdsBase2Pos[codonEnd];
-							chrName = tr.getChromosomeName();
-
-							// More sanity checks
-							codon = tr.cds().substring(codonStart, codonEnd + 1);
-							aa = CodonTables.getInstance().aa(codon, genome, chrName);
-							if (!subSeq.equals(aa)) Timer.showStdErr("WARNING: AA differ: " //
-									+ "\tUniqueName" + isoformRef //
-									+ "\tEnsembl ID: " + trId //
-									+ "\tEnsembl  AA: " + aa//
-									+ "\tNextProt AA:" + subSeq//
-									+ "\n");
-						}
-					} else {
-						if (!proteinDifferences.contains(trId)) Timer.showStdErr("WARNING: Protein sequences differ: " //
-								+ "\tUniqueName" + isoformRef //
-								+ "\tEnsembl ID: " + trId //
-								+ "\n\tEnsembl  (" + protein.length() + "): " + protein //
-								+ "\n\tNextProt (" + sequence.length() + "): " + sequence //
-								+ "\n");
-						proteinDifferences.add(trId);
-					}
+					out(trData.chrName + "\t" + left + "\t" + right + "\t" + info);
 				}
-			}
-
-			if (len == 1) {
-				out(geneId //
-						+ "\t" + isoformRef //
-						+ "\t" + category //
-						+ "\t" + (description != null ? description : "")//
-						+ "\t" + contrVoc //
-						+ "\t" + contrVoc2 //
-						+ "\t" + first //
-						+ "\t" + last //
-						+ "\t" + len //
-						+ "\t" + chrName //
-						+ "\t" + chrPosStart //
-						+ "\t" + chrPosEnd //
-						+ "\t" + subSeq //
-						+ "\t" + codon //
-						+ "\t" + aa//
-				);
 				addAnnotation(category, contrVoc, sequence);
 			}
 		}
@@ -558,7 +620,7 @@ public class NextProt {
 	 * @param xmlDirName
 	 */
 	public void run(String xmlDirName) {
-		Timer.showStdErr("Loading database");
+		Timer.showStdErr("Loading database " + genomeVer);
 		config = new Config(genomeVer, Gpr.HOME + "/snpEff/" + Config.DEFAULT_CONFIG_FILE);
 		snpEffectPredictor = config.loadSnpEffectPredictor();
 		genome = config.getGenome();
@@ -571,19 +633,19 @@ public class NextProt {
 		// Open output and create title
 		String outputFileName = Gpr.HOME + "/snpEff/nextProt/nextProt_categories.txt";
 		openOut(outputFileName);
-		out("Gene Id\tID\tCategory\tDescription\tControlled Vocabulary (Main)\tControlled Vocabulary (other)\tFirst\tLast\tlen\tchr\tchrStart\tchrEnd\tSequence\ttr.Codon\ttr.AA"); // Title
+		if (OUT_TYPE.equals("TXT")) out("Gene Id\tID\tCategory\tDescription\tControlled Vocabulary (Main)\tControlled Vocabulary (other)\tFirst\tLast\tlen\tchr\tchrStart\tchrEnd\tSequence\ttr.Codon\ttr.AA"); // Title
 
 		// Parse all XML files in directory
 		String files[] = (new File(xmlDirName)).list();
 		for (String xmlFileName : files) {
-			if (xmlFileName.endsWith(".xml")) {
+			if (xmlFileName.endsWith(debug ? "_22.xml" : ".xml")) {
 				String path = xmlDirName + "/" + xmlFileName;
 				parse(path);
 			}
 		}
 
 		// Show annotation results and close output file
-		showAnnotations();
+		if (OUT_TYPE.equals("TXT")) outAnnotationTable();
 		closeOut();
 		Timer.showStdErr("Proteing sequences:" //
 				+ "\n\tMatch       : " + proteinOk.size() //
@@ -592,43 +654,6 @@ public class NextProt {
 		);
 		Timer.showStdErr("Done!");
 
-	}
-
-	/**
-	 * Show annotations counters in a table
-	 */
-	void showAnnotations() {
-		ArrayList<String> keys = new ArrayList<String>();
-		keys.addAll(annotationsByType.keySet());
-		Collections.sort(keys);
-
-		// Show title
-		StringBuilder title = new StringBuilder();
-		for (char aa : GprSeq.AMINO_ACIDS)
-			title.append(aa + "\t");
-		title.append("\t" + title);
-		out("Catergory\tControlled Vocabulary\tTotal\t" + title);
-
-		for (String key : keys) {
-			CountByType cbt = annotationsByType.get(key);
-			long total = cbt.sum();
-			if (total > 100) {
-				StringBuilder sb = new StringBuilder();
-				StringBuilder sbPerc = new StringBuilder();
-				sb.append(key + "\t" + total + "\t");
-				for (char aa : GprSeq.AMINO_ACIDS) {
-					long count = cbt.get("" + aa);
-					if (count > 0) {
-						sb.append(count);
-						double perc = ((double) count) / total;
-						sbPerc.append(String.format("%1.2f", perc));
-					}
-					sb.append("\t");
-					sbPerc.append("\t");
-				}
-				out(sb + "\t" + sbPerc);
-			}
-		}
 	}
 
 	/**
@@ -669,4 +694,11 @@ public class NextProt {
 
 		return sb.toString();
 	}
+}
+
+class TranscriptData {
+	public boolean ok = false;
+	public Transcript tr = null;
+	public int chrPosStart = -1, chrPosEnd = -1;
+	public String chrName = "", codon = "", aa = "";
 }
