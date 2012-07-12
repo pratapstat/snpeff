@@ -38,7 +38,7 @@ import ca.mcgill.mcb.pcingola.util.Timer;
  */
 public class NextProt {
 
-	public static boolean debug = true;
+	public static boolean debug = false;
 
 	// We don't care about these categories
 	public static final String CATAGORY_BLACK_LIST_STR[] = { "sequence variant", "sequence conflict", "mature protein", "mutagenesis site" };
