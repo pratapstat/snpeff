@@ -6,6 +6,7 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
 import ca.mcgill.mcb.pcingola.snpSift.SnpSiftCmdAnnotateSorted;
+import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 
 /**
@@ -32,20 +33,24 @@ public class TestCasesAnnotate extends TestCase {
 			vcfAnnotate.initAnnotate();
 
 			VcfFileIterator vcfFile = new VcfFileIterator(fileName);
-			for( VcfEntry vcf : vcfFile ) {
+			for (VcfEntry vcf : vcfFile) {
 				vcfAnnotate.annotate(vcf);
 
 				// We expect the same annotation twice 
 				String idstr = vcf.getId();
-				if( idstr.length() > 1 ) {
+				if (idstr.length() > 1) {
 					String id[] = idstr.split(";");
-					Assert.assertEquals(2, id.length); // Two annotations are expected  
-					Assert.assertEquals(id[0], id[1]); // And both of them should be equal  
+
+					if (id.length != 2) Gpr.debug("ERRORL: Only one ID\t\t" + vcf);
+					Assert.assertEquals(2, id.length); // Two annotations are expected
+
+					if (!id[0].equals(id[1])) Gpr.debug("ERRORL: ID '" + idstr + "'\t\t" + vcf);
+					Assert.assertEquals(id[0], id[1]); // And both of them should be equal
 				}
 			}
 
 			vcfAnnotate.endAnnotate();
-		} catch(IOException e) {
+		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -71,6 +76,16 @@ public class TestCasesAnnotate extends TestCase {
 	public void test_04() {
 		String dbFileName = "./test/db_test_large.vcf";
 		String fileName = "./test/annotate_large.vcf";
+		annotateTest(dbFileName, fileName);
+	}
+
+	/**
+	 * Chromosomes in VCF file are called 'chr22' instead of '22'.
+	 * This should work OK as well.
+	 */
+	public void test_05() {
+		String dbFileName = "./test/db_test_chr22.vcf";
+		String fileName = "./test/test_chr22.vcf";
 		annotateTest(dbFileName, fileName);
 	}
 
