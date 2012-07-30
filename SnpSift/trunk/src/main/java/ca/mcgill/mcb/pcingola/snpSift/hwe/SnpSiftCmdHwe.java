@@ -126,7 +126,7 @@ public class SnpSiftCmdHwe extends SnpSift {
 		for (VcfEntry vcfEntry : vcfFile) {
 			if (entryNum == 1) {
 				addHeader();
-				System.out.println(vcfFile.getHeader()); // Show header
+				if (!vcfFile.getHeader().isEmpty()) System.out.println(vcfFile.getHeader()); // Show header
 			}
 
 			vcfHwe.hwe(vcfEntry, true);

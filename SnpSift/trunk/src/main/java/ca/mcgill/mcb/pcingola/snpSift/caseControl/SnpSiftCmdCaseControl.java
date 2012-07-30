@@ -194,7 +194,7 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 					vcfFile.addHeader(add);
 
 				// Show header
-				System.out.println(vcfFile.getHeader());
+				if (!vcfFile.getHeader().isEmpty()) System.out.println(vcfFile.getHeader());
 				showHeader = false;
 			}
 

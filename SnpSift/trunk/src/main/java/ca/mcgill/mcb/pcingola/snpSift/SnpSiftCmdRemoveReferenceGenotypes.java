@@ -49,7 +49,9 @@ public class SnpSiftCmdRemoveReferenceGenotypes {
 			VcfGenotype nogenotype = null;
 
 			// Show header?
-			if (entryNum == 1) System.out.println(vcfFile.getHeader());
+			if (entryNum == 1) {
+				if (!vcfFile.getHeader().isEmpty()) System.out.println(vcfFile.getHeader());
+			}
 
 			// Replace using 'nogenotype' if it is not a variant
 			List<VcfGenotype> genotypes = vcfEntry.getVcfGenotypes();
