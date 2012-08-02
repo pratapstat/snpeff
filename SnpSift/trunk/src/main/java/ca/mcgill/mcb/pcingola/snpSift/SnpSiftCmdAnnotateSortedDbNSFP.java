@@ -13,20 +13,30 @@ import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 import ca.mcgill.mcb.pcingola.vcf.VcfFileIndexIntervals;
 
 /**
- * Annotate a VCF file with dbNSFP (Sorting Tolerant From Intolerant) from another VCF file (database)
- * http://sites.google.com/site/jpopgen/dbNSFP
+ * Annotate a VCF file with dbNSFP. 
  * 
- * Paper: Liu X, Jian X, and Boerwinkle E. 2011. dbNSFP: a lightweight database of human non-synonymous SNPs and their
- * functional predictions. Human Mutation. 32:894-899.
+ * The dbNSFP is an integrated database of functional predictions from multiple algorithms for the comprehensive 
+ * collection of human non-synonymous SNPs (NSs). Its current version (ver 1.1) is based on CCDS version 20090327 
+ * and includes a total of 75,931,005 NSs. It compiles prediction scores from four prediction algorithms (SIFT, 
+ * Polyphen2, LRT and MutationTaster), two conservation scores (PhyloP and GERP++) and other related information.
+ *   
+ * References:
+ *  
+ * 		http://sites.google.com/site/jpopgen/dbNSFP
+ * 
+ * 		Paper: Liu X, Jian X, and Boerwinkle E. 2011. dbNSFP: a lightweight database of human non-synonymous SNPs and their
+ * 		functional predictions. Human Mutation. 32:894-899.
  * 
  * @author lletourn
  * 
  */
 public class SnpSiftCmdAnnotateSortedDbNSFP extends SnpSift {
-	private static final String KEY_PREFIX = "dbnsfp";
+
+	public static final String KEY_PREFIX = "dbnsfp";
 	private static final Map<String, String> alleleSpecificFieldsToAdd;
 	private static final Map<String, String> positionSpecificFieldsToAdd;
 
+	protected boolean annotateAll; // Annotate empty fields as well?
 	protected String dbNSFPFileName;
 	protected String vcfFileName;
 	protected int count = 0;
@@ -81,12 +91,11 @@ public class SnpSiftCmdAnnotateSortedDbNSFP extends SnpSift {
 	@Override
 	protected void addHeader(VcfFileIterator vcfFile) {
 		super.addHeader(vcfFile);
-		for (String key : alleleSpecificFieldsToAdd.keySet()) {
+		for (String key : alleleSpecificFieldsToAdd.keySet())
 			vcfFile.addHeader("##INFO=<ID=" + KEY_PREFIX + key + ",Number=A,Type=String,Description=\"" + alleleSpecificFieldsToAdd.get(key) + "\">");
-		}
-		for (String key : positionSpecificFieldsToAdd.keySet()) {
+
+		for (String key : positionSpecificFieldsToAdd.keySet())
 			vcfFile.addHeader("##INFO=<ID=" + KEY_PREFIX + key + ",Number=.,Type=String,Description=\"" + positionSpecificFieldsToAdd.get(key) + "\">");
-		}
 	}
 
 	/**
@@ -101,7 +110,7 @@ public class SnpSiftCmdAnnotateSortedDbNSFP extends SnpSift {
 			if (prevChr == null) prevChr = currentEntry.getChromosomeName();
 		}
 
-		// Do we have to seek in db file?
+		// Do we have to seek to new chromosome in db file?
 		String chr = vcf.getChromosomeName();
 		if (!chr.equals(prevChr)) {
 			// Get to the beginning of the new chromosome
@@ -119,6 +128,7 @@ public class SnpSiftCmdAnnotateSortedDbNSFP extends SnpSift {
 			currentEntry = null;
 		}
 
+		// Seek to chromosomal position in db
 		while (true) {
 			if (currentEntry == null) {
 				currentEntry = dbNSFPFile.next();
@@ -130,34 +140,62 @@ public class SnpSiftCmdAnnotateSortedDbNSFP extends SnpSift {
 			currentEntry = null;
 		}
 
+		// Add all INFO fields that refer to this allele
+		boolean annotated = false;
 		StringBuilder info = new StringBuilder();
 		for (String fieldKey : alleleSpecificFieldsToAdd.keySet()) {
+			boolean empty = true;
 			info.setLength(0);
 			for (String alt : vcf.getAlts()) {
 				Map<String, String> values = currentEntry.getAltAlelleValues(alt);
 				if (info.length() > 0) info.append(',');
 
 				if (values == null) info.append('.');
-				else info.append(values.get(fieldKey));
+				else {
+					String val = values.get(fieldKey);
+					if (val == null || val.isEmpty() || val.equals(".")) info.append('.');
+					else {
+						info.append(val);
+						empty = false;
+					}
+				}
 			}
-			String infoStr = info.toString().replace(';', ',').replace('\t', '_').replace(' ', '_');
-			vcf.addInfo(KEY_PREFIX + fieldKey, infoStr);
+
+			if (annotateAll || !empty) {
+				String infoStr = info.toString().replace(';', ',').replace('\t', '_').replace(' ', '_'); // Make sure all characters are valid for VCF field
+				vcf.addInfo(KEY_PREFIX + fieldKey, infoStr);
+				annotated = true;
+			}
 		}
 
+		// Add all INFO fields that refer to this position
 		for (String fieldKey : positionSpecificFieldsToAdd.keySet()) {
+			boolean empty = true;
 			info.setLength(0);
 			if (vcf.getAlts().length > 0) {
 				String alt = vcf.getAlts()[0];
 				Map<String, String> values = currentEntry.getAltAlelleValues(alt);
 
 				if (values == null) info.append('.');
-				else info.append(values.get(fieldKey));
+				else {
+					String val = values.get(fieldKey);
+					if (val == null || val.isEmpty() || val.equals(".")) info.append('.');
+					else {
+						info.append(val);
+						empty = false;
+					}
+				}
 			}
-			String infoStr = info.toString().replace(';', ',').replace('\t', '_').replace(' ', '_');
-			vcf.addInfo(KEY_PREFIX + fieldKey, infoStr);
+
+			if (annotateAll || !empty) {
+				String infoStr = info.toString().replace(';', ',').replace('\t', '_').replace(' ', '_'); // Make sure all characters are valid for VCF field
+				vcf.addInfo(KEY_PREFIX + fieldKey, infoStr);
+				annotated = true;
+			}
 		}
 
 		currentEntry = null;
+		if (annotated) countAnnotated++;
 	}
 
 	/**
@@ -200,12 +238,12 @@ public class SnpSiftCmdAnnotateSortedDbNSFP extends SnpSift {
 	 */
 	@Override
 	public void parse(String[] args) {
-
 		if (args.length == 0) usage(null);
 
 		for (String arg : args) {
 			if (arg.equals("-q")) verbose = false;
 			else if (arg.equals("-v")) verbose = true;
+			else if (arg.equals("-a")) annotateAll = true;
 			else if (arg.equals("-h") || arg.equals("--help")) usage(null);
 			else if (dbNSFPFileName == null) dbNSFPFileName = arg;
 			else if (vcfFileName == null) vcfFileName = arg;
@@ -274,8 +312,9 @@ public class SnpSiftCmdAnnotateSortedDbNSFP extends SnpSift {
 		}
 
 		showVersion();
-		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar " + command + " [-q|-v] dbNSFP.all.gz file.vcf > newFile.vcf\n" //
+		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar " + command + " [-q|-v] [-a] dbNSFP.txt file.vcf > newFile.vcf\n" //
 				+ "Options:\n" //
+				+ "\t-a\t:\tAnnotate all fields, even if the database has an empty value.\n" //
 				+ "\t-q\t:\tBe quiet.\n" //
 				+ "\t-v\t:\tBe verbose.\n" //
 		);
