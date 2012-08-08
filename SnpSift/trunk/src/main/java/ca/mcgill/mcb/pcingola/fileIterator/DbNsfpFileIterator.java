@@ -19,7 +19,7 @@ import java.util.Map;
  * 
  * @author lletourn
  */
-public class DbNSFPFileIterator extends MarkerFileIterator<DbNSFPEntry> {
+public class DbNsfpFileIterator extends MarkerFileIterator<DbNsfpEntry> {
 	@SuppressWarnings("unchecked")
 	static private class StringTokenizer {
 
@@ -118,11 +118,11 @@ public class DbNSFPFileIterator extends MarkerFileIterator<DbNSFPEntry> {
 		return st.tokens(String.class);
 	}
 
-	public DbNSFPFileIterator(BufferedReader reader) {
+	public DbNsfpFileIterator(BufferedReader reader) {
 		super(reader, 1);
 	}
 
-	private DbNSFPEntry parseEntry(List<String[]> linesForEntry) {
+	private DbNsfpEntry parseEntry(List<String[]> linesForEntry) {
 		Map<String, Map<String, String>> values = new HashMap<String, Map<String, String>>();
 
 		String chromosome = null;
@@ -137,12 +137,12 @@ public class DbNSFPFileIterator extends MarkerFileIterator<DbNSFPEntry> {
 			values.put(entryValues.get("alt"), entryValues);
 		}
 
-		DbNSFPEntry entry = new DbNSFPEntry(getChromosome(chromosome), start, values);
+		DbNsfpEntry entry = new DbNsfpEntry(getChromosome(chromosome), start, values);
 		return entry;
 	}
 
 	@Override
-	protected DbNSFPEntry readNext() {
+	protected DbNsfpEntry readNext() {
 		// Read another entry from the file
 		try {
 			List<String[]> linesForEntry = new ArrayList<String[]>();
@@ -175,7 +175,7 @@ public class DbNSFPFileIterator extends MarkerFileIterator<DbNSFPEntry> {
 
 			if (linesForEntry.size() == 0) return null;
 
-			DbNSFPEntry entry = parseEntry(linesForEntry);
+			DbNsfpEntry entry = parseEntry(linesForEntry);
 			return entry;
 
 		} catch (IOException e) {

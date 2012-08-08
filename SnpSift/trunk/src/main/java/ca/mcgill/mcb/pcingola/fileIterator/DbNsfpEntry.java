@@ -11,11 +11,11 @@ import ca.mcgill.mcb.pcingola.interval.Marker;
  * 
  * @author lletourn
  */
-public class DbNSFPEntry extends Marker {
+public class DbNsfpEntry extends Marker {
 	private static final long serialVersionUID = -3275792763917755927L;
 	Map<String, Map<String, String>> values = new HashMap<String, Map<String, String>>();
 
-	public DbNSFPEntry(Marker parent, int start, Map<String, Map<String, String>> values) {
+	public DbNsfpEntry(Marker parent, int start, Map<String, Map<String, String>> values) {
 		super(parent, start, start, 1, "");
 		this.values = values;
 	}
@@ -24,18 +24,19 @@ public class DbNSFPEntry extends Marker {
 		return values.get(allele);
 	}
 
-	/**
-	 * Merge the values of 2 DbNSFPEntry.
-	 * 
-	 * @param entry
-	 * @return true if they were merged. False if they are not the same entry.
-	 */
-	public boolean mergeAndReplace(DbNSFPEntry entry) {
-		if (compareTo(entry) != 0) return false;
-
-		for (String altAllele : entry.values.keySet())
-			values.put(altAllele, entry.values.get(altAllele));
-
-		return true;
-	}
+	// Looks like this is not used !?!??!?
+	//	/**
+	//	 * Merge the values of 2 DbNSFPEntry.
+	//	 * 
+	//	 * @param entry
+	//	 * @return true if they were merged. False if they are not the same entry.
+	//	 */
+	//	public boolean mergeAndReplace(DbNsfpEntry entry) {
+	//		if (compareTo(entry) != 0) return false;
+	//
+	//		for (String altAllele : entry.values.keySet())
+	//			values.put(altAllele, entry.values.get(altAllele));
+	//
+	//		return true;
+	//	}
 }

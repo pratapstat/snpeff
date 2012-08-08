@@ -21,10 +21,10 @@ import flanagan.analysis.Stat;
  */
 public class SnpSift {
 
-	public static final String BUILD = "2012-08-03";
+	public static final String BUILD = "2012-08-08";
 
 	public static final String VERSION_MAJOR = "1.7";
-	public static final String REVISION = "d";
+	public static final String REVISION = "e";
 	public static final String VERSION_SHORT = VERSION_MAJOR + REVISION;
 	public static final String VERSION = VERSION_SHORT + " (build " + BUILD + "), by " + Pcingola.BY;
 
@@ -134,7 +134,7 @@ public class SnpSift {
 		else if (command.startsWith("CA")) SnpSiftCmdCaseControl.main(args);
 		else if (command.startsWith("CONS")) SnpSiftCmdConservation.main(args);
 		else if (command.startsWith("COVMAT")) SnpSiftCmdCovarianceMatrix.main(args);
-		else if (command.startsWith("DBNSFP")) SnpSiftCmdAnnotateSortedDbNSFP.main(args);
+		else if (command.startsWith("DBNSFP")) SnpSiftCmdAnnotateSortedDbNsfp.main(args);
 		else if (command.startsWith("EX")) SnpSiftCmdExtractFields.main(args);
 		else if (command.startsWith("FI")) SnpSiftCmdFilter.main(args);
 		else if (command.startsWith("GWASCAT")) SnpSiftCmdGwasCatalog.main(args);
