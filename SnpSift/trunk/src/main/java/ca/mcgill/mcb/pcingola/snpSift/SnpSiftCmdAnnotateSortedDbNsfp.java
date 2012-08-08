@@ -35,7 +35,7 @@ import ca.mcgill.mcb.pcingola.vcf.VcfFileIndexIntervals;
 public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 
 	public static final String KEY_PREFIX = "dbnsfp";
-	public static final String DEFAULT_FIELDS_NAMES_TO_ADD = "Ensembl_transcriptid,Uniprot_acc,Interpro_domain,SIFT_score,Polyphen2_HVAR_pred,GERP_NR,GERP_RS,29way_logOdds,1000Gp1_AF,1000Gp1_AFR_AF,1000Gp1_EUR_AF,1000Gp1_AMR_AF,1000Gp1_ASN_AF,ESP5400_AA_AF,ESP5400_EA_AF";
+	public static final String DEFAULT_FIELDS_NAMES_TO_ADD = "Ensembl_transcriptid,Uniprot_acc,Interpro_domain,SIFT_score,Polyphen2_HVAR_pred,GERP++_NR,GERP++_RS,29way_logOdds,1000Gp1_AF,1000Gp1_AFR_AF,1000Gp1_EUR_AF,1000Gp1_AMR_AF,1000Gp1_ASN_AF,ESP5400_AA_AF,ESP5400_EA_AF";
 
 	protected Map<String, String> fieldsToAdd;
 	protected Map<String, String> fieldsDescription;
@@ -219,8 +219,8 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 		fieldsDescription.put("LRT_pred", "LRT prediction, D(eleterious), N(eutral) or U(nknown)");
 		fieldsDescription.put("MutationTaster_score", "MutationTaster score");
 		fieldsDescription.put("MutationTaster_pred", "MutationTaster prediction, 'A' ('disease_causing_automatic'), 'D' ('disease_causing'), 'N' ('polymorphism') or 'P' ('polymorphism_automatic')");
-		fieldsDescription.put("GERP_NR", "GERP++ neutral rate");
-		fieldsDescription.put("GERP_RS", "GERP++ RS score, the larger the score, the more conserved the site.");
+		fieldsDescription.put("GERP++_NR", "GERP++ neutral rate");
+		fieldsDescription.put("GERP++_RS", "GERP++ RS score, the larger the score, the more conserved the site.");
 		fieldsDescription.put("PhyloP_score", "PhyloP score, the larger the score, the more conserved the site.");
 		fieldsDescription.put("29way_pi", "The estimated stationary distribution of A, C, G and T at the site, using SiPhy algorithm based on 29 mammals genomes. ");
 		fieldsDescription.put("29way_logOdds", "SiPhy score based on 29 mammals genomes. The larger the score, the more conserved the site.");
@@ -251,6 +251,13 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 
 		indexDb = index(dbNsfpFileName);
 		currentDbEntry = null;
+
+		// No field names specified? Use default
+		if (fieldsNamesToAdd == null) fieldsNamesToAdd = DEFAULT_FIELDS_NAMES_TO_ADD;
+		for (String fn : fieldsNamesToAdd.split(",")) {
+			if (fieldsDescription.get(fn) == null) usage("Error: Field name '" + fn + "' not found");
+			fieldsToAdd.put(fn, fieldsDescription.get(fn));
+		}
 	}
 
 	/**
@@ -276,13 +283,6 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 		// Sanity check
 		if (dbNsfpFileName == null) usage("Missing dbNSFP file");
 		if (vcfFileName == null) usage("Missing 'file.vcf'");
-
-		// No field names specified? Use default
-		if (fieldsNamesToAdd == null) fieldsNamesToAdd = DEFAULT_FIELDS_NAMES_TO_ADD;
-		for (String fn : fieldsNamesToAdd.split(",")) {
-			if (fieldsDescription.get(fn) == null) usage("Error: Field name '" + fn + "' not found");
-			fieldsToAdd.put(fn, fieldsDescription.get(fn));
-		}
 	}
 
 	@Override

@@ -4,6 +4,7 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
 import ca.mcgill.mcb.pcingola.snpSift.SnpSiftCmdAnnotateSortedDbNsfp;
+import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 
 /**
@@ -29,6 +30,7 @@ public class TestCasesDbNsfp extends TestCase {
 			VcfEntry vcfEntry = vcfFile.next();
 
 			cmd.annotate(vcfEntry);
+			Gpr.debug(vcfEntry);
 
 			// Check all values
 			Assert.assertEquals("2.31", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.KEY_PREFIX + "GERP++_RS"));
