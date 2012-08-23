@@ -788,7 +788,7 @@ public class TestCasesFilter extends TestCase {
 		String expression = "EFF[*].GENE = 'BICD1'";
 		List<VcfEntry> list = vcfFilter.filter("test/test_gene.vcf", expression, true);
 
-		VcfEffect.FormatVersion formatVersion = VcfEffect.FormatVersion.FORMAT_2;
+		VcfEffect.FormatVersion formatVersion = VcfEffect.FormatVersion.FORMAT_SNPEFF_2;
 
 		// Check that it satisfies the condition
 		System.out.println("Expression: '" + expression + "'");

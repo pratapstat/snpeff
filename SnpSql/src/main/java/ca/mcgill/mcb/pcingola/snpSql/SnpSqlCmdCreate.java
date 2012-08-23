@@ -29,7 +29,7 @@ public class SnpSqlCmdCreate extends SnpSql {
 	long entryId = 0, effectId = 0, tupleId = 0, tupleIntId = 0, tupleFloatId = 0;
 	int batchSizeEntry = 0, batchSizeEff = 0, batchSizeTuple = 0, batchSizeTupleInt = 0, batchSizeTupleFloat = 0;
 	PreparedStatement pstmtEntry, pstmtEff, pstmtTuple, pstmtTupleInt, pstmtTupleFloat;
-	VcfEffect.FormatVersion formatVersion = VcfEffect.FormatVersion.FORMAT_2;
+	VcfEffect.FormatVersion formatVersion = VcfEffect.FormatVersion.FORMAT_SNPEFF_2;
 
 	/**
 	 * Add VCF effect

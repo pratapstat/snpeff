@@ -197,7 +197,7 @@ public class SnpSiftCmdFilter extends SnpSift {
 		inputFile = "-";
 		filterId = this.getClass().getSimpleName();
 		sets = new ArrayList<HashSet<String>>();
-		formatVersion = VcfEffect.FormatVersion.FORMAT_3;
+		formatVersion = VcfEffect.FormatVersion.FORMAT_SNPEFF_3;
 	}
 
 	/**
@@ -218,8 +218,8 @@ public class SnpSiftCmdFilter extends SnpSift {
 				else if (args[i].equals("-i") || args[i].equalsIgnoreCase("--filterId")) filterId = args[++i];
 				else if (args[i].equalsIgnoreCase("--format")) {
 					String formatVer = args[++i];
-					if (formatVer.equals("2")) formatVersion = FormatVersion.FORMAT_2;
-					else if (formatVer.equals("3")) formatVersion = FormatVersion.FORMAT_3;
+					if (formatVer.equals("2")) formatVersion = FormatVersion.FORMAT_SNPEFF_2;
+					else if (formatVer.equals("3")) formatVersion = FormatVersion.FORMAT_SNPEFF_3;
 					else usage("Unknown format version '" + formatVer + "'");
 				} else if (args[i].equals("-e") || args[i].equalsIgnoreCase("--exprfile")) {
 					String exprFile = args[++i];
