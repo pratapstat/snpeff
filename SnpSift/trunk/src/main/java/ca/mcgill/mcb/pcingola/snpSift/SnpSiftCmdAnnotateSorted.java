@@ -2,12 +2,15 @@ package ca.mcgill.mcb.pcingola.snpSift;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 import ca.mcgill.mcb.pcingola.fileIterator.SeekableBufferedReader;
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
 import ca.mcgill.mcb.pcingola.util.Timer;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 import ca.mcgill.mcb.pcingola.vcf.VcfFileIndexIntervals;
+import ca.mcgill.mcb.pcingola.vcf.VcfHeader;
+import ca.mcgill.mcb.pcingola.vcf.VcfInfo;
 
 /**
  * Annotate a VCF file with ID from another VCF file (database)
@@ -86,6 +89,24 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 			dbId.put(key, vcfDb.getId()); // Add ID field
 			if (useInfoField) dbInfo.put(key, vcfDb.getInfoStr()); // Add INFO field
 		}
+	}
+
+	/**
+	 * Build headers to add
+	 */
+	@Override
+	protected List<String> addHeader() {
+		List<String> newHeaders = super.addHeader();
+
+		// Read database header and add INFO fields to the output vcf header
+		if (useInfoField) {
+			VcfFileIterator vcfDb = new VcfFileIterator(vcfDbFileName);
+			VcfHeader vcfDbHeader = vcfDb.readHeader();
+			for (VcfInfo vcfInfo : vcfDbHeader.getVcfInfo())
+				newHeaders.add(vcfInfo.toString());
+		}
+
+		return newHeaders;
 	}
 
 	/**
@@ -289,10 +310,10 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 			try {
 				// Show header?
 				if (showHeader) {
+					showHeader = false;
 					addHeader(vcfFile);
 					String headerStr = vcfFile.getVcfHeader().toString();
 					if (!headerStr.isEmpty()) System.out.println(headerStr);
-					showHeader = false;
 				}
 
 				// Annotate
