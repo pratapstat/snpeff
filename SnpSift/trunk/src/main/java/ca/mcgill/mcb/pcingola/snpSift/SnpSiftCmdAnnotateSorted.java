@@ -290,7 +290,8 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 				// Show header?
 				if (showHeader) {
 					addHeader(vcfFile);
-					if (!vcfFile.getHeader().isEmpty()) System.out.println(vcfFile.getHeader());
+					String headerStr = vcfFile.getVcfHeader().toString();
+					if (!headerStr.isEmpty()) System.out.println(headerStr);
 					showHeader = false;
 				}
 

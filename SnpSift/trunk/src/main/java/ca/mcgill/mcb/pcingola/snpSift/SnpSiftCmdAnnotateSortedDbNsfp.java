@@ -75,7 +75,7 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 	protected void addHeader(VcfFileIterator vcfFile) {
 		super.addHeader(vcfFile);
 		for (String key : fieldsToAdd.keySet())
-			vcfFile.addHeader("##INFO=<ID=" + KEY_PREFIX + key + ",Number=A,Type=String,Description=\"" + fieldsToAdd.get(key) + "\">");
+			vcfFile.getVcfHeader().addLine("##INFO=<ID=" + KEY_PREFIX + key + ",Number=A,Type=String,Description=\"" + fieldsToAdd.get(key) + "\">");
 	}
 
 	/**
@@ -301,7 +301,8 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 				// Show header?
 				if (showHeader) {
 					addHeader(vcfFile);
-					if (!vcfFile.getHeader().isEmpty()) System.out.println(vcfFile.getHeader());
+					String headerStr = vcfFile.getVcfHeader().toString();
+					if (!headerStr.isEmpty()) System.out.println(headerStr);
 					showHeader = false;
 				}
 

@@ -38,7 +38,7 @@ public class Field extends Expression {
 	public VcfInfoType calcReturnType(VcfEntry vcfEntry) {
 		if (returnType == VcfInfoType.UNKNOWN) {
 			// Is there a filed 'name'
-			VcfInfo vcfInfo = vcfEntry.getVcfFileIterator().getVcfInfo(name);
+			VcfInfo vcfInfo = vcfEntry.getVcfFileIterator().getVcfHeader().getVcfInfo(name);
 			if (vcfInfo == null) throw new RuntimeException("No such field '" + name + "'");
 			returnType = vcfInfo.getVcfInfoType();
 		}
@@ -118,7 +118,7 @@ public class Field extends Expression {
 		String value = null;
 
 		// Is there a filed 'name'
-		VcfInfo vcfInfo = vcfEntry.getVcfFileIterator().getVcfInfo(name);
+		VcfInfo vcfInfo = vcfEntry.getVcfFileIterator().getVcfHeader().getVcfInfo(name);
 		if ((vcfInfo == null) && exceptionIfNotFound) throw new RuntimeException("No such field '" + name + "'");
 
 		// Get field and parse it

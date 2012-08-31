@@ -54,7 +54,8 @@ public class SnpSiftCmdAnnotateMem extends SnpSift {
 			// Show header?
 			if (showHeader) {
 				addHeader(vcf);
-				if (!vcf.getHeader().isEmpty()) System.out.println(vcf.getHeader());
+				String headerStr = vcf.getVcfHeader().toString();
+				if (!headerStr.isEmpty()) System.out.println(headerStr);
 				showHeader = false;
 			}
 

@@ -177,7 +177,7 @@ public class SnpSqlCmdCreate extends SnpSql {
 			Timer t = new Timer();
 			for (VcfEntry vcfEntry : vcfFile) {
 				if (debug) Gpr.debug(vcfEntry);
-				if (vcfInfos == null) vcfInfos = vcfFile.getVcfInfo();
+				if (vcfInfos == null) vcfInfos = vcfFile.getVcfHeader().getVcfInfo();
 
 				// Add VcfEntry
 				long eid = entryId; // It is incremented after the insert operation

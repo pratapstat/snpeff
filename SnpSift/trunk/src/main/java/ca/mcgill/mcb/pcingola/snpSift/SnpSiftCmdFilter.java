@@ -285,7 +285,8 @@ public class SnpSiftCmdFilter extends SnpSift {
 			if (entryNum == 0) {
 				addHeader();
 				if (!createList) {
-					if (!vcfFile.getHeader().isEmpty()) System.out.println(vcfFile.getHeader());
+					String headerStr = vcfFile.getVcfHeader().toString();
+					if (!headerStr.isEmpty()) System.out.println(headerStr);
 				}
 			}
 

@@ -373,7 +373,8 @@ public class SnpSqlGui extends javax.swing.JFrame {
 			for (VcfEntry ve : vfi) {
 				if (header) {
 					header = false;
-					if (!vfi.getHeader().isEmpty()) sb.append(vfi.getHeader() + "\n");
+					String headerStr = vfi.getVcfHeader().toString();
+					if (!headerStr.isEmpty()) System.out.println(headerStr);
 				}
 
 				sb.append(ve + "\n");

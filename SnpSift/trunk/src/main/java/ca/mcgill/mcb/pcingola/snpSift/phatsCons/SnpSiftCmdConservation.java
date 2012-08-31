@@ -79,8 +79,8 @@ public class SnpSiftCmdConservation extends SnpSift {
 			// Show header before first entry
 			if (entryNum == 0) {
 				addHeader();
-				String header = vcf.getHeader();
-				if (!header.isEmpty()) System.out.println(vcf.getHeader());
+				String header = vcf.getVcfHeader().toString();
+				if (!header.isEmpty()) System.out.println(header);
 			}
 
 			// Get score and add it to INFO

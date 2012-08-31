@@ -73,7 +73,7 @@ public class SnpSift {
 	 */
 	protected void addHeader(VcfFileIterator vcfFile) {
 		for (String h : addHeader())
-			vcfFile.addHeader(h);
+			vcfFile.getVcfHeader().addLine(h);
 	}
 
 	/**

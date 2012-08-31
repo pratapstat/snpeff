@@ -47,7 +47,7 @@ public class SnpSiftCmdAnnotateSortedSift extends SnpSiftCmdAnnotateSorted {
 	protected void addAnnotation(VcfEntry vcf) {
 		// Is this change in db?
 		String infoAnnotation = findDbId(vcf);
-		if( infoAnnotation != null ) {
+		if (infoAnnotation != null) {
 			countAnnotated++;
 			vcf.addInfo(infoAnnotation);
 		}
@@ -59,13 +59,13 @@ public class SnpSiftCmdAnnotateSortedSift extends SnpSiftCmdAnnotateSorted {
 	 */
 	@Override
 	void addDb(VcfEntry vcfDb) {
-		for( int i = 0; i < vcfDb.getAlts().length; i++ ) {
+		for (int i = 0; i < vcfDb.getAlts().length; i++) {
 			String key = key(vcfDb, i);
 
 			String siftScore = vcfDb.getInfo("SIFT_SCORE");
 			String siftCons = vcfDb.getInfo("SIFT_CONS");
 
-			if( (siftScore != null) && (siftCons != null) ) {
+			if ((siftScore != null) && (siftCons != null)) {
 				double score = Gpr.parseDoubleSafe(siftScore);
 				double cons = Gpr.parseDoubleSafe(siftCons);
 
@@ -76,7 +76,7 @@ public class SnpSiftCmdAnnotateSortedSift extends SnpSiftCmdAnnotateSorted {
 				String annotation = "SIFT=" + damaging + ";SIFT_SCORE=" + siftScore;
 
 				// Is it low confidence? => Add flag
-				if( cons > LOW_CONFIDENCE ) annotation += ";SIFT_LOW_CONFIDENCE";
+				if (cons > LOW_CONFIDENCE) annotation += ";SIFT_LOW_CONFIDENCE";
 
 				dbId.put(key, annotation);
 			}
@@ -90,9 +90,9 @@ public class SnpSiftCmdAnnotateSortedSift extends SnpSiftCmdAnnotateSorted {
 	@Override
 	protected void addHeader(VcfFileIterator vcfFile) {
 		super.addHeader(vcfFile);
-		vcfFile.addHeader("##INFO=<ID=SIFT,Number=1,Type=String,Description=\"SIFT prediction {TOLERATED, DAMAGING}\">");
-		vcfFile.addHeader("##INFO=<ID=SIFT_SCORE,Number=1,Type=Float,Description=\"SIFT score, 0 = Damaging, 1=Tolerated\">");
-		vcfFile.addHeader("##INFO=<ID=SIFT_LOW_CONFIDENCE,Number=1,Type=Flag,Description=\"SIFT prediction has low confidence (i.e. bad median conservation score)\">");
+		vcfFile.getVcfHeader().addLine("##INFO=<ID=SIFT,Number=1,Type=String,Description=\"SIFT prediction {TOLERATED, DAMAGING}\">");
+		vcfFile.getVcfHeader().addLine("##INFO=<ID=SIFT_SCORE,Number=1,Type=Float,Description=\"SIFT score, 0 = Damaging, 1=Tolerated\">");
+		vcfFile.getVcfHeader().addLine("##INFO=<ID=SIFT_LOW_CONFIDENCE,Number=1,Type=Flag,Description=\"SIFT prediction has low confidence (i.e. bad median conservation score)\">");
 	}
 
 	/**
@@ -103,12 +103,12 @@ public class SnpSiftCmdAnnotateSortedSift extends SnpSiftCmdAnnotateSorted {
 	@Override
 	protected String findDbId(VcfEntry vcf) {
 		readDb(vcf);
-		if( dbId.isEmpty() ) return null;
+		if (dbId.isEmpty()) return null;
 
-		for( int i = 0; i < vcf.getAlts().length; i++ ) {
+		for (int i = 0; i < vcf.getAlts().length; i++) {
 			String key = key(vcf, i);
 			String id = dbId.get(key);
-			if( id != null ) return id;
+			if (id != null) return id;
 		}
 
 		return null;
