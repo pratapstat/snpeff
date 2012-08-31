@@ -1,10 +1,13 @@
 package ca.mcgill.mcb.pcingola.snpSift;
 
 import java.util.HashMap;
+import java.util.List;
 
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
 import ca.mcgill.mcb.pcingola.util.Timer;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
+import ca.mcgill.mcb.pcingola.vcf.VcfHeader;
+import ca.mcgill.mcb.pcingola.vcf.VcfInfo;
 
 /**
  * Annotate a VCF file with ID from another VCF file (database)
@@ -37,6 +40,24 @@ public class SnpSiftCmdAnnotateMem extends SnpSift {
 
 	public SnpSiftCmdAnnotateMem(String args[]) {
 		super(args, "annotate");
+	}
+
+	/**
+	 * Build headers to add
+	 */
+	@Override
+	protected List<String> addHeader() {
+		List<String> newHeaders = super.addHeader();
+
+		// Read database header and add INFO fields to the output vcf header
+		if (useInfoField) {
+			VcfFileIterator dbvcffi = new VcfFileIterator(vcfDb);
+			VcfHeader vcfDbHeader = dbvcffi.readHeader();
+			for (VcfInfo vcfInfo : vcfDbHeader.getVcfInfo())
+				newHeaders.add(vcfInfo.toString());
+		}
+
+		return newHeaders;
 	}
 
 	/**
