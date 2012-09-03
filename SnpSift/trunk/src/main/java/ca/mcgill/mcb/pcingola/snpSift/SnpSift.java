@@ -24,7 +24,7 @@ public class SnpSift {
 	public static final String BUILD = "2012-08-31";
 
 	public static final String VERSION_MAJOR = "1.7";
-	public static final String REVISION = "f";
+	public static final String REVISION = "g";
 	public static final String VERSION_SHORT = VERSION_MAJOR + REVISION;
 	public static final String VERSION = VERSION_SHORT + " (build " + BUILD + "), by " + Pcingola.BY;
 

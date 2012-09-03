@@ -28,6 +28,7 @@ public class TestSuiteAll {
 		suite.addTestSuite(TestCasesVarType.class);
 		suite.addTestSuite(TestCasesGwasCatalog.class);
 		suite.addTestSuite(TestCasesDbNsfp.class);
+		suite.addTestSuite(TestCasesIntervals.class);
 
 		return suite;
 	}

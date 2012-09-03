@@ -1,5 +1,6 @@
 package ca.mcgill.mcb.pcingola.snpSift;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,21 +19,22 @@ import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
  */
 public class SnpSiftCmdIntervals extends SnpSift {
 
+	String vcfFileName;
 	LinkedList<String> bedFiles;
 	IntervalForest intervalForest;
 	Genome genome;
+	boolean exclude;
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		SnpSiftCmdIntervals vcfIntervals = new SnpSiftCmdIntervals(args);
-		vcfIntervals.run();
+		SnpSiftCmdIntervals cmdIntervals = new SnpSiftCmdIntervals(args);
+		cmdIntervals.run();
 	}
 
 	public SnpSiftCmdIntervals(String[] args) {
 		super(args, "int");
-		genome = new Genome("genome");
 	}
 
 	/**
@@ -41,6 +43,9 @@ public class SnpSiftCmdIntervals extends SnpSift {
 	@Override
 	public void init() {
 		verbose = false;
+		genome = new Genome("genome");
+		exclude = false;
+		vcfFileName = "-"; // Default STDIN
 	}
 
 	/**
@@ -81,8 +86,15 @@ public class SnpSiftCmdIntervals extends SnpSift {
 				if (args[i].equals("-h") || args[i].equalsIgnoreCase("-help")) usage(null);
 				else if (args[i].equals("-v")) verbose = true;
 				else if (args[i].equals("-q")) verbose = false;
+				else if (args[i].equals("-x")) exclude = true;
+				else if (args[i].equals("-i")) vcfFileName = args[++i];
 			} else bedFiles.add(args[i]);
 		}
+	}
+
+	@Override
+	public void run() {
+		run(false);
 	}
 
 	/**
@@ -90,12 +102,13 @@ public class SnpSiftCmdIntervals extends SnpSift {
 	 * 
 	 * @param fileName
 	 */
-	@Override
-	public void run() {
+	public List<VcfEntry> run(boolean createList) {
 		loadIntervals();
 
+		List<VcfEntry> results = new ArrayList<VcfEntry>();
+
 		// Read all vcfEntries
-		VcfFileIterator vcfFile = new VcfFileIterator("-");
+		VcfFileIterator vcfFile = new VcfFileIterator(vcfFileName);
 
 		boolean showHeader = true;
 		for (VcfEntry vcfEntry : vcfFile) {
@@ -108,9 +121,19 @@ public class SnpSiftCmdIntervals extends SnpSift {
 				showHeader = false;
 			}
 
-			// Does it intercept any interval?
-			if (!intervalForest.query(vcfEntry).isEmpty()) System.out.println(vcfEntry);
+			if (intervalForest.query(vcfEntry).isEmpty()) {
+				// It does not intercept any interval. Show if we are interested in excluding intervals
+				if (exclude) {
+					results.add(vcfEntry);
+					System.out.println(vcfEntry);
+				}
+			} else if (!exclude) {
+				results.add(vcfEntry);
+				System.out.println(vcfEntry);
+			}
 		}
+
+		return results;
 	}
 
 	/**
@@ -126,7 +149,11 @@ public class SnpSiftCmdIntervals extends SnpSift {
 
 		showVersion();
 
-		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar intervals file_1.bed file_2.bed ... file_N.bed");
+		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar intervals [-x] file_1.bed file_2.bed ... file_N.bed");
+		System.err.println("Options:");
+		System.err.println("\t\t-v        :\tBe verbose");
+		System.err.println("\t\t-i <file> :\tVCF file. Default STDIN");
+		System.err.println("\t\t-x        :\tExclude VCF entries in intervals");
 		System.exit(1);
 	}
 }
