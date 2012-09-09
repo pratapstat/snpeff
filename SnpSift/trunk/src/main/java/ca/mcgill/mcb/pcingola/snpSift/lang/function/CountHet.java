@@ -12,7 +12,7 @@ import ca.mcgill.mcb.pcingola.vcf.VcfInfoType;
 public class CountHet extends Function {
 
 	public CountHet() {
-		super("countHet", VcfInfoType.INTEGER);
+		super("countHet", VcfInfoType.Integer);
 	}
 
 	@SuppressWarnings("rawtypes")

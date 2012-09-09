@@ -102,10 +102,10 @@ public class SnpSqlCmdCreate extends SnpSql {
 					String value = vcfEntry.getInfo(name);
 
 					switch (vcfInfo.getVcfInfoType()) {
-					case FLAG:
+					case Flag:
 						value = "true";
-					case STRING:
-					case CHARACTER:
+					case String:
+					case Character:
 						if (value != null) {
 							if (debug) Gpr.debug("Add Tuple: " + name + " = " + value);
 							pstmtTuple.setLong(1, tupleId++);
@@ -117,7 +117,7 @@ public class SnpSqlCmdCreate extends SnpSql {
 							pstmtTuple.addBatch();
 						}
 						break;
-					case INTEGER:
+					case Integer:
 						if (value != null) {
 							long valInt = vcfEntry.getInfoInt(name);
 							if (debug) Gpr.debug("Add TupleInt: " + name + " = " + valInt);
@@ -130,7 +130,7 @@ public class SnpSqlCmdCreate extends SnpSql {
 							pstmtTupleInt.addBatch();
 						}
 						break;
-					case FLOAT:
+					case Float:
 						if (value != null) {
 							double valFloat = vcfEntry.getInfoFloat(name);
 							if (debug) Gpr.debug("Add TupleFloat: " + name + " = " + valFloat);

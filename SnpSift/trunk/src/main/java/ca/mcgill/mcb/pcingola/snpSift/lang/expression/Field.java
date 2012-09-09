@@ -29,9 +29,9 @@ public class Field extends Expression {
 				|| name.equals("ALT") //
 				|| name.equals("FILTER") //
 				|| name.equals("FORMAT") //
-		) returnType = VcfInfoType.STRING;
-		else if (name.equals("QUAL")) returnType = VcfInfoType.FLOAT;
-		else if (name.equals("POS")) returnType = VcfInfoType.INTEGER;
+		) returnType = VcfInfoType.String;
+		else if (name.equals("QUAL")) returnType = VcfInfoType.Float;
+		else if (name.equals("POS")) returnType = VcfInfoType.Integer;
 		else returnType = VcfInfoType.UNKNOWN;
 	}
 
@@ -51,12 +51,12 @@ public class Field extends Expression {
 	public Comparable get(VcfEntry vcfEntry) {
 		calcReturnType(vcfEntry);
 		switch (returnType) {
-		case INTEGER:
+		case Integer:
 			return getFieldInt(vcfEntry);
-		case FLOAT:
+		case Float:
 			return getFieldFloat(vcfEntry);
-		case STRING:
-		case FLAG:
+		case String:
+		case Flag:
 			return getFieldString(vcfEntry);
 		default:
 			throw new RuntimeException("Unknow return type '" + returnType + "'");

@@ -11,17 +11,17 @@ public class Literal extends Expression {
 
 	public Literal(String str) {
 		this.str = str;
-		returnType = VcfInfoType.STRING;
+		returnType = VcfInfoType.String;
 	}
 
 	public Literal(String str, boolean asNumber) {
 		this.str = str;
 		try {
-			returnType = VcfInfoType.INTEGER;
+			returnType = VcfInfoType.Integer;
 			l = Long.parseLong(str);
 			d = l;
 		} catch (Exception e) {
-			returnType = VcfInfoType.FLOAT;
+			returnType = VcfInfoType.Float;
 			d = Double.parseDouble(str);
 			l = (long) d;
 		}
@@ -31,11 +31,11 @@ public class Literal extends Expression {
 	@Override
 	public Comparable get(VcfEntry vcfEntry) {
 		switch (returnType) {
-		case INTEGER:
+		case Integer:
 			return l;
-		case FLOAT:
+		case Float:
 			return d;
-		case STRING:
+		case String:
 			return str;
 		default:
 			throw new RuntimeException("Unknwon return type '" + returnType + "'");
@@ -44,11 +44,11 @@ public class Literal extends Expression {
 
 	public String getStr() {
 		switch (returnType) {
-		case STRING:
+		case String:
 			return str;
-		case FLOAT:
+		case Float:
 			return "" + d;
-		case INTEGER:
+		case Integer:
 			return "" + l;
 		default:
 			throw new RuntimeException("Unknown type '" + returnType + "'");
@@ -59,11 +59,11 @@ public class Literal extends Expression {
 	@Override
 	public String toString() {
 		switch (returnType) {
-		case STRING:
+		case String:
 			return "'" + str + "'";
-		case FLOAT:
+		case Float:
 			return "" + d;
-		case INTEGER:
+		case Integer:
 			return "" + l;
 		default:
 			throw new RuntimeException("Unknown type '" + returnType + "'");

@@ -12,7 +12,7 @@ import ca.mcgill.mcb.pcingola.vcf.VcfInfoType;
 public class CountRef extends Function {
 
 	public CountRef() {
-		super("countRef", VcfInfoType.INTEGER);
+		super("countRef", VcfInfoType.Integer);
 	}
 
 	@SuppressWarnings("rawtypes")

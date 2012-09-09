@@ -28,8 +28,8 @@ public abstract class Expression {
 		if (returnType == exprT) return o1.compareTo(o2);
 
 		// One Integer one Float?
-		if (((returnType == VcfInfoType.INTEGER) || (returnType == VcfInfoType.FLOAT)) //
-				&& ((exprT == VcfInfoType.INTEGER) || (exprT == VcfInfoType.FLOAT)) //
+		if (((returnType == VcfInfoType.Integer) || (returnType == VcfInfoType.Float)) //
+				&& ((exprT == VcfInfoType.Integer) || (exprT == VcfInfoType.Float)) //
 		) {
 			// Convert to Float and compare
 			double d1 = getFloat(vcfEntry);
@@ -61,9 +61,9 @@ public abstract class Expression {
 		Object o = get(vcfEntry);
 
 		switch (returnType) {
-		case FLOAT:
+		case Float:
 			return (Double) o;
-		case INTEGER:
+		case Integer:
 			return (((Long) o));
 		default:
 			throw new RuntimeException("Cannot cast '" + returnType + "' to FLOAT");

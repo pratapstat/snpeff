@@ -12,7 +12,7 @@ import ca.mcgill.mcb.pcingola.vcf.VcfInfoType;
 public class CountVariant extends Function {
 
 	public CountVariant() {
-		super("countVariant", VcfInfoType.INTEGER);
+		super("countVariant", VcfInfoType.Integer);
 	}
 
 	@SuppressWarnings("rawtypes")
