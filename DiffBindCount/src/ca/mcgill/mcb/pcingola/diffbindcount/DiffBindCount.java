@@ -87,8 +87,17 @@ public class DiffBindCount {
 		HashSet<String> reads = new HashSet<String>();
 		for (SamLocusIterator.LocusInfo locusInfo : samLocusIter) {
 			// Next interval in the list?
-			if ((interval == null) || (!interval.getSequence().equals(locusInfo.getSequenceName()) || ((interval.getStart() < locusInfo.getPosition()) && (interval.getEnd() > locusInfo.getPosition())))) {
-				if (interval != null) System.out.println(interval.getSequence() + "\t" + interval.getStart() + "\t" + interval.getEnd() + "\t" + reads.size());
+			if ((interval == null) //
+					|| !interval.getSequence().equals(locusInfo.getSequenceName()) //
+					|| (locusInfo.getPosition() < interval.getStart()) //
+					|| (interval.getEnd() < locusInfo.getPosition()) //
+			) {
+				if (interval != null) //
+					System.out.println(interval.getSequence() //
+							+ "\t" + interval.getStart() // 
+							+ "\t" + interval.getEnd() //
+							+ "\t" + reads.size() //
+					);
 				intervalNumber++;
 				interval = intList.getIntervals().get(intervalNumber);
 				reads = new HashSet<String>();
@@ -100,6 +109,8 @@ public class DiffBindCount {
 				SAMRecord samRec = recAndPos.getRecord();
 				reads.add(samRec.getReadName());
 			}
+
+			// System.out.println("\t" + interval.getSequence() + "\t" + interval.getStart() + "\t" + interval.getEnd() + "\t" + locusInfo.getSequenceName() + "\t" + locusInfo.getPosition() + "\t" + reads.size());
 		}
 
 		samLocusIter.close();
