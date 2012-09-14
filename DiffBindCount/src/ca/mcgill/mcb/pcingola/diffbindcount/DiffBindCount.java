@@ -25,8 +25,10 @@ public class DiffBindCount {
 	public static int SHOW_EVERY = 1;
 	public static boolean QUIET = true;
 
-	ArrayList<String> samFileNames = new ArrayList<String>();
+	List<String> samFileNames;
 	String intervalsFileName;
+	List<Interval> intervalList;
+	ArrayList<ArrayList<Integer>> countByFile;
 
 	/**
 	 * Main command line
@@ -36,6 +38,13 @@ public class DiffBindCount {
 		DiffBindCount diffBindCount = new DiffBindCount();
 		diffBindCount.parse(args);
 		diffBindCount.run();
+		System.out.println(diffBindCount);
+	}
+
+	public DiffBindCount() {
+		samFileNames = new ArrayList<String>();
+		intervalList = new ArrayList<Interval>();
+		countByFile = new ArrayList<ArrayList<Integer>>();
 	}
 
 	/**
@@ -58,19 +67,21 @@ public class DiffBindCount {
 	/**
 	 * Read intervals from BED or XLS
 	 */
-	protected IntervalList readIntervals(SAMFileReader samReader) {
+	protected List<Interval> readIntervals(String intervalsFileName) {
 		// Create interval list
 		Timer.showStdErr("Reading intervals from: " + intervalsFileName);
-		int count = 0;
-		IntervalList intList = new IntervalList(samReader.getFileHeader());
+		List<Interval> intList = new ArrayList<Interval>();
+
+		// Read from file
 		SeqChangeBedFileIterator bed = new SeqChangeBedFileIterator(intervalsFileName);
 		for (SeqChange sc : bed) {
 			Interval interval = new Interval(sc.getChromosomeNameOri(), sc.getStart(), sc.getEnd());
 			intList.add(interval);
-			count++;
 		}
-		Timer.showStdErr("Total " + count + " intervals added.");
-		if (count <= 0) throw new RuntimeException("No intervals, nothing to do!");
+
+		// Show count (sanity check)
+		Timer.showStdErr("Total " + intList.size() + " intervals added.");
+		if (intList.size() <= 0) throw new RuntimeException("No intervals, nothing to do!");
 
 		return intList;
 	}
@@ -82,12 +93,17 @@ public class DiffBindCount {
 		// Iterate over all BAM/SAM files
 		for (String samFileName : samFileNames) {
 			try {
+				ArrayList<Integer> countReads = new ArrayList<Integer>();
+
 				// Open file
 				Timer.showStdErr("Reading sam file: " + samFileName);
 				SAMFileReader samReader = new SAMFileReader(new File(samFileName));
 
 				// Read intervals from XLS or BED file
-				IntervalList intList = readIntervals(samReader);
+				if (intervalList.isEmpty()) intervalList = readIntervals(intervalsFileName); // Read list of intervals
+				IntervalList intList = new IntervalList(samReader.getFileHeader()); // Create and populate an interval list that is compatible with SamLocusIterator.
+				for (Interval i : intervalList)
+					intList.add(i);
 
 				// Create interval iterator
 				SamLocusIterator samLocusIter = new SamLocusIterator(samReader, intList, true);
@@ -103,7 +119,11 @@ public class DiffBindCount {
 							|| (locusInfo.getPosition() < interval.getStart()) //
 							|| (interval.getEnd() < locusInfo.getPosition()) //
 					) {
-						if (!QUIET && (interval != null)) System.out.println(interval.getSequence() + "\t" + interval.getStart() + "\t" + interval.getEnd() + "\t" + reads.size());
+						if (interval != null) {
+							if (!QUIET) System.out.println(interval.getSequence() + "\t" + interval.getStart() + "\t" + interval.getEnd() + "\t" + reads.size());
+							countReads.add(reads.size()); // Count number of reads in this interval
+						}
+
 						intervalNumber++; // Next interval
 						interval = intList.getIntervals().get(intervalNumber);
 						reads = new HashSet<String>(); // Clear read count
@@ -117,10 +137,12 @@ public class DiffBindCount {
 						SAMRecord samRec = recAndPos.getRecord();
 						reads.add(samRec.getReadName());
 					}
-
 				}
 
-				if (samLocusIter != null) samLocusIter.close();
+				// Update counts
+				countReads.add(reads.size()); // Count number of reads in last interval
+				Gpr.debug("LAST: " + reads.size());
+				countByFile.add(countReads); // Add count to list
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -129,5 +151,27 @@ public class DiffBindCount {
 			Timer.showStdErr("Finished file " + samFileName);
 		}
 		Timer.showStdErr("Done.");
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+
+		// Show title
+		sb.append("chr\tstart\tend\t");
+		for (int j = 0; j < countByFile.size(); j++)
+			sb.append("\t" + samFileNames.get(j));
+		sb.append("\n");
+
+		// Show a row for each interval
+		for (int i = 0; i < intervalList.size(); i++) {
+			Interval interval = intervalList.get(i);
+			sb.append(interval.getSequence() + "\t" + interval.getStart() + "\t" + interval.getEnd());
+			for (ArrayList<Integer> countReads : countByFile)
+				sb.append("\t" + countReads.get(i));
+			sb.append("\n");
+		}
+
+		return sb.toString();
 	}
 }
