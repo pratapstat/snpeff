@@ -22,7 +22,7 @@ import ca.mcgill.mcb.pcingola.util.Timer;
  */
 public class DiffBindCount {
 
-	public static int SHOW_EVERY = 1;
+	public static int SHOW_EVERY = 10;
 	public static boolean QUIET = true;
 
 	List<String> samFileNames;
@@ -141,7 +141,6 @@ public class DiffBindCount {
 
 				// Update counts
 				countReads.add(reads.size()); // Count number of reads in last interval
-				Gpr.debug("LAST: " + reads.size());
 				countByFile.add(countReads); // Add count to list
 			} catch (Exception e) {
 				e.printStackTrace();
