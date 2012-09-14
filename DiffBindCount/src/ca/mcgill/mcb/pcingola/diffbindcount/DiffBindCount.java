@@ -166,8 +166,10 @@ public class DiffBindCount {
 		for (int i = 0; i < intervalList.size(); i++) {
 			Interval interval = intervalList.get(i);
 			sb.append(interval.getSequence() + "\t" + interval.getStart() + "\t" + interval.getEnd());
-			for (ArrayList<Integer> countReads : countByFile)
-				sb.append("\t" + countReads.get(i));
+			for (ArrayList<Integer> countReads : countByFile) {
+				int count = (countReads.size() > i ? countReads.get(i) : 0);
+				sb.append("\t" + count);
+			}
 			sb.append("\n");
 		}
 
