@@ -109,11 +109,9 @@ public class DiffBindCount {
 				SAMRecord samRec = recAndPos.getRecord();
 				reads.add(samRec.getReadName());
 			}
-
-			// System.out.println("\t" + interval.getSequence() + "\t" + interval.getStart() + "\t" + interval.getEnd() + "\t" + locusInfo.getSequenceName() + "\t" + locusInfo.getPosition() + "\t" + reads.size());
 		}
 
-		samLocusIter.close();
+		if (samLocusIter != null) samLocusIter.close();
 		samReader.close();
 		Timer.showStdErr("Done.");
 	}
