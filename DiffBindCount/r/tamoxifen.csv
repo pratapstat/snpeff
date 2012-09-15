@@ -1,0 +1,12 @@
+SampleID,Tissue,Factor,Condition,Replicate,bamReads,bamControl,Peaks
+BT474.1-,BT474,ER,Resistant,1,/Users/pcingola/tbVitaminD/diffBindTest/reads.bam,/Users/pcingola/tbVitaminD/diffBindTest/reads.bam,peaks/BT474_ER_1.bed.gz
+BT474.2-,BT474,ER,Resistant,2,/Users/pcingola/tbVitaminD/diffBindTest/reads.bam,/Users/pcingola/tbVitaminD/diffBindTest/reads.bam,peaks/BT474_ER_2.bed.gz
+MCF7.1+,MCF7,ER,Responsive,1,/Users/pcingola/tbVitaminD/diffBindTest/reads.bam,/Users/pcingola/tbVitaminD/diffBindTest/reads.bam,peaks/MCF7_ER_1.bed.gz
+MCF7.2+,MCF7,ER,Responsive,2,/Users/pcingola/tbVitaminD/diffBindTest/reads.bam,/Users/pcingola/tbVitaminD/diffBindTest/reads.bam,peaks/MCF7_ER_2.bed.gz
+MCF7.3+,MCF7,ER,Responsive,3,/Users/pcingola/tbVitaminD/diffBindTest/reads.bam,/Users/pcingola/tbVitaminD/diffBindTest/reads.bam,peaks/MCF7_ER_3.bed.gz
+T47D.1+,T47D,ER,Responsive,1,/Users/pcingola/tbVitaminD/diffBindTest/reads.bam,/Users/pcingola/tbVitaminD/diffBindTest/reads.bam,peaks/T47D_ER_1.bed.gz
+T47D.2+,T47D,ER,Responsive,2,/Users/pcingola/tbVitaminD/diffBindTest/reads.bam,/Users/pcingola/tbVitaminD/diffBindTest/reads.bam,peaks/T47D_ER_2.bed.gz
+MCF7.1-,MCF7,ER,Resistant,1,/Users/pcingola/tbVitaminD/diffBindTest/reads.bam,/Users/pcingola/tbVitaminD/diffBindTest/reads.bam,peaks/TAMR_ER_1.bed.gz
+MCF7.2-,MCF7,ER,Resistant,2,/Users/pcingola/tbVitaminD/diffBindTest/reads.bam,/Users/pcingola/tbVitaminD/diffBindTest/reads.bam,peaks/TAMR_ER_2.bed.gz
+ZR75.1+,ZR75,ER,Responsive,1,/Users/pcingola/tbVitaminD/diffBindTest/reads.bam,/Users/pcingola/tbVitaminD/diffBindTest/reads.bam,peaks/ZR75_ER_1.bed.gz
+ZR75.2+,ZR75,ER,Responsive,2,/Users/pcingola/tbVitaminD/diffBindTest/reads.bam,/Users/pcingola/tbVitaminD/diffBindTest/reads.bam,peaks/ZR75_ER_2.bed.gz
