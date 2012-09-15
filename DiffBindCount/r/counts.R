@@ -427,6 +427,9 @@ pv.getCounts = function(bamfile,intervals,insertLength=0,bWithoutDupes=F) {
    return(list(counts=counts,rpkm=rpkm,libsize=libsize))
 }
 
+#
+# Counts using DiffBindCount.jar
+#
 pv.getRawCounts = function(bamfile,intervals) {
 
 	tmpBedFile <- tempfile(pattern = "intervals.", fileext=".bed")
@@ -435,19 +438,22 @@ pv.getRawCounts = function(bamfile,intervals) {
 	write.table(bed, file=tmpBedFile, sep='\t', quote=FALSE, row.names=FALSE, col.names=FALSE)
 
 	cat('pv.getRawCounts\n');
-	cat('\tbamfile      :', bamfile ,'\n');
-	cat('\ttmpBedFile   :', tmpBedFile ,'\n');
+	cat('\tbamfile      : ', bamfile ,'\n');
+	cat('\ttmpBedFile   : ', tmpBedFile ,'\n');
+	cat('\ttmpOutFile   : ', tmpOutFile ,'\n');
 
 	# Execute command
 	cmd <- paste("java -Xmx1G -jar /home/pcingola/snpEff/DiffBindCount.jar", tmpBedFile, bamfile, ">", tmpOutFile);
+	cat('Command        : ', cmd, '\n');
 	system(cmd, intern=FALSE);
-	cat("intern:", intern, "\n");
 
-	counts <- read.table(tmpOutFile);
-	cat("counts\n");
-	print(count);
+	# Read commands output
+	counts <- read.csv(tmpOutFile, sep='\t', header=TRUE);
 
 	# Remove tmp files
-	#unlink(tmpBedFile);
+	unlink(tmpBedFile);
+	unlink(tmpOutFile);
+
+	return(counts[[4]]);
 }
 

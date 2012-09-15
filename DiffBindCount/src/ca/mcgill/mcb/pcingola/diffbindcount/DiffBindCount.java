@@ -38,7 +38,7 @@ public class DiffBindCount {
 		DiffBindCount diffBindCount = new DiffBindCount();
 		diffBindCount.parse(args);
 		diffBindCount.run();
-		System.out.println(diffBindCount);
+		System.out.print(diffBindCount);
 	}
 
 	public DiffBindCount() {
@@ -146,7 +146,7 @@ public class DiffBindCount {
 				e.printStackTrace();
 			}
 
-			System.out.println("");
+			System.err.println("");
 			Timer.showStdErr("Finished file " + samFileName);
 		}
 		Timer.showStdErr("Done.");
@@ -157,7 +157,7 @@ public class DiffBindCount {
 		StringBuilder sb = new StringBuilder();
 
 		// Show title
-		sb.append("chr\tstart\tend\t");
+		sb.append("chr\tstart\tend");
 		for (int j = 0; j < countByFile.size(); j++)
 			sb.append("\t" + samFileNames.get(j));
 		sb.append("\n");
