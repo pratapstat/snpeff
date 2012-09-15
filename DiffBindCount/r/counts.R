@@ -400,29 +400,25 @@ pv.getCounts = function(bamfile,intervals,insertLength=0,bWithoutDupes=F) {
    fdebug(sprintf('pv.getCounts: ENTER %s',bamfile))
    
    fdebug("Starting croi_load_reads...")
-   cat("\tbamfile:", bamfile, '\n');
-   cat("\tinsertLength:", insertLength, '\n');
-   bamtree <- .Call("croi_load_reads",as.character(bamfile),as.integer(insertLength))
-	print("bamtree:\n");
-	print(bamtree);
-   fdebug("Loaded...")
-   libsize.croi <- .Call("croi_tree_size",bamtree)
-   fdebug("Starting croi_count_reads...")
-	cat("\tintervals:");
-	print(intervals);
-   counts.croi <- .Call("croi_count_reads",bamtree,
-                                           as.character(intervals[[1]]),
-                                           as.integer(intervals[[2]]),
-                                           as.integer(intervals[[3]]),
-                                           as.integer(length(intervals[[1]])),
-                                           as.logical(bWithoutDupes))
+	if( FALSE ) {
+		bamtree <- .Call("croi_load_reads",as.character(bamfile),as.integer(insertLength))
+		fdebug("Loaded...")
+		libsize.croi <- .Call("croi_tree_size",bamtree)
+		fdebug("Starting croi_count_reads...")
+		counts.croi <- .Call("croi_count_reads",bamtree,
+							   as.character(intervals[[1]]),
+							   as.integer(intervals[[2]]),
+							   as.integer(intervals[[3]]),
+							   as.integer(length(intervals[[1]])),
+							   as.logical(bWithoutDupes))
+	} else {
+		counts.croi <- pv.getRawCounts(bamfile,intervals);
+	}
    fdebug("Done croi_count_reads...")
    counts.croi[counts.croi==0]=1
    fdebug(sprintf("Counted %d reads...",libsize.croi))
 
    counts = counts.croi
-	cat('counts:\n');
-	print(counts)
    libsize = libsize.croi
 
    widths = intervals[,3] - intervals[,2]
@@ -431,4 +427,27 @@ pv.getCounts = function(bamfile,intervals,insertLength=0,bWithoutDupes=F) {
    return(list(counts=counts,rpkm=rpkm,libsize=libsize))
 }
 
+pv.getRawCounts = function(bamfile,intervals) {
+
+	tmpBedFile <- tempfile(pattern = "intervals.", fileext=".bed")
+	tmpOutFile <- tempfile(pattern = "intervals.count.", fileext=".txt")
+	bed <- data.frame(chr=intervals[[1]], start=intervals[[2]], end=intervals[[3]] );
+	write.table(bed, file=tmpBedFile, sep='\t', quote=FALSE, row.names=FALSE, col.names=FALSE)
+
+	cat('pv.getRawCounts\n');
+	cat('\tbamfile      :', bamfile ,'\n');
+	cat('\ttmpBedFile   :', tmpBedFile ,'\n');
+
+	# Execute command
+	cmd <- paste("java -Xmx1G -jar /home/pcingola/snpEff/DiffBindCount.jar", tmpBedFile, bamfile, ">", tmpOutFile);
+	system(cmd, intern=FALSE);
+	cat("intern:", intern, "\n");
+
+	counts <- read.table(tmpOutFile);
+	cat("counts\n");
+	print(count);
+
+	# Remove tmp files
+	#unlink(tmpBedFile);
+}
 
