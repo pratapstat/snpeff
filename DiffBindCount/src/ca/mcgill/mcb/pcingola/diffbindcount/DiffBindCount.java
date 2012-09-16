@@ -8,6 +8,8 @@ import java.util.List;
 import net.sf.picard.util.Interval;
 import net.sf.picard.util.IntervalList;
 import net.sf.picard.util.SamLocusIterator;
+import net.sf.samtools.AbstractBAMFileIndex;
+import net.sf.samtools.BAMIndexMetaData;
 import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMRecord;
 import ca.mcgill.mcb.pcingola.fileIterator.SeqChangeBedFileIterator;
@@ -16,19 +18,21 @@ import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.util.Timer;
 
 /**
- * Count reads from a BAM file given intervals
+ * Count reads from a BAM file given a list of intervals
  * 
  * @author pablocingolani
  */
 public class DiffBindCount {
 
 	public static int SHOW_EVERY = 10;
-	public static boolean QUIET = true;
+	public static boolean debug = true;
 
 	List<String> samFileNames;
 	String intervalsFileName;
 	List<Interval> intervalList;
 	ArrayList<ArrayList<Integer>> countByFile;
+	boolean verbose = false;
+	boolean countTotals = false;
 
 	/**
 	 * Main command line
@@ -38,7 +42,6 @@ public class DiffBindCount {
 		DiffBindCount diffBindCount = new DiffBindCount();
 		diffBindCount.parse(args);
 		diffBindCount.run();
-		System.out.print(diffBindCount);
 	}
 
 	public DiffBindCount() {
@@ -48,20 +51,52 @@ public class DiffBindCount {
 	}
 
 	/**
+	 * Count all reads in a BAM file 
+	 * Note: It uses the BAM index
+	 * 
+	 * @param samReader
+	 * @return
+	 */
+	int countTotalReads(SAMFileReader samReader) {
+		try {
+			if (verbose) Timer.showStdErr("Counting number of reads.");
+			AbstractBAMFileIndex index = (AbstractBAMFileIndex) samReader.getIndex();
+			int count = 0;
+			for (int i = 0; i < index.getNumberOfReferences(); i++) {
+				BAMIndexMetaData meta = index.getMetaData(i);
+				count += meta.getAlignedRecordCount();
+			}
+
+			if (verbose) Timer.showStdErr("Done. Total " + count + " reads.");
+			return count;
+		} catch (Exception e) {
+			// Error? (e.g. no index)
+			System.err.println("ERROR! BAM file not indexed?");
+			return -1;
+		}
+	}
+
+	/**
 	 * Parse
 	 * @param args
 	 */
 	void parse(String[] args) {
-		if (args.length < 2) {
-			System.err.println("Usage: " + this.getClass().getSimpleName() + " intervalsFile readsFile_1 readsFile_2 ...  readsFile_N");
+		// Parse command line arguments
+		for (int i = 0; i < args.length; i++) {
+			if (args[i].equals("-v")) verbose = true;
+			else if (args[i].equals("-c")) countTotals = true;
+			else if (intervalsFileName == null) intervalsFileName = args[i];
+			else samFileNames.add(args[i]);
+		}
+
+		// Sanity check
+		if (samFileNames.size() < 1) {
+			System.err.println("Usage: " + this.getClass().getSimpleName() + " [-v] intervalsFile readsFile_1 readsFile_2 ...  readsFile_N");
 			System.err.println("\tintervals : Intervals in a BED or XLS (MACs).");
 			System.err.println("\treadsFile : A file contianing the reads. Either BAM or SAM format.");
 			System.exit(-1);
 		}
 
-		intervalsFileName = args[0];
-		for (int i = 1; i < args.length; i++)
-			samFileNames.add(args[i]);
 	}
 
 	/**
@@ -69,7 +104,7 @@ public class DiffBindCount {
 	 */
 	protected List<Interval> readIntervals(String intervalsFileName) {
 		// Create interval list
-		Timer.showStdErr("Reading intervals from: " + intervalsFileName);
+		if (verbose) Timer.showStdErr("Reading intervals from: " + intervalsFileName);
 		List<Interval> intList = new ArrayList<Interval>();
 
 		// Read from file
@@ -80,24 +115,37 @@ public class DiffBindCount {
 		}
 
 		// Show count (sanity check)
-		Timer.showStdErr("Total " + intList.size() + " intervals added.");
+		if (verbose) Timer.showStdErr("Total " + intList.size() + " intervals added.");
 		if (intList.size() <= 0) throw new RuntimeException("No intervals, nothing to do!");
 
 		return intList;
 	}
 
 	/**
-	 * Count reads
+	 * Run
 	 */
 	public void run() {
+		if (countTotals) runCountTotals();
+		else {
+			runCountIntervals();
+			System.out.print(this);
+		}
+	}
+
+	/**
+	 * Count reads onto intervals
+	 */
+	void runCountIntervals() {
 		// Iterate over all BAM/SAM files
 		for (String samFileName : samFileNames) {
 			try {
 				ArrayList<Integer> countReads = new ArrayList<Integer>();
 
 				// Open file
-				Timer.showStdErr("Reading sam file: " + samFileName);
+				if (verbose) Timer.showStdErr("Reading sam file: " + samFileName);
 				SAMFileReader samReader = new SAMFileReader(new File(samFileName));
+
+				countTotalReads(samReader);
 
 				// Read intervals from XLS or BED file
 				if (intervalList.isEmpty()) intervalList = readIntervals(intervalsFileName); // Read list of intervals
@@ -120,14 +168,14 @@ public class DiffBindCount {
 							|| (interval.getEnd() < locusInfo.getPosition()) //
 					) {
 						if (interval != null) {
-							if (!QUIET) System.out.println(interval.getSequence() + "\t" + interval.getStart() + "\t" + interval.getEnd() + "\t" + reads.size());
+							if (!debug) System.out.println(interval.getSequence() + "\t" + interval.getStart() + "\t" + interval.getEnd() + "\t" + reads.size());
 							countReads.add(reads.size()); // Count number of reads in this interval
 						}
 
 						intervalNumber++; // Next interval
 						interval = intList.getIntervals().get(intervalNumber);
 						reads = new HashSet<String>(); // Clear read count
-						Gpr.showMark(show++, SHOW_EVERY);
+						if (verbose) Gpr.showMark(show++, SHOW_EVERY);
 					}
 
 					// Get all reads at this position
@@ -146,10 +194,32 @@ public class DiffBindCount {
 				e.printStackTrace();
 			}
 
-			System.err.println("");
-			Timer.showStdErr("Finished file " + samFileName);
+			if (verbose) {
+				System.err.println("");
+				Timer.showStdErr("Finished file " + samFileName);
+			}
 		}
-		Timer.showStdErr("Done.");
+		if (verbose) Timer.showStdErr("Done.");
+	}
+
+	/**
+	 * Count all reasd in each BAM file
+	 */
+	void runCountTotals() {
+		for (String samFileName : samFileNames) {
+			try {
+				ArrayList<Integer> countReads = new ArrayList<Integer>();
+
+				// Open file
+				if (verbose) Timer.showStdErr("Reading sam file: " + samFileName);
+				SAMFileReader samReader = new SAMFileReader(new File(samFileName));
+				int totalReads = countTotalReads(samReader);
+				System.out.println(totalReads);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		if (verbose) Timer.showStdErr("Done.");
 	}
 
 	@Override

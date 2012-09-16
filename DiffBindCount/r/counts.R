@@ -412,7 +412,11 @@ pv.getCounts = function(bamfile,intervals,insertLength=0,bWithoutDupes=F) {
 							   as.integer(length(intervals[[1]])),
 							   as.logical(bWithoutDupes))
 	} else {
-		counts.croi <- pv.getRawCounts(bamfile,intervals);
+		# Use java program to count 
+		# WARNING: This only works on BAM files
+		counts <- pv.getRawCounts(bamfile,intervals);
+		counts.croi <- counts$counts;
+		libsize.croi <- counts$total;
 	}
    fdebug("Done croi_count_reads...")
    counts.croi[counts.croi==0]=1
@@ -432,8 +436,13 @@ pv.getCounts = function(bamfile,intervals,insertLength=0,bWithoutDupes=F) {
 #
 pv.getRawCounts = function(bamfile,intervals) {
 
+	# Initialize
 	tmpBedFile <- tempfile(pattern = "intervals.", fileext=".bed")
 	tmpOutFile <- tempfile(pattern = "intervals.count.", fileext=".txt")
+	diffCountJar <- "/home/pcingola/snpEff/DiffBindCount.jar";
+	javaCmd <- paste("java -Xmx1g -jar", diffCountJar, "-v");
+
+	# Create BED file (intervals)
 	bed <- data.frame(chr=intervals[[1]], start=intervals[[2]], end=intervals[[3]] );
 	write.table(bed, file=tmpBedFile, sep='\t', quote=FALSE, row.names=FALSE, col.names=FALSE)
 
@@ -441,9 +450,21 @@ pv.getRawCounts = function(bamfile,intervals) {
 	cat('\tbamfile      : ', bamfile ,'\n');
 	cat('\ttmpBedFile   : ', tmpBedFile ,'\n');
 	cat('\ttmpOutFile   : ', tmpOutFile ,'\n');
+	cat('\tjavaCmd      : ', javaCmd ,'\n');
 
-	# Execute command
-	cmd <- paste("java -Xmx1G -jar /home/pcingola/snpEff/DiffBindCount.jar", tmpBedFile, bamfile, ">", tmpOutFile);
+	#---
+	# Execute command: Count all reads
+	#---
+	cmd <- paste(javaCmd, "-c", tmpBedFile, bamfile);
+	cat('Command        : ', cmd, '\n');
+	result <- system(cmd, intern=TRUE);
+	totalReads <- as.numeric(result);
+	cat('RESULT:', result, '\tNum:', totalReads, '\n');
+
+	#---
+	# Execute command: Count reads in intervals
+	#---
+	cmd <- paste(javaCmd, tmpBedFile, bamfile, ">", tmpOutFile);
 	cat('Command        : ', cmd, '\n');
 	system(cmd, intern=FALSE);
 
@@ -454,6 +475,6 @@ pv.getRawCounts = function(bamfile,intervals) {
 	unlink(tmpBedFile);
 	unlink(tmpOutFile);
 
-	return(counts[[4]]);
+	return( list( total=totalReads , counts=counts[[4]] ) );
 }
 
