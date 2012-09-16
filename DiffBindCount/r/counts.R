@@ -181,7 +181,6 @@ pv.counts = function(pv,peaks,minOverlap=2,defaultScore=PV_SCORE_RPKM_FOLD,bLog=
                      bOnlyCounts=T,bCalledMasks=T,minMaxval,
                      bParallel=F,bUseLast=F,bWithoutDupes=F, bScaleControl=F) {
    
-	cat('OK 1\n');
    pv = pv.check(pv)
    
    
@@ -210,7 +209,6 @@ pv.counts = function(pv,peaks,minOverlap=2,defaultScore=PV_SCORE_RPKM_FOLD,bLog=
      }
    }
    
-	cat('OK 2\n');
    bed[,1] = pv$chrmap[bed[,1]]
    bed = pv.peaksort(bed)
 
@@ -220,24 +218,20 @@ pv.counts = function(pv,peaks,minOverlap=2,defaultScore=PV_SCORE_RPKM_FOLD,bLog=
    inputs = unique(inputs[!is.na(inputs)])
    todo   = unique(c(chips,inputs))
   
-	cat('OK 2.2\n');
    if(!pv.checkExists(todo)) {
       stop('Some read files could not be accessed. See warnings for details.')
    }
    
    if(!bUseLast) {
-	cat('OK 3.1\n');
       pv = dba.parallel(pv)
       if((pv$config$parallelPackage>0) && bParallel) {   	     
    	     params  = dba.parallel.params(pv$config,c("pv.getCounts","pv.bamReads","pv.BAMstats","fdebug"))            
-	cat('OK 3.1.1\n');
          results = dba.parallel.lapply(pv$config,params,todo,
                                        pv.getCounts,bed,insertLength,bWithoutDupes=bWithoutDupes)
       } else {
          results = NULL
          for(job in todo) {
       	    message('Sample: ',job)
-	cat('OK 3.1.2\n');
             results = pv.listadd(results,pv.getCounts(job,bed,insertLength,bWithoutDupes=bWithoutDupes))
          }	
       }
@@ -245,7 +239,6 @@ pv.counts = function(pv,peaks,minOverlap=2,defaultScore=PV_SCORE_RPKM_FOLD,bLog=
          #save(results,file='dba_last_result.RData')
       }
    } else {
-	cat('OK 3.2\n');
    	  if(PV_DEBUG) {
          load('dba_last_result.RData')
       } else {
@@ -253,7 +246,6 @@ pv.counts = function(pv,peaks,minOverlap=2,defaultScore=PV_SCORE_RPKM_FOLD,bLog=
       }
    }
    
-	cat('OK 4\n');
    if ((defaultScore >= DBA_SCORE_TMM_MINUS_FULL) || (defaultScore <= DBA_SCORE_TMM_READS_EFFECTIVE) ) {
       redoScore = defaultScore
       defaultScore = PV_SCORE_READS_MINUS	
@@ -262,7 +254,6 @@ pv.counts = function(pv,peaks,minOverlap=2,defaultScore=PV_SCORE_RPKM_FOLD,bLog=
    allchips = unique(pv$class[c(PV_BAMREADS,PV_BAMCONTROL),])
    numAdded = 0
    for(chipnum in 1:numChips) {
-		cat('OK 5\n');
    	  if (pv.nodup(pv,chipnum)) {
       	 jnum = which(todo %in% pv$class[PV_BAMREADS,chipnum])
    	     cond = results[[jnum]]
@@ -331,7 +322,6 @@ pv.counts = function(pv,peaks,minOverlap=2,defaultScore=PV_SCORE_RPKM_FOLD,bLog=
       }                  
    }
       
-		cat('OK 6\n');
    if(bOnlyCounts) {
    	  numpeaks = length(pv$peaks)
       res = pv.vectors(pv,(numpeaks-numAdded+1):numpeaks,minOverlap=1,bAnalysis=F,bAllSame=T)
@@ -400,7 +390,14 @@ pv.getCounts = function(bamfile,intervals,insertLength=0,bWithoutDupes=F) {
    fdebug(sprintf('pv.getCounts: ENTER %s',bamfile))
    
    fdebug("Starting croi_load_reads...")
-	if( FALSE ) {
+	ext <- substr(bamfile, nchar(bamfile)-3, nchar(bamfile));
+	if( ext == '.bam' ) {	# Is it really a BAM file?
+		# Use java program to count 
+		# WARNING: This only works on BAM files
+		counts <- pv.getRawCounts(bamfile,intervals);
+		counts.croi <- counts$counts;
+		libsize.croi <- counts$total;
+	} else {
 		bamtree <- .Call("croi_load_reads",as.character(bamfile),as.integer(insertLength))
 		fdebug("Loaded...")
 		libsize.croi <- .Call("croi_tree_size",bamtree)
@@ -411,12 +408,6 @@ pv.getCounts = function(bamfile,intervals,insertLength=0,bWithoutDupes=F) {
 							   as.integer(intervals[[3]]),
 							   as.integer(length(intervals[[1]])),
 							   as.logical(bWithoutDupes))
-	} else {
-		# Use java program to count 
-		# WARNING: This only works on BAM files
-		counts <- pv.getRawCounts(bamfile,intervals);
-		counts.croi <- counts$counts;
-		libsize.croi <- counts$total;
 	}
    fdebug("Done croi_count_reads...")
    counts.croi[counts.croi==0]=1
@@ -446,7 +437,6 @@ pv.getRawCounts = function(bamfile,intervals) {
 	# Create BED file (intervals)
 	bed <- data.frame(chr=intervals[[1]], start=intervals[[2]], end=intervals[[3]] );
 	write.table(bed, file=tmpBedFile, sep='\t', quote=FALSE, row.names=FALSE, col.names=FALSE)
-
 
 	#---
 	# Execute command: Count all reads

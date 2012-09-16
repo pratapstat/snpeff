@@ -57,17 +57,18 @@ public class DiffBindCount {
 	 * @param samReader
 	 * @return
 	 */
-	int countTotalReads(SAMFileReader samReader) {
+	int countTotalReads(String samFileName) {
 		try {
-			if (verbose) Timer.showStdErr("Counting number of reads.");
+			if (verbose) Timer.showStdErr("Counting reads on file: " + samFileName);
+			SAMFileReader samReader = new SAMFileReader(new File(samFileName));
 			AbstractBAMFileIndex index = (AbstractBAMFileIndex) samReader.getIndex();
 			int count = 0;
 			for (int i = 0; i < index.getNumberOfReferences(); i++) {
 				BAMIndexMetaData meta = index.getMetaData(i);
 				count += meta.getAlignedRecordCount();
 			}
-
-			if (verbose) Timer.showStdErr("Done. Total " + count + " reads.");
+			samReader.close();
+			if (verbose) Timer.showStdErr("Total " + count + " reads.");
 			return count;
 		} catch (Exception e) {
 			// Error? (e.g. no index)
@@ -145,8 +146,6 @@ public class DiffBindCount {
 				if (verbose) Timer.showStdErr("Reading sam file: " + samFileName);
 				SAMFileReader samReader = new SAMFileReader(new File(samFileName));
 
-				countTotalReads(samReader);
-
 				// Read intervals from XLS or BED file
 				if (intervalList.isEmpty()) intervalList = readIntervals(intervalsFileName); // Read list of intervals
 				IntervalList intList = new IntervalList(samReader.getFileHeader()); // Create and populate an interval list that is compatible with SamLocusIterator.
@@ -208,12 +207,8 @@ public class DiffBindCount {
 	void runCountTotals() {
 		for (String samFileName : samFileNames) {
 			try {
-				ArrayList<Integer> countReads = new ArrayList<Integer>();
-
 				// Open file
-				if (verbose) Timer.showStdErr("Reading sam file: " + samFileName);
-				SAMFileReader samReader = new SAMFileReader(new File(samFileName));
-				int totalReads = countTotalReads(samReader);
+				int totalReads = countTotalReads(samFileName);
 				System.out.println(totalReads);
 			} catch (Exception e) {
 				e.printStackTrace();
