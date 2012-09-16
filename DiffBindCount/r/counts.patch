@@ -1,0 +1,70 @@
+412,421c412,430
+<    bamtree <- .Call("croi_load_reads",as.character(bamfile),as.integer(insertLength))
+<    fdebug("Loaded...")
+<    libsize.croi <- .Call("croi_tree_size",bamtree)
+<    fdebug("Starting croi_count_reads...")
+<    counts.croi <- .Call("croi_count_reads",bamtree,
+<                                            as.character(intervals[[1]]),
+<                                            as.integer(intervals[[2]]),
+<                                            as.integer(intervals[[3]]),
+<                                            as.integer(length(intervals[[1]])),
+<                                            as.logical(bWithoutDupes))
+---
+> 	ext <- substr(bamfile, nchar(bamfile)-3, nchar(bamfile));
+> 	if( ext == '.bam' ) {	# Is it really a BAM file?
+> 		# Use java program to count 
+> 		# WARNING: This only works on BAM files
+> 		counts <- pv.getRawCounts(bamfile,intervals);
+> 		counts.croi <- counts$counts;
+> 		libsize.croi <- counts$total;
+> 	} else {
+> 		bamtree <- .Call("croi_load_reads",as.character(bamfile),as.integer(insertLength))
+> 		fdebug("Loaded...")
+> 		libsize.croi <- .Call("croi_tree_size",bamtree)
+> 		fdebug("Starting croi_count_reads...")
+> 		counts.croi <- .Call("croi_count_reads",bamtree,
+> 							   as.character(intervals[[1]]),
+> 							   as.integer(intervals[[2]]),
+> 							   as.integer(intervals[[3]]),
+> 							   as.integer(length(intervals[[1]])),
+> 							   as.logical(bWithoutDupes))
+> 	}
+434a444,454
+> #
+> # Counts using DiffBindCount.jar
+> #
+> pv.getRawCounts = function(bamfile,intervals) {
+> 	# Initialize
+> 	tmpBedFile <- tempfile(pattern = "intervals.", fileext=".bed")
+> 	tmpOutFile <- tempfile(pattern = "intervals.count.", fileext=".txt")
+> 	diffCountJar <- system.file("DiffBindCount.jar", package="DiffBind")
+> 	javaCmd <- paste("java -Xmx1g -jar", diffCountJar, "-v");
+> 	fdebug(paste('pv.getRawCounts\n', '\tbamfile      : ', bamfile ,'\n', '\ttmpBedFile   : ', tmpBedFile ,'\n', '\ttmpOutFile   : ', tmpOutFile ,'\n', '\tjavaCmd      : ', javaCmd ,'\n') );
+> 	if( nchar(diffCountJar) < 1 ) { stop( paste("Cannot find JAR file DiffBindCount.jar, please install it in the following directory: ", system.file("DiffBindCount.jar", package="DiffBind"))); }
+435a456,481
+> 	# Create BED file (intervals)
+> 	bed <- data.frame(chr=intervals[[1]], start=intervals[[2]], end=intervals[[3]] );
+> 	write.table(bed, file=tmpBedFile, sep='\t', quote=FALSE, row.names=FALSE, col.names=FALSE)
+> 
+> 	#---
+> 	# Execute command: Count all reads
+> 	#---
+> 	cmd <- paste(javaCmd, "-c", tmpBedFile, bamfile);
+> 	result <- system(cmd, intern=TRUE);
+> 	totalReads <- as.numeric(result);
+> 
+> 	#---
+> 	# Execute command: Count reads in intervals
+> 	#---
+> 	cmd <- paste(javaCmd, tmpBedFile, bamfile, ">", tmpOutFile);
+> 	system(cmd);
+> 
+> 	# Read commands output
+> 	counts <- read.csv(tmpOutFile, sep='\t', header=TRUE);
+> 
+> 	# Remove tmp files
+> 	unlink(tmpBedFile);
+> 	unlink(tmpOutFile);
+> 
+> 	return( list( total=totalReads , counts=counts[[4]] ) );
+> }
