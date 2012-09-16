@@ -435,38 +435,31 @@ pv.getCounts = function(bamfile,intervals,insertLength=0,bWithoutDupes=F) {
 # Counts using DiffBindCount.jar
 #
 pv.getRawCounts = function(bamfile,intervals) {
-
 	# Initialize
 	tmpBedFile <- tempfile(pattern = "intervals.", fileext=".bed")
 	tmpOutFile <- tempfile(pattern = "intervals.count.", fileext=".txt")
-	diffCountJar <- "/home/pcingola/snpEff/DiffBindCount.jar";
+	diffCountJar <- system.file("DiffBindCount.jar", package="DiffBind")
 	javaCmd <- paste("java -Xmx1g -jar", diffCountJar, "-v");
+	fdebug(paste('pv.getRawCounts\n', '\tbamfile      : ', bamfile ,'\n', '\ttmpBedFile   : ', tmpBedFile ,'\n', '\ttmpOutFile   : ', tmpOutFile ,'\n', '\tjavaCmd      : ', javaCmd ,'\n') );
+	if( nchar(diffCountJar) < 1 ) { stop( paste("Cannot find JAR file DiffBindCount.jar, please install it in the following directory: ", system.file("DiffBindCount.jar", package="DiffBind"))); }
 
 	# Create BED file (intervals)
 	bed <- data.frame(chr=intervals[[1]], start=intervals[[2]], end=intervals[[3]] );
 	write.table(bed, file=tmpBedFile, sep='\t', quote=FALSE, row.names=FALSE, col.names=FALSE)
 
-	cat('pv.getRawCounts\n');
-	cat('\tbamfile      : ', bamfile ,'\n');
-	cat('\ttmpBedFile   : ', tmpBedFile ,'\n');
-	cat('\ttmpOutFile   : ', tmpOutFile ,'\n');
-	cat('\tjavaCmd      : ', javaCmd ,'\n');
 
 	#---
 	# Execute command: Count all reads
 	#---
 	cmd <- paste(javaCmd, "-c", tmpBedFile, bamfile);
-	cat('Command        : ', cmd, '\n');
 	result <- system(cmd, intern=TRUE);
 	totalReads <- as.numeric(result);
-	cat('RESULT:', result, '\tNum:', totalReads, '\n');
 
 	#---
 	# Execute command: Count reads in intervals
 	#---
 	cmd <- paste(javaCmd, tmpBedFile, bamfile, ">", tmpOutFile);
-	cat('Command        : ', cmd, '\n');
-	system(cmd, intern=FALSE);
+	system(cmd);
 
 	# Read commands output
 	counts <- read.csv(tmpOutFile, sep='\t', header=TRUE);
