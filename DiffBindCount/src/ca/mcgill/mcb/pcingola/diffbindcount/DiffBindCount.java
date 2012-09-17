@@ -92,7 +92,7 @@ public class DiffBindCount {
 
 		// Sanity check
 		if (samFileNames.size() < 1) {
-			System.err.println("Usage: " + this.getClass().getSimpleName() + " [-v] intervalsFile readsFile_1 readsFile_2 ...  readsFile_N");
+			System.err.println("Usage: " + this.getClass().getSimpleName() + " [-v] [-c] intervalsFile readsFile_1 readsFile_2 ...  readsFile_N");
 			System.err.println("\tintervals : Intervals in a BED or XLS (MACs).");
 			System.err.println("\treadsFile : A file contianing the reads. Either BAM or SAM format.");
 			System.exit(-1);
