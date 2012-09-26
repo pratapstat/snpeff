@@ -66,11 +66,14 @@ public class SnpSiftCmdFilter extends SnpSift {
 
 	static boolean debug = false;
 
-	boolean usePassField;
-	String inputFile;
-	String expression;
-	Condition condition;
-	String filterId = this.getClass().getSimpleName();
+	boolean usePassField; // Use Filter field
+	boolean inverse; // Inverse filter (i.e. do NOT show lines that match the filter)
+	String inputFile; // Input file
+	String expression; // Expression (as a string)
+	Condition condition; // Condition (parsed expression)
+	String filterId; // FilterID string to add to FILTER field if the filter does NOT pass.
+	String addFilterField ; // Add a string to FILTER field.
+	String rmFilterField ; // Remove String from FILTER field
 	ArrayList<HashSet<String>> sets;
 	VcfEffect.FormatVersion formatVersion;
 
@@ -96,7 +99,7 @@ public class SnpSiftCmdFilter extends SnpSift {
 	protected List<String> addHeader() {
 		List<String> addHeader = super.addHeader();
 		String expr = expression.replace('\n', ' ').replace('\r', ' ').replace('\t', ' ').trim();
-		addHeader.add("##FILTER=<ID=" + filterId + ",Description=\"" + VERSION + ", Expression used: " + expr + "\">");
+		if( !filterId.isEmpty() ) addHeader.add("##FILTER=<ID=" + filterId + ",Description=\"" + VERSION + ", Expression used: " + expr + "\">");
 		return addHeader;
 	}
 
@@ -170,8 +173,15 @@ public class SnpSiftCmdFilter extends SnpSift {
 			else break;
 		} while (true);
 
-		if (fieldIterator.getType() == Field.TYPE_ALL) return all;
-		return any;
+		// Iteration type (ALL or ANY)?
+		boolean ret = false;
+		if (fieldIterator.getType() == Field.TYPE_ALL) ret = all;
+		ret = any;
+		
+		// Inverse result
+		ret = inverse ^ ret; 
+		
+		return ret;
 	}
 
 	/**
@@ -194,8 +204,11 @@ public class SnpSiftCmdFilter extends SnpSift {
 	public void init() {
 		verbose = false;
 		usePassField = false;
+		inverse = false;
 		inputFile = "-";
-		filterId = this.getClass().getSimpleName();
+		filterId = SnpSift.class.getSimpleName();
+		addFilterField = null;
+		rmFilterField = null;
 		sets = new ArrayList<HashSet<String>>();
 		formatVersion = VcfEffect.FormatVersion.FORMAT_SNPEFF_3;
 	}
@@ -213,9 +226,13 @@ public class SnpSiftCmdFilter extends SnpSift {
 				else if (args[i].equals("-f") || args[i].equalsIgnoreCase("--file")) inputFile = args[++i];
 				else if (args[i].equals("-s") || args[i].equalsIgnoreCase("--set")) addSet(args[++i]);
 				else if (args[i].equals("-p") || args[i].equalsIgnoreCase("--pass")) usePassField = true;
+				else if (args[i].equals("-i") || args[i].equalsIgnoreCase("--inverse")) inverse= true;
 				else if (args[i].equals("-v")) verbose = true;
 				else if (args[i].equals("-q")) verbose = false;
-				else if (args[i].equals("-i") || args[i].equalsIgnoreCase("--filterId")) filterId = args[++i];
+				else if (args[i].equals("-i") || args[i].equalsIgnoreCase("--filterId")) 					{usePassField = true; filterId = args[++i]; }
+				 else if (args[i].equals("-a") || args[i].equalsIgnoreCase("--addFilter")) 						addFilterField = args[++i];
+				 else if (args[i].equals("-r") || args[i].equalsIgnoreCase("--rmFilter")) 					rmFilterField = args[++i];
+				 else if (args[i].equals("-n") || args[i].equalsIgnoreCase("--inverse")) 					inverse = true;
 				else if (args[i].equalsIgnoreCase("--format")) {
 					String formatVer = args[++i];
 					if (formatVer.equals("2")) formatVersion = FormatVersion.FORMAT_SNPEFF_2;
@@ -290,30 +307,33 @@ public class SnpSiftCmdFilter extends SnpSift {
 				}
 			}
 
-			// Does this entry pass the filter? => Show it
-			boolean show = usePassField;
 
 			// Evaluate expression
 			boolean eval = evaluate(vcfEntry);
+			boolean show = eval; // Does this entry pass the filter? => Show it
 
+			//---
 			// Actions after evaluation
-			if (usePassField) { // Add to 'FILTER' field?
-				show = true;
+			//---
 
-				if (eval) vcfEntry.setFilterPass("PASS");
-				else {
-					// Show in filterPass field
-					// Get current value
-					String filter = vcfEntry.getFilterPass();
-					if (filter.equals(".")) filter = ""; // Empty?
-					// Append new value
-					filter += (!filter.isEmpty() ? ";" : "") + filterId; // Add this filter to the not-passed list
-					vcfEntry.setFilterPass(filter);
-				}
-			} else show = eval; // Show entry (or not) depending on evaluation 
+			// Always show entries (just change FILTER field)
+			if( usePassField || ( addFilterField != null ) || ( rmFilterField != null )) show = true; 
 
+			// Use FILTER field? ('PASS' or filter name)
+			if (usePassField) {
+				if (eval) vcfEntry.setFilterPass("PASS"); // Filter passed: PASS
+				else addVcfFilter(vcfEntry, filterId); // Filter not passed? Show filter name
+			}
+			
+			// Add or delete dtrings from filter field
+			if( eval ) {
+				if( addFilterField != null ) addVcfFilter(vcfEntry, addFilterField); // Filter passed? Add to FILTER field
+				if( rmFilterField != null ) delVcfFilter(vcfEntry, rmFilterField); // Filter passed? Delete string from FILTER field
+			}
+
+			// Show
 			if (show) {
-				if (passEntries != null) passEntries.add(vcfEntry); // Do not show. just add to the list
+				if (passEntries != null) passEntries.add(vcfEntry); // Do not show. just add to the list (this is used for debugging and testing)
 				else System.out.println(vcfEntry);
 			}
 
@@ -323,6 +343,44 @@ public class SnpSiftCmdFilter extends SnpSift {
 		}
 
 		return passEntries;
+	}
+
+	/**
+	 * Add string to FILTER vcf field
+	 * @param vcfEntry
+	 * @param filterStr
+	 */
+	void addVcfFilter(VcfEntry vcfEntry, String filterStr) {
+		// Get current value
+		String filter = vcfEntry.getFilterPass();
+		if (filter.equals(".")) filter = ""; // Empty?
+		// Append new value
+		filter += (!filter.isEmpty() ? ";" : "") + filterStr; // Add this filter to the not-passed list
+		vcfEntry.setFilterPass(filter);
+	}
+
+	/**
+	 * Remove a string from FILTER vcf field
+	 * @param vcfEntry
+	 * @param filterStr
+	 */
+	void delVcfFilter(VcfEntry vcfEntry, String filterStr) {
+		// Get current value
+		String filter = vcfEntry.getFilterPass();
+		StringBuilder sbFilter = new StringBuilder();
+
+		// Split by semicolon and filter out the undesired values
+		boolean removed=false;
+		for( String f : filter.split(";")) {
+			if( !f.equals(filterStr)) sbFilter.append((sbFilter.length()>0 ? ";" : "") + filterStr); // Append if it does not match filterStr
+			else removed = true;
+		}
+		
+		// Changed? Set new value
+		if(removed) {
+			Gpr.debug("REMOVE:" + filter + "\t" + filterStr +"\t=>\t" + sbFilter);
+			vcfEntry.setFilterPass(sbFilter.toString());
+		}
 	}
 
 	/**
@@ -340,14 +398,17 @@ public class SnpSiftCmdFilter extends SnpSift {
 
 		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + "" + ".jar filter [options] 'expression'");
 		System.err.println("Options:");
-		System.err.println("\t-f|--file <file>      : VCF input file. Default: STDIN");
-		System.err.println("\t-s|--set <file>       : Create a SET using 'file'");
+		System.err.println("\t-a|--addFilter <str>  : Add a string to FILTER VCF field if 'expression' is true. Default: '' (none)");
 		System.err.println("\t-e|--exprFile <file>  : Read expression from a file");
+		System.err.println("\t-f|--file <file>      : VCF input file. Default: STDIN");
 		System.err.println("\t-h|--help             : Show this help message");
+		System.err.println("\t-i|--filterId <str>   : ID for this filter (##FILTER tag in header and FILTER VCF field). Default: '" + filterId+"'");
+		System.err.println("\t-n|--inverse          : Inverse. Show lines that do not match filter expression");
 		System.err.println("\t-p|--pass             : Use 'PASS' field instead of filtering out VCF entries");
+		System.err.println("\t-r|--rmFilter <str>   : Remove a string from FILTER VCF field if 'expression' is true (and 'str' is in the field). Default: '' (none)");
+		System.err.println("\t-s|--set <file>       : Create a SET using 'file'");
 		System.err.println("\t--format <format>     : SnpEff format version: {2, 3}. Default: 3");
 		System.err.println("\t--galaxy              : Used from Galaxy (expressions have been sanitized).");
-		System.err.println("\t-i|--filterId         : ID for this filter (##FILTER tag in header). Default: " + this.getClass().getSimpleName());
 		System.exit(-1);
 	}
 

@@ -4,6 +4,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
+import ca.mcgill.mcb.pcingola.snpSift.SnpSift;
 import ca.mcgill.mcb.pcingola.snpSift.SnpSiftCmdFilter;
 import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.vcf.VcfEffect;
@@ -802,6 +803,98 @@ public class TestCasesFilter extends TestCase {
 			}
 
 			Assert.assertEquals(true, any);
+		}
+	}
+
+	/**
+	 * Inverse of a filter
+	 */
+	public void test_36() {
+		double minQ = 50;
+
+		// Filter data
+		String expression = "QUAL >= " + minQ;
+		String args[] = {"-f", "test/test01.vcf", "-n", expression};
+		SnpSiftCmdFilter vcfFilter = new SnpSiftCmdFilter(args);
+		List<VcfEntry> list = vcfFilter.filter("test/test01.vcf", expression, true);
+
+		// Check that it satisfies the condition
+		System.out.println("Expression: '" + expression + "'");
+		Assert.assertNotNull(list);
+		Assert.assertTrue(list.size() > 0);
+		for (VcfEntry vcfEntry : list) {
+			if (verbose) System.out.println("\t" + vcfEntry);
+			Assert.assertTrue(vcfEntry.getQuality() < minQ);
+		}
+	}
+
+	/**
+	 * Use filter field (add 'PASS' if expression is true)
+	 */
+	public void test_37() {
+		double minQ = 50;
+
+		// Filter data
+		String expression = "QUAL >= " + minQ;
+		String args[] = {"-f", "test/test01.vcf", "-p", expression};
+		SnpSiftCmdFilter vcfFilter = new SnpSiftCmdFilter(args);
+		List<VcfEntry> list = vcfFilter.filter("test/test01.vcf", expression, true);
+
+		// Check that it satisfies the condition
+		System.out.println("Expression: '" + expression + "'");
+		Assert.assertNotNull(list);
+		Assert.assertTrue(list.size() > 0);
+		for (VcfEntry vcfEntry : list) {
+			if (verbose) System.out.println(vcfEntry.getFilterPass() + "\t" + vcfEntry);
+			if( vcfEntry.getFilterPass().equals("PASS") ) Assert.assertTrue(vcfEntry.getQuality() >= minQ);
+			else Assert.assertTrue(vcfEntry.getQuality() < minQ);
+		}
+	}
+
+	/**
+	 * Add a string to FILTER if expression is true)
+	 */
+	public void test_38() {
+		double minQ = 50;
+		verbose = true;
+
+		// Filter data
+		String expression = "QUAL >= " + minQ;
+		String args[] = {"-f", "test/test01.vcf", "-a", "ADD", expression};
+		SnpSiftCmdFilter vcfFilter = new SnpSiftCmdFilter(args);
+		List<VcfEntry> list = vcfFilter.filter("test/test01.vcf", expression, true);
+
+		// Check that it satisfies the condition
+		System.out.println("Expression: '" + expression + "'");
+		Assert.assertNotNull(list);
+		Assert.assertTrue(list.size() > 0);
+		for (VcfEntry vcfEntry : list) {
+			if (verbose) System.out.println(vcfEntry.getFilterPass() + "\t" + vcfEntry);
+			if( vcfEntry.getFilterPass().equals("ADD") ) Assert.assertTrue(vcfEntry.getQuality() >= minQ);
+			else Assert.assertTrue(vcfEntry.getQuality() < minQ);
+		}
+	}
+
+	/**
+	 * Remove FILTER strings
+	 */
+	public void test_39() {
+		verbose = true;
+
+		// Filter data
+		String expression = "REF = 'A'";
+		String vcfFile = "test/downstream.vcf";
+		String args[] = {"-f", vcfFile, "-r", "SVM", expression}; // Remove FILTER string 'SVM' from all reference = 'A'
+		SnpSiftCmdFilter vcfFilter = new SnpSiftCmdFilter(args);
+		List<VcfEntry> list = vcfFilter.filter(vcfFile, expression, true);
+
+		// Check that it satisfies the condition
+		System.out.println("Expression: '" + expression + "'");
+		Assert.assertNotNull(list);
+		Assert.assertTrue(list.size() > 0);
+		for (VcfEntry vcfEntry : list) {
+			if (verbose) System.out.println(vcfEntry.getFilterPass() + "\t" + vcfEntry);
+			if( vcfEntry.getFilterPass().equals("SVM") ) Assert.assertTrue(!vcfEntry.getRef().equals("A"));
 		}
 	}
 
