@@ -39,7 +39,7 @@ public class SnpSiftCmdGwasCatalog extends SnpSift {
 	@Override
 	protected List<String> addHeader() {
 		List<String> newHeaders = super.addHeader();
-		newHeaders.add("##INFO=<" + GWAS_CATALOG_TRAIT + "=SNP,Number=.,Type=String,Description=\"Trait related to this chromosomal position, according to GWAS catalog\">");
+		newHeaders.add("##INFO=<ID=" + GWAS_CATALOG_TRAIT + ",Number=.,Type=String,Description=\"Trait related to this chromosomal position, according to GWAS catalog\">");
 		return newHeaders;
 	}
 
