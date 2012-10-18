@@ -3,8 +3,13 @@ package ca.mcgill.mcb.pcingola.snpSift.lang;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import org.antlr.runtime.ANTLRStringStream;
+import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.Tree;
 
+import ca.mcgill.mcb.pcingola.snpSift.antlr.VcfFilterLexer;
+import ca.mcgill.mcb.pcingola.snpSift.antlr.VcfFilterParser;
 import ca.mcgill.mcb.pcingola.snpSift.lang.condition.And;
 import ca.mcgill.mcb.pcingola.snpSift.lang.condition.Condition;
 import ca.mcgill.mcb.pcingola.snpSift.lang.condition.Eq;
@@ -50,6 +55,11 @@ public class LangFactory {
 	protected static boolean debug = false;
 	ArrayList<HashSet<String>> sets = new ArrayList<HashSet<String>>();
 	VcfEffect.FormatVersion formatVersion;
+
+	public LangFactory() {
+		sets = new ArrayList<HashSet<String>>(); // No sets
+		formatVersion = VcfEffect.FormatVersion.FORMAT_SNPEFF_3; // Latest format version
+	}
 
 	public LangFactory(ArrayList<HashSet<String>> sets, VcfEffect.FormatVersion formatVersion) {
 		this.sets = sets;
@@ -116,6 +126,35 @@ public class LangFactory {
 	}
 
 	/**
+	 * Create a field using lexer
+	 * @param lexer
+	 * @param verbose
+	 * @return
+	 * @throws RecognitionException
+	 */
+	private Field createFieldFromLexer(VcfFilterLexer lexer, boolean verbose) throws RecognitionException {
+		CommonTokenStream tokens = new CommonTokenStream(lexer);
+		VcfFilterParser parser = new VcfFilterParser(tokens);
+
+		// Parse 'var' (field)
+		VcfFilterParser.var_return root;
+		root = parser.var();
+		Tree parseTree = (Tree) root.getTree();
+
+		// Error creating?
+		if (parseTree == null) {
+			System.err.println("Can't create field tree");
+			return null;
+		}
+
+		if (debug) Gpr.debug("Field Tree: " + parseTree.toStringTree());
+
+		// Create a language factory
+		LangFactory langFactory = new LangFactory(sets, formatVersion);
+		return langFactory.fieldFactory(parseTree);
+	}
+
+	/**
 	 * Create 'Expression' from Tree
 	 * @param tree
 	 * @return
@@ -127,26 +166,13 @@ public class LangFactory {
 
 		Expression expr = null;
 
-		if (leaveName.equalsIgnoreCase("VAR_FIELD")) {
-			String name = tree.getChild(0).getText();
-			expr = new Field(name);
-		} else if (leaveName.equalsIgnoreCase("VAR_SUBFIELD")) {
-			String name = tree.getChild(0).getText();
-			int index = parseIndexField(tree.getChild(1).getText(), IteratorType.VAR);
-			expr = new FieldSub(name, index);
-		} else if (leaveName.equalsIgnoreCase("VAR_GENOTYPE_SUB")) {
-			int genotypeIndex = parseIndexField(tree.getChild(0).getText(), IteratorType.GENOTYPE);
-			String name = tree.getChild(1).getText();
-			expr = new FieldGenotype(name, genotypeIndex);
-		} else if (leaveName.equalsIgnoreCase("VAR_EFF_SUB")) {
-			int effIndex = parseIndexField(tree.getChild(0).getText(), IteratorType.EFFECT);
-			String name = tree.getChild(1).getText();
-			expr = new FieldEff(name, effIndex, formatVersion);
-		} else if (leaveName.equalsIgnoreCase("VAR_GENOTYPE_SUB_ARRAY")) {
-			int genotypeIndex = parseIndexField(tree.getChild(0).getText(), IteratorType.GENOTYPE);
-			String name = tree.getChild(1).getText();
-			int index = parseIndexField(tree.getChild(2).getText(), IteratorType.GENOTYPE_VAR);
-			expr = new FieldGenotypeSub(name, genotypeIndex, index);
+		if (leaveName.equalsIgnoreCase("VAR_FIELD") //
+				|| leaveName.equalsIgnoreCase("VAR_SUBFIELD") //
+				|| leaveName.equalsIgnoreCase("VAR_GENOTYPE_SUB") //
+				|| leaveName.equalsIgnoreCase("VAR_EFF_SUB") //
+				|| leaveName.equalsIgnoreCase("VAR_GENOTYPE_SUB_ARRAY")) {
+			// Is it a field?
+			expr = fieldFactory(tree);
 		} else if (leaveName.equalsIgnoreCase("LITERAL_NUMBER")) {
 			String num = tree.getChild(0).getText();
 			expr = new Literal(num, true);
@@ -159,6 +185,43 @@ public class LangFactory {
 
 		if (debug) Gpr.debug("vcfExpression [" + expr.getClass().getSimpleName() + "]: " + expr);
 		return expr;
+	}
+
+	/**
+	 * Create 'Expression' from Tree
+	 * @param tree
+	 * @return
+	 */
+	public Field fieldFactory(Tree tree) {
+		String leaveName = tree.getText();
+
+		if (debug) Gpr.debug("\n\tLeaveName : " + leaveName + "\n\tTree      : " + tree.toStringTree());
+
+		Field field = null;
+
+		if (leaveName.equalsIgnoreCase("VAR_FIELD")) {
+			String name = tree.getChild(0).getText();
+			field = new Field(name);
+		} else if (leaveName.equalsIgnoreCase("VAR_SUBFIELD")) {
+			String name = tree.getChild(0).getText();
+			int index = parseIndexField(tree.getChild(1).getText(), IteratorType.VAR);
+			field = new FieldSub(name, index);
+		} else if (leaveName.equalsIgnoreCase("VAR_GENOTYPE_SUB")) {
+			int genotypeIndex = parseIndexField(tree.getChild(0).getText(), IteratorType.GENOTYPE);
+			String name = tree.getChild(1).getText();
+			field = new FieldGenotype(name, genotypeIndex);
+		} else if (leaveName.equalsIgnoreCase("VAR_EFF_SUB")) {
+			int effIndex = parseIndexField(tree.getChild(0).getText(), IteratorType.EFFECT);
+			String name = tree.getChild(1).getText();
+			field = new FieldEff(name, effIndex, formatVersion);
+		} else if (leaveName.equalsIgnoreCase("VAR_GENOTYPE_SUB_ARRAY")) {
+			int genotypeIndex = parseIndexField(tree.getChild(0).getText(), IteratorType.GENOTYPE);
+			String name = tree.getChild(1).getText();
+			int index = parseIndexField(tree.getChild(2).getText(), IteratorType.GENOTYPE_VAR);
+			field = new FieldGenotypeSub(name, genotypeIndex, index);
+		} else throw new RuntimeException("Unknown field '" + leaveName + "'");
+
+		return field;
 	}
 
 	/**
@@ -246,6 +309,26 @@ public class LangFactory {
 	int genotypeNum(Tree tree) {
 		if (!tree.getText().equals("VAR_GENOTYPE")) throw new RuntimeException("Expecting genotype (VAR_GENOTYPE) , but got: " + tree.getText());
 		return Gpr.parseIntSafe(tree.getChild(0).getText());
+	}
+
+	/**
+	 * Parse a field
+	 * @param fieldStr
+	 * @return
+	 * @throws Exception
+	 */
+	public Field parseField(String fieldStr) throws Exception {
+		if (debug) Gpr.debug("Parse field: \"" + fieldStr + "\"");
+		VcfFilterLexer lexer = new VcfFilterLexer(new ANTLRStringStream(fieldStr)); // Parse string (lexer first, then parser)
+		Field field = createFieldFromLexer(lexer, true); // Parse tree and create expression
+
+		if (field == null) {
+			System.err.println("Fatal error: Cannot build field tree.");
+			System.exit(-1);
+		}
+
+		if (debug) Gpr.debug("Field: " + field);
+		return field;
 	}
 
 	/**
