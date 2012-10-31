@@ -5,7 +5,7 @@ import ca.mcgill.mcb.pcingola.vcf.VcfEffect;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 
 /**
- * A field form SnpEff:
+ * An 'EFF' field form SnpEff:
  * 
  * E.g.:  'EFF[2].GENE'
  * 

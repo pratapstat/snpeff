@@ -29,6 +29,8 @@ import ca.mcgill.mcb.pcingola.snpSift.lang.expression.FieldEff;
 import ca.mcgill.mcb.pcingola.snpSift.lang.expression.FieldGenotype;
 import ca.mcgill.mcb.pcingola.snpSift.lang.expression.FieldGenotypeSub;
 import ca.mcgill.mcb.pcingola.snpSift.lang.expression.FieldIterator.IteratorType;
+import ca.mcgill.mcb.pcingola.snpSift.lang.expression.FieldLof;
+import ca.mcgill.mcb.pcingola.snpSift.lang.expression.FieldNmd;
 import ca.mcgill.mcb.pcingola.snpSift.lang.expression.FieldSub;
 import ca.mcgill.mcb.pcingola.snpSift.lang.expression.Literal;
 import ca.mcgill.mcb.pcingola.snpSift.lang.function.CountHet;
@@ -170,6 +172,8 @@ public class LangFactory {
 				|| leaveName.equalsIgnoreCase("VAR_SUBFIELD") //
 				|| leaveName.equalsIgnoreCase("VAR_GENOTYPE_SUB") //
 				|| leaveName.equalsIgnoreCase("VAR_EFF_SUB") //
+				|| leaveName.equalsIgnoreCase("VAR_LOF_SUB") //
+				|| leaveName.equalsIgnoreCase("VAR_NMD_SUB") //
 				|| leaveName.equalsIgnoreCase("VAR_GENOTYPE_SUB_ARRAY")) {
 			// Is it a field?
 			expr = fieldFactory(tree);
@@ -214,6 +218,14 @@ public class LangFactory {
 			int effIndex = parseIndexField(tree.getChild(0).getText(), IteratorType.EFFECT);
 			String name = tree.getChild(1).getText();
 			field = new FieldEff(name, effIndex, formatVersion);
+		} else if (leaveName.equalsIgnoreCase("VAR_LOF_SUB")) {
+			int lofIndex = parseIndexField(tree.getChild(0).getText(), IteratorType.LOF);
+			String name = tree.getChild(1).getText();
+			field = new FieldLof(name, lofIndex);
+		} else if (leaveName.equalsIgnoreCase("VAR_NMD_SUB")) {
+			int nmdIndex = parseIndexField(tree.getChild(0).getText(), IteratorType.NMD);
+			String name = tree.getChild(1).getText();
+			field = new FieldNmd(name, nmdIndex);
 		} else if (leaveName.equalsIgnoreCase("VAR_GENOTYPE_SUB_ARRAY")) {
 			int genotypeIndex = parseIndexField(tree.getChild(0).getText(), IteratorType.GENOTYPE);
 			String name = tree.getChild(1).getText();

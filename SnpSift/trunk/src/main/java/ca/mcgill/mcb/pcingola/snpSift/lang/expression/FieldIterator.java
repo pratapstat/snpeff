@@ -1,6 +1,5 @@
 package ca.mcgill.mcb.pcingola.snpSift.lang.expression;
 
-
 /**
  * Iterates on fields / sub-fields
  * It's a singleton
@@ -10,7 +9,7 @@ package ca.mcgill.mcb.pcingola.snpSift.lang.expression;
 public class FieldIterator {
 
 	public enum IteratorType {
-		VAR, EFFECT, GENOTYPE, GENOTYPE_VAR
+		VAR, EFFECT, GENOTYPE, GENOTYPE_VAR, LOF, NMD
 	}
 
 	private static final FieldIterator fieldIterator = new FieldIterator();
@@ -20,6 +19,8 @@ public class FieldIterator {
 	SimpleIterator gentype = new SimpleIterator();
 	SimpleIterator effect = new SimpleIterator();
 	SimpleIterator gentypeVar = new SimpleIterator();
+	SimpleIterator lof = new SimpleIterator();
+	SimpleIterator nmd = new SimpleIterator();
 
 	public static FieldIterator get() {
 		return fieldIterator;
@@ -43,6 +44,12 @@ public class FieldIterator {
 
 		case EFFECT:
 			return effect.current;
+
+		case LOF:
+			return lof.current;
+
+		case NMD:
+			return nmd.current;
 
 		default:
 			throw new RuntimeException("Unknown iterator type '" + iterType + "'");
@@ -76,9 +83,26 @@ public class FieldIterator {
 			return;
 		}
 
+		if (nmd.hasNext()) {
+			gentypeVar.reset();
+			gentype.reset();
+			nmd.next();
+			return;
+		}
+
+		if (lof.hasNext()) {
+			gentypeVar.reset();
+			gentype.reset();
+			nmd.reset();
+			lof.next();
+			return;
+		}
+
 		if (effect.hasNext()) {
 			gentypeVar.reset();
 			gentype.reset();
+			nmd.reset();
+			lof.reset();
 			effect.next();
 			return;
 		}
@@ -86,6 +110,8 @@ public class FieldIterator {
 		if (var.hasNext()) {
 			gentypeVar.reset();
 			gentype.reset();
+			nmd.reset();
+			lof.reset();
 			effect.reset();
 			var.next();
 			return;
@@ -101,6 +127,8 @@ public class FieldIterator {
 		type = 0;
 		gentypeVar.reset();
 		gentype.reset();
+		nmd.reset();
+		lof.reset();
 		effect.reset();
 		var.reset();
 	}
@@ -126,6 +154,14 @@ public class FieldIterator {
 
 		case EFFECT:
 			effect.max = Math.max(max, effect.max);
+			break;
+
+		case LOF:
+			lof.max = Math.max(max, lof.max);
+			break;
+
+		case NMD:
+			nmd.max = Math.max(max, nmd.max);
 			break;
 
 		default:

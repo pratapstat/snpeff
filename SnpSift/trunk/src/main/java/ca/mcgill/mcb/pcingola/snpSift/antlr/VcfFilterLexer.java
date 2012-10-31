@@ -1,4 +1,4 @@
-// $ANTLR 3.4 /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g 2012-06-06 15:10:52
+// $ANTLR 3.4 /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g 2012-10-31 15:46:42
 
 package ca.mcgill.mcb.pcingola.snpSift.antlr;
 
@@ -11,8 +11,6 @@ import java.util.ArrayList;
 @SuppressWarnings({"all", "warnings", "unchecked"})
 public class VcfFilterLexer extends Lexer {
     public static final int EOF=-1;
-    public static final int T__30=30;
-    public static final int T__31=31;
     public static final int T__32=32;
     public static final int T__33=33;
     public static final int T__34=34;
@@ -45,6 +43,10 @@ public class VcfFilterLexer extends Lexer {
     public static final int T__61=61;
     public static final int T__62=62;
     public static final int T__63=63;
+    public static final int T__64=64;
+    public static final int T__65=65;
+    public static final int T__66=66;
+    public static final int T__67=67;
     public static final int ALPHANUM=4;
     public static final int COMMENT_SL=5;
     public static final int CONDITION=6;
@@ -69,8 +71,10 @@ public class VcfFilterLexer extends Lexer {
     public static final int VAR_GENOTYPE=25;
     public static final int VAR_GENOTYPE_SUB=26;
     public static final int VAR_GENOTYPE_SUB_ARRAY=27;
-    public static final int VAR_SUBFIELD=28;
-    public static final int WS=29;
+    public static final int VAR_LOF_SUB=28;
+    public static final int VAR_NMD_SUB=29;
+    public static final int VAR_SUBFIELD=30;
+    public static final int WS=31;
 
     // delegates
     // delegators
@@ -87,61 +91,15 @@ public class VcfFilterLexer extends Lexer {
     }
     public String getGrammarFileName() { return "/Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g"; }
 
-    // $ANTLR start "T__30"
-    public final void mT__30() throws RecognitionException {
-        try {
-            int _type = T__30;
-            int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:6:7: ( '!' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:6:9: '!'
-            {
-            match('!'); 
-
-            }
-
-            state.type = _type;
-            state.channel = _channel;
-        }
-        finally {
-        	// do for sure before leaving
-        }
-    }
-    // $ANTLR end "T__30"
-
-    // $ANTLR start "T__31"
-    public final void mT__31() throws RecognitionException {
-        try {
-            int _type = T__31;
-            int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:7:7: ( '!=' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:7:9: '!='
-            {
-            match("!="); 
-
-
-
-            }
-
-            state.type = _type;
-            state.channel = _channel;
-        }
-        finally {
-        	// do for sure before leaving
-        }
-    }
-    // $ANTLR end "T__31"
-
     // $ANTLR start "T__32"
     public final void mT__32() throws RecognitionException {
         try {
             int _type = T__32;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:8:7: ( '!~' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:8:9: '!~'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:6:7: ( '!' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:6:9: '!'
             {
-            match("!~"); 
-
-
+            match('!'); 
 
             }
 
@@ -159,10 +117,12 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = T__33;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:9:7: ( '&' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:9:9: '&'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:7:7: ( '!=' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:7:9: '!='
             {
-            match('&'); 
+            match("!="); 
+
+
 
             }
 
@@ -180,10 +140,12 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = T__34;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:10:7: ( '(' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:10:9: '('
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:8:7: ( '!~' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:8:9: '!~'
             {
-            match('('); 
+            match("!~"); 
+
+
 
             }
 
@@ -201,10 +163,10 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = T__35;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:11:7: ( ')' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:11:9: ')'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:9:7: ( '&' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:9:9: '&'
             {
-            match(')'); 
+            match('&'); 
 
             }
 
@@ -222,10 +184,10 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = T__36;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:12:7: ( '*' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:12:9: '*'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:10:7: ( '(' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:10:9: '('
             {
-            match('*'); 
+            match('('); 
 
             }
 
@@ -243,10 +205,10 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = T__37;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:13:7: ( '.' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:13:9: '.'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:11:7: ( ')' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:11:9: ')'
             {
-            match('.'); 
+            match(')'); 
 
             }
 
@@ -264,10 +226,10 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = T__38;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:14:7: ( '<' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:14:9: '<'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:12:7: ( '*' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:12:9: '*'
             {
-            match('<'); 
+            match('*'); 
 
             }
 
@@ -285,12 +247,10 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = T__39;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:15:7: ( '<=' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:15:9: '<='
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:13:7: ( '.' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:13:9: '.'
             {
-            match("<="); 
-
-
+            match('.'); 
 
             }
 
@@ -308,10 +268,10 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = T__40;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:16:7: ( '=' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:16:9: '='
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:14:7: ( '<' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:14:9: '<'
             {
-            match('='); 
+            match('<'); 
 
             }
 
@@ -329,10 +289,10 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = T__41;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:17:7: ( '=~' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:17:9: '=~'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:15:7: ( '<=' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:15:9: '<='
             {
-            match("=~"); 
+            match("<="); 
 
 
 
@@ -352,10 +312,10 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = T__42;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:18:7: ( '>' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:18:9: '>'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:16:7: ( '=' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:16:9: '='
             {
-            match('>'); 
+            match('='); 
 
             }
 
@@ -373,10 +333,10 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = T__43;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:19:7: ( '>=' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:19:9: '>='
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:17:7: ( '=~' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:17:9: '=~'
             {
-            match(">="); 
+            match("=~"); 
 
 
 
@@ -396,10 +356,10 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = T__44;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:20:7: ( '?' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:20:9: '?'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:18:7: ( '>' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:18:9: '>'
             {
-            match('?'); 
+            match('>'); 
 
             }
 
@@ -417,10 +377,10 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = T__45;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:21:7: ( 'ALL' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:21:9: 'ALL'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:19:7: ( '>=' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:19:9: '>='
             {
-            match("ALL"); 
+            match(">="); 
 
 
 
@@ -440,12 +400,10 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = T__46;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:22:7: ( 'ANY' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:22:9: 'ANY'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:20:7: ( '?' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:20:9: '?'
             {
-            match("ANY"); 
-
-
+            match('?'); 
 
             }
 
@@ -463,10 +421,10 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = T__47;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:23:7: ( 'EFF' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:23:9: 'EFF'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:21:7: ( 'ALL' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:21:9: 'ALL'
             {
-            match("EFF"); 
+            match("ALL"); 
 
 
 
@@ -486,10 +444,10 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = T__48;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:24:7: ( 'GEN' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:24:9: 'GEN'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:22:7: ( 'ANY' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:22:9: 'ANY'
             {
-            match("GEN"); 
+            match("ANY"); 
 
 
 
@@ -509,10 +467,10 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = T__49;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:25:7: ( 'SET' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:25:9: 'SET'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:23:7: ( 'EFF' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:23:9: 'EFF'
             {
-            match("SET"); 
+            match("EFF"); 
 
 
 
@@ -532,10 +490,12 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = T__50;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:26:7: ( '[' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:26:9: '['
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:24:7: ( 'GEN' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:24:9: 'GEN'
             {
-            match('['); 
+            match("GEN"); 
+
+
 
             }
 
@@ -553,10 +513,12 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = T__51;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:27:7: ( ']' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:27:9: ']'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:25:7: ( 'LOF' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:25:9: 'LOF'
             {
-            match(']'); 
+            match("LOF"); 
+
+
 
             }
 
@@ -574,10 +536,10 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = T__52;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:28:7: ( 'countHet' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:28:9: 'countHet'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:26:7: ( 'NMD' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:26:9: 'NMD'
             {
-            match("countHet"); 
+            match("NMD"); 
 
 
 
@@ -597,10 +559,10 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = T__53;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:29:7: ( 'countHom' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:29:9: 'countHom'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:27:7: ( 'SET' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:27:9: 'SET'
             {
-            match("countHom"); 
+            match("SET"); 
 
 
 
@@ -620,12 +582,10 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = T__54;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:30:7: ( 'countRef' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:30:9: 'countRef'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:28:7: ( '[' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:28:9: '['
             {
-            match("countRef"); 
-
-
+            match('['); 
 
             }
 
@@ -643,12 +603,10 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = T__55;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:31:7: ( 'countVariant' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:31:9: 'countVariant'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:29:7: ( ']' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:29:9: ']'
             {
-            match("countVariant"); 
-
-
+            match(']'); 
 
             }
 
@@ -666,10 +624,10 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = T__56;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:32:7: ( 'exists' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:32:9: 'exists'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:30:7: ( 'countHet' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:30:9: 'countHet'
             {
-            match("exists"); 
+            match("countHet"); 
 
 
 
@@ -689,10 +647,10 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = T__57;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:33:7: ( 'in' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:33:9: 'in'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:31:7: ( 'countHom' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:31:9: 'countHom'
             {
-            match("in"); 
+            match("countHom"); 
 
 
 
@@ -712,10 +670,10 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = T__58;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:34:7: ( 'isHet' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:34:9: 'isHet'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:32:7: ( 'countRef' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:32:9: 'countRef'
             {
-            match("isHet"); 
+            match("countRef"); 
 
 
 
@@ -735,10 +693,10 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = T__59;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:35:7: ( 'isHom' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:35:9: 'isHom'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:33:7: ( 'countVariant' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:33:9: 'countVariant'
             {
-            match("isHom"); 
+            match("countVariant"); 
 
 
 
@@ -758,10 +716,10 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = T__60;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:36:7: ( 'isRef' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:36:9: 'isRef'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:34:7: ( 'exists' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:34:9: 'exists'
             {
-            match("isRef"); 
+            match("exists"); 
 
 
 
@@ -781,10 +739,10 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = T__61;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:37:7: ( 'isVariant' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:37:9: 'isVariant'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:35:7: ( 'in' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:35:9: 'in'
             {
-            match("isVariant"); 
+            match("in"); 
 
 
 
@@ -804,10 +762,10 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = T__62;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:38:7: ( 'na' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:38:9: 'na'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:36:7: ( 'isHet' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:36:9: 'isHet'
             {
-            match("na"); 
+            match("isHet"); 
 
 
 
@@ -827,10 +785,12 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = T__63;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:39:7: ( '|' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:39:9: '|'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:37:7: ( 'isHom' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:37:9: 'isHom'
             {
-            match('|'); 
+            match("isHom"); 
+
+
 
             }
 
@@ -843,15 +803,105 @@ public class VcfFilterLexer extends Lexer {
     }
     // $ANTLR end "T__63"
 
+    // $ANTLR start "T__64"
+    public final void mT__64() throws RecognitionException {
+        try {
+            int _type = T__64;
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:38:7: ( 'isRef' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:38:9: 'isRef'
+            {
+            match("isRef"); 
+
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally {
+        	// do for sure before leaving
+        }
+    }
+    // $ANTLR end "T__64"
+
+    // $ANTLR start "T__65"
+    public final void mT__65() throws RecognitionException {
+        try {
+            int _type = T__65;
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:39:7: ( 'isVariant' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:39:9: 'isVariant'
+            {
+            match("isVariant"); 
+
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally {
+        	// do for sure before leaving
+        }
+    }
+    // $ANTLR end "T__65"
+
+    // $ANTLR start "T__66"
+    public final void mT__66() throws RecognitionException {
+        try {
+            int _type = T__66;
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:40:7: ( 'na' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:40:9: 'na'
+            {
+            match("na"); 
+
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally {
+        	// do for sure before leaving
+        }
+    }
+    // $ANTLR end "T__66"
+
+    // $ANTLR start "T__67"
+    public final void mT__67() throws RecognitionException {
+        try {
+            int _type = T__67;
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:41:7: ( '|' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:41:9: '|'
+            {
+            match('|'); 
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally {
+        	// do for sure before leaving
+        }
+    }
+    // $ANTLR end "T__67"
+
     // $ANTLR start "WS"
     public final void mWS() throws RecognitionException {
         try {
             int _type = WS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:46:5: ( ( ' ' | '\\t' )+ )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:46:7: ( ' ' | '\\t' )+
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:48:5: ( ( ' ' | '\\t' )+ )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:48:7: ( ' ' | '\\t' )+
             {
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:46:7: ( ' ' | '\\t' )+
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:48:7: ( ' ' | '\\t' )+
             int cnt1=0;
             loop1:
             do {
@@ -908,10 +958,10 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = NEWLINE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:51:10: ( ( ( '\\r' )? '\\n' )+ )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:51:12: ( ( '\\r' )? '\\n' )+
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:53:10: ( ( ( '\\r' )? '\\n' )+ )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:53:12: ( ( '\\r' )? '\\n' )+
             {
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:51:12: ( ( '\\r' )? '\\n' )+
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:53:12: ( ( '\\r' )? '\\n' )+
             int cnt3=0;
             loop3:
             do {
@@ -925,9 +975,9 @@ public class VcfFilterLexer extends Lexer {
 
                 switch (alt3) {
             	case 1 :
-            	    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:51:13: ( '\\r' )? '\\n'
+            	    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:53:13: ( '\\r' )? '\\n'
             	    {
-            	    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:51:13: ( '\\r' )?
+            	    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:53:13: ( '\\r' )?
             	    int alt2=2;
             	    int LA2_0 = input.LA(1);
 
@@ -936,7 +986,7 @@ public class VcfFilterLexer extends Lexer {
             	    }
             	    switch (alt2) {
             	        case 1 :
-            	            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:51:13: '\\r'
+            	            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:53:13: '\\r'
             	            {
             	            match('\r'); 
 
@@ -977,10 +1027,10 @@ public class VcfFilterLexer extends Lexer {
     // $ANTLR start "NUMBER"
     public final void mNUMBER() throws RecognitionException {
         try {
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:55:17: ( ( DIGIT )+ )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:55:19: ( DIGIT )+
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:57:17: ( ( DIGIT )+ )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:57:19: ( DIGIT )+
             {
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:55:19: ( DIGIT )+
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:57:19: ( DIGIT )+
             int cnt4=0;
             loop4:
             do {
@@ -1032,7 +1082,7 @@ public class VcfFilterLexer extends Lexer {
     // $ANTLR start "DIGIT"
     public final void mDIGIT() throws RecognitionException {
         try {
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:58:16: ( '0' .. '9' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:60:16: ( '0' .. '9' )
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:
             {
             if ( (input.LA(1) >= '0' && input.LA(1) <= '9') ) {
@@ -1058,7 +1108,7 @@ public class VcfFilterLexer extends Lexer {
     // $ANTLR start "LETTER"
     public final void mLETTER() throws RecognitionException {
         try {
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:61:17: ( LOWER | UPPER )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:63:17: ( LOWER | UPPER )
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:
             {
             if ( (input.LA(1) >= 'A' && input.LA(1) <= 'Z')||(input.LA(1) >= 'a' && input.LA(1) <= 'z') ) {
@@ -1084,7 +1134,7 @@ public class VcfFilterLexer extends Lexer {
     // $ANTLR start "LOWER"
     public final void mLOWER() throws RecognitionException {
         try {
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:62:16: ( 'a' .. 'z' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:64:16: ( 'a' .. 'z' )
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:
             {
             if ( (input.LA(1) >= 'a' && input.LA(1) <= 'z') ) {
@@ -1110,7 +1160,7 @@ public class VcfFilterLexer extends Lexer {
     // $ANTLR start "UPPER"
     public final void mUPPER() throws RecognitionException {
         try {
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:63:16: ( 'A' .. 'Z' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:65:16: ( 'A' .. 'Z' )
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:
             {
             if ( (input.LA(1) >= 'A' && input.LA(1) <= 'Z') ) {
@@ -1136,7 +1186,7 @@ public class VcfFilterLexer extends Lexer {
     // $ANTLR start "ALPHANUM"
     public final void mALPHANUM() throws RecognitionException {
         try {
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:66:20: ( LETTER | DIGIT )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:68:20: ( LETTER | DIGIT )
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:
             {
             if ( (input.LA(1) >= '0' && input.LA(1) <= '9')||(input.LA(1) >= 'A' && input.LA(1) <= 'Z')||(input.LA(1) >= 'a' && input.LA(1) <= 'z') ) {
@@ -1164,14 +1214,14 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = COMMENT_SL;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:69:12: ( '//' (~ ( '\\r' | '\\n' ) )* NEWLINE )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:69:14: '//' (~ ( '\\r' | '\\n' ) )* NEWLINE
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:71:12: ( '//' (~ ( '\\r' | '\\n' ) )* NEWLINE )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:71:14: '//' (~ ( '\\r' | '\\n' ) )* NEWLINE
             {
             match("//"); 
 
 
 
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:69:19: (~ ( '\\r' | '\\n' ) )*
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:71:19: (~ ( '\\r' | '\\n' ) )*
             loop5:
             do {
                 int alt5=2;
@@ -1226,10 +1276,10 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = FLOAT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:72:8: ( ( '+' | '-' )? NUMBER ( '.' NUMBER )? ( ( 'e' | 'E' ) ( '+' | '-' )? NUMBER )? )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:72:12: ( '+' | '-' )? NUMBER ( '.' NUMBER )? ( ( 'e' | 'E' ) ( '+' | '-' )? NUMBER )?
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:74:8: ( ( '+' | '-' )? NUMBER ( '.' NUMBER )? ( ( 'e' | 'E' ) ( '+' | '-' )? NUMBER )? )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:74:12: ( '+' | '-' )? NUMBER ( '.' NUMBER )? ( ( 'e' | 'E' ) ( '+' | '-' )? NUMBER )?
             {
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:72:12: ( '+' | '-' )?
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:74:12: ( '+' | '-' )?
             int alt6=2;
             int LA6_0 = input.LA(1);
 
@@ -1259,7 +1309,7 @@ public class VcfFilterLexer extends Lexer {
             mNUMBER(); 
 
 
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:72:30: ( '.' NUMBER )?
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:74:30: ( '.' NUMBER )?
             int alt7=2;
             int LA7_0 = input.LA(1);
 
@@ -1268,7 +1318,7 @@ public class VcfFilterLexer extends Lexer {
             }
             switch (alt7) {
                 case 1 :
-                    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:72:32: '.' NUMBER
+                    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:74:32: '.' NUMBER
                     {
                     match('.'); 
 
@@ -1281,7 +1331,7 @@ public class VcfFilterLexer extends Lexer {
             }
 
 
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:72:46: ( ( 'e' | 'E' ) ( '+' | '-' )? NUMBER )?
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:74:46: ( ( 'e' | 'E' ) ( '+' | '-' )? NUMBER )?
             int alt9=2;
             int LA9_0 = input.LA(1);
 
@@ -1290,7 +1340,7 @@ public class VcfFilterLexer extends Lexer {
             }
             switch (alt9) {
                 case 1 :
-                    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:72:47: ( 'e' | 'E' ) ( '+' | '-' )? NUMBER
+                    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:74:47: ( 'e' | 'E' ) ( '+' | '-' )? NUMBER
                     {
                     if ( input.LA(1)=='E'||input.LA(1)=='e' ) {
                         input.consume();
@@ -1302,7 +1352,7 @@ public class VcfFilterLexer extends Lexer {
                     }
 
 
-                    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:72:57: ( '+' | '-' )?
+                    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:74:57: ( '+' | '-' )?
                     int alt8=2;
                     int LA8_0 = input.LA(1);
 
@@ -1354,12 +1404,12 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = STRING;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:75:7: ( '\\'' (~ ( '\\n' | '\\r' | '\\'' ) )* '\\'' )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:75:9: '\\'' (~ ( '\\n' | '\\r' | '\\'' ) )* '\\''
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:77:7: ( '\\'' (~ ( '\\n' | '\\r' | '\\'' ) )* '\\'' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:77:9: '\\'' (~ ( '\\n' | '\\r' | '\\'' ) )* '\\''
             {
             match('\''); 
 
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:75:14: (~ ( '\\n' | '\\r' | '\\'' ) )*
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:77:14: (~ ( '\\n' | '\\r' | '\\'' ) )*
             loop10:
             do {
                 int alt10=2;
@@ -1413,13 +1463,13 @@ public class VcfFilterLexer extends Lexer {
         try {
             int _type = ID;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:78:4: ( LETTER ( ALPHANUM | '_' | '.' )* )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:78:6: LETTER ( ALPHANUM | '_' | '.' )*
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:80:4: ( LETTER ( ALPHANUM | '_' | '.' )* )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:80:6: LETTER ( ALPHANUM | '_' | '.' )*
             {
             mLETTER(); 
 
 
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:78:13: ( ALPHANUM | '_' | '.' )*
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:80:13: ( ALPHANUM | '_' | '.' )*
             loop11:
             do {
                 int alt11=2;
@@ -1465,324 +1515,340 @@ public class VcfFilterLexer extends Lexer {
     // $ANTLR end "ID"
 
     public void mTokens() throws RecognitionException {
-        // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:8: ( T__30 | T__31 | T__32 | T__33 | T__34 | T__35 | T__36 | T__37 | T__38 | T__39 | T__40 | T__41 | T__42 | T__43 | T__44 | T__45 | T__46 | T__47 | T__48 | T__49 | T__50 | T__51 | T__52 | T__53 | T__54 | T__55 | T__56 | T__57 | T__58 | T__59 | T__60 | T__61 | T__62 | T__63 | WS | NEWLINE | COMMENT_SL | FLOAT | STRING | ID )
-        int alt12=40;
+        // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:8: ( T__32 | T__33 | T__34 | T__35 | T__36 | T__37 | T__38 | T__39 | T__40 | T__41 | T__42 | T__43 | T__44 | T__45 | T__46 | T__47 | T__48 | T__49 | T__50 | T__51 | T__52 | T__53 | T__54 | T__55 | T__56 | T__57 | T__58 | T__59 | T__60 | T__61 | T__62 | T__63 | T__64 | T__65 | T__66 | T__67 | WS | NEWLINE | COMMENT_SL | FLOAT | STRING | ID )
+        int alt12=42;
         alt12 = dfa12.predict(input);
         switch (alt12) {
             case 1 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:10: T__30
-                {
-                mT__30(); 
-
-
-                }
-                break;
-            case 2 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:16: T__31
-                {
-                mT__31(); 
-
-
-                }
-                break;
-            case 3 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:22: T__32
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:10: T__32
                 {
                 mT__32(); 
 
 
                 }
                 break;
-            case 4 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:28: T__33
+            case 2 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:16: T__33
                 {
                 mT__33(); 
 
 
                 }
                 break;
-            case 5 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:34: T__34
+            case 3 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:22: T__34
                 {
                 mT__34(); 
 
 
                 }
                 break;
-            case 6 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:40: T__35
+            case 4 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:28: T__35
                 {
                 mT__35(); 
 
 
                 }
                 break;
-            case 7 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:46: T__36
+            case 5 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:34: T__36
                 {
                 mT__36(); 
 
 
                 }
                 break;
-            case 8 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:52: T__37
+            case 6 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:40: T__37
                 {
                 mT__37(); 
 
 
                 }
                 break;
-            case 9 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:58: T__38
+            case 7 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:46: T__38
                 {
                 mT__38(); 
 
 
                 }
                 break;
-            case 10 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:64: T__39
+            case 8 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:52: T__39
                 {
                 mT__39(); 
 
 
                 }
                 break;
-            case 11 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:70: T__40
+            case 9 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:58: T__40
                 {
                 mT__40(); 
 
 
                 }
                 break;
-            case 12 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:76: T__41
+            case 10 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:64: T__41
                 {
                 mT__41(); 
 
 
                 }
                 break;
-            case 13 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:82: T__42
+            case 11 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:70: T__42
                 {
                 mT__42(); 
 
 
                 }
                 break;
-            case 14 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:88: T__43
+            case 12 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:76: T__43
                 {
                 mT__43(); 
 
 
                 }
                 break;
-            case 15 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:94: T__44
+            case 13 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:82: T__44
                 {
                 mT__44(); 
 
 
                 }
                 break;
-            case 16 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:100: T__45
+            case 14 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:88: T__45
                 {
                 mT__45(); 
 
 
                 }
                 break;
-            case 17 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:106: T__46
+            case 15 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:94: T__46
                 {
                 mT__46(); 
 
 
                 }
                 break;
-            case 18 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:112: T__47
+            case 16 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:100: T__47
                 {
                 mT__47(); 
 
 
                 }
                 break;
-            case 19 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:118: T__48
+            case 17 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:106: T__48
                 {
                 mT__48(); 
 
 
                 }
                 break;
-            case 20 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:124: T__49
+            case 18 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:112: T__49
                 {
                 mT__49(); 
 
 
                 }
                 break;
-            case 21 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:130: T__50
+            case 19 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:118: T__50
                 {
                 mT__50(); 
 
 
                 }
                 break;
-            case 22 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:136: T__51
+            case 20 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:124: T__51
                 {
                 mT__51(); 
 
 
                 }
                 break;
-            case 23 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:142: T__52
+            case 21 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:130: T__52
                 {
                 mT__52(); 
 
 
                 }
                 break;
-            case 24 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:148: T__53
+            case 22 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:136: T__53
                 {
                 mT__53(); 
 
 
                 }
                 break;
-            case 25 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:154: T__54
+            case 23 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:142: T__54
                 {
                 mT__54(); 
 
 
                 }
                 break;
-            case 26 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:160: T__55
+            case 24 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:148: T__55
                 {
                 mT__55(); 
 
 
                 }
                 break;
-            case 27 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:166: T__56
+            case 25 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:154: T__56
                 {
                 mT__56(); 
 
 
                 }
                 break;
-            case 28 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:172: T__57
+            case 26 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:160: T__57
                 {
                 mT__57(); 
 
 
                 }
                 break;
-            case 29 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:178: T__58
+            case 27 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:166: T__58
                 {
                 mT__58(); 
 
 
                 }
                 break;
-            case 30 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:184: T__59
+            case 28 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:172: T__59
                 {
                 mT__59(); 
 
 
                 }
                 break;
-            case 31 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:190: T__60
+            case 29 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:178: T__60
                 {
                 mT__60(); 
 
 
                 }
                 break;
-            case 32 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:196: T__61
+            case 30 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:184: T__61
                 {
                 mT__61(); 
 
 
                 }
                 break;
-            case 33 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:202: T__62
+            case 31 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:190: T__62
                 {
                 mT__62(); 
 
 
                 }
                 break;
-            case 34 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:208: T__63
+            case 32 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:196: T__63
                 {
                 mT__63(); 
 
 
                 }
                 break;
+            case 33 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:202: T__64
+                {
+                mT__64(); 
+
+
+                }
+                break;
+            case 34 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:208: T__65
+                {
+                mT__65(); 
+
+
+                }
+                break;
             case 35 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:214: WS
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:214: T__66
+                {
+                mT__66(); 
+
+
+                }
+                break;
+            case 36 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:220: T__67
+                {
+                mT__67(); 
+
+
+                }
+                break;
+            case 37 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:226: WS
                 {
                 mWS(); 
 
 
                 }
                 break;
-            case 36 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:217: NEWLINE
+            case 38 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:229: NEWLINE
                 {
                 mNEWLINE(); 
 
 
                 }
                 break;
-            case 37 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:225: COMMENT_SL
+            case 39 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:237: COMMENT_SL
                 {
                 mCOMMENT_SL(); 
 
 
                 }
                 break;
-            case 38 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:236: FLOAT
+            case 40 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:248: FLOAT
                 {
                 mFLOAT(); 
 
 
                 }
                 break;
-            case 39 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:242: STRING
+            case 41 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:254: STRING
                 {
                 mSTRING(); 
 
 
                 }
                 break;
-            case 40 :
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:249: ID
+            case 42 :
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:1:261: ID
                 {
                 mID(); 
 
@@ -1797,145 +1863,154 @@ public class VcfFilterLexer extends Lexer {
 
     protected DFA12 dfa12 = new DFA12(this);
     static final String DFA12_eotS =
-        "\1\uffff\1\36\5\uffff\1\40\1\42\1\44\1\uffff\4\33\2\uffff\4\33\20"+
-        "\uffff\7\33\1\66\1\33\1\72\1\73\1\74\1\75\1\76\1\77\2\33\1\uffff"+
-        "\3\33\6\uffff\10\33\1\120\1\121\1\122\4\33\1\130\3\uffff\5\33\1"+
-        "\uffff\1\33\1\137\1\140\1\141\2\33\3\uffff\1\33\1\145\1\33\1\uffff"+
-        "\1\33\1\150\1\uffff";
+        "\1\uffff\1\40\5\uffff\1\42\1\44\1\46\1\uffff\6\35\2\uffff\4\35\20"+
+        "\uffff\11\35\1\74\1\35\1\100\1\101\1\102\1\103\1\104\1\105\1\106"+
+        "\1\107\2\35\1\uffff\3\35\10\uffff\10\35\1\130\1\131\1\132\4\35\1"+
+        "\140\3\uffff\5\35\1\uffff\1\35\1\147\1\150\1\151\2\35\3\uffff\1"+
+        "\35\1\155\1\35\1\uffff\1\35\1\160\1\uffff";
     static final String DFA12_eofS =
-        "\151\uffff";
+        "\161\uffff";
     static final String DFA12_minS =
-        "\1\11\1\75\5\uffff\1\75\1\176\1\75\1\uffff\1\114\1\106\2\105\2\uffff"+
-        "\1\157\1\170\1\156\1\141\20\uffff\1\114\1\131\1\106\1\116\1\124"+
-        "\1\165\1\151\1\56\1\110\6\56\1\156\1\163\1\uffff\2\145\1\141\6\uffff"+
-        "\3\164\1\155\1\146\1\162\1\110\1\163\3\56\1\151\2\145\1\141\1\56"+
-        "\3\uffff\1\141\1\164\1\155\1\146\1\162\1\uffff\1\156\3\56\1\151"+
-        "\1\164\3\uffff\1\141\1\56\1\156\1\uffff\1\164\1\56\1\uffff";
+        "\1\11\1\75\5\uffff\1\75\1\176\1\75\1\uffff\1\114\1\106\1\105\1\117"+
+        "\1\115\1\105\2\uffff\1\157\1\170\1\156\1\141\20\uffff\1\114\1\131"+
+        "\1\106\1\116\1\106\1\104\1\124\1\165\1\151\1\56\1\110\10\56\1\156"+
+        "\1\163\1\uffff\2\145\1\141\10\uffff\3\164\1\155\1\146\1\162\1\110"+
+        "\1\163\3\56\1\151\2\145\1\141\1\56\3\uffff\1\141\1\164\1\155\1\146"+
+        "\1\162\1\uffff\1\156\3\56\1\151\1\164\3\uffff\1\141\1\56\1\156\1"+
+        "\uffff\1\164\1\56\1\uffff";
     static final String DFA12_maxS =
-        "\1\174\1\176\5\uffff\1\75\1\176\1\75\1\uffff\1\116\1\106\2\105\2"+
-        "\uffff\1\157\1\170\1\163\1\141\20\uffff\1\114\1\131\1\106\1\116"+
-        "\1\124\1\165\1\151\1\172\1\126\6\172\1\156\1\163\1\uffff\1\157\1"+
-        "\145\1\141\6\uffff\3\164\1\155\1\146\1\162\1\126\1\163\3\172\1\151"+
-        "\1\157\1\145\1\141\1\172\3\uffff\1\141\1\164\1\155\1\146\1\162\1"+
-        "\uffff\1\156\3\172\1\151\1\164\3\uffff\1\141\1\172\1\156\1\uffff"+
-        "\1\164\1\172\1\uffff";
+        "\1\174\1\176\5\uffff\1\75\1\176\1\75\1\uffff\1\116\1\106\1\105\1"+
+        "\117\1\115\1\105\2\uffff\1\157\1\170\1\163\1\141\20\uffff\1\114"+
+        "\1\131\1\106\1\116\1\106\1\104\1\124\1\165\1\151\1\172\1\126\10"+
+        "\172\1\156\1\163\1\uffff\1\157\1\145\1\141\10\uffff\3\164\1\155"+
+        "\1\146\1\162\1\126\1\163\3\172\1\151\1\157\1\145\1\141\1\172\3\uffff"+
+        "\1\141\1\164\1\155\1\146\1\162\1\uffff\1\156\3\172\1\151\1\164\3"+
+        "\uffff\1\141\1\172\1\156\1\uffff\1\164\1\172\1\uffff";
     static final String DFA12_acceptS =
-        "\2\uffff\1\4\1\5\1\6\1\7\1\10\3\uffff\1\17\4\uffff\1\25\1\26\4\uffff"+
-        "\1\42\1\43\1\44\1\45\1\46\1\47\1\50\1\2\1\3\1\1\1\12\1\11\1\14\1"+
-        "\13\1\16\1\15\21\uffff\1\34\3\uffff\1\41\1\20\1\21\1\22\1\23\1\24"+
-        "\20\uffff\1\35\1\36\1\37\5\uffff\1\33\6\uffff\1\27\1\30\1\31\3\uffff"+
-        "\1\40\2\uffff\1\32";
+        "\2\uffff\1\4\1\5\1\6\1\7\1\10\3\uffff\1\17\6\uffff\1\27\1\30\4\uffff"+
+        "\1\44\1\45\1\46\1\47\1\50\1\51\1\52\1\2\1\3\1\1\1\12\1\11\1\14\1"+
+        "\13\1\16\1\15\25\uffff\1\36\3\uffff\1\43\1\20\1\21\1\22\1\23\1\24"+
+        "\1\25\1\26\20\uffff\1\37\1\40\1\41\5\uffff\1\35\6\uffff\1\31\1\32"+
+        "\1\33\3\uffff\1\42\2\uffff\1\34";
     static final String DFA12_specialS =
-        "\151\uffff}>";
+        "\161\uffff}>";
     static final String[] DFA12_transitionS = {
-            "\1\26\1\27\2\uffff\1\27\22\uffff\1\26\1\1\4\uffff\1\2\1\32\1"+
-            "\3\1\4\1\5\1\31\1\uffff\1\31\1\6\1\30\12\31\2\uffff\1\7\1\10"+
-            "\1\11\1\12\1\uffff\1\13\3\33\1\14\1\33\1\15\13\33\1\16\7\33"+
-            "\1\17\1\uffff\1\20\3\uffff\2\33\1\21\1\33\1\22\3\33\1\23\4\33"+
-            "\1\24\14\33\1\uffff\1\25",
-            "\1\34\100\uffff\1\35",
+            "\1\30\1\31\2\uffff\1\31\22\uffff\1\30\1\1\4\uffff\1\2\1\34\1"+
+            "\3\1\4\1\5\1\33\1\uffff\1\33\1\6\1\32\12\33\2\uffff\1\7\1\10"+
+            "\1\11\1\12\1\uffff\1\13\3\35\1\14\1\35\1\15\4\35\1\16\1\35\1"+
+            "\17\4\35\1\20\7\35\1\21\1\uffff\1\22\3\uffff\2\35\1\23\1\35"+
+            "\1\24\3\35\1\25\4\35\1\26\14\35\1\uffff\1\27",
+            "\1\36\100\uffff\1\37",
             "",
             "",
             "",
             "",
             "",
-            "\1\37",
             "\1\41",
             "\1\43",
+            "\1\45",
             "",
-            "\1\45\1\uffff\1\46",
-            "\1\47",
-            "\1\50",
+            "\1\47\1\uffff\1\50",
             "\1\51",
-            "",
-            "",
             "\1\52",
             "\1\53",
-            "\1\54\4\uffff\1\55",
+            "\1\54",
+            "\1\55",
+            "",
+            "",
             "\1\56",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
             "\1\57",
-            "\1\60",
-            "\1\61",
+            "\1\60\4\uffff\1\61",
             "\1\62",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
             "\1\63",
             "\1\64",
             "\1\65",
-            "\1\33\1\uffff\12\33\7\uffff\32\33\4\uffff\1\33\1\uffff\32\33",
-            "\1\67\11\uffff\1\70\3\uffff\1\71",
-            "\1\33\1\uffff\12\33\7\uffff\32\33\4\uffff\1\33\1\uffff\32\33",
-            "\1\33\1\uffff\12\33\7\uffff\32\33\4\uffff\1\33\1\uffff\32\33",
-            "\1\33\1\uffff\12\33\7\uffff\32\33\4\uffff\1\33\1\uffff\32\33",
-            "\1\33\1\uffff\12\33\7\uffff\32\33\4\uffff\1\33\1\uffff\32\33",
-            "\1\33\1\uffff\12\33\7\uffff\32\33\4\uffff\1\33\1\uffff\32\33",
-            "\1\33\1\uffff\12\33\7\uffff\32\33\4\uffff\1\33\1\uffff\32\33",
-            "\1\100",
-            "\1\101",
-            "",
-            "\1\102\11\uffff\1\103",
-            "\1\104",
-            "\1\105",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "\1\106",
-            "\1\107",
+            "\1\66",
+            "\1\67",
+            "\1\70",
+            "\1\71",
+            "\1\72",
+            "\1\73",
+            "\1\35\1\uffff\12\35\7\uffff\32\35\4\uffff\1\35\1\uffff\32\35",
+            "\1\75\11\uffff\1\76\3\uffff\1\77",
+            "\1\35\1\uffff\12\35\7\uffff\32\35\4\uffff\1\35\1\uffff\32\35",
+            "\1\35\1\uffff\12\35\7\uffff\32\35\4\uffff\1\35\1\uffff\32\35",
+            "\1\35\1\uffff\12\35\7\uffff\32\35\4\uffff\1\35\1\uffff\32\35",
+            "\1\35\1\uffff\12\35\7\uffff\32\35\4\uffff\1\35\1\uffff\32\35",
+            "\1\35\1\uffff\12\35\7\uffff\32\35\4\uffff\1\35\1\uffff\32\35",
+            "\1\35\1\uffff\12\35\7\uffff\32\35\4\uffff\1\35\1\uffff\32\35",
+            "\1\35\1\uffff\12\35\7\uffff\32\35\4\uffff\1\35\1\uffff\32\35",
+            "\1\35\1\uffff\12\35\7\uffff\32\35\4\uffff\1\35\1\uffff\32\35",
             "\1\110",
             "\1\111",
-            "\1\112",
-            "\1\113",
-            "\1\114\11\uffff\1\115\3\uffff\1\116",
+            "",
+            "\1\112\11\uffff\1\113",
+            "\1\114",
+            "\1\115",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "\1\116",
             "\1\117",
-            "\1\33\1\uffff\12\33\7\uffff\32\33\4\uffff\1\33\1\uffff\32\33",
-            "\1\33\1\uffff\12\33\7\uffff\32\33\4\uffff\1\33\1\uffff\32\33",
-            "\1\33\1\uffff\12\33\7\uffff\32\33\4\uffff\1\33\1\uffff\32\33",
+            "\1\120",
+            "\1\121",
+            "\1\122",
             "\1\123",
-            "\1\124\11\uffff\1\125",
-            "\1\126",
+            "\1\124\11\uffff\1\125\3\uffff\1\126",
             "\1\127",
-            "\1\33\1\uffff\12\33\7\uffff\32\33\4\uffff\1\33\1\uffff\32\33",
-            "",
-            "",
-            "",
-            "\1\131",
-            "\1\132",
+            "\1\35\1\uffff\12\35\7\uffff\32\35\4\uffff\1\35\1\uffff\32\35",
+            "\1\35\1\uffff\12\35\7\uffff\32\35\4\uffff\1\35\1\uffff\32\35",
+            "\1\35\1\uffff\12\35\7\uffff\32\35\4\uffff\1\35\1\uffff\32\35",
             "\1\133",
-            "\1\134",
-            "\1\135",
-            "",
+            "\1\134\11\uffff\1\135",
             "\1\136",
-            "\1\33\1\uffff\12\33\7\uffff\32\33\4\uffff\1\33\1\uffff\32\33",
-            "\1\33\1\uffff\12\33\7\uffff\32\33\4\uffff\1\33\1\uffff\32\33",
-            "\1\33\1\uffff\12\33\7\uffff\32\33\4\uffff\1\33\1\uffff\32\33",
+            "\1\137",
+            "\1\35\1\uffff\12\35\7\uffff\32\35\4\uffff\1\35\1\uffff\32\35",
+            "",
+            "",
+            "",
+            "\1\141",
             "\1\142",
             "\1\143",
-            "",
-            "",
-            "",
             "\1\144",
-            "\1\33\1\uffff\12\33\7\uffff\32\33\4\uffff\1\33\1\uffff\32\33",
-            "\1\146",
+            "\1\145",
             "",
-            "\1\147",
-            "\1\33\1\uffff\12\33\7\uffff\32\33\4\uffff\1\33\1\uffff\32\33",
+            "\1\146",
+            "\1\35\1\uffff\12\35\7\uffff\32\35\4\uffff\1\35\1\uffff\32\35",
+            "\1\35\1\uffff\12\35\7\uffff\32\35\4\uffff\1\35\1\uffff\32\35",
+            "\1\35\1\uffff\12\35\7\uffff\32\35\4\uffff\1\35\1\uffff\32\35",
+            "\1\152",
+            "\1\153",
+            "",
+            "",
+            "",
+            "\1\154",
+            "\1\35\1\uffff\12\35\7\uffff\32\35\4\uffff\1\35\1\uffff\32\35",
+            "\1\156",
+            "",
+            "\1\157",
+            "\1\35\1\uffff\12\35\7\uffff\32\35\4\uffff\1\35\1\uffff\32\35",
             ""
     };
 
@@ -1969,7 +2044,7 @@ public class VcfFilterLexer extends Lexer {
             this.transition = DFA12_transition;
         }
         public String getDescription() {
-            return "1:1: Tokens : ( T__30 | T__31 | T__32 | T__33 | T__34 | T__35 | T__36 | T__37 | T__38 | T__39 | T__40 | T__41 | T__42 | T__43 | T__44 | T__45 | T__46 | T__47 | T__48 | T__49 | T__50 | T__51 | T__52 | T__53 | T__54 | T__55 | T__56 | T__57 | T__58 | T__59 | T__60 | T__61 | T__62 | T__63 | WS | NEWLINE | COMMENT_SL | FLOAT | STRING | ID );";
+            return "1:1: Tokens : ( T__32 | T__33 | T__34 | T__35 | T__36 | T__37 | T__38 | T__39 | T__40 | T__41 | T__42 | T__43 | T__44 | T__45 | T__46 | T__47 | T__48 | T__49 | T__50 | T__51 | T__52 | T__53 | T__54 | T__55 | T__56 | T__57 | T__58 | T__59 | T__60 | T__61 | T__62 | T__63 | T__64 | T__65 | T__66 | T__67 | WS | NEWLINE | COMMENT_SL | FLOAT | STRING | ID );";
         }
     }
  
