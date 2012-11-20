@@ -142,7 +142,6 @@ public class SnpSift {
 		else if (command.startsWith("INTIDX")) SnpSiftCmdIntervalsIndex.main(args);
 		else if (command.startsWith("IN")) SnpSiftCmdIntervals.main(args);
 		else if (command.startsWith("JOIN")) SnpSiftCmdJoin.main(args);
-		else if (command.startsWith("LOF")) SnpSiftCmdLof.main(args);
 		else if (command.startsWith("RM")) SnpSiftCmdRemoveReferenceGenotypes.main(args);
 		else if (command.startsWith("SIF")) SnpSiftCmdAnnotateSortedSift.main(args);
 		else if (command.startsWith("TS")) SnpSiftCmdTsTv.main(args);

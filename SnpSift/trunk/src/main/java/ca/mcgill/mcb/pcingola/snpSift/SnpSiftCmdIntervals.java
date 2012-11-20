@@ -7,6 +7,7 @@ import java.util.List;
 import ca.mcgill.mcb.pcingola.fileIterator.SeqChangeBedFileIterator;
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
 import ca.mcgill.mcb.pcingola.interval.Genome;
+import ca.mcgill.mcb.pcingola.interval.Markers;
 import ca.mcgill.mcb.pcingola.interval.SeqChange;
 import ca.mcgill.mcb.pcingola.interval.tree.IntervalForest;
 import ca.mcgill.mcb.pcingola.util.Timer;
@@ -104,7 +105,7 @@ public class SnpSiftCmdIntervals extends SnpSift {
 	 */
 	public List<VcfEntry> run(boolean createList) {
 		loadIntervals();
-
+		if (verbose) Timer.showStdErr("FileName: '" + vcfFileName + "'\n\t\t\tIntervals: " + bedFiles + "\n\t\t\tExclude : " + exclude);
 		List<VcfEntry> results = new ArrayList<VcfEntry>();
 
 		// Read all vcfEntries
@@ -112,7 +113,6 @@ public class SnpSiftCmdIntervals extends SnpSift {
 
 		boolean showHeader = true;
 		for (VcfEntry vcfEntry : vcfFile) {
-
 			// Show header
 			if (showHeader) {
 				addHeader(vcfFile);
@@ -121,7 +121,11 @@ public class SnpSiftCmdIntervals extends SnpSift {
 				showHeader = false;
 			}
 
-			if (intervalForest.query(vcfEntry).isEmpty()) {
+			// Does it hit any markers
+			Markers queryResult = intervalForest.query(vcfEntry);
+
+			// Show?
+			if (queryResult.isEmpty()) {
 				// It does not intercept any interval. Show if we are interested in excluding intervals
 				if (exclude) {
 					results.add(vcfEntry);
