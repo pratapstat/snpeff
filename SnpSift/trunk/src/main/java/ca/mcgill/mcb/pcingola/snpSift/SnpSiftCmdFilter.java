@@ -123,6 +123,20 @@ public class SnpSiftCmdFilter extends SnpSift {
 	}
 
 	/**
+	 * Add string to FILTER vcf field
+	 * @param vcfEntry
+	 * @param filterStr
+	 */
+	void addVcfFilter(VcfEntry vcfEntry, String filterStr) {
+		// Get current value
+		String filter = vcfEntry.getFilterPass();
+		if (filter.equals(".")) filter = ""; // Empty?
+		// Append new value
+		filter += (!filter.isEmpty() ? ";" : "") + filterStr; // Add this filter to the not-passed list
+		vcfEntry.setFilterPass(filter);
+	}
+
+	/**
 	 * Create a "Vcf filter condition" from an FCL definition string
 	 * @param lexer : lexer to use
 	 * @param verbose : be verbose?
@@ -147,6 +161,30 @@ public class SnpSiftCmdFilter extends SnpSift {
 		// Create a language factory
 		LangFactory langFactory = new LangFactory(sets, formatVersion);
 		return langFactory.conditionFactory(parseTree);
+	}
+
+	/**
+	 * Remove a string from FILTER vcf field
+	 * @param vcfEntry
+	 * @param filterStr
+	 */
+	void delVcfFilter(VcfEntry vcfEntry, String filterStr) {
+		// Get current value
+		String filter = vcfEntry.getFilterPass();
+		StringBuilder sbFilter = new StringBuilder();
+
+		// Split by semicolon and filter out the undesired values
+		boolean removed = false;
+		for (String f : filter.split(";")) {
+			if (!f.equals(filterStr)) sbFilter.append((sbFilter.length() > 0 ? ";" : "") + filterStr); // Append if it does not match filterStr
+			else removed = true;
+		}
+
+		// Changed? Set new value
+		if (removed) {
+			Gpr.debug("REMOVE:" + filter + "\t" + filterStr + "\t=>\t" + sbFilter);
+			vcfEntry.setFilterPass(sbFilter.toString());
+		}
 	}
 
 	/**
@@ -225,7 +263,6 @@ public class SnpSiftCmdFilter extends SnpSift {
 				else if (args[i].equals("-f") || args[i].equalsIgnoreCase("--file")) inputFile = args[++i];
 				else if (args[i].equals("-s") || args[i].equalsIgnoreCase("--set")) addSet(args[++i]);
 				else if (args[i].equals("-p") || args[i].equalsIgnoreCase("--pass")) usePassField = true;
-				else if (args[i].equals("-i") || args[i].equalsIgnoreCase("--inverse")) inverse = true;
 				else if (args[i].equals("-v")) verbose = true;
 				else if (args[i].equals("-q")) verbose = false;
 				else if (args[i].equals("-i") || args[i].equalsIgnoreCase("--filterId")) {
@@ -343,44 +380,6 @@ public class SnpSiftCmdFilter extends SnpSift {
 		}
 
 		return passEntries;
-	}
-
-	/**
-	 * Add string to FILTER vcf field
-	 * @param vcfEntry
-	 * @param filterStr
-	 */
-	void addVcfFilter(VcfEntry vcfEntry, String filterStr) {
-		// Get current value
-		String filter = vcfEntry.getFilterPass();
-		if (filter.equals(".")) filter = ""; // Empty?
-		// Append new value
-		filter += (!filter.isEmpty() ? ";" : "") + filterStr; // Add this filter to the not-passed list
-		vcfEntry.setFilterPass(filter);
-	}
-
-	/**
-	 * Remove a string from FILTER vcf field
-	 * @param vcfEntry
-	 * @param filterStr
-	 */
-	void delVcfFilter(VcfEntry vcfEntry, String filterStr) {
-		// Get current value
-		String filter = vcfEntry.getFilterPass();
-		StringBuilder sbFilter = new StringBuilder();
-
-		// Split by semicolon and filter out the undesired values
-		boolean removed = false;
-		for (String f : filter.split(";")) {
-			if (!f.equals(filterStr)) sbFilter.append((sbFilter.length() > 0 ? ";" : "") + filterStr); // Append if it does not match filterStr
-			else removed = true;
-		}
-
-		// Changed? Set new value
-		if (removed) {
-			Gpr.debug("REMOVE:" + filter + "\t" + filterStr + "\t=>\t" + sbFilter);
-			vcfEntry.setFilterPass(sbFilter.toString());
-		}
 	}
 
 	/**
