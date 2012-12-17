@@ -1,4 +1,4 @@
-// $ANTLR 3.4 /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g 2012-10-31 15:46:42
+// $ANTLR 3.4 /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g 2012-12-17 11:22:21
 
 package ca.mcgill.mcb.pcingola.snpSift.antlr;
 
@@ -133,7 +133,7 @@ public TreeAdaptor getTreeAdaptor() {
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:87:7: (f= condition -> ^( CONDITION $f) )
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:87:9: f= condition
             {
-            pushFollow(FOLLOW_condition_in_main377);
+            pushFollow(FOLLOW_condition_in_main375);
             f=condition();
 
             state._fsp--;
@@ -225,7 +225,7 @@ public TreeAdaptor getTreeAdaptor() {
             root_0 = (Object)adaptor.nil();
 
 
-            pushFollow(FOLLOW_subcondition_in_condition394);
+            pushFollow(FOLLOW_subcondition_in_condition392);
             subcondition1=subcondition();
 
             state._fsp--;
@@ -247,14 +247,14 @@ public TreeAdaptor getTreeAdaptor() {
             	case 1 :
             	    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:89:27: boolOperator ^ subcondition
             	    {
-            	    pushFollow(FOLLOW_boolOperator_in_condition397);
+            	    pushFollow(FOLLOW_boolOperator_in_condition395);
             	    boolOperator2=boolOperator();
 
             	    state._fsp--;
 
             	    root_0 = (Object)adaptor.becomeRoot(boolOperator2.getTree(), root_0);
 
-            	    pushFollow(FOLLOW_subcondition_in_condition400);
+            	    pushFollow(FOLLOW_subcondition_in_condition398);
             	    subcondition3=subcondition();
 
             	    state._fsp--;
@@ -542,7 +542,7 @@ public TreeAdaptor getTreeAdaptor() {
                 case 1 :
                     // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:90:17: '!' ^
                     {
-                    char_literal4=(Token)match(input,32,FOLLOW_32_in_subcondition410); 
+                    char_literal4=(Token)match(input,32,FOLLOW_32_in_subcondition408); 
                     char_literal4_tree = 
                     (Object)adaptor.create(char_literal4)
                     ;
@@ -576,7 +576,7 @@ public TreeAdaptor getTreeAdaptor() {
                 case 1 :
                     // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:90:25: bare
                     {
-                    pushFollow(FOLLOW_bare_in_subcondition416);
+                    pushFollow(FOLLOW_bare_in_subcondition414);
                     bare5=bare();
 
                     state._fsp--;
@@ -588,7 +588,7 @@ public TreeAdaptor getTreeAdaptor() {
                 case 2 :
                     // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:90:32: paren
                     {
-                    pushFollow(FOLLOW_paren_in_subcondition420);
+                    pushFollow(FOLLOW_paren_in_subcondition418);
                     paren6=paren();
 
                     state._fsp--;
@@ -1183,7 +1183,7 @@ public TreeAdaptor getTreeAdaptor() {
                     root_0 = (Object)adaptor.nil();
 
 
-                    pushFollow(FOLLOW_unaryExpr_in_bare429);
+                    pushFollow(FOLLOW_unaryExpr_in_bare427);
                     unaryExpr7=unaryExpr();
 
                     state._fsp--;
@@ -1198,7 +1198,7 @@ public TreeAdaptor getTreeAdaptor() {
                     root_0 = (Object)adaptor.nil();
 
 
-                    pushFollow(FOLLOW_binaryExpr_in_bare433);
+                    pushFollow(FOLLOW_binaryExpr_in_bare431);
                     binaryExpr8=binaryExpr();
 
                     state._fsp--;
@@ -1213,7 +1213,7 @@ public TreeAdaptor getTreeAdaptor() {
                     root_0 = (Object)adaptor.nil();
 
 
-                    pushFollow(FOLLOW_functionBoolean_in_bare437);
+                    pushFollow(FOLLOW_functionBoolean_in_bare435);
                     functionBoolean9=functionBoolean();
 
                     state._fsp--;
@@ -1276,16 +1276,16 @@ public TreeAdaptor getTreeAdaptor() {
             root_0 = (Object)adaptor.nil();
 
 
-            char_literal10=(Token)match(input,36,FOLLOW_36_in_paren447); 
+            char_literal10=(Token)match(input,36,FOLLOW_36_in_paren445); 
 
-            pushFollow(FOLLOW_condition_in_paren450);
+            pushFollow(FOLLOW_condition_in_paren448);
             condition11=condition();
 
             state._fsp--;
 
             adaptor.addChild(root_0, condition11.getTree());
 
-            char_literal12=(Token)match(input,37,FOLLOW_37_in_paren452); 
+            char_literal12=(Token)match(input,37,FOLLOW_37_in_paren450); 
 
             }
 
@@ -1339,21 +1339,21 @@ public TreeAdaptor getTreeAdaptor() {
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:95:12: (l= expression o= binOperator r= expression -> ^( OP_BINARY $o $l $r) )
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:95:14: l= expression o= binOperator r= expression
             {
-            pushFollow(FOLLOW_expression_in_binaryExpr464);
+            pushFollow(FOLLOW_expression_in_binaryExpr462);
             l=expression();
 
             state._fsp--;
 
             stream_expression.add(l.getTree());
 
-            pushFollow(FOLLOW_binOperator_in_binaryExpr468);
+            pushFollow(FOLLOW_binOperator_in_binaryExpr466);
             o=binOperator();
 
             state._fsp--;
 
             stream_binOperator.add(o.getTree());
 
-            pushFollow(FOLLOW_expression_in_binaryExpr472);
+            pushFollow(FOLLOW_expression_in_binaryExpr470);
             r=expression();
 
             state._fsp--;
@@ -1361,7 +1361,7 @@ public TreeAdaptor getTreeAdaptor() {
             stream_expression.add(r.getTree());
 
             // AST REWRITE
-            // elements: o, r, l
+            // elements: l, o, r
             // token labels: 
             // rule labels: retval, r, o, l
             // token list labels: 
@@ -1447,14 +1447,14 @@ public TreeAdaptor getTreeAdaptor() {
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:96:11: (o= uniOperator e= expression -> ^( OP_UNARY $o $e) )
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:96:13: o= uniOperator e= expression
             {
-            pushFollow(FOLLOW_uniOperator_in_unaryExpr499);
+            pushFollow(FOLLOW_uniOperator_in_unaryExpr497);
             o=uniOperator();
 
             state._fsp--;
 
             stream_uniOperator.add(o.getTree());
 
-            pushFollow(FOLLOW_expression_in_unaryExpr503);
+            pushFollow(FOLLOW_expression_in_unaryExpr501);
             e=expression();
 
             state._fsp--;
@@ -1462,7 +1462,7 @@ public TreeAdaptor getTreeAdaptor() {
             stream_expression.add(e.getTree());
 
             // AST REWRITE
-            // elements: o, e
+            // elements: e, o
             // token labels: 
             // rule labels: retval, e, o
             // token list labels: 
@@ -1785,7 +1785,7 @@ public TreeAdaptor getTreeAdaptor() {
                     root_0 = (Object)adaptor.nil();
 
 
-                    pushFollow(FOLLOW_var_in_expression606);
+                    pushFollow(FOLLOW_var_in_expression604);
                     var16=var();
 
                     state._fsp--;
@@ -1800,7 +1800,7 @@ public TreeAdaptor getTreeAdaptor() {
                     root_0 = (Object)adaptor.nil();
 
 
-                    pushFollow(FOLLOW_functionEntry_in_expression614);
+                    pushFollow(FOLLOW_functionEntry_in_expression612);
                     functionEntry17=functionEntry();
 
                     state._fsp--;
@@ -1815,7 +1815,7 @@ public TreeAdaptor getTreeAdaptor() {
                     root_0 = (Object)adaptor.nil();
 
 
-                    pushFollow(FOLLOW_literalFloat_in_expression621);
+                    pushFollow(FOLLOW_literalFloat_in_expression619);
                     literalFloat18=literalFloat();
 
                     state._fsp--;
@@ -1830,7 +1830,7 @@ public TreeAdaptor getTreeAdaptor() {
                     root_0 = (Object)adaptor.nil();
 
 
-                    pushFollow(FOLLOW_literalString_in_expression629);
+                    pushFollow(FOLLOW_literalString_in_expression627);
                     literalString19=literalString();
 
                     state._fsp--;
@@ -1887,7 +1887,7 @@ public TreeAdaptor getTreeAdaptor() {
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:110:14: (f= FLOAT -> ^( LITERAL_NUMBER $f) )
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:110:16: f= FLOAT
             {
-            f=(Token)match(input,FLOAT,FOLLOW_FLOAT_in_literalFloat640);  
+            f=(Token)match(input,FLOAT,FOLLOW_FLOAT_in_literalFloat638);  
             stream_FLOAT.add(f);
 
 
@@ -1970,7 +1970,7 @@ public TreeAdaptor getTreeAdaptor() {
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:111:15: (s= STRING -> ^( LITERAL_STRING $s) )
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:111:17: s= STRING
             {
-            s=(Token)match(input,STRING,FOLLOW_STRING_in_literalString665);  
+            s=(Token)match(input,STRING,FOLLOW_STRING_in_literalString663);  
             stream_STRING.add(s);
 
 
@@ -2187,7 +2187,7 @@ public TreeAdaptor getTreeAdaptor() {
                     root_0 = (Object)adaptor.nil();
 
 
-                    pushFollow(FOLLOW_varField_in_var693);
+                    pushFollow(FOLLOW_varField_in_var691);
                     varField20=varField();
 
                     state._fsp--;
@@ -2202,7 +2202,7 @@ public TreeAdaptor getTreeAdaptor() {
                     root_0 = (Object)adaptor.nil();
 
 
-                    pushFollow(FOLLOW_varSubfield_in_var697);
+                    pushFollow(FOLLOW_varSubfield_in_var695);
                     varSubfield21=varSubfield();
 
                     state._fsp--;
@@ -2217,7 +2217,7 @@ public TreeAdaptor getTreeAdaptor() {
                     root_0 = (Object)adaptor.nil();
 
 
-                    pushFollow(FOLLOW_varGenotypeSub_in_var701);
+                    pushFollow(FOLLOW_varGenotypeSub_in_var699);
                     varGenotypeSub22=varGenotypeSub();
 
                     state._fsp--;
@@ -2232,7 +2232,7 @@ public TreeAdaptor getTreeAdaptor() {
                     root_0 = (Object)adaptor.nil();
 
 
-                    pushFollow(FOLLOW_varGenotypeSubArray_in_var705);
+                    pushFollow(FOLLOW_varGenotypeSubArray_in_var703);
                     varGenotypeSubArray23=varGenotypeSubArray();
 
                     state._fsp--;
@@ -2247,7 +2247,7 @@ public TreeAdaptor getTreeAdaptor() {
                     root_0 = (Object)adaptor.nil();
 
 
-                    pushFollow(FOLLOW_varEffSub_in_var709);
+                    pushFollow(FOLLOW_varEffSub_in_var707);
                     varEffSub24=varEffSub();
 
                     state._fsp--;
@@ -2262,7 +2262,7 @@ public TreeAdaptor getTreeAdaptor() {
                     root_0 = (Object)adaptor.nil();
 
 
-                    pushFollow(FOLLOW_varLofSub_in_var713);
+                    pushFollow(FOLLOW_varLofSub_in_var711);
                     varLofSub25=varLofSub();
 
                     state._fsp--;
@@ -2277,7 +2277,7 @@ public TreeAdaptor getTreeAdaptor() {
                     root_0 = (Object)adaptor.nil();
 
 
-                    pushFollow(FOLLOW_varNmdSub_in_var717);
+                    pushFollow(FOLLOW_varNmdSub_in_var715);
                     varNmdSub26=varNmdSub();
 
                     state._fsp--;
@@ -2334,7 +2334,7 @@ public TreeAdaptor getTreeAdaptor() {
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:115:11: (i= ID -> ^( VAR_FIELD $i) )
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:115:13: i= ID
             {
-            i=(Token)match(input,ID,FOLLOW_ID_in_varField727);  
+            i=(Token)match(input,ID,FOLLOW_ID_in_varField725);  
             stream_ID.add(i);
 
 
@@ -2425,22 +2425,22 @@ public TreeAdaptor getTreeAdaptor() {
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:116:14: (i= ID '[' n= index ']' -> ^( VAR_SUBFIELD $i $n) )
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:116:16: i= ID '[' n= index ']'
             {
-            i=(Token)match(input,ID,FOLLOW_ID_in_varSubfield752);  
+            i=(Token)match(input,ID,FOLLOW_ID_in_varSubfield750);  
             stream_ID.add(i);
 
 
-            char_literal27=(Token)match(input,54,FOLLOW_54_in_varSubfield754);  
+            char_literal27=(Token)match(input,54,FOLLOW_54_in_varSubfield752);  
             stream_54.add(char_literal27);
 
 
-            pushFollow(FOLLOW_index_in_varSubfield758);
+            pushFollow(FOLLOW_index_in_varSubfield756);
             n=index();
 
             state._fsp--;
 
             stream_index.add(n.getTree());
 
-            char_literal28=(Token)match(input,55,FOLLOW_55_in_varSubfield760);  
+            char_literal28=(Token)match(input,55,FOLLOW_55_in_varSubfield758);  
             stream_55.add(char_literal28);
 
 
@@ -2534,22 +2534,22 @@ public TreeAdaptor getTreeAdaptor() {
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:117:14: ( 'GEN' '[' g= index ']' -> ^( VAR_GENOTYPE $g) )
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:117:16: 'GEN' '[' g= index ']'
             {
-            string_literal29=(Token)match(input,50,FOLLOW_50_in_varGenotype784);  
+            string_literal29=(Token)match(input,50,FOLLOW_50_in_varGenotype782);  
             stream_50.add(string_literal29);
 
 
-            char_literal30=(Token)match(input,54,FOLLOW_54_in_varGenotype786);  
+            char_literal30=(Token)match(input,54,FOLLOW_54_in_varGenotype784);  
             stream_54.add(char_literal30);
 
 
-            pushFollow(FOLLOW_index_in_varGenotype790);
+            pushFollow(FOLLOW_index_in_varGenotype788);
             g=index();
 
             state._fsp--;
 
             stream_index.add(g.getTree());
 
-            char_literal31=(Token)match(input,55,FOLLOW_55_in_varGenotype792);  
+            char_literal31=(Token)match(input,55,FOLLOW_55_in_varGenotype790);  
             stream_55.add(char_literal31);
 
 
@@ -2646,30 +2646,30 @@ public TreeAdaptor getTreeAdaptor() {
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:118:17: ( 'GEN' '[' g= index ']' '.' i= ID -> ^( VAR_GENOTYPE_SUB $g $i) )
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:118:19: 'GEN' '[' g= index ']' '.' i= ID
             {
-            string_literal32=(Token)match(input,50,FOLLOW_50_in_varGenotypeSub814);  
+            string_literal32=(Token)match(input,50,FOLLOW_50_in_varGenotypeSub812);  
             stream_50.add(string_literal32);
 
 
-            char_literal33=(Token)match(input,54,FOLLOW_54_in_varGenotypeSub816);  
+            char_literal33=(Token)match(input,54,FOLLOW_54_in_varGenotypeSub814);  
             stream_54.add(char_literal33);
 
 
-            pushFollow(FOLLOW_index_in_varGenotypeSub820);
+            pushFollow(FOLLOW_index_in_varGenotypeSub818);
             g=index();
 
             state._fsp--;
 
             stream_index.add(g.getTree());
 
-            char_literal34=(Token)match(input,55,FOLLOW_55_in_varGenotypeSub822);  
+            char_literal34=(Token)match(input,55,FOLLOW_55_in_varGenotypeSub820);  
             stream_55.add(char_literal34);
 
 
-            char_literal35=(Token)match(input,39,FOLLOW_39_in_varGenotypeSub824);  
+            char_literal35=(Token)match(input,39,FOLLOW_39_in_varGenotypeSub822);  
             stream_39.add(char_literal35);
 
 
-            i=(Token)match(input,ID,FOLLOW_ID_in_varGenotypeSub828);  
+            i=(Token)match(input,ID,FOLLOW_ID_in_varGenotypeSub826);  
             stream_ID.add(i);
 
 
@@ -2775,50 +2775,50 @@ public TreeAdaptor getTreeAdaptor() {
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:119:21: ( 'GEN' '[' g= index ']' '.' i= ID '[' n= index ']' -> ^( VAR_GENOTYPE_SUB_ARRAY $g $i $n) )
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:119:23: 'GEN' '[' g= index ']' '.' i= ID '[' n= index ']'
             {
-            string_literal36=(Token)match(input,50,FOLLOW_50_in_varGenotypeSubArray850);  
+            string_literal36=(Token)match(input,50,FOLLOW_50_in_varGenotypeSubArray848);  
             stream_50.add(string_literal36);
 
 
-            char_literal37=(Token)match(input,54,FOLLOW_54_in_varGenotypeSubArray852);  
+            char_literal37=(Token)match(input,54,FOLLOW_54_in_varGenotypeSubArray850);  
             stream_54.add(char_literal37);
 
 
-            pushFollow(FOLLOW_index_in_varGenotypeSubArray856);
+            pushFollow(FOLLOW_index_in_varGenotypeSubArray854);
             g=index();
 
             state._fsp--;
 
             stream_index.add(g.getTree());
 
-            char_literal38=(Token)match(input,55,FOLLOW_55_in_varGenotypeSubArray858);  
+            char_literal38=(Token)match(input,55,FOLLOW_55_in_varGenotypeSubArray856);  
             stream_55.add(char_literal38);
 
 
-            char_literal39=(Token)match(input,39,FOLLOW_39_in_varGenotypeSubArray860);  
+            char_literal39=(Token)match(input,39,FOLLOW_39_in_varGenotypeSubArray858);  
             stream_39.add(char_literal39);
 
 
-            i=(Token)match(input,ID,FOLLOW_ID_in_varGenotypeSubArray864);  
+            i=(Token)match(input,ID,FOLLOW_ID_in_varGenotypeSubArray862);  
             stream_ID.add(i);
 
 
-            char_literal40=(Token)match(input,54,FOLLOW_54_in_varGenotypeSubArray867);  
+            char_literal40=(Token)match(input,54,FOLLOW_54_in_varGenotypeSubArray865);  
             stream_54.add(char_literal40);
 
 
-            pushFollow(FOLLOW_index_in_varGenotypeSubArray871);
+            pushFollow(FOLLOW_index_in_varGenotypeSubArray869);
             n=index();
 
             state._fsp--;
 
             stream_index.add(n.getTree());
 
-            char_literal41=(Token)match(input,55,FOLLOW_55_in_varGenotypeSubArray873);  
+            char_literal41=(Token)match(input,55,FOLLOW_55_in_varGenotypeSubArray871);  
             stream_55.add(char_literal41);
 
 
             // AST REWRITE
-            // elements: n, i, g
+            // elements: n, g, i
             // token labels: i
             // rule labels: g, retval, n
             // token list labels: 
@@ -2916,35 +2916,35 @@ public TreeAdaptor getTreeAdaptor() {
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:120:12: ( 'EFF' '[' g= index ']' '.' i= ID -> ^( VAR_EFF_SUB $g $i) )
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:120:14: 'EFF' '[' g= index ']' '.' i= ID
             {
-            string_literal42=(Token)match(input,49,FOLLOW_49_in_varEffSub897);  
+            string_literal42=(Token)match(input,49,FOLLOW_49_in_varEffSub895);  
             stream_49.add(string_literal42);
 
 
-            char_literal43=(Token)match(input,54,FOLLOW_54_in_varEffSub899);  
+            char_literal43=(Token)match(input,54,FOLLOW_54_in_varEffSub897);  
             stream_54.add(char_literal43);
 
 
-            pushFollow(FOLLOW_index_in_varEffSub903);
+            pushFollow(FOLLOW_index_in_varEffSub901);
             g=index();
 
             state._fsp--;
 
             stream_index.add(g.getTree());
 
-            char_literal44=(Token)match(input,55,FOLLOW_55_in_varEffSub905);  
+            char_literal44=(Token)match(input,55,FOLLOW_55_in_varEffSub903);  
             stream_55.add(char_literal44);
 
 
-            char_literal45=(Token)match(input,39,FOLLOW_39_in_varEffSub907);  
+            char_literal45=(Token)match(input,39,FOLLOW_39_in_varEffSub905);  
             stream_39.add(char_literal45);
 
 
-            i=(Token)match(input,ID,FOLLOW_ID_in_varEffSub911);  
+            i=(Token)match(input,ID,FOLLOW_ID_in_varEffSub909);  
             stream_ID.add(i);
 
 
             // AST REWRITE
-            // elements: i, g
+            // elements: g, i
             // token labels: i
             // rule labels: g, retval
             // token list labels: 
@@ -3039,30 +3039,30 @@ public TreeAdaptor getTreeAdaptor() {
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:121:12: ( 'LOF' '[' g= index ']' '.' i= ID -> ^( VAR_LOF_SUB $g $i) )
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:121:14: 'LOF' '[' g= index ']' '.' i= ID
             {
-            string_literal46=(Token)match(input,51,FOLLOW_51_in_varLofSub934);  
+            string_literal46=(Token)match(input,51,FOLLOW_51_in_varLofSub932);  
             stream_51.add(string_literal46);
 
 
-            char_literal47=(Token)match(input,54,FOLLOW_54_in_varLofSub936);  
+            char_literal47=(Token)match(input,54,FOLLOW_54_in_varLofSub934);  
             stream_54.add(char_literal47);
 
 
-            pushFollow(FOLLOW_index_in_varLofSub940);
+            pushFollow(FOLLOW_index_in_varLofSub938);
             g=index();
 
             state._fsp--;
 
             stream_index.add(g.getTree());
 
-            char_literal48=(Token)match(input,55,FOLLOW_55_in_varLofSub942);  
+            char_literal48=(Token)match(input,55,FOLLOW_55_in_varLofSub940);  
             stream_55.add(char_literal48);
 
 
-            char_literal49=(Token)match(input,39,FOLLOW_39_in_varLofSub944);  
+            char_literal49=(Token)match(input,39,FOLLOW_39_in_varLofSub942);  
             stream_39.add(char_literal49);
 
 
-            i=(Token)match(input,ID,FOLLOW_ID_in_varLofSub948);  
+            i=(Token)match(input,ID,FOLLOW_ID_in_varLofSub946);  
             stream_ID.add(i);
 
 
@@ -3162,35 +3162,35 @@ public TreeAdaptor getTreeAdaptor() {
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:122:12: ( 'NMD' '[' g= index ']' '.' i= ID -> ^( VAR_NMD_SUB $g $i) )
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:122:14: 'NMD' '[' g= index ']' '.' i= ID
             {
-            string_literal50=(Token)match(input,52,FOLLOW_52_in_varNmdSub971);  
+            string_literal50=(Token)match(input,52,FOLLOW_52_in_varNmdSub969);  
             stream_52.add(string_literal50);
 
 
-            char_literal51=(Token)match(input,54,FOLLOW_54_in_varNmdSub973);  
+            char_literal51=(Token)match(input,54,FOLLOW_54_in_varNmdSub971);  
             stream_54.add(char_literal51);
 
 
-            pushFollow(FOLLOW_index_in_varNmdSub977);
+            pushFollow(FOLLOW_index_in_varNmdSub975);
             g=index();
 
             state._fsp--;
 
             stream_index.add(g.getTree());
 
-            char_literal52=(Token)match(input,55,FOLLOW_55_in_varNmdSub979);  
+            char_literal52=(Token)match(input,55,FOLLOW_55_in_varNmdSub977);  
             stream_55.add(char_literal52);
 
 
-            char_literal53=(Token)match(input,39,FOLLOW_39_in_varNmdSub981);  
+            char_literal53=(Token)match(input,39,FOLLOW_39_in_varNmdSub979);  
             stream_39.add(char_literal53);
 
 
-            i=(Token)match(input,ID,FOLLOW_ID_in_varNmdSub985);  
+            i=(Token)match(input,ID,FOLLOW_ID_in_varNmdSub983);  
             stream_ID.add(i);
 
 
             // AST REWRITE
-            // elements: i, g
+            // elements: g, i
             // token labels: i
             // rule labels: g, retval
             // token list labels: 
@@ -3276,18 +3276,18 @@ public TreeAdaptor getTreeAdaptor() {
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:125:16: (f= functionEntryName '(' ')' -> ^( FUNCTION_ENTRY $f) )
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:125:18: f= functionEntryName '(' ')'
             {
-            pushFollow(FOLLOW_functionEntryName_in_functionEntry1012);
+            pushFollow(FOLLOW_functionEntryName_in_functionEntry1010);
             f=functionEntryName();
 
             state._fsp--;
 
             stream_functionEntryName.add(f.getTree());
 
-            char_literal54=(Token)match(input,36,FOLLOW_36_in_functionEntry1014);  
+            char_literal54=(Token)match(input,36,FOLLOW_36_in_functionEntry1012);  
             stream_36.add(char_literal54);
 
 
-            char_literal55=(Token)match(input,37,FOLLOW_37_in_functionEntry1016);  
+            char_literal55=(Token)match(input,37,FOLLOW_37_in_functionEntry1014);  
             stream_37.add(char_literal55);
 
 
@@ -3457,7 +3457,7 @@ public TreeAdaptor getTreeAdaptor() {
                     root_0 = (Object)adaptor.nil();
 
 
-                    pushFollow(FOLLOW_functionGenotypeBool_in_functionBoolean1057);
+                    pushFollow(FOLLOW_functionGenotypeBool_in_functionBoolean1055);
                     functionGenotypeBool57=functionGenotypeBool();
 
                     state._fsp--;
@@ -3472,7 +3472,7 @@ public TreeAdaptor getTreeAdaptor() {
                     root_0 = (Object)adaptor.nil();
 
 
-                    pushFollow(FOLLOW_functionBooleanSet_in_functionBoolean1066);
+                    pushFollow(FOLLOW_functionBooleanSet_in_functionBoolean1064);
                     functionBooleanSet58=functionBooleanSet();
 
                     state._fsp--;
@@ -3543,33 +3543,33 @@ public TreeAdaptor getTreeAdaptor() {
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:134:20: (e= expression f= 'in' 'SET' '[' i= index ']' -> ^( FUNCTION_BOOL_SET $f $i $e) )
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:134:22: e= expression f= 'in' 'SET' '[' i= index ']'
             {
-            pushFollow(FOLLOW_expression_in_functionBooleanSet1082);
+            pushFollow(FOLLOW_expression_in_functionBooleanSet1080);
             e=expression();
 
             state._fsp--;
 
             stream_expression.add(e.getTree());
 
-            f=(Token)match(input,61,FOLLOW_61_in_functionBooleanSet1086);  
+            f=(Token)match(input,61,FOLLOW_61_in_functionBooleanSet1084);  
             stream_61.add(f);
 
 
-            string_literal59=(Token)match(input,53,FOLLOW_53_in_functionBooleanSet1088);  
+            string_literal59=(Token)match(input,53,FOLLOW_53_in_functionBooleanSet1086);  
             stream_53.add(string_literal59);
 
 
-            char_literal60=(Token)match(input,54,FOLLOW_54_in_functionBooleanSet1090);  
+            char_literal60=(Token)match(input,54,FOLLOW_54_in_functionBooleanSet1088);  
             stream_54.add(char_literal60);
 
 
-            pushFollow(FOLLOW_index_in_functionBooleanSet1094);
+            pushFollow(FOLLOW_index_in_functionBooleanSet1092);
             i=index();
 
             state._fsp--;
 
             stream_index.add(i.getTree());
 
-            char_literal61=(Token)match(input,55,FOLLOW_55_in_functionBooleanSet1096);  
+            char_literal61=(Token)match(input,55,FOLLOW_55_in_functionBooleanSet1094);  
             stream_55.add(char_literal61);
 
 
@@ -3666,25 +3666,25 @@ public TreeAdaptor getTreeAdaptor() {
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:137:22: (f= functionGenotypeBoolName '(' g= varGenotype ')' -> ^( FUNCTION_BOOL_GENOTYPE $f $g) )
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:137:24: f= functionGenotypeBoolName '(' g= varGenotype ')'
             {
-            pushFollow(FOLLOW_functionGenotypeBoolName_in_functionGenotypeBool1124);
+            pushFollow(FOLLOW_functionGenotypeBoolName_in_functionGenotypeBool1122);
             f=functionGenotypeBoolName();
 
             state._fsp--;
 
             stream_functionGenotypeBoolName.add(f.getTree());
 
-            char_literal62=(Token)match(input,36,FOLLOW_36_in_functionGenotypeBool1126);  
+            char_literal62=(Token)match(input,36,FOLLOW_36_in_functionGenotypeBool1124);  
             stream_36.add(char_literal62);
 
 
-            pushFollow(FOLLOW_varGenotype_in_functionGenotypeBool1130);
+            pushFollow(FOLLOW_varGenotype_in_functionGenotypeBool1128);
             g=varGenotype();
 
             state._fsp--;
 
             stream_varGenotype.add(g.getTree());
 
-            char_literal63=(Token)match(input,37,FOLLOW_37_in_functionGenotypeBool1132);  
+            char_literal63=(Token)match(input,37,FOLLOW_37_in_functionGenotypeBool1130);  
             stream_37.add(char_literal63);
 
 
@@ -3880,93 +3880,93 @@ public TreeAdaptor getTreeAdaptor() {
 
  
 
-    public static final BitSet FOLLOW_condition_in_main377 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_subcondition_in_condition394 = new BitSet(new long[]{0x0000000800000002L,0x0000000000000008L});
-    public static final BitSet FOLLOW_boolOperator_in_condition397 = new BitSet(new long[]{0xDF1E001100201100L,0x0000000000000007L});
-    public static final BitSet FOLLOW_subcondition_in_condition400 = new BitSet(new long[]{0x0000000800000002L,0x0000000000000008L});
-    public static final BitSet FOLLOW_32_in_subcondition410 = new BitSet(new long[]{0xDF1E001100201100L,0x0000000000000007L});
-    public static final BitSet FOLLOW_bare_in_subcondition416 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_paren_in_subcondition420 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_unaryExpr_in_bare429 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_binaryExpr_in_bare433 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_functionBoolean_in_bare437 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_36_in_paren447 = new BitSet(new long[]{0xDF1E001100201100L,0x0000000000000007L});
-    public static final BitSet FOLLOW_condition_in_paren450 = new BitSet(new long[]{0x0000002000000000L});
-    public static final BitSet FOLLOW_37_in_paren452 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_expression_in_binaryExpr464 = new BitSet(new long[]{0x00003F0600000000L});
-    public static final BitSet FOLLOW_binOperator_in_binaryExpr468 = new BitSet(new long[]{0x0F1E000000201100L});
-    public static final BitSet FOLLOW_expression_in_binaryExpr472 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_uniOperator_in_unaryExpr499 = new BitSet(new long[]{0x0F1E000000201100L});
-    public static final BitSet FOLLOW_expression_in_unaryExpr503 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_var_in_expression606 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_functionEntry_in_expression614 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_literalFloat_in_expression621 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_literalString_in_expression629 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_FLOAT_in_literalFloat640 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_STRING_in_literalString665 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_varField_in_var693 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_varSubfield_in_var697 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_varGenotypeSub_in_var701 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_varGenotypeSubArray_in_var705 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_varEffSub_in_var709 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_varLofSub_in_var713 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_varNmdSub_in_var717 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ID_in_varField727 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ID_in_varSubfield752 = new BitSet(new long[]{0x0040000000000000L});
-    public static final BitSet FOLLOW_54_in_varSubfield754 = new BitSet(new long[]{0x0001C04000000100L});
-    public static final BitSet FOLLOW_index_in_varSubfield758 = new BitSet(new long[]{0x0080000000000000L});
-    public static final BitSet FOLLOW_55_in_varSubfield760 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_50_in_varGenotype784 = new BitSet(new long[]{0x0040000000000000L});
-    public static final BitSet FOLLOW_54_in_varGenotype786 = new BitSet(new long[]{0x0001C04000000100L});
-    public static final BitSet FOLLOW_index_in_varGenotype790 = new BitSet(new long[]{0x0080000000000000L});
-    public static final BitSet FOLLOW_55_in_varGenotype792 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_50_in_varGenotypeSub814 = new BitSet(new long[]{0x0040000000000000L});
-    public static final BitSet FOLLOW_54_in_varGenotypeSub816 = new BitSet(new long[]{0x0001C04000000100L});
-    public static final BitSet FOLLOW_index_in_varGenotypeSub820 = new BitSet(new long[]{0x0080000000000000L});
-    public static final BitSet FOLLOW_55_in_varGenotypeSub822 = new BitSet(new long[]{0x0000008000000000L});
-    public static final BitSet FOLLOW_39_in_varGenotypeSub824 = new BitSet(new long[]{0x0000000000001000L});
-    public static final BitSet FOLLOW_ID_in_varGenotypeSub828 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_50_in_varGenotypeSubArray850 = new BitSet(new long[]{0x0040000000000000L});
-    public static final BitSet FOLLOW_54_in_varGenotypeSubArray852 = new BitSet(new long[]{0x0001C04000000100L});
-    public static final BitSet FOLLOW_index_in_varGenotypeSubArray856 = new BitSet(new long[]{0x0080000000000000L});
-    public static final BitSet FOLLOW_55_in_varGenotypeSubArray858 = new BitSet(new long[]{0x0000008000000000L});
-    public static final BitSet FOLLOW_39_in_varGenotypeSubArray860 = new BitSet(new long[]{0x0000000000001000L});
-    public static final BitSet FOLLOW_ID_in_varGenotypeSubArray864 = new BitSet(new long[]{0x0040000000000000L});
-    public static final BitSet FOLLOW_54_in_varGenotypeSubArray867 = new BitSet(new long[]{0x0001C04000000100L});
-    public static final BitSet FOLLOW_index_in_varGenotypeSubArray871 = new BitSet(new long[]{0x0080000000000000L});
-    public static final BitSet FOLLOW_55_in_varGenotypeSubArray873 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_49_in_varEffSub897 = new BitSet(new long[]{0x0040000000000000L});
-    public static final BitSet FOLLOW_54_in_varEffSub899 = new BitSet(new long[]{0x0001C04000000100L});
-    public static final BitSet FOLLOW_index_in_varEffSub903 = new BitSet(new long[]{0x0080000000000000L});
-    public static final BitSet FOLLOW_55_in_varEffSub905 = new BitSet(new long[]{0x0000008000000000L});
-    public static final BitSet FOLLOW_39_in_varEffSub907 = new BitSet(new long[]{0x0000000000001000L});
-    public static final BitSet FOLLOW_ID_in_varEffSub911 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_51_in_varLofSub934 = new BitSet(new long[]{0x0040000000000000L});
-    public static final BitSet FOLLOW_54_in_varLofSub936 = new BitSet(new long[]{0x0001C04000000100L});
-    public static final BitSet FOLLOW_index_in_varLofSub940 = new BitSet(new long[]{0x0080000000000000L});
-    public static final BitSet FOLLOW_55_in_varLofSub942 = new BitSet(new long[]{0x0000008000000000L});
-    public static final BitSet FOLLOW_39_in_varLofSub944 = new BitSet(new long[]{0x0000000000001000L});
-    public static final BitSet FOLLOW_ID_in_varLofSub948 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_52_in_varNmdSub971 = new BitSet(new long[]{0x0040000000000000L});
-    public static final BitSet FOLLOW_54_in_varNmdSub973 = new BitSet(new long[]{0x0001C04000000100L});
-    public static final BitSet FOLLOW_index_in_varNmdSub977 = new BitSet(new long[]{0x0080000000000000L});
-    public static final BitSet FOLLOW_55_in_varNmdSub979 = new BitSet(new long[]{0x0000008000000000L});
-    public static final BitSet FOLLOW_39_in_varNmdSub981 = new BitSet(new long[]{0x0000000000001000L});
-    public static final BitSet FOLLOW_ID_in_varNmdSub985 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_functionEntryName_in_functionEntry1012 = new BitSet(new long[]{0x0000001000000000L});
-    public static final BitSet FOLLOW_36_in_functionEntry1014 = new BitSet(new long[]{0x0000002000000000L});
-    public static final BitSet FOLLOW_37_in_functionEntry1016 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_functionGenotypeBool_in_functionBoolean1057 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_functionBooleanSet_in_functionBoolean1066 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_expression_in_functionBooleanSet1082 = new BitSet(new long[]{0x2000000000000000L});
-    public static final BitSet FOLLOW_61_in_functionBooleanSet1086 = new BitSet(new long[]{0x0020000000000000L});
-    public static final BitSet FOLLOW_53_in_functionBooleanSet1088 = new BitSet(new long[]{0x0040000000000000L});
-    public static final BitSet FOLLOW_54_in_functionBooleanSet1090 = new BitSet(new long[]{0x0001C04000000100L});
-    public static final BitSet FOLLOW_index_in_functionBooleanSet1094 = new BitSet(new long[]{0x0080000000000000L});
-    public static final BitSet FOLLOW_55_in_functionBooleanSet1096 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_functionGenotypeBoolName_in_functionGenotypeBool1124 = new BitSet(new long[]{0x0000001000000000L});
-    public static final BitSet FOLLOW_36_in_functionGenotypeBool1126 = new BitSet(new long[]{0x0004000000000000L});
-    public static final BitSet FOLLOW_varGenotype_in_functionGenotypeBool1130 = new BitSet(new long[]{0x0000002000000000L});
-    public static final BitSet FOLLOW_37_in_functionGenotypeBool1132 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_condition_in_main375 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_subcondition_in_condition392 = new BitSet(new long[]{0x0000000800000002L,0x0000000000000008L});
+    public static final BitSet FOLLOW_boolOperator_in_condition395 = new BitSet(new long[]{0xDF1E001100201100L,0x0000000000000007L});
+    public static final BitSet FOLLOW_subcondition_in_condition398 = new BitSet(new long[]{0x0000000800000002L,0x0000000000000008L});
+    public static final BitSet FOLLOW_32_in_subcondition408 = new BitSet(new long[]{0xDF1E001100201100L,0x0000000000000007L});
+    public static final BitSet FOLLOW_bare_in_subcondition414 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_paren_in_subcondition418 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_unaryExpr_in_bare427 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_binaryExpr_in_bare431 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_functionBoolean_in_bare435 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_36_in_paren445 = new BitSet(new long[]{0xDF1E001100201100L,0x0000000000000007L});
+    public static final BitSet FOLLOW_condition_in_paren448 = new BitSet(new long[]{0x0000002000000000L});
+    public static final BitSet FOLLOW_37_in_paren450 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_expression_in_binaryExpr462 = new BitSet(new long[]{0x00003F0600000000L});
+    public static final BitSet FOLLOW_binOperator_in_binaryExpr466 = new BitSet(new long[]{0x0F1E000000201100L});
+    public static final BitSet FOLLOW_expression_in_binaryExpr470 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_uniOperator_in_unaryExpr497 = new BitSet(new long[]{0x0F1E000000201100L});
+    public static final BitSet FOLLOW_expression_in_unaryExpr501 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_var_in_expression604 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_functionEntry_in_expression612 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_literalFloat_in_expression619 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_literalString_in_expression627 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_FLOAT_in_literalFloat638 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_STRING_in_literalString663 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_varField_in_var691 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_varSubfield_in_var695 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_varGenotypeSub_in_var699 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_varGenotypeSubArray_in_var703 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_varEffSub_in_var707 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_varLofSub_in_var711 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_varNmdSub_in_var715 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ID_in_varField725 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ID_in_varSubfield750 = new BitSet(new long[]{0x0040000000000000L});
+    public static final BitSet FOLLOW_54_in_varSubfield752 = new BitSet(new long[]{0x0001C04000000100L});
+    public static final BitSet FOLLOW_index_in_varSubfield756 = new BitSet(new long[]{0x0080000000000000L});
+    public static final BitSet FOLLOW_55_in_varSubfield758 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_50_in_varGenotype782 = new BitSet(new long[]{0x0040000000000000L});
+    public static final BitSet FOLLOW_54_in_varGenotype784 = new BitSet(new long[]{0x0001C04000000100L});
+    public static final BitSet FOLLOW_index_in_varGenotype788 = new BitSet(new long[]{0x0080000000000000L});
+    public static final BitSet FOLLOW_55_in_varGenotype790 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_50_in_varGenotypeSub812 = new BitSet(new long[]{0x0040000000000000L});
+    public static final BitSet FOLLOW_54_in_varGenotypeSub814 = new BitSet(new long[]{0x0001C04000000100L});
+    public static final BitSet FOLLOW_index_in_varGenotypeSub818 = new BitSet(new long[]{0x0080000000000000L});
+    public static final BitSet FOLLOW_55_in_varGenotypeSub820 = new BitSet(new long[]{0x0000008000000000L});
+    public static final BitSet FOLLOW_39_in_varGenotypeSub822 = new BitSet(new long[]{0x0000000000001000L});
+    public static final BitSet FOLLOW_ID_in_varGenotypeSub826 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_50_in_varGenotypeSubArray848 = new BitSet(new long[]{0x0040000000000000L});
+    public static final BitSet FOLLOW_54_in_varGenotypeSubArray850 = new BitSet(new long[]{0x0001C04000000100L});
+    public static final BitSet FOLLOW_index_in_varGenotypeSubArray854 = new BitSet(new long[]{0x0080000000000000L});
+    public static final BitSet FOLLOW_55_in_varGenotypeSubArray856 = new BitSet(new long[]{0x0000008000000000L});
+    public static final BitSet FOLLOW_39_in_varGenotypeSubArray858 = new BitSet(new long[]{0x0000000000001000L});
+    public static final BitSet FOLLOW_ID_in_varGenotypeSubArray862 = new BitSet(new long[]{0x0040000000000000L});
+    public static final BitSet FOLLOW_54_in_varGenotypeSubArray865 = new BitSet(new long[]{0x0001C04000000100L});
+    public static final BitSet FOLLOW_index_in_varGenotypeSubArray869 = new BitSet(new long[]{0x0080000000000000L});
+    public static final BitSet FOLLOW_55_in_varGenotypeSubArray871 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_49_in_varEffSub895 = new BitSet(new long[]{0x0040000000000000L});
+    public static final BitSet FOLLOW_54_in_varEffSub897 = new BitSet(new long[]{0x0001C04000000100L});
+    public static final BitSet FOLLOW_index_in_varEffSub901 = new BitSet(new long[]{0x0080000000000000L});
+    public static final BitSet FOLLOW_55_in_varEffSub903 = new BitSet(new long[]{0x0000008000000000L});
+    public static final BitSet FOLLOW_39_in_varEffSub905 = new BitSet(new long[]{0x0000000000001000L});
+    public static final BitSet FOLLOW_ID_in_varEffSub909 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_51_in_varLofSub932 = new BitSet(new long[]{0x0040000000000000L});
+    public static final BitSet FOLLOW_54_in_varLofSub934 = new BitSet(new long[]{0x0001C04000000100L});
+    public static final BitSet FOLLOW_index_in_varLofSub938 = new BitSet(new long[]{0x0080000000000000L});
+    public static final BitSet FOLLOW_55_in_varLofSub940 = new BitSet(new long[]{0x0000008000000000L});
+    public static final BitSet FOLLOW_39_in_varLofSub942 = new BitSet(new long[]{0x0000000000001000L});
+    public static final BitSet FOLLOW_ID_in_varLofSub946 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_52_in_varNmdSub969 = new BitSet(new long[]{0x0040000000000000L});
+    public static final BitSet FOLLOW_54_in_varNmdSub971 = new BitSet(new long[]{0x0001C04000000100L});
+    public static final BitSet FOLLOW_index_in_varNmdSub975 = new BitSet(new long[]{0x0080000000000000L});
+    public static final BitSet FOLLOW_55_in_varNmdSub977 = new BitSet(new long[]{0x0000008000000000L});
+    public static final BitSet FOLLOW_39_in_varNmdSub979 = new BitSet(new long[]{0x0000000000001000L});
+    public static final BitSet FOLLOW_ID_in_varNmdSub983 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_functionEntryName_in_functionEntry1010 = new BitSet(new long[]{0x0000001000000000L});
+    public static final BitSet FOLLOW_36_in_functionEntry1012 = new BitSet(new long[]{0x0000002000000000L});
+    public static final BitSet FOLLOW_37_in_functionEntry1014 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_functionGenotypeBool_in_functionBoolean1055 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_functionBooleanSet_in_functionBoolean1064 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_expression_in_functionBooleanSet1080 = new BitSet(new long[]{0x2000000000000000L});
+    public static final BitSet FOLLOW_61_in_functionBooleanSet1084 = new BitSet(new long[]{0x0020000000000000L});
+    public static final BitSet FOLLOW_53_in_functionBooleanSet1086 = new BitSet(new long[]{0x0040000000000000L});
+    public static final BitSet FOLLOW_54_in_functionBooleanSet1088 = new BitSet(new long[]{0x0001C04000000100L});
+    public static final BitSet FOLLOW_index_in_functionBooleanSet1092 = new BitSet(new long[]{0x0080000000000000L});
+    public static final BitSet FOLLOW_55_in_functionBooleanSet1094 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_functionGenotypeBoolName_in_functionGenotypeBool1122 = new BitSet(new long[]{0x0000001000000000L});
+    public static final BitSet FOLLOW_36_in_functionGenotypeBool1124 = new BitSet(new long[]{0x0004000000000000L});
+    public static final BitSet FOLLOW_varGenotype_in_functionGenotypeBool1128 = new BitSet(new long[]{0x0000002000000000L});
+    public static final BitSet FOLLOW_37_in_functionGenotypeBool1130 = new BitSet(new long[]{0x0000000000000002L});
 
 }

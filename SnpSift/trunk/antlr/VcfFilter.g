@@ -77,7 +77,7 @@ FLOAT  :   ('+'|'-')? NUMBER ( '.' NUMBER )? (('e'|'E') ('+'|'-')? NUMBER)? ;
  STRING: '\'' ~( '\n' | '\r' | '\'' )* '\'' { setText(getText().substring( 1, getText().length()-1 ) ); } ;
 
 // An identifier.
-ID : LETTER (ALPHANUM | '_' | '.' )*;
+ID : (ALPHANUM | '_' | '.' )*;
 
 //-----------------------------------------------------------------------------
 // Parser
