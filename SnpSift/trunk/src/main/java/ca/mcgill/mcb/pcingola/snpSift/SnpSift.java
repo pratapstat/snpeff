@@ -21,10 +21,10 @@ import flanagan.analysis.Stat;
  */
 public class SnpSift {
 
-	public static final String BUILD = "2012-12-17";
+	public static final String BUILD = "2012-12-20";
 
 	public static final String VERSION_MAJOR = "1.8";
-	public static final String REVISION = "a";
+	public static final String REVISION = "b";
 	public static final String VERSION_SHORT = VERSION_MAJOR + REVISION;
 	public static final String VERSION = VERSION_SHORT + " (build " + BUILD + "), by " + Pcingola.BY;
 

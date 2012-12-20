@@ -2,7 +2,7 @@ import java.io.*;
 import org.antlr.runtime.*;
 import org.antlr.runtime.debug.DebugEventSocketProxy;
 
-import ca.mcgill.mcb.pcingola.vcfEtc.antlr.*;
+import ca.mcgill.mcb.pcingola.snpSift.antlr.*;
 
 
 public class __Test__ {
@@ -13,7 +13,7 @@ public class __Test__ {
 
         VcfFilterParser g = new VcfFilterParser(tokens, 49100, null);
         try {
-            g.main();
+            g.var();
         } catch (RecognitionException e) {
             e.printStackTrace();
         }

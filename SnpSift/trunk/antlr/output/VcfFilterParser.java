@@ -1,4 +1,4 @@
-// $ANTLR 3.4 /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g 2012-12-17 11:22:21
+// $ANTLR 3.4 /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g 2012-12-20 12:59:10
 
 package ca.mcgill.mcb.pcingola.snpSift.antlr;
 
@@ -14,7 +14,7 @@ import org.antlr.runtime.tree.*;
 @SuppressWarnings({"all", "warnings", "unchecked"})
 public class VcfFilterParser extends Parser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "ALPHANUM", "COMMENT_SL", "CONDITION", "DIGIT", "FLOAT", "FUNCTION_BOOL_GENOTYPE", "FUNCTION_BOOL_SET", "FUNCTION_ENTRY", "ID", "LETTER", "LITERAL_NUMBER", "LITERAL_STRING", "LOWER", "NEWLINE", "NUMBER", "OP_BINARY", "OP_UNARY", "STRING", "UPPER", "VAR_EFF_SUB", "VAR_FIELD", "VAR_GENOTYPE", "VAR_GENOTYPE_SUB", "VAR_GENOTYPE_SUB_ARRAY", "VAR_LOF_SUB", "VAR_NMD_SUB", "VAR_SUBFIELD", "WS", "'!'", "'!='", "'!~'", "'&'", "'('", "')'", "'*'", "'.'", "'<'", "'<='", "'='", "'=~'", "'>'", "'>='", "'?'", "'ALL'", "'ANY'", "'EFF'", "'GEN'", "'LOF'", "'NMD'", "'SET'", "'['", "']'", "'countHet'", "'countHom'", "'countRef'", "'countVariant'", "'exists'", "'in'", "'isHet'", "'isHom'", "'isRef'", "'isVariant'", "'na'", "'|'"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "ALPHANUM", "COMMENT_SL", "CONDITION", "DIGIT", "FLOAT", "FUNCTION_BOOL_GENOTYPE", "FUNCTION_BOOL_SET", "FUNCTION_ENTRY", "ID", "LETTER", "LITERAL_NUMBER", "LITERAL_STRING", "LOWER", "NEWLINE", "NUMBER", "OP_BINARY", "OP_UNARY", "STRING", "UPPER", "VAR_EFF_SUB", "VAR_FIELD", "VAR_GENOTYPE", "VAR_GENOTYPE_SUB", "VAR_GENOTYPE_SUB_ARRAY", "VAR_LOF_SUB", "VAR_NMD_SUB", "VAR_SUBFIELD", "WS", "'!'", "'!='", "'!~'", "'&'", "'('", "')'", "'*'", "'<'", "'<='", "'='", "'=~'", "'>'", "'>='", "'?'", "'ALL'", "'ANY'", "'EFF'", "'GEN'", "'LOF'", "'NMD'", "'SET'", "'['", "']'", "'].'", "'countHet'", "'countHom'", "'countRef'", "'countVariant'", "'exists'", "'in'", "'isHet'", "'isHom'", "'isRef'", "'isVariant'", "'na'", "'|'"
     };
 
     public static final int EOF=-1;
@@ -346,63 +346,59 @@ public TreeAdaptor getTreeAdaptor() {
                         {
                         int LA2_4 = input.LA(3);
 
-                        if ( (LA2_4==54) ) {
+                        if ( (LA2_4==53) ) {
                             int LA2_12 = input.LA(4);
 
-                            if ( (LA2_12==FLOAT||LA2_12==38||(LA2_12 >= 46 && LA2_12 <= 48)) ) {
+                            if ( (LA2_12==FLOAT||LA2_12==38||(LA2_12 >= 45 && LA2_12 <= 47)) ) {
                                 int LA2_18 = input.LA(5);
 
-                                if ( (LA2_18==55) ) {
+                                if ( (LA2_18==54) ) {
                                     int LA2_24 = input.LA(6);
 
-                                    if ( ((LA2_24 >= 33 && LA2_24 <= 34)||(LA2_24 >= 40 && LA2_24 <= 45)||LA2_24==61) ) {
+                                    if ( ((LA2_24 >= 33 && LA2_24 <= 34)||(LA2_24 >= 39 && LA2_24 <= 44)||LA2_24==61) ) {
                                         alt2=1;
                                     }
                                 }
                             }
                         }
-                        else if ( ((LA2_4 >= 33 && LA2_4 <= 34)||(LA2_4 >= 40 && LA2_4 <= 45)||LA2_4==61) ) {
+                        else if ( ((LA2_4 >= 33 && LA2_4 <= 34)||(LA2_4 >= 39 && LA2_4 <= 44)||LA2_4==61) ) {
                             alt2=1;
                         }
                         }
                         break;
-                    case 50:
+                    case 49:
                         {
                         int LA2_5 = input.LA(3);
 
-                        if ( (LA2_5==54) ) {
+                        if ( (LA2_5==53) ) {
                             int LA2_13 = input.LA(4);
 
-                            if ( (LA2_13==FLOAT||LA2_13==38||(LA2_13 >= 46 && LA2_13 <= 48)) ) {
+                            if ( (LA2_13==FLOAT||LA2_13==38||(LA2_13 >= 45 && LA2_13 <= 47)) ) {
                                 int LA2_19 = input.LA(5);
 
                                 if ( (LA2_19==55) ) {
                                     int LA2_25 = input.LA(6);
 
-                                    if ( (LA2_25==39) ) {
+                                    if ( (LA2_25==ID) ) {
                                         int LA2_29 = input.LA(7);
 
-                                        if ( (LA2_29==ID) ) {
+                                        if ( (LA2_29==53) ) {
                                             int LA2_33 = input.LA(8);
 
-                                            if ( (LA2_33==54) ) {
-                                                int LA2_37 = input.LA(9);
+                                            if ( (LA2_33==FLOAT||LA2_33==38||(LA2_33 >= 45 && LA2_33 <= 47)) ) {
+                                                int LA2_34 = input.LA(9);
 
-                                                if ( (LA2_37==FLOAT||LA2_37==38||(LA2_37 >= 46 && LA2_37 <= 48)) ) {
-                                                    int LA2_38 = input.LA(10);
+                                                if ( (LA2_34==54) ) {
+                                                    int LA2_35 = input.LA(10);
 
-                                                    if ( (LA2_38==55) ) {
-                                                        int LA2_39 = input.LA(11);
-
-                                                        if ( ((LA2_39 >= 33 && LA2_39 <= 34)||(LA2_39 >= 40 && LA2_39 <= 45)||LA2_39==61) ) {
-                                                            alt2=1;
-                                                        }
+                                                    if ( ((LA2_35 >= 33 && LA2_35 <= 34)||(LA2_35 >= 39 && LA2_35 <= 44)||LA2_35==61) ) {
+                                                        alt2=1;
                                                     }
                                                 }
                                             }
-                                            else if ( ((LA2_33 >= 33 && LA2_33 <= 34)||(LA2_33 >= 40 && LA2_33 <= 45)||LA2_33==61) ) {
-                                                alt2=1;
-                                            }
+                                        }
+                                        else if ( ((LA2_29 >= 33 && LA2_29 <= 34)||(LA2_29 >= 39 && LA2_29 <= 44)||LA2_29==61) ) {
+                                            alt2=1;
                                         }
                                     }
                                 }
@@ -410,28 +406,49 @@ public TreeAdaptor getTreeAdaptor() {
                         }
                         }
                         break;
-                    case 49:
+                    case 48:
                         {
                         int LA2_6 = input.LA(3);
 
-                        if ( (LA2_6==54) ) {
+                        if ( (LA2_6==53) ) {
                             int LA2_14 = input.LA(4);
 
-                            if ( (LA2_14==FLOAT||LA2_14==38||(LA2_14 >= 46 && LA2_14 <= 48)) ) {
+                            if ( (LA2_14==FLOAT||LA2_14==38||(LA2_14 >= 45 && LA2_14 <= 47)) ) {
                                 int LA2_20 = input.LA(5);
 
                                 if ( (LA2_20==55) ) {
                                     int LA2_26 = input.LA(6);
 
-                                    if ( (LA2_26==39) ) {
+                                    if ( (LA2_26==ID) ) {
                                         int LA2_30 = input.LA(7);
 
-                                        if ( (LA2_30==ID) ) {
-                                            int LA2_34 = input.LA(8);
+                                        if ( ((LA2_30 >= 33 && LA2_30 <= 34)||(LA2_30 >= 39 && LA2_30 <= 44)||LA2_30==61) ) {
+                                            alt2=1;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        }
+                        break;
+                    case 50:
+                        {
+                        int LA2_7 = input.LA(3);
 
-                                            if ( ((LA2_34 >= 33 && LA2_34 <= 34)||(LA2_34 >= 40 && LA2_34 <= 45)||LA2_34==61) ) {
-                                                alt2=1;
-                                            }
+                        if ( (LA2_7==53) ) {
+                            int LA2_15 = input.LA(4);
+
+                            if ( (LA2_15==FLOAT||LA2_15==38||(LA2_15 >= 45 && LA2_15 <= 47)) ) {
+                                int LA2_21 = input.LA(5);
+
+                                if ( (LA2_21==55) ) {
+                                    int LA2_27 = input.LA(6);
+
+                                    if ( (LA2_27==ID) ) {
+                                        int LA2_31 = input.LA(7);
+
+                                        if ( ((LA2_31 >= 33 && LA2_31 <= 34)||(LA2_31 >= 39 && LA2_31 <= 44)||LA2_31==61) ) {
+                                            alt2=1;
                                         }
                                     }
                                 }
@@ -441,55 +458,22 @@ public TreeAdaptor getTreeAdaptor() {
                         break;
                     case 51:
                         {
-                        int LA2_7 = input.LA(3);
-
-                        if ( (LA2_7==54) ) {
-                            int LA2_15 = input.LA(4);
-
-                            if ( (LA2_15==FLOAT||LA2_15==38||(LA2_15 >= 46 && LA2_15 <= 48)) ) {
-                                int LA2_21 = input.LA(5);
-
-                                if ( (LA2_21==55) ) {
-                                    int LA2_27 = input.LA(6);
-
-                                    if ( (LA2_27==39) ) {
-                                        int LA2_31 = input.LA(7);
-
-                                        if ( (LA2_31==ID) ) {
-                                            int LA2_35 = input.LA(8);
-
-                                            if ( ((LA2_35 >= 33 && LA2_35 <= 34)||(LA2_35 >= 40 && LA2_35 <= 45)||LA2_35==61) ) {
-                                                alt2=1;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        }
-                        break;
-                    case 52:
-                        {
                         int LA2_8 = input.LA(3);
 
-                        if ( (LA2_8==54) ) {
+                        if ( (LA2_8==53) ) {
                             int LA2_16 = input.LA(4);
 
-                            if ( (LA2_16==FLOAT||LA2_16==38||(LA2_16 >= 46 && LA2_16 <= 48)) ) {
+                            if ( (LA2_16==FLOAT||LA2_16==38||(LA2_16 >= 45 && LA2_16 <= 47)) ) {
                                 int LA2_22 = input.LA(5);
 
                                 if ( (LA2_22==55) ) {
                                     int LA2_28 = input.LA(6);
 
-                                    if ( (LA2_28==39) ) {
+                                    if ( (LA2_28==ID) ) {
                                         int LA2_32 = input.LA(7);
 
-                                        if ( (LA2_32==ID) ) {
-                                            int LA2_36 = input.LA(8);
-
-                                            if ( ((LA2_36 >= 33 && LA2_36 <= 34)||(LA2_36 >= 40 && LA2_36 <= 45)||LA2_36==61) ) {
-                                                alt2=1;
-                                            }
+                                        if ( ((LA2_32 >= 33 && LA2_32 <= 34)||(LA2_32 >= 39 && LA2_32 <= 44)||LA2_32==61) ) {
+                                            alt2=1;
                                         }
                                     }
                                 }
@@ -510,7 +494,7 @@ public TreeAdaptor getTreeAdaptor() {
                             if ( (LA2_17==37) ) {
                                 int LA2_23 = input.LA(5);
 
-                                if ( ((LA2_23 >= 33 && LA2_23 <= 34)||(LA2_23 >= 40 && LA2_23 <= 45)||LA2_23==61) ) {
+                                if ( ((LA2_23 >= 33 && LA2_23 <= 34)||(LA2_23 >= 39 && LA2_23 <= 44)||LA2_23==61) ) {
                                     alt2=1;
                                 }
                             }
@@ -521,7 +505,7 @@ public TreeAdaptor getTreeAdaptor() {
                         {
                         int LA2_10 = input.LA(3);
 
-                        if ( ((LA2_10 >= 33 && LA2_10 <= 34)||(LA2_10 >= 40 && LA2_10 <= 45)||LA2_10==61) ) {
+                        if ( ((LA2_10 >= 33 && LA2_10 <= 34)||(LA2_10 >= 39 && LA2_10 <= 44)||LA2_10==61) ) {
                             alt2=1;
                         }
                         }
@@ -530,7 +514,7 @@ public TreeAdaptor getTreeAdaptor() {
                         {
                         int LA2_11 = input.LA(3);
 
-                        if ( ((LA2_11 >= 33 && LA2_11 <= 34)||(LA2_11 >= 40 && LA2_11 <= 45)||LA2_11==61) ) {
+                        if ( ((LA2_11 >= 33 && LA2_11 <= 34)||(LA2_11 >= 39 && LA2_11 <= 44)||LA2_11==61) ) {
                             alt2=1;
                         }
                         }
@@ -559,7 +543,7 @@ public TreeAdaptor getTreeAdaptor() {
             int alt3=2;
             int LA3_0 = input.LA(1);
 
-            if ( (LA3_0==FLOAT||LA3_0==ID||LA3_0==STRING||LA3_0==32||(LA3_0 >= 49 && LA3_0 <= 52)||(LA3_0 >= 56 && LA3_0 <= 60)||(LA3_0 >= 62 && LA3_0 <= 66)) ) {
+            if ( (LA3_0==FLOAT||LA3_0==ID||LA3_0==STRING||LA3_0==32||(LA3_0 >= 48 && LA3_0 <= 51)||(LA3_0 >= 56 && LA3_0 <= 60)||(LA3_0 >= 62 && LA3_0 <= 66)) ) {
                 alt3=1;
             }
             else if ( (LA3_0==36) ) {
@@ -662,17 +646,17 @@ public TreeAdaptor getTreeAdaptor() {
             case ID:
                 {
                 switch ( input.LA(2) ) {
-                case 54:
+                case 53:
                     {
                     int LA4_11 = input.LA(3);
 
-                    if ( (LA4_11==FLOAT||LA4_11==38||(LA4_11 >= 46 && LA4_11 <= 48)) ) {
+                    if ( (LA4_11==FLOAT||LA4_11==38||(LA4_11 >= 45 && LA4_11 <= 47)) ) {
                         int LA4_18 = input.LA(4);
 
-                        if ( (LA4_18==55) ) {
+                        if ( (LA4_18==54) ) {
                             int LA4_24 = input.LA(5);
 
-                            if ( ((LA4_24 >= 33 && LA4_24 <= 34)||(LA4_24 >= 40 && LA4_24 <= 45)) ) {
+                            if ( ((LA4_24 >= 33 && LA4_24 <= 34)||(LA4_24 >= 39 && LA4_24 <= 44)) ) {
                                 alt4=2;
                             }
                             else if ( (LA4_24==61) ) {
@@ -705,12 +689,12 @@ public TreeAdaptor getTreeAdaptor() {
                     break;
                 case 33:
                 case 34:
+                case 39:
                 case 40:
                 case 41:
                 case 42:
                 case 43:
                 case 44:
-                case 45:
                     {
                     alt4=2;
                     }
@@ -730,51 +714,40 @@ public TreeAdaptor getTreeAdaptor() {
 
                 }
                 break;
-            case 50:
+            case 49:
                 {
                 int LA4_3 = input.LA(2);
 
-                if ( (LA4_3==54) ) {
+                if ( (LA4_3==53) ) {
                     int LA4_13 = input.LA(3);
 
-                    if ( (LA4_13==FLOAT||LA4_13==38||(LA4_13 >= 46 && LA4_13 <= 48)) ) {
+                    if ( (LA4_13==FLOAT||LA4_13==38||(LA4_13 >= 45 && LA4_13 <= 47)) ) {
                         int LA4_19 = input.LA(4);
 
                         if ( (LA4_19==55) ) {
                             int LA4_25 = input.LA(5);
 
-                            if ( (LA4_25==39) ) {
-                                int LA4_29 = input.LA(6);
+                            if ( (LA4_25==ID) ) {
+                                switch ( input.LA(6) ) {
+                                case 53:
+                                    {
+                                    int LA4_33 = input.LA(7);
 
-                                if ( (LA4_29==ID) ) {
-                                    switch ( input.LA(7) ) {
-                                    case 54:
-                                        {
-                                        int LA4_37 = input.LA(8);
+                                    if ( (LA4_33==FLOAT||LA4_33==38||(LA4_33 >= 45 && LA4_33 <= 47)) ) {
+                                        int LA4_34 = input.LA(8);
 
-                                        if ( (LA4_37==FLOAT||LA4_37==38||(LA4_37 >= 46 && LA4_37 <= 48)) ) {
-                                            int LA4_38 = input.LA(9);
+                                        if ( (LA4_34==54) ) {
+                                            int LA4_35 = input.LA(9);
 
-                                            if ( (LA4_38==55) ) {
-                                                int LA4_39 = input.LA(10);
-
-                                                if ( ((LA4_39 >= 33 && LA4_39 <= 34)||(LA4_39 >= 40 && LA4_39 <= 45)) ) {
-                                                    alt4=2;
-                                                }
-                                                else if ( (LA4_39==61) ) {
-                                                    alt4=3;
-                                                }
-                                                else {
-                                                    NoViableAltException nvae =
-                                                        new NoViableAltException("", 4, 39, input);
-
-                                                    throw nvae;
-
-                                                }
+                                            if ( ((LA4_35 >= 33 && LA4_35 <= 34)||(LA4_35 >= 39 && LA4_35 <= 44)) ) {
+                                                alt4=2;
+                                            }
+                                            else if ( (LA4_35==61) ) {
+                                                alt4=3;
                                             }
                                             else {
                                                 NoViableAltException nvae =
-                                                    new NoViableAltException("", 4, 38, input);
+                                                    new NoViableAltException("", 4, 35, input);
 
                                                 throw nvae;
 
@@ -782,46 +755,46 @@ public TreeAdaptor getTreeAdaptor() {
                                         }
                                         else {
                                             NoViableAltException nvae =
-                                                new NoViableAltException("", 4, 37, input);
+                                                new NoViableAltException("", 4, 34, input);
 
                                             throw nvae;
 
                                         }
-                                        }
-                                        break;
-                                    case 33:
-                                    case 34:
-                                    case 40:
-                                    case 41:
-                                    case 42:
-                                    case 43:
-                                    case 44:
-                                    case 45:
-                                        {
-                                        alt4=2;
-                                        }
-                                        break;
-                                    case 61:
-                                        {
-                                        alt4=3;
-                                        }
-                                        break;
-                                    default:
+                                    }
+                                    else {
                                         NoViableAltException nvae =
                                             new NoViableAltException("", 4, 33, input);
 
                                         throw nvae;
 
                                     }
-
-                                }
-                                else {
+                                    }
+                                    break;
+                                case 33:
+                                case 34:
+                                case 39:
+                                case 40:
+                                case 41:
+                                case 42:
+                                case 43:
+                                case 44:
+                                    {
+                                    alt4=2;
+                                    }
+                                    break;
+                                case 61:
+                                    {
+                                    alt4=3;
+                                    }
+                                    break;
+                                default:
                                     NoViableAltException nvae =
                                         new NoViableAltException("", 4, 29, input);
 
                                     throw nvae;
 
                                 }
+
                             }
                             else {
                                 NoViableAltException nvae =
@@ -856,38 +829,27 @@ public TreeAdaptor getTreeAdaptor() {
                 }
                 }
                 break;
-            case 49:
+            case 48:
                 {
                 int LA4_4 = input.LA(2);
 
-                if ( (LA4_4==54) ) {
+                if ( (LA4_4==53) ) {
                     int LA4_14 = input.LA(3);
 
-                    if ( (LA4_14==FLOAT||LA4_14==38||(LA4_14 >= 46 && LA4_14 <= 48)) ) {
+                    if ( (LA4_14==FLOAT||LA4_14==38||(LA4_14 >= 45 && LA4_14 <= 47)) ) {
                         int LA4_20 = input.LA(4);
 
                         if ( (LA4_20==55) ) {
                             int LA4_26 = input.LA(5);
 
-                            if ( (LA4_26==39) ) {
+                            if ( (LA4_26==ID) ) {
                                 int LA4_30 = input.LA(6);
 
-                                if ( (LA4_30==ID) ) {
-                                    int LA4_34 = input.LA(7);
-
-                                    if ( ((LA4_34 >= 33 && LA4_34 <= 34)||(LA4_34 >= 40 && LA4_34 <= 45)) ) {
-                                        alt4=2;
-                                    }
-                                    else if ( (LA4_34==61) ) {
-                                        alt4=3;
-                                    }
-                                    else {
-                                        NoViableAltException nvae =
-                                            new NoViableAltException("", 4, 34, input);
-
-                                        throw nvae;
-
-                                    }
+                                if ( ((LA4_30 >= 33 && LA4_30 <= 34)||(LA4_30 >= 39 && LA4_30 <= 44)) ) {
+                                    alt4=2;
+                                }
+                                else if ( (LA4_30==61) ) {
+                                    alt4=3;
                                 }
                                 else {
                                     NoViableAltException nvae =
@@ -930,38 +892,27 @@ public TreeAdaptor getTreeAdaptor() {
                 }
                 }
                 break;
-            case 51:
+            case 50:
                 {
                 int LA4_5 = input.LA(2);
 
-                if ( (LA4_5==54) ) {
+                if ( (LA4_5==53) ) {
                     int LA4_15 = input.LA(3);
 
-                    if ( (LA4_15==FLOAT||LA4_15==38||(LA4_15 >= 46 && LA4_15 <= 48)) ) {
+                    if ( (LA4_15==FLOAT||LA4_15==38||(LA4_15 >= 45 && LA4_15 <= 47)) ) {
                         int LA4_21 = input.LA(4);
 
                         if ( (LA4_21==55) ) {
                             int LA4_27 = input.LA(5);
 
-                            if ( (LA4_27==39) ) {
+                            if ( (LA4_27==ID) ) {
                                 int LA4_31 = input.LA(6);
 
-                                if ( (LA4_31==ID) ) {
-                                    int LA4_35 = input.LA(7);
-
-                                    if ( ((LA4_35 >= 33 && LA4_35 <= 34)||(LA4_35 >= 40 && LA4_35 <= 45)) ) {
-                                        alt4=2;
-                                    }
-                                    else if ( (LA4_35==61) ) {
-                                        alt4=3;
-                                    }
-                                    else {
-                                        NoViableAltException nvae =
-                                            new NoViableAltException("", 4, 35, input);
-
-                                        throw nvae;
-
-                                    }
+                                if ( ((LA4_31 >= 33 && LA4_31 <= 34)||(LA4_31 >= 39 && LA4_31 <= 44)) ) {
+                                    alt4=2;
+                                }
+                                else if ( (LA4_31==61) ) {
+                                    alt4=3;
                                 }
                                 else {
                                     NoViableAltException nvae =
@@ -1004,38 +955,27 @@ public TreeAdaptor getTreeAdaptor() {
                 }
                 }
                 break;
-            case 52:
+            case 51:
                 {
                 int LA4_6 = input.LA(2);
 
-                if ( (LA4_6==54) ) {
+                if ( (LA4_6==53) ) {
                     int LA4_16 = input.LA(3);
 
-                    if ( (LA4_16==FLOAT||LA4_16==38||(LA4_16 >= 46 && LA4_16 <= 48)) ) {
+                    if ( (LA4_16==FLOAT||LA4_16==38||(LA4_16 >= 45 && LA4_16 <= 47)) ) {
                         int LA4_22 = input.LA(4);
 
                         if ( (LA4_22==55) ) {
                             int LA4_28 = input.LA(5);
 
-                            if ( (LA4_28==39) ) {
+                            if ( (LA4_28==ID) ) {
                                 int LA4_32 = input.LA(6);
 
-                                if ( (LA4_32==ID) ) {
-                                    int LA4_36 = input.LA(7);
-
-                                    if ( ((LA4_36 >= 33 && LA4_36 <= 34)||(LA4_36 >= 40 && LA4_36 <= 45)) ) {
-                                        alt4=2;
-                                    }
-                                    else if ( (LA4_36==61) ) {
-                                        alt4=3;
-                                    }
-                                    else {
-                                        NoViableAltException nvae =
-                                            new NoViableAltException("", 4, 36, input);
-
-                                        throw nvae;
-
-                                    }
+                                if ( ((LA4_32 >= 33 && LA4_32 <= 34)||(LA4_32 >= 39 && LA4_32 <= 44)) ) {
+                                    alt4=2;
+                                }
+                                else if ( (LA4_32==61) ) {
+                                    alt4=3;
                                 }
                                 else {
                                     NoViableAltException nvae =
@@ -1091,7 +1031,7 @@ public TreeAdaptor getTreeAdaptor() {
                     if ( (LA4_17==37) ) {
                         int LA4_23 = input.LA(4);
 
-                        if ( ((LA4_23 >= 33 && LA4_23 <= 34)||(LA4_23 >= 40 && LA4_23 <= 45)) ) {
+                        if ( ((LA4_23 >= 33 && LA4_23 <= 34)||(LA4_23 >= 39 && LA4_23 <= 44)) ) {
                             alt4=2;
                         }
                         else if ( (LA4_23==61) ) {
@@ -1126,7 +1066,7 @@ public TreeAdaptor getTreeAdaptor() {
                 {
                 int LA4_8 = input.LA(2);
 
-                if ( ((LA4_8 >= 33 && LA4_8 <= 34)||(LA4_8 >= 40 && LA4_8 <= 45)) ) {
+                if ( ((LA4_8 >= 33 && LA4_8 <= 34)||(LA4_8 >= 39 && LA4_8 <= 44)) ) {
                     alt4=2;
                 }
                 else if ( (LA4_8==61) ) {
@@ -1145,7 +1085,7 @@ public TreeAdaptor getTreeAdaptor() {
                 {
                 int LA4_9 = input.LA(2);
 
-                if ( ((LA4_9 >= 33 && LA4_9 <= 34)||(LA4_9 >= 40 && LA4_9 <= 45)) ) {
+                if ( ((LA4_9 >= 33 && LA4_9 <= 34)||(LA4_9 >= 39 && LA4_9 <= 44)) ) {
                     alt4=2;
                 }
                 else if ( (LA4_9==61) ) {
@@ -1361,7 +1301,7 @@ public TreeAdaptor getTreeAdaptor() {
             stream_expression.add(r.getTree());
 
             // AST REWRITE
-            // elements: l, o, r
+            // elements: o, r, l
             // token labels: 
             // rule labels: retval, r, o, l
             // token list labels: 
@@ -1612,7 +1552,7 @@ public TreeAdaptor getTreeAdaptor() {
 
             set14=(Token)input.LT(1);
 
-            if ( (input.LA(1) >= 33 && input.LA(1) <= 34)||(input.LA(1) >= 40 && input.LA(1) <= 45) ) {
+            if ( (input.LA(1) >= 33 && input.LA(1) <= 34)||(input.LA(1) >= 39 && input.LA(1) <= 44) ) {
                 input.consume();
                 adaptor.addChild(root_0, 
                 (Object)adaptor.create(set14)
@@ -1744,10 +1684,10 @@ public TreeAdaptor getTreeAdaptor() {
             int alt5=4;
             switch ( input.LA(1) ) {
             case ID:
+            case 48:
             case 49:
             case 50:
             case 51:
-            case 52:
                 {
                 alt5=1;
                 }
@@ -2068,10 +2008,10 @@ public TreeAdaptor getTreeAdaptor() {
                 {
                 int LA6_1 = input.LA(2);
 
-                if ( (LA6_1==54) ) {
+                if ( (LA6_1==53) ) {
                     alt6=2;
                 }
-                else if ( (LA6_1==EOF||(LA6_1 >= 33 && LA6_1 <= 35)||LA6_1==37||(LA6_1 >= 40 && LA6_1 <= 45)||LA6_1==61||LA6_1==67) ) {
+                else if ( (LA6_1==EOF||(LA6_1 >= 33 && LA6_1 <= 35)||LA6_1==37||(LA6_1 >= 39 && LA6_1 <= 44)||LA6_1==61||LA6_1==67) ) {
                     alt6=1;
                 }
                 else {
@@ -2083,38 +2023,27 @@ public TreeAdaptor getTreeAdaptor() {
                 }
                 }
                 break;
-            case 50:
+            case 49:
                 {
                 int LA6_2 = input.LA(2);
 
-                if ( (LA6_2==54) ) {
+                if ( (LA6_2==53) ) {
                     int LA6_8 = input.LA(3);
 
-                    if ( (LA6_8==FLOAT||LA6_8==38||(LA6_8 >= 46 && LA6_8 <= 48)) ) {
+                    if ( (LA6_8==FLOAT||LA6_8==38||(LA6_8 >= 45 && LA6_8 <= 47)) ) {
                         int LA6_9 = input.LA(4);
 
                         if ( (LA6_9==55) ) {
                             int LA6_10 = input.LA(5);
 
-                            if ( (LA6_10==39) ) {
+                            if ( (LA6_10==ID) ) {
                                 int LA6_11 = input.LA(6);
 
-                                if ( (LA6_11==ID) ) {
-                                    int LA6_12 = input.LA(7);
-
-                                    if ( (LA6_12==54) ) {
-                                        alt6=4;
-                                    }
-                                    else if ( (LA6_12==EOF||(LA6_12 >= 33 && LA6_12 <= 35)||LA6_12==37||(LA6_12 >= 40 && LA6_12 <= 45)||LA6_12==61||LA6_12==67) ) {
-                                        alt6=3;
-                                    }
-                                    else {
-                                        NoViableAltException nvae =
-                                            new NoViableAltException("", 6, 12, input);
-
-                                        throw nvae;
-
-                                    }
+                                if ( (LA6_11==53) ) {
+                                    alt6=4;
+                                }
+                                else if ( (LA6_11==EOF||(LA6_11 >= 33 && LA6_11 <= 35)||LA6_11==37||(LA6_11 >= 39 && LA6_11 <= 44)||LA6_11==61||LA6_11==67) ) {
+                                    alt6=3;
                                 }
                                 else {
                                     NoViableAltException nvae =
@@ -2157,17 +2086,17 @@ public TreeAdaptor getTreeAdaptor() {
                 }
                 }
                 break;
-            case 49:
+            case 48:
                 {
                 alt6=5;
                 }
                 break;
-            case 51:
+            case 50:
                 {
                 alt6=6;
                 }
                 break;
-            case 52:
+            case 51:
                 {
                 alt6=7;
                 }
@@ -2417,8 +2346,8 @@ public TreeAdaptor getTreeAdaptor() {
         Object i_tree=null;
         Object char_literal27_tree=null;
         Object char_literal28_tree=null;
-        RewriteRuleTokenStream stream_55=new RewriteRuleTokenStream(adaptor,"token 55");
         RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
+        RewriteRuleTokenStream stream_53=new RewriteRuleTokenStream(adaptor,"token 53");
         RewriteRuleTokenStream stream_54=new RewriteRuleTokenStream(adaptor,"token 54");
         RewriteRuleSubtreeStream stream_index=new RewriteRuleSubtreeStream(adaptor,"rule index");
         try {
@@ -2429,8 +2358,8 @@ public TreeAdaptor getTreeAdaptor() {
             stream_ID.add(i);
 
 
-            char_literal27=(Token)match(input,54,FOLLOW_54_in_varSubfield752);  
-            stream_54.add(char_literal27);
+            char_literal27=(Token)match(input,53,FOLLOW_53_in_varSubfield752);  
+            stream_53.add(char_literal27);
 
 
             pushFollow(FOLLOW_index_in_varSubfield756);
@@ -2440,8 +2369,8 @@ public TreeAdaptor getTreeAdaptor() {
 
             stream_index.add(n.getTree());
 
-            char_literal28=(Token)match(input,55,FOLLOW_55_in_varSubfield758);  
-            stream_55.add(char_literal28);
+            char_literal28=(Token)match(input,54,FOLLOW_54_in_varSubfield758);  
+            stream_54.add(char_literal28);
 
 
             // AST REWRITE
@@ -2526,20 +2455,20 @@ public TreeAdaptor getTreeAdaptor() {
         Object string_literal29_tree=null;
         Object char_literal30_tree=null;
         Object char_literal31_tree=null;
-        RewriteRuleTokenStream stream_55=new RewriteRuleTokenStream(adaptor,"token 55");
+        RewriteRuleTokenStream stream_49=new RewriteRuleTokenStream(adaptor,"token 49");
+        RewriteRuleTokenStream stream_53=new RewriteRuleTokenStream(adaptor,"token 53");
         RewriteRuleTokenStream stream_54=new RewriteRuleTokenStream(adaptor,"token 54");
-        RewriteRuleTokenStream stream_50=new RewriteRuleTokenStream(adaptor,"token 50");
         RewriteRuleSubtreeStream stream_index=new RewriteRuleSubtreeStream(adaptor,"rule index");
         try {
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:117:14: ( 'GEN' '[' g= index ']' -> ^( VAR_GENOTYPE $g) )
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:117:16: 'GEN' '[' g= index ']'
             {
-            string_literal29=(Token)match(input,50,FOLLOW_50_in_varGenotype782);  
-            stream_50.add(string_literal29);
+            string_literal29=(Token)match(input,49,FOLLOW_49_in_varGenotype782);  
+            stream_49.add(string_literal29);
 
 
-            char_literal30=(Token)match(input,54,FOLLOW_54_in_varGenotype784);  
-            stream_54.add(char_literal30);
+            char_literal30=(Token)match(input,53,FOLLOW_53_in_varGenotype784);  
+            stream_53.add(char_literal30);
 
 
             pushFollow(FOLLOW_index_in_varGenotype788);
@@ -2549,8 +2478,8 @@ public TreeAdaptor getTreeAdaptor() {
 
             stream_index.add(g.getTree());
 
-            char_literal31=(Token)match(input,55,FOLLOW_55_in_varGenotype790);  
-            stream_55.add(char_literal31);
+            char_literal31=(Token)match(input,54,FOLLOW_54_in_varGenotype790);  
+            stream_54.add(char_literal31);
 
 
             // AST REWRITE
@@ -2615,7 +2544,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "varGenotypeSub"
-    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:118:1: varGenotypeSub : 'GEN' '[' g= index ']' '.' i= ID -> ^( VAR_GENOTYPE_SUB $g $i) ;
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:118:1: varGenotypeSub : 'GEN' '[' g= index '].' i= ID -> ^( VAR_GENOTYPE_SUB $g $i) ;
     public final VcfFilterParser.varGenotypeSub_return varGenotypeSub() throws RecognitionException {
         VcfFilterParser.varGenotypeSub_return retval = new VcfFilterParser.varGenotypeSub_return();
         retval.start = input.LT(1);
@@ -2626,32 +2555,29 @@ public TreeAdaptor getTreeAdaptor() {
         Token i=null;
         Token string_literal32=null;
         Token char_literal33=null;
-        Token char_literal34=null;
-        Token char_literal35=null;
+        Token string_literal34=null;
         VcfFilterParser.index_return g =null;
 
 
         Object i_tree=null;
         Object string_literal32_tree=null;
         Object char_literal33_tree=null;
-        Object char_literal34_tree=null;
-        Object char_literal35_tree=null;
+        Object string_literal34_tree=null;
+        RewriteRuleTokenStream stream_49=new RewriteRuleTokenStream(adaptor,"token 49");
         RewriteRuleTokenStream stream_55=new RewriteRuleTokenStream(adaptor,"token 55");
         RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
-        RewriteRuleTokenStream stream_54=new RewriteRuleTokenStream(adaptor,"token 54");
-        RewriteRuleTokenStream stream_39=new RewriteRuleTokenStream(adaptor,"token 39");
-        RewriteRuleTokenStream stream_50=new RewriteRuleTokenStream(adaptor,"token 50");
+        RewriteRuleTokenStream stream_53=new RewriteRuleTokenStream(adaptor,"token 53");
         RewriteRuleSubtreeStream stream_index=new RewriteRuleSubtreeStream(adaptor,"rule index");
         try {
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:118:17: ( 'GEN' '[' g= index ']' '.' i= ID -> ^( VAR_GENOTYPE_SUB $g $i) )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:118:19: 'GEN' '[' g= index ']' '.' i= ID
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:118:17: ( 'GEN' '[' g= index '].' i= ID -> ^( VAR_GENOTYPE_SUB $g $i) )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:118:19: 'GEN' '[' g= index '].' i= ID
             {
-            string_literal32=(Token)match(input,50,FOLLOW_50_in_varGenotypeSub812);  
-            stream_50.add(string_literal32);
+            string_literal32=(Token)match(input,49,FOLLOW_49_in_varGenotypeSub812);  
+            stream_49.add(string_literal32);
 
 
-            char_literal33=(Token)match(input,54,FOLLOW_54_in_varGenotypeSub814);  
-            stream_54.add(char_literal33);
+            char_literal33=(Token)match(input,53,FOLLOW_53_in_varGenotypeSub814);  
+            stream_53.add(char_literal33);
 
 
             pushFollow(FOLLOW_index_in_varGenotypeSub818);
@@ -2661,20 +2587,16 @@ public TreeAdaptor getTreeAdaptor() {
 
             stream_index.add(g.getTree());
 
-            char_literal34=(Token)match(input,55,FOLLOW_55_in_varGenotypeSub820);  
-            stream_55.add(char_literal34);
+            string_literal34=(Token)match(input,55,FOLLOW_55_in_varGenotypeSub820);  
+            stream_55.add(string_literal34);
 
 
-            char_literal35=(Token)match(input,39,FOLLOW_39_in_varGenotypeSub822);  
-            stream_39.add(char_literal35);
-
-
-            i=(Token)match(input,ID,FOLLOW_ID_in_varGenotypeSub826);  
+            i=(Token)match(input,ID,FOLLOW_ID_in_varGenotypeSub824);  
             stream_ID.add(i);
 
 
             // AST REWRITE
-            // elements: i, g
+            // elements: g, i
             // token labels: i
             // rule labels: g, retval
             // token list labels: 
@@ -2686,9 +2608,9 @@ public TreeAdaptor getTreeAdaptor() {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (Object)adaptor.nil();
-            // 118:53: -> ^( VAR_GENOTYPE_SUB $g $i)
+            // 118:50: -> ^( VAR_GENOTYPE_SUB $g $i)
             {
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:118:56: ^( VAR_GENOTYPE_SUB $g $i)
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:118:53: ^( VAR_GENOTYPE_SUB $g $i)
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot(
@@ -2738,7 +2660,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "varGenotypeSubArray"
-    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:119:1: varGenotypeSubArray : 'GEN' '[' g= index ']' '.' i= ID '[' n= index ']' -> ^( VAR_GENOTYPE_SUB_ARRAY $g $i $n) ;
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:119:1: varGenotypeSubArray : 'GEN' '[' g= index '].' i= ID '[' n= index ']' -> ^( VAR_GENOTYPE_SUB_ARRAY $g $i $n) ;
     public final VcfFilterParser.varGenotypeSubArray_return varGenotypeSubArray() throws RecognitionException {
         VcfFilterParser.varGenotypeSubArray_return retval = new VcfFilterParser.varGenotypeSubArray_return();
         retval.start = input.LT(1);
@@ -2747,74 +2669,68 @@ public TreeAdaptor getTreeAdaptor() {
         Object root_0 = null;
 
         Token i=null;
-        Token string_literal36=null;
-        Token char_literal37=null;
+        Token string_literal35=null;
+        Token char_literal36=null;
+        Token string_literal37=null;
         Token char_literal38=null;
         Token char_literal39=null;
-        Token char_literal40=null;
-        Token char_literal41=null;
         VcfFilterParser.index_return g =null;
 
         VcfFilterParser.index_return n =null;
 
 
         Object i_tree=null;
-        Object string_literal36_tree=null;
-        Object char_literal37_tree=null;
+        Object string_literal35_tree=null;
+        Object char_literal36_tree=null;
+        Object string_literal37_tree=null;
         Object char_literal38_tree=null;
         Object char_literal39_tree=null;
-        Object char_literal40_tree=null;
-        Object char_literal41_tree=null;
+        RewriteRuleTokenStream stream_49=new RewriteRuleTokenStream(adaptor,"token 49");
         RewriteRuleTokenStream stream_55=new RewriteRuleTokenStream(adaptor,"token 55");
         RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
+        RewriteRuleTokenStream stream_53=new RewriteRuleTokenStream(adaptor,"token 53");
         RewriteRuleTokenStream stream_54=new RewriteRuleTokenStream(adaptor,"token 54");
-        RewriteRuleTokenStream stream_39=new RewriteRuleTokenStream(adaptor,"token 39");
-        RewriteRuleTokenStream stream_50=new RewriteRuleTokenStream(adaptor,"token 50");
         RewriteRuleSubtreeStream stream_index=new RewriteRuleSubtreeStream(adaptor,"rule index");
         try {
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:119:21: ( 'GEN' '[' g= index ']' '.' i= ID '[' n= index ']' -> ^( VAR_GENOTYPE_SUB_ARRAY $g $i $n) )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:119:23: 'GEN' '[' g= index ']' '.' i= ID '[' n= index ']'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:119:21: ( 'GEN' '[' g= index '].' i= ID '[' n= index ']' -> ^( VAR_GENOTYPE_SUB_ARRAY $g $i $n) )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:119:23: 'GEN' '[' g= index '].' i= ID '[' n= index ']'
             {
-            string_literal36=(Token)match(input,50,FOLLOW_50_in_varGenotypeSubArray848);  
-            stream_50.add(string_literal36);
+            string_literal35=(Token)match(input,49,FOLLOW_49_in_varGenotypeSubArray846);  
+            stream_49.add(string_literal35);
 
 
-            char_literal37=(Token)match(input,54,FOLLOW_54_in_varGenotypeSubArray850);  
-            stream_54.add(char_literal37);
+            char_literal36=(Token)match(input,53,FOLLOW_53_in_varGenotypeSubArray848);  
+            stream_53.add(char_literal36);
 
 
-            pushFollow(FOLLOW_index_in_varGenotypeSubArray854);
+            pushFollow(FOLLOW_index_in_varGenotypeSubArray852);
             g=index();
 
             state._fsp--;
 
             stream_index.add(g.getTree());
 
-            char_literal38=(Token)match(input,55,FOLLOW_55_in_varGenotypeSubArray856);  
-            stream_55.add(char_literal38);
+            string_literal37=(Token)match(input,55,FOLLOW_55_in_varGenotypeSubArray854);  
+            stream_55.add(string_literal37);
 
 
-            char_literal39=(Token)match(input,39,FOLLOW_39_in_varGenotypeSubArray858);  
-            stream_39.add(char_literal39);
-
-
-            i=(Token)match(input,ID,FOLLOW_ID_in_varGenotypeSubArray862);  
+            i=(Token)match(input,ID,FOLLOW_ID_in_varGenotypeSubArray858);  
             stream_ID.add(i);
 
 
-            char_literal40=(Token)match(input,54,FOLLOW_54_in_varGenotypeSubArray865);  
-            stream_54.add(char_literal40);
+            char_literal38=(Token)match(input,53,FOLLOW_53_in_varGenotypeSubArray861);  
+            stream_53.add(char_literal38);
 
 
-            pushFollow(FOLLOW_index_in_varGenotypeSubArray869);
+            pushFollow(FOLLOW_index_in_varGenotypeSubArray865);
             n=index();
 
             state._fsp--;
 
             stream_index.add(n.getTree());
 
-            char_literal41=(Token)match(input,55,FOLLOW_55_in_varGenotypeSubArray871);  
-            stream_55.add(char_literal41);
+            char_literal39=(Token)match(input,54,FOLLOW_54_in_varGenotypeSubArray867);  
+            stream_54.add(char_literal39);
 
 
             // AST REWRITE
@@ -2831,9 +2747,9 @@ public TreeAdaptor getTreeAdaptor() {
             RewriteRuleSubtreeStream stream_n=new RewriteRuleSubtreeStream(adaptor,"rule n",n!=null?n.tree:null);
 
             root_0 = (Object)adaptor.nil();
-            // 119:72: -> ^( VAR_GENOTYPE_SUB_ARRAY $g $i $n)
+            // 119:69: -> ^( VAR_GENOTYPE_SUB_ARRAY $g $i $n)
             {
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:119:75: ^( VAR_GENOTYPE_SUB_ARRAY $g $i $n)
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:119:72: ^( VAR_GENOTYPE_SUB_ARRAY $g $i $n)
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot(
@@ -2885,7 +2801,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "varEffSub"
-    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:120:1: varEffSub : 'EFF' '[' g= index ']' '.' i= ID -> ^( VAR_EFF_SUB $g $i) ;
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:120:1: varEffSub : 'EFF' '[' g= index '].' i= ID -> ^( VAR_EFF_SUB $g $i) ;
     public final VcfFilterParser.varEffSub_return varEffSub() throws RecognitionException {
         VcfFilterParser.varEffSub_return retval = new VcfFilterParser.varEffSub_return();
         retval.start = input.LT(1);
@@ -2894,52 +2810,45 @@ public TreeAdaptor getTreeAdaptor() {
         Object root_0 = null;
 
         Token i=null;
+        Token string_literal40=null;
+        Token char_literal41=null;
         Token string_literal42=null;
-        Token char_literal43=null;
-        Token char_literal44=null;
-        Token char_literal45=null;
         VcfFilterParser.index_return g =null;
 
 
         Object i_tree=null;
+        Object string_literal40_tree=null;
+        Object char_literal41_tree=null;
         Object string_literal42_tree=null;
-        Object char_literal43_tree=null;
-        Object char_literal44_tree=null;
-        Object char_literal45_tree=null;
-        RewriteRuleTokenStream stream_49=new RewriteRuleTokenStream(adaptor,"token 49");
+        RewriteRuleTokenStream stream_48=new RewriteRuleTokenStream(adaptor,"token 48");
         RewriteRuleTokenStream stream_55=new RewriteRuleTokenStream(adaptor,"token 55");
         RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
-        RewriteRuleTokenStream stream_54=new RewriteRuleTokenStream(adaptor,"token 54");
-        RewriteRuleTokenStream stream_39=new RewriteRuleTokenStream(adaptor,"token 39");
+        RewriteRuleTokenStream stream_53=new RewriteRuleTokenStream(adaptor,"token 53");
         RewriteRuleSubtreeStream stream_index=new RewriteRuleSubtreeStream(adaptor,"rule index");
         try {
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:120:12: ( 'EFF' '[' g= index ']' '.' i= ID -> ^( VAR_EFF_SUB $g $i) )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:120:14: 'EFF' '[' g= index ']' '.' i= ID
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:120:12: ( 'EFF' '[' g= index '].' i= ID -> ^( VAR_EFF_SUB $g $i) )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:120:14: 'EFF' '[' g= index '].' i= ID
             {
-            string_literal42=(Token)match(input,49,FOLLOW_49_in_varEffSub895);  
-            stream_49.add(string_literal42);
+            string_literal40=(Token)match(input,48,FOLLOW_48_in_varEffSub891);  
+            stream_48.add(string_literal40);
 
 
-            char_literal43=(Token)match(input,54,FOLLOW_54_in_varEffSub897);  
-            stream_54.add(char_literal43);
+            char_literal41=(Token)match(input,53,FOLLOW_53_in_varEffSub893);  
+            stream_53.add(char_literal41);
 
 
-            pushFollow(FOLLOW_index_in_varEffSub901);
+            pushFollow(FOLLOW_index_in_varEffSub897);
             g=index();
 
             state._fsp--;
 
             stream_index.add(g.getTree());
 
-            char_literal44=(Token)match(input,55,FOLLOW_55_in_varEffSub903);  
-            stream_55.add(char_literal44);
+            string_literal42=(Token)match(input,55,FOLLOW_55_in_varEffSub899);  
+            stream_55.add(string_literal42);
 
 
-            char_literal45=(Token)match(input,39,FOLLOW_39_in_varEffSub905);  
-            stream_39.add(char_literal45);
-
-
-            i=(Token)match(input,ID,FOLLOW_ID_in_varEffSub909);  
+            i=(Token)match(input,ID,FOLLOW_ID_in_varEffSub903);  
             stream_ID.add(i);
 
 
@@ -2956,9 +2865,9 @@ public TreeAdaptor getTreeAdaptor() {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (Object)adaptor.nil();
-            // 120:48: -> ^( VAR_EFF_SUB $g $i)
+            // 120:45: -> ^( VAR_EFF_SUB $g $i)
             {
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:120:51: ^( VAR_EFF_SUB $g $i)
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:120:48: ^( VAR_EFF_SUB $g $i)
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot(
@@ -3008,7 +2917,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "varLofSub"
-    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:121:1: varLofSub : 'LOF' '[' g= index ']' '.' i= ID -> ^( VAR_LOF_SUB $g $i) ;
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:121:1: varLofSub : 'LOF' '[' g= index '].' i= ID -> ^( VAR_LOF_SUB $g $i) ;
     public final VcfFilterParser.varLofSub_return varLofSub() throws RecognitionException {
         VcfFilterParser.varLofSub_return retval = new VcfFilterParser.varLofSub_return();
         retval.start = input.LT(1);
@@ -3017,52 +2926,45 @@ public TreeAdaptor getTreeAdaptor() {
         Object root_0 = null;
 
         Token i=null;
-        Token string_literal46=null;
-        Token char_literal47=null;
-        Token char_literal48=null;
-        Token char_literal49=null;
+        Token string_literal43=null;
+        Token char_literal44=null;
+        Token string_literal45=null;
         VcfFilterParser.index_return g =null;
 
 
         Object i_tree=null;
-        Object string_literal46_tree=null;
-        Object char_literal47_tree=null;
-        Object char_literal48_tree=null;
-        Object char_literal49_tree=null;
+        Object string_literal43_tree=null;
+        Object char_literal44_tree=null;
+        Object string_literal45_tree=null;
         RewriteRuleTokenStream stream_55=new RewriteRuleTokenStream(adaptor,"token 55");
-        RewriteRuleTokenStream stream_51=new RewriteRuleTokenStream(adaptor,"token 51");
         RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
-        RewriteRuleTokenStream stream_54=new RewriteRuleTokenStream(adaptor,"token 54");
-        RewriteRuleTokenStream stream_39=new RewriteRuleTokenStream(adaptor,"token 39");
+        RewriteRuleTokenStream stream_53=new RewriteRuleTokenStream(adaptor,"token 53");
+        RewriteRuleTokenStream stream_50=new RewriteRuleTokenStream(adaptor,"token 50");
         RewriteRuleSubtreeStream stream_index=new RewriteRuleSubtreeStream(adaptor,"rule index");
         try {
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:121:12: ( 'LOF' '[' g= index ']' '.' i= ID -> ^( VAR_LOF_SUB $g $i) )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:121:14: 'LOF' '[' g= index ']' '.' i= ID
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:121:12: ( 'LOF' '[' g= index '].' i= ID -> ^( VAR_LOF_SUB $g $i) )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:121:14: 'LOF' '[' g= index '].' i= ID
             {
-            string_literal46=(Token)match(input,51,FOLLOW_51_in_varLofSub932);  
-            stream_51.add(string_literal46);
+            string_literal43=(Token)match(input,50,FOLLOW_50_in_varLofSub926);  
+            stream_50.add(string_literal43);
 
 
-            char_literal47=(Token)match(input,54,FOLLOW_54_in_varLofSub934);  
-            stream_54.add(char_literal47);
+            char_literal44=(Token)match(input,53,FOLLOW_53_in_varLofSub928);  
+            stream_53.add(char_literal44);
 
 
-            pushFollow(FOLLOW_index_in_varLofSub938);
+            pushFollow(FOLLOW_index_in_varLofSub932);
             g=index();
 
             state._fsp--;
 
             stream_index.add(g.getTree());
 
-            char_literal48=(Token)match(input,55,FOLLOW_55_in_varLofSub940);  
-            stream_55.add(char_literal48);
+            string_literal45=(Token)match(input,55,FOLLOW_55_in_varLofSub934);  
+            stream_55.add(string_literal45);
 
 
-            char_literal49=(Token)match(input,39,FOLLOW_39_in_varLofSub942);  
-            stream_39.add(char_literal49);
-
-
-            i=(Token)match(input,ID,FOLLOW_ID_in_varLofSub946);  
+            i=(Token)match(input,ID,FOLLOW_ID_in_varLofSub938);  
             stream_ID.add(i);
 
 
@@ -3079,9 +2981,9 @@ public TreeAdaptor getTreeAdaptor() {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (Object)adaptor.nil();
-            // 121:48: -> ^( VAR_LOF_SUB $g $i)
+            // 121:45: -> ^( VAR_LOF_SUB $g $i)
             {
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:121:51: ^( VAR_LOF_SUB $g $i)
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:121:48: ^( VAR_LOF_SUB $g $i)
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot(
@@ -3131,7 +3033,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "varNmdSub"
-    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:122:1: varNmdSub : 'NMD' '[' g= index ']' '.' i= ID -> ^( VAR_NMD_SUB $g $i) ;
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:122:1: varNmdSub : 'NMD' '[' g= index '].' i= ID -> ^( VAR_NMD_SUB $g $i) ;
     public final VcfFilterParser.varNmdSub_return varNmdSub() throws RecognitionException {
         VcfFilterParser.varNmdSub_return retval = new VcfFilterParser.varNmdSub_return();
         retval.start = input.LT(1);
@@ -3140,57 +3042,50 @@ public TreeAdaptor getTreeAdaptor() {
         Object root_0 = null;
 
         Token i=null;
-        Token string_literal50=null;
-        Token char_literal51=null;
-        Token char_literal52=null;
-        Token char_literal53=null;
+        Token string_literal46=null;
+        Token char_literal47=null;
+        Token string_literal48=null;
         VcfFilterParser.index_return g =null;
 
 
         Object i_tree=null;
-        Object string_literal50_tree=null;
-        Object char_literal51_tree=null;
-        Object char_literal52_tree=null;
-        Object char_literal53_tree=null;
+        Object string_literal46_tree=null;
+        Object char_literal47_tree=null;
+        Object string_literal48_tree=null;
         RewriteRuleTokenStream stream_55=new RewriteRuleTokenStream(adaptor,"token 55");
+        RewriteRuleTokenStream stream_51=new RewriteRuleTokenStream(adaptor,"token 51");
         RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
-        RewriteRuleTokenStream stream_52=new RewriteRuleTokenStream(adaptor,"token 52");
-        RewriteRuleTokenStream stream_54=new RewriteRuleTokenStream(adaptor,"token 54");
-        RewriteRuleTokenStream stream_39=new RewriteRuleTokenStream(adaptor,"token 39");
+        RewriteRuleTokenStream stream_53=new RewriteRuleTokenStream(adaptor,"token 53");
         RewriteRuleSubtreeStream stream_index=new RewriteRuleSubtreeStream(adaptor,"rule index");
         try {
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:122:12: ( 'NMD' '[' g= index ']' '.' i= ID -> ^( VAR_NMD_SUB $g $i) )
-            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:122:14: 'NMD' '[' g= index ']' '.' i= ID
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:122:12: ( 'NMD' '[' g= index '].' i= ID -> ^( VAR_NMD_SUB $g $i) )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:122:14: 'NMD' '[' g= index '].' i= ID
             {
-            string_literal50=(Token)match(input,52,FOLLOW_52_in_varNmdSub969);  
-            stream_52.add(string_literal50);
+            string_literal46=(Token)match(input,51,FOLLOW_51_in_varNmdSub961);  
+            stream_51.add(string_literal46);
 
 
-            char_literal51=(Token)match(input,54,FOLLOW_54_in_varNmdSub971);  
-            stream_54.add(char_literal51);
+            char_literal47=(Token)match(input,53,FOLLOW_53_in_varNmdSub963);  
+            stream_53.add(char_literal47);
 
 
-            pushFollow(FOLLOW_index_in_varNmdSub975);
+            pushFollow(FOLLOW_index_in_varNmdSub967);
             g=index();
 
             state._fsp--;
 
             stream_index.add(g.getTree());
 
-            char_literal52=(Token)match(input,55,FOLLOW_55_in_varNmdSub977);  
-            stream_55.add(char_literal52);
+            string_literal48=(Token)match(input,55,FOLLOW_55_in_varNmdSub969);  
+            stream_55.add(string_literal48);
 
 
-            char_literal53=(Token)match(input,39,FOLLOW_39_in_varNmdSub979);  
-            stream_39.add(char_literal53);
-
-
-            i=(Token)match(input,ID,FOLLOW_ID_in_varNmdSub983);  
+            i=(Token)match(input,ID,FOLLOW_ID_in_varNmdSub973);  
             stream_ID.add(i);
 
 
             // AST REWRITE
-            // elements: g, i
+            // elements: i, g
             // token labels: i
             // rule labels: g, retval
             // token list labels: 
@@ -3202,9 +3097,9 @@ public TreeAdaptor getTreeAdaptor() {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (Object)adaptor.nil();
-            // 122:48: -> ^( VAR_NMD_SUB $g $i)
+            // 122:45: -> ^( VAR_NMD_SUB $g $i)
             {
-                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:122:51: ^( VAR_NMD_SUB $g $i)
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:122:48: ^( VAR_NMD_SUB $g $i)
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot(
@@ -3262,13 +3157,13 @@ public TreeAdaptor getTreeAdaptor() {
 
         Object root_0 = null;
 
-        Token char_literal54=null;
-        Token char_literal55=null;
+        Token char_literal49=null;
+        Token char_literal50=null;
         VcfFilterParser.functionEntryName_return f =null;
 
 
-        Object char_literal54_tree=null;
-        Object char_literal55_tree=null;
+        Object char_literal49_tree=null;
+        Object char_literal50_tree=null;
         RewriteRuleTokenStream stream_36=new RewriteRuleTokenStream(adaptor,"token 36");
         RewriteRuleTokenStream stream_37=new RewriteRuleTokenStream(adaptor,"token 37");
         RewriteRuleSubtreeStream stream_functionEntryName=new RewriteRuleSubtreeStream(adaptor,"rule functionEntryName");
@@ -3276,19 +3171,19 @@ public TreeAdaptor getTreeAdaptor() {
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:125:16: (f= functionEntryName '(' ')' -> ^( FUNCTION_ENTRY $f) )
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:125:18: f= functionEntryName '(' ')'
             {
-            pushFollow(FOLLOW_functionEntryName_in_functionEntry1010);
+            pushFollow(FOLLOW_functionEntryName_in_functionEntry1000);
             f=functionEntryName();
 
             state._fsp--;
 
             stream_functionEntryName.add(f.getTree());
 
-            char_literal54=(Token)match(input,36,FOLLOW_36_in_functionEntry1012);  
-            stream_36.add(char_literal54);
+            char_literal49=(Token)match(input,36,FOLLOW_36_in_functionEntry1002);  
+            stream_36.add(char_literal49);
 
 
-            char_literal55=(Token)match(input,37,FOLLOW_37_in_functionEntry1014);  
-            stream_37.add(char_literal55);
+            char_literal50=(Token)match(input,37,FOLLOW_37_in_functionEntry1004);  
+            stream_37.add(char_literal50);
 
 
             // AST REWRITE
@@ -3361,9 +3256,9 @@ public TreeAdaptor getTreeAdaptor() {
 
         Object root_0 = null;
 
-        Token set56=null;
+        Token set51=null;
 
-        Object set56_tree=null;
+        Object set51_tree=null;
 
         try {
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:126:19: ( 'countHom' | 'countHet' | 'countVariant' | 'countRef' )
@@ -3372,12 +3267,12 @@ public TreeAdaptor getTreeAdaptor() {
             root_0 = (Object)adaptor.nil();
 
 
-            set56=(Token)input.LT(1);
+            set51=(Token)input.LT(1);
 
             if ( (input.LA(1) >= 56 && input.LA(1) <= 59) ) {
                 input.consume();
                 adaptor.addChild(root_0, 
-                (Object)adaptor.create(set56)
+                (Object)adaptor.create(set51)
                 );
                 state.errorRecovery=false;
             }
@@ -3426,9 +3321,9 @@ public TreeAdaptor getTreeAdaptor() {
 
         Object root_0 = null;
 
-        VcfFilterParser.functionGenotypeBool_return functionGenotypeBool57 =null;
+        VcfFilterParser.functionGenotypeBool_return functionGenotypeBool52 =null;
 
-        VcfFilterParser.functionBooleanSet_return functionBooleanSet58 =null;
+        VcfFilterParser.functionBooleanSet_return functionBooleanSet53 =null;
 
 
 
@@ -3440,7 +3335,7 @@ public TreeAdaptor getTreeAdaptor() {
             if ( ((LA7_0 >= 62 && LA7_0 <= 65)) ) {
                 alt7=1;
             }
-            else if ( (LA7_0==FLOAT||LA7_0==ID||LA7_0==STRING||(LA7_0 >= 49 && LA7_0 <= 52)||(LA7_0 >= 56 && LA7_0 <= 59)) ) {
+            else if ( (LA7_0==FLOAT||LA7_0==ID||LA7_0==STRING||(LA7_0 >= 48 && LA7_0 <= 51)||(LA7_0 >= 56 && LA7_0 <= 59)) ) {
                 alt7=2;
             }
             else {
@@ -3457,12 +3352,12 @@ public TreeAdaptor getTreeAdaptor() {
                     root_0 = (Object)adaptor.nil();
 
 
-                    pushFollow(FOLLOW_functionGenotypeBool_in_functionBoolean1055);
-                    functionGenotypeBool57=functionGenotypeBool();
+                    pushFollow(FOLLOW_functionGenotypeBool_in_functionBoolean1045);
+                    functionGenotypeBool52=functionGenotypeBool();
 
                     state._fsp--;
 
-                    adaptor.addChild(root_0, functionGenotypeBool57.getTree());
+                    adaptor.addChild(root_0, functionGenotypeBool52.getTree());
 
                     }
                     break;
@@ -3472,12 +3367,12 @@ public TreeAdaptor getTreeAdaptor() {
                     root_0 = (Object)adaptor.nil();
 
 
-                    pushFollow(FOLLOW_functionBooleanSet_in_functionBoolean1064);
-                    functionBooleanSet58=functionBooleanSet();
+                    pushFollow(FOLLOW_functionBooleanSet_in_functionBoolean1054);
+                    functionBooleanSet53=functionBooleanSet();
 
                     state._fsp--;
 
-                    adaptor.addChild(root_0, functionBooleanSet58.getTree());
+                    adaptor.addChild(root_0, functionBooleanSet53.getTree());
 
                     }
                     break;
@@ -3521,19 +3416,19 @@ public TreeAdaptor getTreeAdaptor() {
         Object root_0 = null;
 
         Token f=null;
-        Token string_literal59=null;
-        Token char_literal60=null;
-        Token char_literal61=null;
+        Token string_literal54=null;
+        Token char_literal55=null;
+        Token char_literal56=null;
         VcfFilterParser.expression_return e =null;
 
         VcfFilterParser.index_return i =null;
 
 
         Object f_tree=null;
-        Object string_literal59_tree=null;
-        Object char_literal60_tree=null;
-        Object char_literal61_tree=null;
-        RewriteRuleTokenStream stream_55=new RewriteRuleTokenStream(adaptor,"token 55");
+        Object string_literal54_tree=null;
+        Object char_literal55_tree=null;
+        Object char_literal56_tree=null;
+        RewriteRuleTokenStream stream_52=new RewriteRuleTokenStream(adaptor,"token 52");
         RewriteRuleTokenStream stream_53=new RewriteRuleTokenStream(adaptor,"token 53");
         RewriteRuleTokenStream stream_54=new RewriteRuleTokenStream(adaptor,"token 54");
         RewriteRuleTokenStream stream_61=new RewriteRuleTokenStream(adaptor,"token 61");
@@ -3543,34 +3438,34 @@ public TreeAdaptor getTreeAdaptor() {
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:134:20: (e= expression f= 'in' 'SET' '[' i= index ']' -> ^( FUNCTION_BOOL_SET $f $i $e) )
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:134:22: e= expression f= 'in' 'SET' '[' i= index ']'
             {
-            pushFollow(FOLLOW_expression_in_functionBooleanSet1080);
+            pushFollow(FOLLOW_expression_in_functionBooleanSet1070);
             e=expression();
 
             state._fsp--;
 
             stream_expression.add(e.getTree());
 
-            f=(Token)match(input,61,FOLLOW_61_in_functionBooleanSet1084);  
+            f=(Token)match(input,61,FOLLOW_61_in_functionBooleanSet1074);  
             stream_61.add(f);
 
 
-            string_literal59=(Token)match(input,53,FOLLOW_53_in_functionBooleanSet1086);  
-            stream_53.add(string_literal59);
+            string_literal54=(Token)match(input,52,FOLLOW_52_in_functionBooleanSet1076);  
+            stream_52.add(string_literal54);
 
 
-            char_literal60=(Token)match(input,54,FOLLOW_54_in_functionBooleanSet1088);  
-            stream_54.add(char_literal60);
+            char_literal55=(Token)match(input,53,FOLLOW_53_in_functionBooleanSet1078);  
+            stream_53.add(char_literal55);
 
 
-            pushFollow(FOLLOW_index_in_functionBooleanSet1092);
+            pushFollow(FOLLOW_index_in_functionBooleanSet1082);
             i=index();
 
             state._fsp--;
 
             stream_index.add(i.getTree());
 
-            char_literal61=(Token)match(input,55,FOLLOW_55_in_functionBooleanSet1094);  
-            stream_55.add(char_literal61);
+            char_literal56=(Token)match(input,54,FOLLOW_54_in_functionBooleanSet1084);  
+            stream_54.add(char_literal56);
 
 
             // AST REWRITE
@@ -3649,15 +3544,15 @@ public TreeAdaptor getTreeAdaptor() {
 
         Object root_0 = null;
 
-        Token char_literal62=null;
-        Token char_literal63=null;
+        Token char_literal57=null;
+        Token char_literal58=null;
         VcfFilterParser.functionGenotypeBoolName_return f =null;
 
         VcfFilterParser.varGenotype_return g =null;
 
 
-        Object char_literal62_tree=null;
-        Object char_literal63_tree=null;
+        Object char_literal57_tree=null;
+        Object char_literal58_tree=null;
         RewriteRuleTokenStream stream_36=new RewriteRuleTokenStream(adaptor,"token 36");
         RewriteRuleTokenStream stream_37=new RewriteRuleTokenStream(adaptor,"token 37");
         RewriteRuleSubtreeStream stream_functionGenotypeBoolName=new RewriteRuleSubtreeStream(adaptor,"rule functionGenotypeBoolName");
@@ -3666,26 +3561,26 @@ public TreeAdaptor getTreeAdaptor() {
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:137:22: (f= functionGenotypeBoolName '(' g= varGenotype ')' -> ^( FUNCTION_BOOL_GENOTYPE $f $g) )
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:137:24: f= functionGenotypeBoolName '(' g= varGenotype ')'
             {
-            pushFollow(FOLLOW_functionGenotypeBoolName_in_functionGenotypeBool1122);
+            pushFollow(FOLLOW_functionGenotypeBoolName_in_functionGenotypeBool1112);
             f=functionGenotypeBoolName();
 
             state._fsp--;
 
             stream_functionGenotypeBoolName.add(f.getTree());
 
-            char_literal62=(Token)match(input,36,FOLLOW_36_in_functionGenotypeBool1124);  
-            stream_36.add(char_literal62);
+            char_literal57=(Token)match(input,36,FOLLOW_36_in_functionGenotypeBool1114);  
+            stream_36.add(char_literal57);
 
 
-            pushFollow(FOLLOW_varGenotype_in_functionGenotypeBool1128);
+            pushFollow(FOLLOW_varGenotype_in_functionGenotypeBool1118);
             g=varGenotype();
 
             state._fsp--;
 
             stream_varGenotype.add(g.getTree());
 
-            char_literal63=(Token)match(input,37,FOLLOW_37_in_functionGenotypeBool1130);  
-            stream_37.add(char_literal63);
+            char_literal58=(Token)match(input,37,FOLLOW_37_in_functionGenotypeBool1120);  
+            stream_37.add(char_literal58);
 
 
             // AST REWRITE
@@ -3761,9 +3656,9 @@ public TreeAdaptor getTreeAdaptor() {
 
         Object root_0 = null;
 
-        Token set64=null;
+        Token set59=null;
 
-        Object set64_tree=null;
+        Object set59_tree=null;
 
         try {
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:138:26: ( 'isHom' | 'isHet' | 'isVariant' | 'isRef' )
@@ -3772,12 +3667,12 @@ public TreeAdaptor getTreeAdaptor() {
             root_0 = (Object)adaptor.nil();
 
 
-            set64=(Token)input.LT(1);
+            set59=(Token)input.LT(1);
 
             if ( (input.LA(1) >= 62 && input.LA(1) <= 65) ) {
                 input.consume();
                 adaptor.addChild(root_0, 
-                (Object)adaptor.create(set64)
+                (Object)adaptor.create(set59)
                 );
                 state.errorRecovery=false;
             }
@@ -3826,9 +3721,9 @@ public TreeAdaptor getTreeAdaptor() {
 
         Object root_0 = null;
 
-        Token set65=null;
+        Token set60=null;
 
-        Object set65_tree=null;
+        Object set60_tree=null;
 
         try {
             // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:141:9: ( FLOAT | '*' | 'ANY' | '?' | 'ALL' )
@@ -3837,12 +3732,12 @@ public TreeAdaptor getTreeAdaptor() {
             root_0 = (Object)adaptor.nil();
 
 
-            set65=(Token)input.LT(1);
+            set60=(Token)input.LT(1);
 
-            if ( input.LA(1)==FLOAT||input.LA(1)==38||(input.LA(1) >= 46 && input.LA(1) <= 48) ) {
+            if ( input.LA(1)==FLOAT||input.LA(1)==38||(input.LA(1) >= 45 && input.LA(1) <= 47) ) {
                 input.consume();
                 adaptor.addChild(root_0, 
-                (Object)adaptor.create(set65)
+                (Object)adaptor.create(set60)
                 );
                 state.errorRecovery=false;
             }
@@ -3882,21 +3777,21 @@ public TreeAdaptor getTreeAdaptor() {
 
     public static final BitSet FOLLOW_condition_in_main375 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_subcondition_in_condition392 = new BitSet(new long[]{0x0000000800000002L,0x0000000000000008L});
-    public static final BitSet FOLLOW_boolOperator_in_condition395 = new BitSet(new long[]{0xDF1E001100201100L,0x0000000000000007L});
+    public static final BitSet FOLLOW_boolOperator_in_condition395 = new BitSet(new long[]{0xDF0F001100201100L,0x0000000000000007L});
     public static final BitSet FOLLOW_subcondition_in_condition398 = new BitSet(new long[]{0x0000000800000002L,0x0000000000000008L});
-    public static final BitSet FOLLOW_32_in_subcondition408 = new BitSet(new long[]{0xDF1E001100201100L,0x0000000000000007L});
+    public static final BitSet FOLLOW_32_in_subcondition408 = new BitSet(new long[]{0xDF0F001100201100L,0x0000000000000007L});
     public static final BitSet FOLLOW_bare_in_subcondition414 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_paren_in_subcondition418 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_unaryExpr_in_bare427 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_binaryExpr_in_bare431 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_functionBoolean_in_bare435 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_36_in_paren445 = new BitSet(new long[]{0xDF1E001100201100L,0x0000000000000007L});
+    public static final BitSet FOLLOW_36_in_paren445 = new BitSet(new long[]{0xDF0F001100201100L,0x0000000000000007L});
     public static final BitSet FOLLOW_condition_in_paren448 = new BitSet(new long[]{0x0000002000000000L});
     public static final BitSet FOLLOW_37_in_paren450 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_expression_in_binaryExpr462 = new BitSet(new long[]{0x00003F0600000000L});
-    public static final BitSet FOLLOW_binOperator_in_binaryExpr466 = new BitSet(new long[]{0x0F1E000000201100L});
+    public static final BitSet FOLLOW_expression_in_binaryExpr462 = new BitSet(new long[]{0x00001F8600000000L});
+    public static final BitSet FOLLOW_binOperator_in_binaryExpr466 = new BitSet(new long[]{0x0F0F000000201100L});
     public static final BitSet FOLLOW_expression_in_binaryExpr470 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_uniOperator_in_unaryExpr497 = new BitSet(new long[]{0x0F1E000000201100L});
+    public static final BitSet FOLLOW_uniOperator_in_unaryExpr497 = new BitSet(new long[]{0x0F0F000000201100L});
     public static final BitSet FOLLOW_expression_in_unaryExpr501 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_var_in_expression604 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_functionEntry_in_expression612 = new BitSet(new long[]{0x0000000000000002L});
@@ -3912,61 +3807,56 @@ public TreeAdaptor getTreeAdaptor() {
     public static final BitSet FOLLOW_varLofSub_in_var711 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_varNmdSub_in_var715 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ID_in_varField725 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ID_in_varSubfield750 = new BitSet(new long[]{0x0040000000000000L});
-    public static final BitSet FOLLOW_54_in_varSubfield752 = new BitSet(new long[]{0x0001C04000000100L});
-    public static final BitSet FOLLOW_index_in_varSubfield756 = new BitSet(new long[]{0x0080000000000000L});
-    public static final BitSet FOLLOW_55_in_varSubfield758 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_50_in_varGenotype782 = new BitSet(new long[]{0x0040000000000000L});
-    public static final BitSet FOLLOW_54_in_varGenotype784 = new BitSet(new long[]{0x0001C04000000100L});
-    public static final BitSet FOLLOW_index_in_varGenotype788 = new BitSet(new long[]{0x0080000000000000L});
-    public static final BitSet FOLLOW_55_in_varGenotype790 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_50_in_varGenotypeSub812 = new BitSet(new long[]{0x0040000000000000L});
-    public static final BitSet FOLLOW_54_in_varGenotypeSub814 = new BitSet(new long[]{0x0001C04000000100L});
+    public static final BitSet FOLLOW_ID_in_varSubfield750 = new BitSet(new long[]{0x0020000000000000L});
+    public static final BitSet FOLLOW_53_in_varSubfield752 = new BitSet(new long[]{0x0000E04000000100L});
+    public static final BitSet FOLLOW_index_in_varSubfield756 = new BitSet(new long[]{0x0040000000000000L});
+    public static final BitSet FOLLOW_54_in_varSubfield758 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_49_in_varGenotype782 = new BitSet(new long[]{0x0020000000000000L});
+    public static final BitSet FOLLOW_53_in_varGenotype784 = new BitSet(new long[]{0x0000E04000000100L});
+    public static final BitSet FOLLOW_index_in_varGenotype788 = new BitSet(new long[]{0x0040000000000000L});
+    public static final BitSet FOLLOW_54_in_varGenotype790 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_49_in_varGenotypeSub812 = new BitSet(new long[]{0x0020000000000000L});
+    public static final BitSet FOLLOW_53_in_varGenotypeSub814 = new BitSet(new long[]{0x0000E04000000100L});
     public static final BitSet FOLLOW_index_in_varGenotypeSub818 = new BitSet(new long[]{0x0080000000000000L});
-    public static final BitSet FOLLOW_55_in_varGenotypeSub820 = new BitSet(new long[]{0x0000008000000000L});
-    public static final BitSet FOLLOW_39_in_varGenotypeSub822 = new BitSet(new long[]{0x0000000000001000L});
-    public static final BitSet FOLLOW_ID_in_varGenotypeSub826 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_50_in_varGenotypeSubArray848 = new BitSet(new long[]{0x0040000000000000L});
-    public static final BitSet FOLLOW_54_in_varGenotypeSubArray850 = new BitSet(new long[]{0x0001C04000000100L});
-    public static final BitSet FOLLOW_index_in_varGenotypeSubArray854 = new BitSet(new long[]{0x0080000000000000L});
-    public static final BitSet FOLLOW_55_in_varGenotypeSubArray856 = new BitSet(new long[]{0x0000008000000000L});
-    public static final BitSet FOLLOW_39_in_varGenotypeSubArray858 = new BitSet(new long[]{0x0000000000001000L});
-    public static final BitSet FOLLOW_ID_in_varGenotypeSubArray862 = new BitSet(new long[]{0x0040000000000000L});
-    public static final BitSet FOLLOW_54_in_varGenotypeSubArray865 = new BitSet(new long[]{0x0001C04000000100L});
-    public static final BitSet FOLLOW_index_in_varGenotypeSubArray869 = new BitSet(new long[]{0x0080000000000000L});
-    public static final BitSet FOLLOW_55_in_varGenotypeSubArray871 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_49_in_varEffSub895 = new BitSet(new long[]{0x0040000000000000L});
-    public static final BitSet FOLLOW_54_in_varEffSub897 = new BitSet(new long[]{0x0001C04000000100L});
-    public static final BitSet FOLLOW_index_in_varEffSub901 = new BitSet(new long[]{0x0080000000000000L});
-    public static final BitSet FOLLOW_55_in_varEffSub903 = new BitSet(new long[]{0x0000008000000000L});
-    public static final BitSet FOLLOW_39_in_varEffSub905 = new BitSet(new long[]{0x0000000000001000L});
-    public static final BitSet FOLLOW_ID_in_varEffSub909 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_51_in_varLofSub932 = new BitSet(new long[]{0x0040000000000000L});
-    public static final BitSet FOLLOW_54_in_varLofSub934 = new BitSet(new long[]{0x0001C04000000100L});
-    public static final BitSet FOLLOW_index_in_varLofSub938 = new BitSet(new long[]{0x0080000000000000L});
-    public static final BitSet FOLLOW_55_in_varLofSub940 = new BitSet(new long[]{0x0000008000000000L});
-    public static final BitSet FOLLOW_39_in_varLofSub942 = new BitSet(new long[]{0x0000000000001000L});
-    public static final BitSet FOLLOW_ID_in_varLofSub946 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_52_in_varNmdSub969 = new BitSet(new long[]{0x0040000000000000L});
-    public static final BitSet FOLLOW_54_in_varNmdSub971 = new BitSet(new long[]{0x0001C04000000100L});
-    public static final BitSet FOLLOW_index_in_varNmdSub975 = new BitSet(new long[]{0x0080000000000000L});
-    public static final BitSet FOLLOW_55_in_varNmdSub977 = new BitSet(new long[]{0x0000008000000000L});
-    public static final BitSet FOLLOW_39_in_varNmdSub979 = new BitSet(new long[]{0x0000000000001000L});
-    public static final BitSet FOLLOW_ID_in_varNmdSub983 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_functionEntryName_in_functionEntry1010 = new BitSet(new long[]{0x0000001000000000L});
-    public static final BitSet FOLLOW_36_in_functionEntry1012 = new BitSet(new long[]{0x0000002000000000L});
-    public static final BitSet FOLLOW_37_in_functionEntry1014 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_functionGenotypeBool_in_functionBoolean1055 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_functionBooleanSet_in_functionBoolean1064 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_expression_in_functionBooleanSet1080 = new BitSet(new long[]{0x2000000000000000L});
-    public static final BitSet FOLLOW_61_in_functionBooleanSet1084 = new BitSet(new long[]{0x0020000000000000L});
-    public static final BitSet FOLLOW_53_in_functionBooleanSet1086 = new BitSet(new long[]{0x0040000000000000L});
-    public static final BitSet FOLLOW_54_in_functionBooleanSet1088 = new BitSet(new long[]{0x0001C04000000100L});
-    public static final BitSet FOLLOW_index_in_functionBooleanSet1092 = new BitSet(new long[]{0x0080000000000000L});
-    public static final BitSet FOLLOW_55_in_functionBooleanSet1094 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_functionGenotypeBoolName_in_functionGenotypeBool1122 = new BitSet(new long[]{0x0000001000000000L});
-    public static final BitSet FOLLOW_36_in_functionGenotypeBool1124 = new BitSet(new long[]{0x0004000000000000L});
-    public static final BitSet FOLLOW_varGenotype_in_functionGenotypeBool1128 = new BitSet(new long[]{0x0000002000000000L});
-    public static final BitSet FOLLOW_37_in_functionGenotypeBool1130 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_55_in_varGenotypeSub820 = new BitSet(new long[]{0x0000000000001000L});
+    public static final BitSet FOLLOW_ID_in_varGenotypeSub824 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_49_in_varGenotypeSubArray846 = new BitSet(new long[]{0x0020000000000000L});
+    public static final BitSet FOLLOW_53_in_varGenotypeSubArray848 = new BitSet(new long[]{0x0000E04000000100L});
+    public static final BitSet FOLLOW_index_in_varGenotypeSubArray852 = new BitSet(new long[]{0x0080000000000000L});
+    public static final BitSet FOLLOW_55_in_varGenotypeSubArray854 = new BitSet(new long[]{0x0000000000001000L});
+    public static final BitSet FOLLOW_ID_in_varGenotypeSubArray858 = new BitSet(new long[]{0x0020000000000000L});
+    public static final BitSet FOLLOW_53_in_varGenotypeSubArray861 = new BitSet(new long[]{0x0000E04000000100L});
+    public static final BitSet FOLLOW_index_in_varGenotypeSubArray865 = new BitSet(new long[]{0x0040000000000000L});
+    public static final BitSet FOLLOW_54_in_varGenotypeSubArray867 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_48_in_varEffSub891 = new BitSet(new long[]{0x0020000000000000L});
+    public static final BitSet FOLLOW_53_in_varEffSub893 = new BitSet(new long[]{0x0000E04000000100L});
+    public static final BitSet FOLLOW_index_in_varEffSub897 = new BitSet(new long[]{0x0080000000000000L});
+    public static final BitSet FOLLOW_55_in_varEffSub899 = new BitSet(new long[]{0x0000000000001000L});
+    public static final BitSet FOLLOW_ID_in_varEffSub903 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_50_in_varLofSub926 = new BitSet(new long[]{0x0020000000000000L});
+    public static final BitSet FOLLOW_53_in_varLofSub928 = new BitSet(new long[]{0x0000E04000000100L});
+    public static final BitSet FOLLOW_index_in_varLofSub932 = new BitSet(new long[]{0x0080000000000000L});
+    public static final BitSet FOLLOW_55_in_varLofSub934 = new BitSet(new long[]{0x0000000000001000L});
+    public static final BitSet FOLLOW_ID_in_varLofSub938 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_51_in_varNmdSub961 = new BitSet(new long[]{0x0020000000000000L});
+    public static final BitSet FOLLOW_53_in_varNmdSub963 = new BitSet(new long[]{0x0000E04000000100L});
+    public static final BitSet FOLLOW_index_in_varNmdSub967 = new BitSet(new long[]{0x0080000000000000L});
+    public static final BitSet FOLLOW_55_in_varNmdSub969 = new BitSet(new long[]{0x0000000000001000L});
+    public static final BitSet FOLLOW_ID_in_varNmdSub973 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_functionEntryName_in_functionEntry1000 = new BitSet(new long[]{0x0000001000000000L});
+    public static final BitSet FOLLOW_36_in_functionEntry1002 = new BitSet(new long[]{0x0000002000000000L});
+    public static final BitSet FOLLOW_37_in_functionEntry1004 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_functionGenotypeBool_in_functionBoolean1045 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_functionBooleanSet_in_functionBoolean1054 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_expression_in_functionBooleanSet1070 = new BitSet(new long[]{0x2000000000000000L});
+    public static final BitSet FOLLOW_61_in_functionBooleanSet1074 = new BitSet(new long[]{0x0010000000000000L});
+    public static final BitSet FOLLOW_52_in_functionBooleanSet1076 = new BitSet(new long[]{0x0020000000000000L});
+    public static final BitSet FOLLOW_53_in_functionBooleanSet1078 = new BitSet(new long[]{0x0000E04000000100L});
+    public static final BitSet FOLLOW_index_in_functionBooleanSet1082 = new BitSet(new long[]{0x0040000000000000L});
+    public static final BitSet FOLLOW_54_in_functionBooleanSet1084 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_functionGenotypeBoolName_in_functionGenotypeBool1112 = new BitSet(new long[]{0x0000001000000000L});
+    public static final BitSet FOLLOW_36_in_functionGenotypeBool1114 = new BitSet(new long[]{0x0002000000000000L});
+    public static final BitSet FOLLOW_varGenotype_in_functionGenotypeBool1118 = new BitSet(new long[]{0x0000002000000000L});
+    public static final BitSet FOLLOW_37_in_functionGenotypeBool1120 = new BitSet(new long[]{0x0000000000000002L});
 
 }

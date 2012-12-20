@@ -115,11 +115,11 @@ var 			:	varField | varSubfield | varGenotypeSub | varGenotypeSubArray | varEffS
 varField		:	i=ID							-> ^(VAR_FIELD $i);
 varSubfield		:	i=ID '[' n=index ']'					-> ^(VAR_SUBFIELD $i $n);
 varGenotype		:	'GEN' '[' g=index ']' 					-> ^(VAR_GENOTYPE $g);
-varGenotypeSub		:	'GEN' '[' g=index ']' '.' i=ID				-> ^(VAR_GENOTYPE_SUB $g $i);
-varGenotypeSubArray	:	'GEN' '[' g=index ']' '.' i=ID  '[' n=index ']'		-> ^(VAR_GENOTYPE_SUB_ARRAY $g $i $n);
-varEffSub		:	'EFF' '[' g=index ']' '.' i=ID				-> ^(VAR_EFF_SUB $g $i);
-varLofSub		:	'LOF' '[' g=index ']' '.' i=ID				-> ^(VAR_LOF_SUB $g $i);
-varNmdSub		:	'NMD' '[' g=index ']' '.' i=ID				-> ^(VAR_NMD_SUB $g $i);
+varGenotypeSub		:	'GEN' '[' g=index '].' i=ID				-> ^(VAR_GENOTYPE_SUB $g $i);
+varGenotypeSubArray	:	'GEN' '[' g=index '].' i=ID  '[' n=index ']'		-> ^(VAR_GENOTYPE_SUB_ARRAY $g $i $n);
+varEffSub		:	'EFF' '[' g=index '].' i=ID				-> ^(VAR_EFF_SUB $g $i);
+varLofSub		:	'LOF' '[' g=index '].' i=ID				-> ^(VAR_LOF_SUB $g $i);
+varNmdSub		:	'NMD' '[' g=index '].' i=ID				-> ^(VAR_NMD_SUB $g $i);
 
 // Functions based on the whole VCF entry information
 functionEntry		:	f=functionEntryName '(' ')'				-> ^(FUNCTION_ENTRY $f);

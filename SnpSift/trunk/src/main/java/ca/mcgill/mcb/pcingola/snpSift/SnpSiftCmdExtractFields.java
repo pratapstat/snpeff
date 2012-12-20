@@ -1,6 +1,8 @@
 package ca.mcgill.mcb.pcingola.snpSift;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
 import ca.mcgill.mcb.pcingola.snpSift.lang.LangFactory;
@@ -35,25 +37,6 @@ public class SnpSiftCmdExtractFields extends SnpSift {
 	}
 
 	/**
-	 * Parse command line arguments
-	 */
-	@Override
-	public void parse(String[] args) {
-		int argNum = 0;
-		if (args.length == 0) usage(null);
-
-		if (args.length >= argNum) vcfFile = args[argNum++];
-		else usage("Missing 'file.vcf'");
-
-		// Read all field named
-		fieldNames = new ArrayList<String>();
-		for (int i = argNum; i < args.length; i++)
-			fieldNames.add(args[i]);
-
-		if (fieldNames.isEmpty()) usage("Missing field names");
-	}
-
-	/**
 	 * Iterate over all possible 'FieldIterator' values until one 'true' is found, otherwise return false.
 	 * @param vcfEntry
 	 * @return
@@ -76,6 +59,25 @@ public class SnpSiftCmdExtractFields extends SnpSift {
 		} while (true);
 
 		return values.toString();
+	}
+
+	/**
+	 * Parse command line arguments
+	 */
+	@Override
+	public void parse(String[] args) {
+		int argNum = 0;
+		if (args.length == 0) usage(null);
+
+		if (args.length >= argNum) vcfFile = args[argNum++];
+		else usage("Missing 'file.vcf'");
+
+		// Read all field named
+		fieldNames = new ArrayList<String>();
+		for (int i = argNum; i < args.length; i++)
+			fieldNames.add(args[i]);
+
+		if (fieldNames.isEmpty()) usage("Missing field names");
 	}
 
 	/**
@@ -106,16 +108,24 @@ public class SnpSiftCmdExtractFields extends SnpSift {
 	 */
 	@Override
 	public void run() {
+		run(false);
+	}
+
+	public List<String> run(boolean createList) {
+		LinkedList<String> list = new LinkedList<String>();
+
 		// Parse fiels
 		fields = parseFields(fieldNames);
 
 		// Show title
-		String sep = "#";
-		for (String fieldName : fieldNames) {
-			System.out.print(sep + fieldName);
-			sep = "\t";
+		if (!createList) {
+			String sep = "#";
+			for (String fieldName : fieldNames) {
+				System.out.print(sep + fieldName);
+				sep = "\t";
+			}
+			System.out.println("");
 		}
-		System.out.println("");
 
 		//---
 		// Iterate on file
@@ -130,8 +140,11 @@ public class SnpSiftCmdExtractFields extends SnpSift {
 
 			// Show line
 			out.deleteCharAt(out.length() - 1); // Remove last '\t'
-			System.out.println(out);
+			if (createList) list.add(out.toString());
+			else System.out.println(out);
 		}
+
+		return list;
 	}
 
 	/**
