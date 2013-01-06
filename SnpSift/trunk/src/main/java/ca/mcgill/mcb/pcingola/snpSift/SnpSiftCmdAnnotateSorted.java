@@ -68,11 +68,15 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 		String infoStr = useInfoField ? findDbInfo(vcf) : null;
 
 		if (id != null) {
-			countAnnotated++;
+			// Get unique ids (the ones not already present in vcf.id)
+			id = uniqueIds(id, vcf.getId());
+			if (!id.isEmpty()) { // Skip if no new ids found
+				countAnnotated++;
 
-			// Add ID
-			if (!vcf.getId().isEmpty()) id = vcf.getId() + ";" + id;
-			vcf.setId(id);
+				// Add ID
+				if (!vcf.getId().isEmpty()) id = vcf.getId() + ";" + id;
+				vcf.setId(id);
+			}
 		}
 
 		// Add INFO fields
@@ -343,6 +347,30 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 
 	public void setSuppressOutput(boolean suppressOutput) {
 		this.suppressOutput = suppressOutput;
+	}
+
+	/** 
+	 * IDs from database not present in VCF
+	 * @param idStrDb
+	 * @param idStrVcf
+	 * @return
+	 */
+	String uniqueIds(String idStrDb, String idStrVcf) {
+		StringBuilder sbId = new StringBuilder();
+		String idsDb[] = idStrDb.split(";");
+		String idsVcf[] = idStrVcf.split(";");
+
+		for (String idDb : idsDb) {
+			// Add only if there is no other matching ID in VCF 
+			boolean skip = false;
+			for (String idVcf : idsVcf)
+				skip |= idDb.equals(idVcf);
+
+			// Append ID?
+			if (!skip) sbId.append((sbId.length() > 0 ? ";" : "") + idDb);
+		}
+
+		return sbId.toString();
 	}
 
 	/**
