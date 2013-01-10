@@ -5,7 +5,7 @@ import java.io.IOException;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
-import ca.mcgill.mcb.pcingola.snpSift.SnpSiftCmdAnnotateSorted;
+import ca.mcgill.mcb.pcingola.snpSift.SnpSiftCmdAnnotateMem;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 
 /**
@@ -13,7 +13,7 @@ import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
  * 
  * @author pcingola
  */
-public class TestCasesAnnotate extends TestCase {
+public class TestCasesAnnotateMem extends TestCase {
 
 	public static boolean verbose = false;
 
@@ -27,33 +27,29 @@ public class TestCasesAnnotate extends TestCase {
 		String args[] = { dbFileName, fileName };
 
 		// Iterate over VCF entries
-		try {
-			SnpSiftCmdAnnotateSorted vcfAnnotate = new SnpSiftCmdAnnotateSorted(args);
-			vcfAnnotate.setSuppressOutput(true);
-			vcfAnnotate.initAnnotate();
+		SnpSiftCmdAnnotateMem vcfAnnotate = new SnpSiftCmdAnnotateMem(args);
+		vcfAnnotate.setSuppressOutput(true);
+		vcfAnnotate.initAnnotate();
 
-			VcfFileIterator vcfFile = new VcfFileIterator(fileName);
-			for (VcfEntry vcf : vcfFile) {
-				vcfAnnotate.annotate(vcf);
+		VcfFileIterator vcfFile = new VcfFileIterator(fileName);
+		for (VcfEntry vcf : vcfFile) {
+			vcfAnnotate.annotate(vcf);
 
-				// We expect the same annotation twice 
-				String idstr = vcf.getId();
+			// We expect the same annotation twice 
+			String idstr = vcf.getId();
 
-				// Get expected IDs
-				String expectedIds = vcf.getInfo("EXP_IDS");
-				if (expectedIds != null) {
-					expectedIds = expectedIds.replace('|', ';');
-					if (expectedIds.equals(".")) expectedIds = "";
+			// Get expected IDs
+			String expectedIds = vcf.getInfo("EXP_IDS");
+			if (expectedIds != null) {
+				expectedIds = expectedIds.replace('|', ';');
+				if (expectedIds.equals(".")) expectedIds = "";
 
-					// Compare
-					Assert.assertEquals(expectedIds, idstr);
-				} else fail("EXP_IDS (expected ids) INFO field missing in " + fileName + ", entry:\n" + vcf);
-			}
-
-			vcfAnnotate.endAnnotate();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+				// Compare
+				Assert.assertEquals(expectedIds, idstr);
+			} else fail("EXP_IDS (expected ids) INFO field missing in " + fileName + ", entry:\n" + vcf);
 		}
+
+		vcfAnnotate.endAnnotate();
 	}
 
 	public void test_01() {
@@ -103,7 +99,7 @@ public class TestCasesAnnotate extends TestCase {
 		String args[] = { dbFileName, fileName };
 
 		// Get SnpSift ready
-		SnpSiftCmdAnnotateSorted vcfAnnotate = new SnpSiftCmdAnnotateSorted(args);
+		SnpSiftCmdAnnotateMem vcfAnnotate = new SnpSiftCmdAnnotateMem(args);
 		vcfAnnotate.setSuppressOutput(true);
 		vcfAnnotate.initAnnotate();
 
@@ -129,7 +125,7 @@ public class TestCasesAnnotate extends TestCase {
 		String args[] = { "-info", "AF,AN,ABE", dbFileName, fileName };
 
 		// Get SnpSift ready
-		SnpSiftCmdAnnotateSorted vcfAnnotate = new SnpSiftCmdAnnotateSorted(args);
+		SnpSiftCmdAnnotateMem vcfAnnotate = new SnpSiftCmdAnnotateMem(args);
 		vcfAnnotate.setSuppressOutput(true);
 		vcfAnnotate.initAnnotate();
 

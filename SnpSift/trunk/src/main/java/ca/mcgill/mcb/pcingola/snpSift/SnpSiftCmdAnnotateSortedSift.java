@@ -44,13 +44,16 @@ public class SnpSiftCmdAnnotateSortedSift extends SnpSiftCmdAnnotateSorted {
 	 * @param vcf
 	 */
 	@Override
-	protected void addAnnotation(VcfEntry vcf) {
+	protected boolean addAnnotation(VcfEntry vcf) {
+		boolean annotated = false;
 		// Is this change in db?
 		String infoAnnotation = findDbId(vcf);
 		if (infoAnnotation != null) {
-			countAnnotated++;
+			annotated = true;
 			vcf.addInfo(infoAnnotation);
 		}
+
+		return annotated;
 	}
 
 	/**

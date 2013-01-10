@@ -1,13 +1,10 @@
 package ca.mcgill.mcb.pcingola.snpSift;
 
-import java.util.HashMap;
-import java.util.List;
+import java.io.IOException;
 
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
 import ca.mcgill.mcb.pcingola.util.Timer;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
-import ca.mcgill.mcb.pcingola.vcf.VcfHeader;
-import ca.mcgill.mcb.pcingola.vcf.VcfInfo;
 
 /**
  * Annotate a VCF file with ID from another VCF file (database)
@@ -17,16 +14,7 @@ import ca.mcgill.mcb.pcingola.vcf.VcfInfo;
  * 
  * @author pablocingolani
  */
-public class SnpSiftCmdAnnotateMem extends SnpSift {
-
-	public static final int SHOW = 10000;
-	public static final int SHOW_LINES = 100 * SHOW;
-
-	protected boolean useInfoField; // Use all info fields
-	String vcfDb;
-	String vcfFile;
-	HashMap<String, String> dbId = new HashMap<String, String>();
-	HashMap<String, String> dbInfo = new HashMap<String, String>();
+public class SnpSiftCmdAnnotateMem extends SnpSiftCmdAnnotateSorted {
 
 	/**
 	 * Main
@@ -34,151 +22,108 @@ public class SnpSiftCmdAnnotateMem extends SnpSift {
 	 */
 	public static void main(String[] args) {
 		SnpSiftCmdAnnotateMem vcfAnnotate = new SnpSiftCmdAnnotateMem(args);
-		vcfAnnotate.readDb();
-		vcfAnnotate.annotate();
+		vcfAnnotate.run();
 	}
 
 	public SnpSiftCmdAnnotateMem(String args[]) {
-		super(args, "annotate");
+		super(args, "annotateMem");
 	}
 
 	/**
-	 * Build headers to add
+	 * Annotate a single vcf entry
+	 * @param vcfEntry
+	 * @return
 	 */
 	@Override
-	protected List<String> addHeader() {
-		List<String> newHeaders = super.addHeader();
+	public boolean annotate(VcfEntry vcfEntry) {
+		// Anything found? => Annotate
+		boolean annotated = false;
+		for (int i = 0; i < vcfEntry.getAlts().length; i++) {
+			String key = key(vcfEntry, i);
+			String id = dbId.get(key);
 
-		// Read database header and add INFO fields to the output vcf header
-		if (useInfoField) {
-			VcfFileIterator dbvcffi = new VcfFileIterator(vcfDb);
-			VcfHeader vcfDbHeader = dbvcffi.readHeader();
-			for (VcfInfo vcfInfo : vcfDbHeader.getVcfInfo())
-				newHeaders.add(vcfInfo.toString());
-		}
+			String info = (useInfoField ? dbInfo.get(key) : null);
 
-		return newHeaders;
-	}
-
-	/**
-	 * Annotate entries
-	 */
-	public void annotate() {
-		if (verbose) Timer.showStdErr("Annotating entries from: '" + vcfFile + "'");
-
-		VcfFileIterator vcf = new VcfFileIterator(vcfFile);
-
-		int countAnnotated = 0, count = 0;
-		boolean showHeader = true;
-		for (VcfEntry vcfEntry : vcf) {
-
-			// Show header?
-			if (showHeader) {
-				addHeader(vcf);
-				String headerStr = vcf.getVcfHeader().toString();
-				if (!headerStr.isEmpty()) System.out.println(headerStr);
-				showHeader = false;
-			}
-
-			// Anything found? => Annotate
-			boolean annotated = false;
-			for (int i = 0; i < vcfEntry.getAlts().length; i++) {
-				String key = key(vcfEntry, i);
-				String id = dbId.get(key);
-
-				String info = (useInfoField ? dbInfo.get(key) : null);
-
-				// Add ID
-				if (id != null) {
+			// Add ID
+			if (id != null) {
+				id = uniqueIds(id, vcfEntry.getId());
+				if (!id.isEmpty()) {
 					if (!vcfEntry.getId().isEmpty()) id = vcfEntry.getId() + ";" + id; // Append if there is already an entry
 					vcfEntry.setId(id);
 					annotated = true;
 				}
-
-				// Add INFO strings
-				if (info != null) {
-					vcfEntry.addInfo(info);
-					annotated = true;
-				}
 			}
 
-			// Show entry
-			System.out.println(vcfEntry);
-
-			if (annotated) countAnnotated++;
-			count++;
+			// Add INFO strings
+			if (info != null) {
+				vcfEntry.addInfo(info);
+				annotated = true;
+			}
 		}
 
-		double perc = (100.0 * countAnnotated) / count;
-		if (verbose) Timer.showStdErr("Done." //
-				+ "\n\tTotal annotated entries : " + countAnnotated //
-				+ "\n\tTotal entries           : " + count //
-				+ "\n\tPercent                 : " + String.format("%.2f%%", perc) //
-		);
+		return annotated;
 	}
 
 	/**
-	 * Initialize default values
+	 * Finish up annotation process
 	 */
 	@Override
-	public void init() {
-		useInfoField = true; // Default: Use INFO fields
+	public void endAnnotate() {
+		// Nothing to do
 	}
 
 	/**
-	 * Create a key for a hash
-	 * @param vcfEntry
-	 * @return
-	 */
-	String key(VcfEntry vcfEntry, int altIndex) {
-		return vcfEntry.getChromosomeName() + ":" + vcfEntry.getStart() + "_" + vcfEntry.getRef() + "/" + vcfEntry.getAlts()[altIndex];
-	}
-
-	/**
-	 * Parse command line arguments
+	 * Initialize annotation process
+	 * @throws IOException
 	 */
 	@Override
-	public void parse(String[] args) {
-		int argNum = 0;
-		if (args.length == 0) usage(null);
-
-		for (String arg : args) {
-			if (args[argNum].startsWith("-")) {
-				if (args[argNum].equals("-q")) verbose = false;
-				else if (args[argNum].equals("-v")) verbose = true;
-				else if (arg.equals("-id")) useInfoField = false;
-			} else if (vcfDb == null) vcfDb = args[argNum];
-			else if (vcfFile == null) vcfFile = args[argNum];
-
-			argNum++;
-		}
-
-		// Sanity check
-		if (vcfDb == null) usage("Missing 'database.vcf'");
-		if (vcfFile == null) usage("Missing 'file.vcf'");
+	public void initAnnotate() {
+		readDb();
 	}
 
 	/**
 	 * Read database
 	 */
 	public void readDb() {
-		if (verbose) Timer.showStdErr("Loading database: '" + vcfDb + "'");
-		VcfFileIterator dbFile = new VcfFileIterator(vcfDb);
+		if (verbose) Timer.showStdErr("Loading database: '" + vcfDbFileName + "'");
+		VcfFileIterator dbFile = new VcfFileIterator(vcfDbFileName);
 
 		int count = 1;
-		for (VcfEntry vcfEntry : dbFile) {
+		for (VcfEntry vcfDbEntry : dbFile) {
 
-			for (int i = 0; i < vcfEntry.getAlts().length; i++) {
-				String key = key(vcfEntry, i);
+			for (int i = 0; i < vcfDbEntry.getAlts().length; i++) {
+				String key = key(vcfDbEntry, i);
 
 				// Add ID
 				if (dbId.containsKey(key)) {
-					String multipleId = dbId.get(key) + ";" + vcfEntry.getId();
+					String multipleId = dbId.get(key) + ";" + vcfDbEntry.getId();
 					dbId.put(key, multipleId);
-				} else dbId.put(key, vcfEntry.getId());
+				} else dbId.put(key, vcfDbEntry.getId());
 
 				// Add INFO fields
-				if (useInfoField) dbInfo.put(key, vcfEntry.getInfoStr());
+				if (useInfoField) {
+					if (infoFields == null) {
+						// Add all INFO fields
+						dbInfo.put(key, vcfDbEntry.getInfoStr()); // Add INFO field
+					} else {
+						// Add some INFO fields
+						StringBuilder infoSb = new StringBuilder();
+
+						// Add all fields
+						for (String fieldName : infoFields) {
+							String val = vcfDbEntry.getInfo(fieldName);
+
+							// Any value? => Add
+							if (val != null) {
+								if (infoSb.length() > 0) infoSb.append(";");
+								infoSb.append(fieldName + "=" + val);
+							}
+						}
+
+						dbInfo.put(key, infoSb.toString());
+					}
+
+				}
 			}
 
 			count++;
@@ -208,13 +153,15 @@ public class SnpSiftCmdAnnotateMem extends SnpSift {
 
 		showVersion();
 
-		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar annotate [-q] database.vcf file.vcf > newFile.vcf\n"//
+		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar annotateMem [options] database.vcf file.vcf > newFile.vcf\n"//
 				+ "Options:\n" //
-				+ "\t-id\t:\tOnly annotate ID field (do not add INFO field).\n" //
-				+ "\t-q\t:\tBe quiet.\n" //
-				+ "\t-v\t:\tBe verbose.\n" //
-				+ "Note: It is assumed that both files fit in memory." //
+				+ "\t-id          : Only annotate ID field (do not add INFO field).\n" //
+				+ "\t-info <list> : Annotate using a list of info fields (list is a comma separated list of fields). Default: ALL.\n" //
+				+ "\t-q           : Be quiet.\n" //
+				+ "\t-v           : Be verbose.\n" //
+				+ "Note: It is assumed that the database file fits in memory." //
 		);
 		System.exit(1);
 	}
+
 }
