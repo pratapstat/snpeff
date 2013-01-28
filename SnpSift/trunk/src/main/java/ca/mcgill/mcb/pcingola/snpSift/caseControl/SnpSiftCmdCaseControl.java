@@ -115,7 +115,7 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 	}
 
 	/**
-	 *  Parse a string having indicatinf 'hom' or 'het'
+	 *  Parse a string having indicating 'hom' or 'het'
 	 * @param homStr
 	 * @return
 	 */
@@ -232,7 +232,7 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		showVersion();
 
 		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar caseControl [-v] [-q] [-t numThreads] <CaseControlString> file.vcf");
-		System.err.println("\t-q       : Be quite");
+		System.err.println("\t-q       : Be quiet");
 		System.err.println("\t-v       : Be verbose");
 		System.err.println("\t-t <num> : Number of threads. Default: " + numWorkers);
 		System.err.println("\t<CaseControlString> : A string of {'+', '-', '0'}, one per sample, to identify two groups (case='+', control='-', neutral='0')");

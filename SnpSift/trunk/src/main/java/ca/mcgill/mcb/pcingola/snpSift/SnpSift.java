@@ -7,6 +7,7 @@ import java.util.List;
 import ca.mcgill.mcb.pcingola.Pcingola;
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
 import ca.mcgill.mcb.pcingola.snpSift.caseControl.SnpSiftCmdCaseControl;
+import ca.mcgill.mcb.pcingola.snpSift.caseControl.SnpSiftCmdCaseControlSummary;
 import ca.mcgill.mcb.pcingola.snpSift.hwe.SnpSiftCmdHwe;
 import ca.mcgill.mcb.pcingola.snpSift.matrix.SnpSiftCmdAlleleMatrix;
 import ca.mcgill.mcb.pcingola.snpSift.matrix.SnpSiftCmdCovarianceMatrix;
@@ -132,6 +133,7 @@ public class SnpSift {
 		else if (command.startsWith("ANNM")) SnpSiftCmdAnnotateMem.main(args);
 		else if (command.startsWith("ANN")) SnpSiftCmdAnnotateSorted.main(args);
 		else if (command.startsWith("CA")) SnpSiftCmdCaseControl.main(args);
+		else if (command.startsWith("CCS")) SnpSiftCmdCaseControlSummary.main(args);
 		else if (command.startsWith("CONS")) SnpSiftCmdConservation.main(args);
 		else if (command.startsWith("COVMAT")) SnpSiftCmdCovarianceMatrix.main(args);
 		else if (command.startsWith("DBNSFP")) SnpSiftCmdAnnotateSortedDbNsfp.main(args);
@@ -208,6 +210,7 @@ public class SnpSift {
 				+ "\n\tannotate      : Annotate 'ID' from a database (e.g. dbSnp). Assumes entries are sorted." //
 				+ "\n\tannMem        : Annotate 'ID' from a database (e.g. dbSnp). Loads db in memory. Does not assume sorted entries." //
 				+ "\n\tcaseControl   : Compare how many variants are in 'case' and in 'control' groups. Also calculates p-values (Fisher exact test and Cochran-Armitage test)" //
+				+ "\n\tccs           : Case control summary. Case and control summaries by region, allele frequency and variant's functional effect." //
 				+ "\n\tcons t        : Annotate using conservation scores (phastCons)." //
 				+ "\n\tcovMat        : Create an covariance matrix output (allele matrix as input)." //
 				+ "\n\tdbnsfp        : Annotate with multiple entries from dbNSFP. <EXPERIMENTAL>" //
