@@ -42,7 +42,7 @@ public class SnpSiftCmdCaseControlSummary extends SnpSift {
 	public static final int PHENOTYPE_CONTROL = 1;
 	public static final int PHENOTYPE_MISSING = 0;
 
-	public static FormatVersion formatVersion = FormatVersion.FORMAT_SNPEFF_2;
+	public static FormatVersion formatVersion = FormatVersion.FORMAT_SNPEFF_3;
 
 	static Boolean CaseControl[] = { true, false };
 	static String VariantsAf[] = { "COMMON", "RARE" };
@@ -221,7 +221,8 @@ public class SnpSiftCmdCaseControlSummary extends SnpSift {
 						int ac = 0, count = 0;
 						for (VcfGenotype gen : ve) {
 							count += 2;
-							ac += gen.getGenotypeCode();
+							int genCode = gen.getGenotypeCode();
+							if (genCode > 0) ac += genCode;
 						}
 						maf = ((double) ac) / count;
 					}
