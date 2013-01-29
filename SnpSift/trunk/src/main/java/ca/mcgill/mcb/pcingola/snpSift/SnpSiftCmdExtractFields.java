@@ -23,15 +23,6 @@ public class SnpSiftCmdExtractFields extends SnpSift {
 	ArrayList<String> fieldNames;
 	ArrayList<Field> fields;
 
-	/**
-	 * Main
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		SnpSiftCmdExtractFields vcfExtractFields = new SnpSiftCmdExtractFields(args);
-		vcfExtractFields.run();
-	}
-
 	public SnpSiftCmdExtractFields(String args[]) {
 		super(args, "extractFields");
 	}

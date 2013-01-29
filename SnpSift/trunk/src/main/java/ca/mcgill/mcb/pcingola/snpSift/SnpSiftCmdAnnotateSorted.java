@@ -41,16 +41,6 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 	protected VcfFileIndexIntervals indexDb;
 	protected VcfFileIterator vcfFile, vcfDbFile;
 
-	/**
-	 * Main
-	 * @param args
-	 * @throws IOException 
-	 */
-	public static void main(String[] args) {
-		SnpSiftCmdAnnotateSorted annotate = new SnpSiftCmdAnnotateSorted(args);
-		annotate.run();
-	}
-
 	public SnpSiftCmdAnnotateSorted(String args[]) {
 		super(args, "annotate");
 	}

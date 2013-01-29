@@ -26,14 +26,6 @@ public class SnpSiftCmdIntervals extends SnpSift {
 	Genome genome;
 	boolean exclude;
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		SnpSiftCmdIntervals cmdIntervals = new SnpSiftCmdIntervals(args);
-		cmdIntervals.run();
-	}
-
 	public SnpSiftCmdIntervals(String[] args) {
 		super(args, "int");
 	}

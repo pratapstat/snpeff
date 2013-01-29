@@ -64,8 +64,6 @@ public class SnpSiftCmdFilter extends SnpSift {
 
 	public static final String VERSION = SnpSiftCmdFilter.class.getSimpleName() + " v0.2";
 
-	static boolean debug = false;
-
 	boolean usePassField; // Use Filter field
 	boolean inverse; // Inverse filter (i.e. do NOT show lines that match the filter)
 	String inputFile; // Input file
@@ -76,16 +74,6 @@ public class SnpSiftCmdFilter extends SnpSift {
 	String rmFilterField; // Remove String from FILTER field
 	ArrayList<HashSet<String>> sets;
 	VcfEffect.FormatVersion formatVersion;
-
-	/**
-	 * Main
-	 * @param args
-	 * @throws Exception 
-	 */
-	public static void main(String[] args) {
-		SnpSiftCmdFilter vcfFilter = new SnpSiftCmdFilter(args);
-		vcfFilter.run();
-	}
 
 	public SnpSiftCmdFilter() {
 		super(null, "filter");

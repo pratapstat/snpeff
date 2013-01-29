@@ -14,30 +14,20 @@ import ca.mcgill.mcb.pcingola.vcf.VcfGenotype;
  * 
  * @author pablocingolani
  */
-public class SnpSiftCmdRemoveReferenceGenotypes {
+public class SnpSiftCmdRemoveReferenceGenotypes extends SnpSift {
 
 	public static final int SHOW_EVERY = 1000;
 	public static final int SHOW_EVERY_NL = 100 * SHOW_EVERY;
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		SnpSiftCmdRemoveReferenceGenotypes vcfSnpCompare = new SnpSiftCmdRemoveReferenceGenotypes();
-		vcfSnpCompare.run();
-	}
-
-	public SnpSiftCmdRemoveReferenceGenotypes() {
-	}
-
 	public SnpSiftCmdRemoveReferenceGenotypes(String[] args) {
-		if (args.length != 0) usage(null);
+		super(args, "RemoveReferenceGenotypes");
 	}
 
 	/**
 	 * Analyze the file
 	 */
-	void run() {
+	@Override
+	public void run() {
 		Timer.showStdErr("Reading STDIN");
 		Genome genome = new Genome("genome");
 		VcfFileIterator vcfFile = new VcfFileIterator("-", genome);
@@ -84,7 +74,8 @@ public class SnpSiftCmdRemoveReferenceGenotypes {
 	/**
 	 * Show usage and exit
 	 */
-	void usage(String errMsg) {
+	@Override
+	public void usage(String errMsg) {
 		if (errMsg != null) System.err.println("Error: " + errMsg);
 		System.err.println("Usage: cat file.vcf | java -jar " + SnpSift.class.getSimpleName() + "" + ".jar rmRefGen > file_noref.vcf");
 		System.exit(1);

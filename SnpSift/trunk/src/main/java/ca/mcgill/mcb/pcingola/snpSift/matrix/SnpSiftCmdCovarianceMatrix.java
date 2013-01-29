@@ -23,11 +23,6 @@ public class SnpSiftCmdCovarianceMatrix extends SnpSift {
 	double mean[];
 	double matrix[][];
 
-	public static void main(String[] args) {
-		SnpSiftCmdCovarianceMatrix covMatrix = new SnpSiftCmdCovarianceMatrix(args);
-		covMatrix.run();
-	}
-
 	public SnpSiftCmdCovarianceMatrix() {
 		super(null, null);
 	}

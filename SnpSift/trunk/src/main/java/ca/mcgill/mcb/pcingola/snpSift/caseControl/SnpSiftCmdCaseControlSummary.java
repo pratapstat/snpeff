@@ -54,11 +54,6 @@ public class SnpSiftCmdCaseControlSummary extends SnpSift {
 	ArrayList<String> groupNamesSorted;
 	IntervalForest intForest;
 
-	public static void main(String[] args) {
-		SnpSiftCmdCaseControlSummary ccs = new SnpSiftCmdCaseControlSummary(args);
-		ccs.run();
-	}
-
 	public SnpSiftCmdCaseControlSummary(String[] args) {
 		super(args, "caseControlSummary");
 	}
@@ -283,7 +278,7 @@ public class SnpSiftCmdCaseControlSummary extends SnpSift {
 				}
 			}
 
-			if (vcf.getLineNum() > 1000) break;
+			//if (vcf.getLineNum() > 1000) break;
 		}
 
 		// Show summaries by interval

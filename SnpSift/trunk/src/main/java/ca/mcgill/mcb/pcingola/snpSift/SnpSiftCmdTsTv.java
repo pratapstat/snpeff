@@ -11,7 +11,7 @@ import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
  * 
  * @author pablocingolani
  */
-public class SnpSiftCmdTsTv {
+public class SnpSiftCmdTsTv extends SnpSift {
 
 	public static final int SHOW_EVERY = 1000;
 	public static final int SHOW_EVERY_NL = 100 * SHOW_EVERY;
@@ -20,21 +20,8 @@ public class SnpSiftCmdTsTv {
 	TsTvStats tsTvStats;
 	String vcfFileName;
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		SnpSiftCmdTsTv vcfTsTv = new SnpSiftCmdTsTv(args);
-		vcfTsTv.run();
-	}
-
-	public SnpSiftCmdTsTv(Genome genome, Boolean homozygous) {
-		this.genome = genome;
-		tsTvStats = new TsTvStats(homozygous);
-	}
-
 	public SnpSiftCmdTsTv(String[] args) {
-		parse(args);
+		super(args, "tstv");
 	}
 
 	/**
@@ -50,17 +37,18 @@ public class SnpSiftCmdTsTv {
 	 * Parse command line arguments
 	 * @param args
 	 */
-	void parse(String[] args) {
-		if( args.length != 2 ) usage(null);
+	@Override
+	public void parse(String[] args) {
+		if (args.length != 2) usage(null);
 		int argc = 0;
 
 		// Homozygous, heterozygous or 'any' SNPs?
 		Boolean homozygous = null;
 		String homStr = args[argc++].toUpperCase();
 		// You can write 'ho' or 'homozygous'
-		if( homStr.startsWith("HO") ) homozygous = true;
-		else if( homStr.startsWith("HE") ) homozygous = false;
-		else if( homStr.startsWith("AN") ) homozygous = null;
+		if (homStr.startsWith("HO")) homozygous = true;
+		else if (homStr.startsWith("HE")) homozygous = false;
+		else if (homStr.startsWith("AN")) homozygous = null;
 		else usage("Expecting 'hom', 'het' or 'any', but got '" + args[3] + "'");
 
 		// Create stats object
@@ -76,7 +64,8 @@ public class SnpSiftCmdTsTv {
 	/**
 	 * Analyze the file
 	 */
-	void run() {
+	@Override
+	public void run() {
 		Timer.showStdErr("Analysing '" + vcfFileName + "'");
 
 		VcfFileIterator vcfFile = new VcfFileIterator(vcfFileName, genome);
@@ -84,18 +73,18 @@ public class SnpSiftCmdTsTv {
 
 		// Read all vcfEntries
 		int entryNum = 1;
-		for( VcfEntry vcfEntry : vcfFile ) {
+		for (VcfEntry vcfEntry : vcfFile) {
 			try {
 				entryNum++;
 				tsTvStats.sample(vcfEntry);
 
 				// Show progress
-				if( entryNum % SHOW_EVERY == 0 ) {
-					if( entryNum % SHOW_EVERY_NL == 0 ) System.err.println('.');
+				if (entryNum % SHOW_EVERY == 0) {
+					if (entryNum % SHOW_EVERY_NL == 0) System.err.println('.');
 					else System.err.print('.');
 				}
 
-			} catch(Throwable t) {
+			} catch (Throwable t) {
 				error(t, "Error while processing VCF entry (line " + vcfFile.getLineNum() + ") :\n\t" + vcfEntry + "\n" + t);
 			}
 
@@ -109,8 +98,9 @@ public class SnpSiftCmdTsTv {
 	/**
 	 * Show usage and exit
 	 */
-	void usage(String errMsg) {
-		if( errMsg != null ) System.err.println("Error: " + errMsg);
+	@Override
+	public void usage(String errMsg) {
+		if (errMsg != null) System.err.println("Error: " + errMsg);
 		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + "" + ".jar tstv <homozygous> file1.vcf\n\t<homozygous> : Use only 'hom', 'het', 'any' genotype fields (i.e. samples). \nWARNING: Only SNPs are used for Ts/Tv calculations.");
 		System.exit(1);
 	}

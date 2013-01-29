@@ -97,6 +97,11 @@ public class SnpSiftCmdHwe extends SnpSift {
 		int batchSize = Master.DEFAULT_BATCH_SIZE;
 		Props props = new Props(new UntypedActorFactory() {
 
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public Actor create() {
 				MasterVcfHwe master = new MasterVcfHwe(numWorkers);

@@ -51,17 +51,6 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 	protected String prevChr = null;
 	protected String fieldsNamesToAdd;
 
-	/**
-	 * Main
-	 * 
-	 * @param args
-	 * @throws IOException
-	 */
-	public static void main(String[] args) {
-		SnpSiftCmdAnnotateSortedDbNsfp sift = new SnpSiftCmdAnnotateSortedDbNsfp(args);
-		sift.run();
-	}
-
 	public SnpSiftCmdAnnotateSortedDbNsfp(String args[]) {
 		super(args, "dbnsfp");
 	}

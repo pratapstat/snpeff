@@ -23,15 +23,6 @@ public class SnpSiftCmdVarType extends SnpSift {
 	String vcfFile;
 	HashMap<String, String> db = new HashMap<String, String>();
 
-	/**
-	 * Main
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		SnpSiftCmdVarType varType = new SnpSiftCmdVarType(args);
-		varType.annotate();
-	}
-
 	public SnpSiftCmdVarType(String args[]) {
 		super(args, "varType");
 	}

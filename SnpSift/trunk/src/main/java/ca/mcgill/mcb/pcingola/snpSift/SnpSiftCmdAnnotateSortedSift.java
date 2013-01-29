@@ -1,7 +1,5 @@
 package ca.mcgill.mcb.pcingola.snpSift;
 
-import java.io.IOException;
-
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
 import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
@@ -24,16 +22,6 @@ public class SnpSiftCmdAnnotateSortedSift extends SnpSiftCmdAnnotateSorted {
 
 	// A variant is damaging if it has a score over this number (see referenced paper)
 	public static final double MAX_DAMAGING_SCORE = 0.05;
-
-	/**
-	 * Main
-	 * @param args
-	 * @throws IOException 
-	 */
-	public static void main(String[] args) {
-		SnpSiftCmdAnnotateSortedSift sift = new SnpSiftCmdAnnotateSortedSift(args);
-		sift.run();
-	}
 
 	public SnpSiftCmdAnnotateSortedSift(String args[]) {
 		super(args, "sift");

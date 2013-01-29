@@ -25,11 +25,6 @@ public class SnpSiftCmdAlleleMatrix extends SnpSift {
 	public static int SHOW_EVERY = 1000;
 	String vcfFile;
 
-	public static void main(String[] args) {
-		SnpSiftCmdAlleleMatrix alleleMatrix = new SnpSiftCmdAlleleMatrix(args);
-		alleleMatrix.run();
-	}
-
 	public SnpSiftCmdAlleleMatrix() {
 		super(null, null);
 	}

@@ -17,14 +17,6 @@ public class SnpSiftCmdConservation extends SnpSift {
 	String vcfFile;
 	String wigFile;
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		SnpSiftCmdConservation cmd = new SnpSiftCmdConservation(args);
-		cmd.run();
-	}
-
 	public SnpSiftCmdConservation(String args[]) {
 		super(args, "cons");
 	}

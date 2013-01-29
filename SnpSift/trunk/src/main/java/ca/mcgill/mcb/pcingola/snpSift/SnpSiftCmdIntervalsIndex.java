@@ -31,14 +31,6 @@ public class SnpSiftCmdIntervalsIndex extends SnpSift {
 	String vcfFile;
 	String bedFile;
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		SnpSiftCmdIntervalsIndex vcfIntervals = new SnpSiftCmdIntervalsIndex(args);
-		vcfIntervals.run();
-	}
-
 	public SnpSiftCmdIntervalsIndex(String[] args) {
 		super(args, "intidx");
 	}

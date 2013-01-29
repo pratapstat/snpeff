@@ -31,7 +31,11 @@ public class SnpSift {
 
 	public static final int MAX_ERRORS = 10; // Report an error no more than X times
 
-	protected boolean verbose = false;
+	protected boolean help; // Be verbose
+	protected boolean verbose; // Be verbose
+	protected boolean debug; // Debug mode
+	protected boolean quiet; // Be quiet
+	protected boolean log; // Log to server (statistics)
 	protected String args[];
 	protected String command;
 	protected int numWorkers = Gpr.NUM_CORES; // Max number of threads (if multi-threaded version is available)
@@ -118,37 +122,59 @@ public class SnpSift {
 		command = args[0].toUpperCase();
 
 		// Create new array shifting everything 1 position
-		String newArgs[] = new String[args.length - 1];
-		for (int i = 1; i < args.length; i++)
-			newArgs[i - 1] = args[i];
+		ArrayList<String> argsList = new ArrayList<String>();
+		for (int i = 1; i < args.length; i++) {
+			if (args[i].equalsIgnoreCase("-noLog")) log = false;
+			else if (args[i].equals("-h") || args[i].equalsIgnoreCase("-help")) help = true;
+			else if (args[i].equals("-v") || args[i].equalsIgnoreCase("-verbose")) verbose = true;
+			else if (args[i].equals("-q") || args[i].equalsIgnoreCase("-quiet")) quiet = true;
+			else if (args[i].equals("-d") || args[i].equalsIgnoreCase("-debug")) debug = true;
+			else argsList.add(args[i]);
+		}
 
-		this.args = newArgs;
+		this.args = argsList.toArray(new String[0]);;
 	}
 
 	/** 
 	 * Run: Executes the appropriate class
 	 */
 	public void run() {
-		if (command.startsWith("ALLELEMAT")) SnpSiftCmdAlleleMatrix.main(args);
-		else if (command.startsWith("ANNM")) SnpSiftCmdAnnotateMem.main(args);
-		else if (command.startsWith("ANN")) SnpSiftCmdAnnotateSorted.main(args);
-		else if (command.startsWith("CA")) SnpSiftCmdCaseControl.main(args);
-		else if (command.startsWith("CCS")) SnpSiftCmdCaseControlSummary.main(args);
-		else if (command.startsWith("CONS")) SnpSiftCmdConservation.main(args);
-		else if (command.startsWith("COVMAT")) SnpSiftCmdCovarianceMatrix.main(args);
-		else if (command.startsWith("DBNSFP")) SnpSiftCmdAnnotateSortedDbNsfp.main(args);
-		else if (command.startsWith("EX")) SnpSiftCmdExtractFields.main(args);
-		else if (command.startsWith("FI")) SnpSiftCmdFilter.main(args);
-		else if (command.startsWith("GWASCAT")) SnpSiftCmdGwasCatalog.main(args);
-		else if (command.startsWith("HW")) SnpSiftCmdHwe.main(args);
-		else if (command.startsWith("INTIDX")) SnpSiftCmdIntervalsIndex.main(args);
-		else if (command.startsWith("IN")) SnpSiftCmdIntervals.main(args);
-		else if (command.startsWith("JOIN")) SnpSiftCmdJoin.main(args);
-		else if (command.startsWith("RM")) SnpSiftCmdRemoveReferenceGenotypes.main(args);
-		else if (command.startsWith("SIF")) SnpSiftCmdAnnotateSortedSift.main(args);
-		else if (command.startsWith("TS")) SnpSiftCmdTsTv.main(args);
-		else if (command.startsWith("VARTYPE")) SnpSiftCmdVarType.main(args);
+		SnpSift cmd = null;
+
+		if (command.startsWith("ALLELEMAT")) cmd = new SnpSiftCmdAlleleMatrix(args);
+		else if (command.startsWith("ANNM")) cmd = new SnpSiftCmdAnnotateMem(args);
+		else if (command.startsWith("ANN")) cmd = new SnpSiftCmdAnnotateSorted(args);
+		else if (command.startsWith("CA")) cmd = new SnpSiftCmdCaseControl(args);
+		else if (command.startsWith("CCS")) cmd = new SnpSiftCmdCaseControlSummary(args);
+		else if (command.startsWith("CONS")) cmd = new SnpSiftCmdConservation(args);
+		else if (command.startsWith("COVMAT")) cmd = new SnpSiftCmdCovarianceMatrix(args);
+		else if (command.startsWith("DBNSFP")) cmd = new SnpSiftCmdAnnotateSortedDbNsfp(args);
+		else if (command.startsWith("EX")) cmd = new SnpSiftCmdExtractFields(args);
+		else if (command.startsWith("FI")) cmd = new SnpSiftCmdFilter(args);
+		else if (command.startsWith("GWASCAT")) cmd = new SnpSiftCmdGwasCatalog(args);
+		else if (command.startsWith("HW")) cmd = new SnpSiftCmdHwe(args);
+		else if (command.startsWith("INTIDX")) cmd = new SnpSiftCmdIntervalsIndex(args);
+		else if (command.startsWith("IN")) cmd = new SnpSiftCmdIntervals(args);
+		else if (command.startsWith("JOIN")) cmd = new SnpSiftCmdJoin(args);
+		else if (command.startsWith("RM")) cmd = new SnpSiftCmdRemoveReferenceGenotypes(args);
+		else if (command.startsWith("SIF")) cmd = new SnpSiftCmdAnnotateSortedSift(args);
+		else if (command.startsWith("TS")) cmd = new SnpSiftCmdTsTv(args);
+		else if (command.startsWith("VARTYPE")) cmd = new SnpSiftCmdVarType(args);
 		else usage("Unknown command '" + command + "'");
+
+		if (!help) cmd.run();
+	}
+
+	public void setDebug(boolean debug) {
+		this.debug = debug;
+	}
+
+	public void setQuiet(boolean quiet) {
+		this.quiet = quiet;
+	}
+
+	public void setVerbose(boolean verbose) {
+		this.verbose = verbose;
 	}
 
 	/**

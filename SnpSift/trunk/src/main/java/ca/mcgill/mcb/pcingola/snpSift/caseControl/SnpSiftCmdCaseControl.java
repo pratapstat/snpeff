@@ -34,14 +34,6 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 	FisherExactTest fisherExactTest = FisherExactTest.get();
 	VcfCaseControl vcfCaseControl;
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		SnpSiftCmdCaseControl cmd = new SnpSiftCmdCaseControl(args);
-		cmd.run();
-	}
-
 	public SnpSiftCmdCaseControl(String args[]) {
 		super(args, "casecontrol");
 		vcfCaseControl = new VcfCaseControl(groups, homozygousCase, homozygousControl);

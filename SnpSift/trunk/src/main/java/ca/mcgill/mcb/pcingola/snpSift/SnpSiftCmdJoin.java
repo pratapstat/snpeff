@@ -27,28 +27,6 @@ public class SnpSiftCmdJoin extends SnpSift {
 	ArrayList<GenericMarker> list[];
 	SnpEffectPredictor snpEffectPredictor = new SnpEffectPredictor(genome);
 
-	/**
-	 * Main
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		SnpSiftCmdJoin join = new SnpSiftCmdJoin(args);
-		join.run();
-	}
-
-	@Override
-	public void init() {
-		file = new String[2];
-		inOffset = new int[2];
-		colChr = new int[2];
-		colStart = new int[2];
-		colEnd = new int[2];
-		verbose = false;
-		showEmpty = false;
-		showAll = false;
-		showClosest = false;
-	}
-
 	@SuppressWarnings("unchecked")
 	public SnpSiftCmdJoin(String[] args) {
 		super(args, "join");
@@ -110,6 +88,19 @@ public class SnpSiftCmdJoin extends SnpSift {
 		}
 
 		return null; // Nothing found
+	}
+
+	@Override
+	public void init() {
+		file = new String[2];
+		inOffset = new int[2];
+		colChr = new int[2];
+		colStart = new int[2];
+		colEnd = new int[2];
+		verbose = false;
+		showEmpty = false;
+		showAll = false;
+		showClosest = false;
 	}
 
 	/**

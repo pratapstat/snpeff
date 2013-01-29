@@ -26,14 +26,8 @@ public class SnpSiftCmdGwasCatalog extends SnpSift {
 	String vcfFile;
 	GwasCatalog gwasCatalog;
 
-	/**
-	 * Main
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		SnpSiftCmdGwasCatalog vcfGwasCat = new SnpSiftCmdGwasCatalog(args);
-		vcfGwasCat.readDb();
-		vcfGwasCat.annotate();
+	public SnpSiftCmdGwasCatalog(String args[]) {
+		super(args, "gwasCat");
 	}
 
 	@Override
@@ -41,26 +35,6 @@ public class SnpSiftCmdGwasCatalog extends SnpSift {
 		List<String> newHeaders = super.addHeader();
 		newHeaders.add("##INFO=<ID=" + GWAS_CATALOG_TRAIT + ",Number=.,Type=String,Description=\"Trait related to this chromosomal position, according to GWAS catalog\">");
 		return newHeaders;
-	}
-
-	public SnpSiftCmdGwasCatalog(String args[]) {
-		super(args, "gwasCat");
-	}
-
-	/**
-	 * Create an annotation string
-	 * @return
-	 */
-	String vcfAnnotation(List<GwasCatalogEntry> list) {
-		StringBuilder sb = new StringBuilder();
-
-		// Add all traits (comma separated)
-		for (GwasCatalogEntry ge : list) {
-			if (sb.length() > 0) sb.append(",");
-			sb.append(ge.getTraitCode());
-		}
-
-		return sb.toString();
 	}
 
 	/**
@@ -151,5 +125,21 @@ public class SnpSiftCmdGwasCatalog extends SnpSift {
 
 		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar gwasCat [-v] gwasCatalog.txt file.vcf > newFile.vcf.");
 		System.exit(1);
+	}
+
+	/**
+	 * Create an annotation string
+	 * @return
+	 */
+	String vcfAnnotation(List<GwasCatalogEntry> list) {
+		StringBuilder sb = new StringBuilder();
+
+		// Add all traits (comma separated)
+		for (GwasCatalogEntry ge : list) {
+			if (sb.length() > 0) sb.append(",");
+			sb.append(ge.getTraitCode());
+		}
+
+		return sb.toString();
 	}
 }
