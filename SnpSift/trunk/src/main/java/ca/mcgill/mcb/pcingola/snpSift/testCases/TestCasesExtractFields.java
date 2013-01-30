@@ -37,7 +37,7 @@ public class TestCasesExtractFields extends TestCase {
 	}
 
 	/**
-	 * Extract firlds form a file and check that the line matches (only one line expected from the file)
+	 * Extract fields form a file and check that the line matches (only one line expected from the file)
 	 * @param vcfFileName
 	 * @param fieldExpression
 	 * @param expected

@@ -42,7 +42,7 @@ public class SnpSiftCmdCaseControlSummary extends SnpSift {
 	public static final int PHENOTYPE_CONTROL = 1;
 	public static final int PHENOTYPE_MISSING = 0;
 
-	public static FormatVersion formatVersion = FormatVersion.FORMAT_SNPEFF_3;
+	public static FormatVersion formatVersion = null;
 
 	static Boolean CaseControl[] = { true, false };
 	static String VariantsAf[] = { "COMMON", "RARE" };

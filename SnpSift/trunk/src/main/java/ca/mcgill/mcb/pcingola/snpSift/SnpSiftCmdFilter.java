@@ -235,7 +235,7 @@ public class SnpSiftCmdFilter extends SnpSift {
 		addFilterField = null;
 		rmFilterField = null;
 		sets = new ArrayList<HashSet<String>>();
-		formatVersion = VcfEffect.FormatVersion.FORMAT_SNPEFF_3;
+		formatVersion = null; // VcfEffect.FormatVersion.FORMAT_SNPEFF_3;
 	}
 
 	/**

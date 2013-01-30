@@ -4,7 +4,6 @@ import java.util.List;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
-import ca.mcgill.mcb.pcingola.snpSift.SnpSift;
 import ca.mcgill.mcb.pcingola.snpSift.SnpSiftCmdFilter;
 import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.vcf.VcfEffect;
@@ -797,7 +796,7 @@ public class TestCasesFilter extends TestCase {
 			if (verbose) System.out.println("\t" + vcfEntry);
 
 			boolean any = false;
-			for (VcfEffect eff : vcfEntry.parseEffects(formatVersion)) {
+			for (VcfEffect eff : vcfEntry.parseEffects(null)) {
 				Assert.assertEquals("BICD1", eff.getGene());
 				any = true;
 			}
@@ -814,7 +813,7 @@ public class TestCasesFilter extends TestCase {
 
 		// Filter data
 		String expression = "QUAL >= " + minQ;
-		String args[] = {"-f", "test/test01.vcf", "-n", expression};
+		String args[] = { "-f", "test/test01.vcf", "-n", expression };
 		SnpSiftCmdFilter vcfFilter = new SnpSiftCmdFilter(args);
 		List<VcfEntry> list = vcfFilter.filter("test/test01.vcf", expression, true);
 
@@ -836,7 +835,7 @@ public class TestCasesFilter extends TestCase {
 
 		// Filter data
 		String expression = "QUAL >= " + minQ;
-		String args[] = {"-f", "test/test01.vcf", "-p", expression};
+		String args[] = { "-f", "test/test01.vcf", "-p", expression };
 		SnpSiftCmdFilter vcfFilter = new SnpSiftCmdFilter(args);
 		List<VcfEntry> list = vcfFilter.filter("test/test01.vcf", expression, true);
 
@@ -846,7 +845,7 @@ public class TestCasesFilter extends TestCase {
 		Assert.assertTrue(list.size() > 0);
 		for (VcfEntry vcfEntry : list) {
 			if (verbose) System.out.println(vcfEntry.getFilterPass() + "\t" + vcfEntry);
-			if( vcfEntry.getFilterPass().equals("PASS") ) Assert.assertTrue(vcfEntry.getQuality() >= minQ);
+			if (vcfEntry.getFilterPass().equals("PASS")) Assert.assertTrue(vcfEntry.getQuality() >= minQ);
 			else Assert.assertTrue(vcfEntry.getQuality() < minQ);
 		}
 	}
@@ -860,7 +859,7 @@ public class TestCasesFilter extends TestCase {
 
 		// Filter data
 		String expression = "QUAL >= " + minQ;
-		String args[] = {"-f", "test/test01.vcf", "-a", "ADD", expression};
+		String args[] = { "-f", "test/test01.vcf", "-a", "ADD", expression };
 		SnpSiftCmdFilter vcfFilter = new SnpSiftCmdFilter(args);
 		List<VcfEntry> list = vcfFilter.filter("test/test01.vcf", expression, true);
 
@@ -870,7 +869,7 @@ public class TestCasesFilter extends TestCase {
 		Assert.assertTrue(list.size() > 0);
 		for (VcfEntry vcfEntry : list) {
 			if (verbose) System.out.println(vcfEntry.getFilterPass() + "\t" + vcfEntry);
-			if( vcfEntry.getFilterPass().equals("ADD") ) Assert.assertTrue(vcfEntry.getQuality() >= minQ);
+			if (vcfEntry.getFilterPass().equals("ADD")) Assert.assertTrue(vcfEntry.getQuality() >= minQ);
 			else Assert.assertTrue(vcfEntry.getQuality() < minQ);
 		}
 	}
@@ -884,7 +883,7 @@ public class TestCasesFilter extends TestCase {
 		// Filter data
 		String expression = "REF = 'A'";
 		String vcfFile = "test/downstream.vcf";
-		String args[] = {"-f", vcfFile, "-r", "SVM", expression}; // Remove FILTER string 'SVM' from all reference = 'A'
+		String args[] = { "-f", vcfFile, "-r", "SVM", expression }; // Remove FILTER string 'SVM' from all reference = 'A'
 		SnpSiftCmdFilter vcfFilter = new SnpSiftCmdFilter(args);
 		List<VcfEntry> list = vcfFilter.filter(vcfFile, expression, true);
 
@@ -894,7 +893,7 @@ public class TestCasesFilter extends TestCase {
 		Assert.assertTrue(list.size() > 0);
 		for (VcfEntry vcfEntry : list) {
 			if (verbose) System.out.println(vcfEntry.getFilterPass() + "\t" + vcfEntry);
-			if( vcfEntry.getFilterPass().equals("SVM") ) Assert.assertTrue(!vcfEntry.getRef().equals("A"));
+			if (vcfEntry.getFilterPass().equals("SVM")) Assert.assertTrue(!vcfEntry.getRef().equals("A"));
 		}
 	}
 

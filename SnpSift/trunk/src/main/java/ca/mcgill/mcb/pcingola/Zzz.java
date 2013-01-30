@@ -14,7 +14,7 @@ public class Zzz {
 		// Filter data
 		SnpSiftCmdFilter vcfFilter = new SnpSiftCmdFilter();
 		String expression = "EFF[0].EFFECT = 'SYNONYMOUS_CODING'";
-		List<VcfEntry> list = vcfFilter.filter("test/test03.vcf", expression, true);
+		List<VcfEntry> list = vcfFilter.filter("test/extractFields_01.eff.vcf", expression, true);
 
 		// Check that it satisfies the condition
 		System.out.println("Expression: '" + expression + "'");
