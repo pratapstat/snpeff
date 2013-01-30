@@ -1,7 +1,10 @@
 package ca.mcgill.mcb.pcingola.snpSift.lang.expression;
 
+import java.util.List;
+
 import ca.mcgill.mcb.pcingola.snpSift.lang.expression.FieldIterator.IteratorType;
 import ca.mcgill.mcb.pcingola.vcf.VcfEffect;
+import ca.mcgill.mcb.pcingola.vcf.VcfEffect.FormatVersion;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 
 /**
@@ -14,13 +17,10 @@ import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 public class FieldEff extends FieldSub {
 
 	int fieldNum = -1;
-	VcfEffect.FormatVersion formatVersion;
+	FormatVersion formatVersion = null;
 
-	public FieldEff(String name, int index, VcfEffect.FormatVersion formatVersion) {
+	public FieldEff(String name, int index) {
 		super("EFF." + name, index); // Add an 'EFF.' at the beginning
-		this.formatVersion = formatVersion;
-		fieldNum = fieldNum(this.name);
-		if (fieldNum < 0) throw new RuntimeException("No such EFF subfield '" + name + "'");
 	}
 
 	/**
@@ -28,7 +28,8 @@ public class FieldEff extends FieldSub {
 	 * @param name
 	 * @return
 	 */
-	int fieldNum(String name) {
+	int fieldNum(String name, VcfEntry vcfEntry) {
+		FormatVersion formatVersion = vcfEntry.effectFormatVersion();
 		return VcfEffect.fieldNum(name, formatVersion);
 	}
 
@@ -40,28 +41,33 @@ public class FieldEff extends FieldSub {
 	 */
 	@Override
 	public String getFieldString(VcfEntry vcfEntry) {
-		// Genotype field => Look for genotype and then field
-		String effStr = vcfEntry.getInfo("EFF");
-		if (effStr == null) return null;
+		// Get all effects
+		List<VcfEffect> effects = vcfEntry.parseEffects(formatVersion);
+		if (effects.size() <= 0) return null;
 
 		// Find field
-		String effects[] = effStr.split(",");
-		if (index >= effects.length) return null;
+		if (index >= effects.size()) return null;
 
 		// Is this field 'iterable'?
 		int idx = index;
 		if (index < 0) {
-			FieldIterator.get().setMax(IteratorType.EFFECT, effects.length - 1);
+			FieldIterator.get().setMax(IteratorType.EFFECT, effects.size() - 1);
 			FieldIterator.get().setType(index);
 			idx = FieldIterator.get().get(IteratorType.EFFECT);
 		}
 
 		// Find sub-field
-		String eff = effects[idx];
+		String eff = effects.get(idx);
 		eff = eff.replace('(', ' '); // Replace all chars by spaces
 		eff = eff.replace('|', ' ');
 		eff = eff.replace(')', ' ');
 		String subField[] = eff.split("\\s");
+
+		// Field number not set? Try to guess it
+		if (fieldNum < 0) {
+			fieldNum = fieldNum(this.name, vcfEntry);
+			if (fieldNum < 0) throw new RuntimeException("No such EFF subfield '" + name + "'");
+		}
 
 		if (fieldNum >= subField.length) return null;
 		return subField[fieldNum];

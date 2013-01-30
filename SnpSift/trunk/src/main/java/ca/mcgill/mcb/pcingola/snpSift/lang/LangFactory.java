@@ -45,7 +45,6 @@ import ca.mcgill.mcb.pcingola.snpSift.lang.function.IsHom;
 import ca.mcgill.mcb.pcingola.snpSift.lang.function.IsRef;
 import ca.mcgill.mcb.pcingola.snpSift.lang.function.IsVariant;
 import ca.mcgill.mcb.pcingola.util.Gpr;
-import ca.mcgill.mcb.pcingola.vcf.VcfEffect;
 
 /**
  * Creates objects from an AST
@@ -56,16 +55,13 @@ public class LangFactory {
 
 	protected static boolean debug = false;
 	ArrayList<HashSet<String>> sets = new ArrayList<HashSet<String>>();
-	VcfEffect.FormatVersion formatVersion;
 
 	public LangFactory() {
 		sets = new ArrayList<HashSet<String>>(); // No sets
-		formatVersion = VcfEffect.FormatVersion.FORMAT_SNPEFF_3; // Latest format version
 	}
 
-	public LangFactory(ArrayList<HashSet<String>> sets, VcfEffect.FormatVersion formatVersion) {
+	public LangFactory(ArrayList<HashSet<String>> sets) {
 		this.sets = sets;
-		this.formatVersion = formatVersion;
 	}
 
 	/**
@@ -152,7 +148,7 @@ public class LangFactory {
 		if (debug) Gpr.debug("Field Tree: " + parseTree.toStringTree());
 
 		// Create a language factory
-		LangFactory langFactory = new LangFactory(sets, formatVersion);
+		LangFactory langFactory = new LangFactory(sets);
 		return langFactory.fieldFactory(parseTree);
 	}
 
@@ -217,7 +213,7 @@ public class LangFactory {
 		} else if (leaveName.equalsIgnoreCase("VAR_EFF_SUB")) {
 			int effIndex = parseIndexField(tree.getChild(0).getText(), IteratorType.EFFECT);
 			String name = tree.getChild(1).getText();
-			field = new FieldEff(name, effIndex, formatVersion);
+			field = new FieldEff(name, effIndex);
 		} else if (leaveName.equalsIgnoreCase("VAR_LOF_SUB")) {
 			int lofIndex = parseIndexField(tree.getChild(0).getText(), IteratorType.LOF);
 			String name = tree.getChild(1).getText();
