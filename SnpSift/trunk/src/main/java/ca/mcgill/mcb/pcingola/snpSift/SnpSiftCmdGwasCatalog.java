@@ -70,6 +70,8 @@ public class SnpSiftCmdGwasCatalog extends SnpSift {
 	 */
 	@Override
 	public void run() {
+		readDb();
+
 		if (verbose) Timer.showStdErr("Annotating entries from: '" + vcfFile + "'");
 
 		VcfFileIterator vcf = new VcfFileIterator(vcfFile);
