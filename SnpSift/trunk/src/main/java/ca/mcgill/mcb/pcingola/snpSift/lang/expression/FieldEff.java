@@ -68,7 +68,7 @@ public class FieldEff extends FieldSub {
 
 		// Field number not set? Try to guess it
 		if (fieldNum < 0) {
-			fieldNum = fieldNum(this.name, eff);
+			fieldNum = fieldNum(name, eff);
 			if (fieldNum < 0) throw new RuntimeException("No such EFF subfield '" + name + "'");
 		}
 
