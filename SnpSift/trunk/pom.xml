@@ -28,7 +28,7 @@
   </developers>
 
   <dependencies>
-    <!-- 
+  <!-- 
     <dependency>
       <groupId>ca.mcgill.mcb.pcingola</groupId>
       <artifactId>snpEff</artifactId>

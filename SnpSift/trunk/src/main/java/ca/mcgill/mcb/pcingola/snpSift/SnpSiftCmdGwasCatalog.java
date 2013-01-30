@@ -38,9 +38,38 @@ public class SnpSiftCmdGwasCatalog extends SnpSift {
 	}
 
 	/**
+	 * Parse command line arguments
+	 */
+	@Override
+	public void parse(String[] args) {
+		int argNum = 0;
+		if (args.length == 0) usage(null);
+
+		if (args[argNum].equals("-v")) {
+			verbose = true;
+			argNum++;
+		}
+
+		if (args.length >= argNum) gwasCatalogFile = args[argNum++];
+		else usage("Missing 'gwasCatalog.txt'");
+
+		if (args.length >= argNum) vcfFile = args[argNum++];
+		else usage("Missing 'file.vcf'");
+	}
+
+	/**
+	 * Read database
+	 */
+	public void readDb() {
+		if (verbose) Timer.showStdErr("Loading database: '" + gwasCatalogFile + "'");
+		gwasCatalog = new GwasCatalog(gwasCatalogFile);
+	}
+
+	/**
 	 * Annotate entries
 	 */
-	public void annotate() {
+	@Override
+	public void run() {
 		if (verbose) Timer.showStdErr("Annotating entries from: '" + vcfFile + "'");
 
 		VcfFileIterator vcf = new VcfFileIterator(vcfFile);
@@ -80,34 +109,6 @@ public class SnpSiftCmdGwasCatalog extends SnpSift {
 				+ "\n\tTotal entries           : " + count //
 				+ "\n\tPercent                 : " + String.format("%.2f%%", perc) //
 		);
-	}
-
-	/**
-	 * Parse command line arguments
-	 */
-	@Override
-	public void parse(String[] args) {
-		int argNum = 0;
-		if (args.length == 0) usage(null);
-
-		if (args[argNum].equals("-v")) {
-			verbose = true;
-			argNum++;
-		}
-
-		if (args.length >= argNum) gwasCatalogFile = args[argNum++];
-		else usage("Missing 'gwasCatalog.txt'");
-
-		if (args.length >= argNum) vcfFile = args[argNum++];
-		else usage("Missing 'file.vcf'");
-	}
-
-	/**
-	 * Read database
-	 */
-	public void readDb() {
-		if (verbose) Timer.showStdErr("Loading database: '" + gwasCatalogFile + "'");
-		gwasCatalog = new GwasCatalog(gwasCatalogFile);
 	}
 
 	/**
