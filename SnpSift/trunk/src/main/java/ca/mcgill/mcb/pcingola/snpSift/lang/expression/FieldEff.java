@@ -19,8 +19,15 @@ public class FieldEff extends FieldSub {
 	int fieldNum = -1;
 	FormatVersion formatVersion = null;
 
-	public FieldEff(String name, int index) {
+	/**
+	 * Constructor
+	 * @param name
+	 * @param index
+	 * @param formatVersion : Can be null (it will be guessed)
+	 */
+	public FieldEff(String name, int index, FormatVersion formatVersion) {
 		super("EFF." + name, index); // Add an 'EFF.' at the beginning
+		this.formatVersion = formatVersion;
 	}
 
 	/**
@@ -28,8 +35,8 @@ public class FieldEff extends FieldSub {
 	 * @param name
 	 * @return
 	 */
-	int fieldNum(String name, VcfEntry vcfEntry) {
-		FormatVersion formatVersion = vcfEntry.effectFormatVersion();
+	int fieldNum(String name, VcfEffect eff) {
+		if (formatVersion == null) formatVersion = eff.formatVersion();
 		return VcfEffect.fieldNum(name, formatVersion);
 	}
 
@@ -57,20 +64,17 @@ public class FieldEff extends FieldSub {
 		}
 
 		// Find sub-field
-		String eff = effects.get(idx);
-		eff = eff.replace('(', ' '); // Replace all chars by spaces
-		eff = eff.replace('|', ' ');
-		eff = eff.replace(')', ' ');
-		String subField[] = eff.split("\\s");
+		VcfEffect eff = effects.get(idx);
 
 		// Field number not set? Try to guess it
 		if (fieldNum < 0) {
-			fieldNum = fieldNum(this.name, vcfEntry);
+			fieldNum = fieldNum(this.name, eff);
 			if (fieldNum < 0) throw new RuntimeException("No such EFF subfield '" + name + "'");
 		}
 
-		if (fieldNum >= subField.length) return null;
-		return subField[fieldNum];
+		eff.formatVersion();
+
+		return eff.get(fieldNum);
 	}
 
 	@Override
