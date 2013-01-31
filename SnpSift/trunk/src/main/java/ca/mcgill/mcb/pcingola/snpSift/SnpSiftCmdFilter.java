@@ -394,7 +394,7 @@ public class SnpSiftCmdFilter extends SnpSift {
 		System.err.println("\t-p|--pass             : Use 'PASS' field instead of filtering out VCF entries");
 		System.err.println("\t-r|--rmFilter <str>   : Remove a string from FILTER VCF field if 'expression' is true (and 'str' is in the field). Default: '' (none)");
 		System.err.println("\t-s|--set <file>       : Create a SET using 'file'");
-		System.err.println("\t--format <format>     : SnpEff format version: {2, 3}. Default: 3");
+		System.err.println("\t--format <format>     : SnpEff format version: {2, 3}. Default: " + (formatVersion == null ? "Auto" : formatVersion));
 		System.err.println("\t--galaxy              : Used from Galaxy (expressions have been sanitized).");
 		System.exit(-1);
 	}
