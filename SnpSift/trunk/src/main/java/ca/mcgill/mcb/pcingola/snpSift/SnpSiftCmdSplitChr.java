@@ -15,7 +15,7 @@ import ca.mcgill.mcb.pcingola.util.Timer;
  */
 public class SnpSiftCmdSplitChr extends SnpSift {
 
-	public static final int SHOW = 10000;
+	public static final int SHOW = 1000;
 	public static final int SHOW_LINES = 100 * SHOW;
 	public static String exts[] = { ".vcf", ".vcf.gz" };
 

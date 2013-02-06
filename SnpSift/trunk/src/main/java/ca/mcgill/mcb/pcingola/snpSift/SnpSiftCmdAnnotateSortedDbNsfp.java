@@ -34,7 +34,7 @@ import ca.mcgill.mcb.pcingola.vcf.VcfFileIndexIntervals;
  */
 public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 
-	public static final String KEY_PREFIX = "dbnsfp";
+	public static final String VCF_INFO_PREFIX = "dbnsfp";
 	public static final String DEFAULT_FIELDS_NAMES_TO_ADD = "Ensembl_transcriptid,Uniprot_acc,Interpro_domain,SIFT_score,Polyphen2_HVAR_pred,GERP++_NR,GERP++_RS,29way_logOdds,1000Gp1_AF,1000Gp1_AFR_AF,1000Gp1_EUR_AF,1000Gp1_AMR_AF,1000Gp1_ASN_AF,ESP5400_AA_AF,ESP5400_EA_AF";
 
 	protected Map<String, String> fieldsToAdd;
@@ -64,7 +64,7 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 	protected void addHeader(VcfFileIterator vcfFile) {
 		super.addHeader(vcfFile);
 		for (String key : fieldsToAdd.keySet())
-			vcfFile.getVcfHeader().addLine("##INFO=<ID=" + KEY_PREFIX + key + ",Number=A,Type=String,Description=\"" + fieldsToAdd.get(key) + "\">");
+			vcfFile.getVcfHeader().addLine("##INFO=<ID=" + VCF_INFO_PREFIX + key + ",Number=A,Type=String,Description=\"" + fieldsToAdd.get(key) + "\">");
 	}
 
 	/**
@@ -132,7 +132,7 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 
 			if (annotateAll || !empty) {
 				String infoStr = info.toString().replace(';', ',').replace('\t', '_').replace(' ', '_'); // Make sure all characters are valid for VCF field
-				vcf.addInfo(KEY_PREFIX + fieldKey, infoStr);
+				vcf.addInfo(VCF_INFO_PREFIX + fieldKey, infoStr);
 				annotated = true;
 			}
 		}

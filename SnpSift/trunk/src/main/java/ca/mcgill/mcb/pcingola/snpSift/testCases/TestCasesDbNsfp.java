@@ -33,14 +33,14 @@ public class TestCasesDbNsfp extends TestCase {
 			Gpr.debug(vcfEntry);
 
 			// Check all values
-			Assert.assertEquals("2.31", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.KEY_PREFIX + "GERP++_RS"));
-			Assert.assertEquals("2.31", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.KEY_PREFIX + "GERP++_NR"));
-			Assert.assertEquals("0.004785", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.KEY_PREFIX + "ESP5400_AA_AF"));
-			Assert.assertEquals("8.5094", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.KEY_PREFIX + "29way_logOdds"));
-			Assert.assertEquals("B", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.KEY_PREFIX + "Polyphen2_HVAR_pred"));
-			Assert.assertEquals("0.090000", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.KEY_PREFIX + "SIFT_score"));
-			Assert.assertEquals("Q8NH21", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.KEY_PREFIX + "Uniprot_acc"));
-			Assert.assertEquals("ENST00000534990,ENST00000335137", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.KEY_PREFIX + "Ensembl_transcriptid"));
+			Assert.assertEquals("2.31", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.VCF_INFO_PREFIX + "GERP++_RS"));
+			Assert.assertEquals("2.31", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.VCF_INFO_PREFIX + "GERP++_NR"));
+			Assert.assertEquals("0.004785", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.VCF_INFO_PREFIX + "ESP5400_AA_AF"));
+			Assert.assertEquals("8.5094", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.VCF_INFO_PREFIX + "29way_logOdds"));
+			Assert.assertEquals("B", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.VCF_INFO_PREFIX + "Polyphen2_HVAR_pred"));
+			Assert.assertEquals("0.090000", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.VCF_INFO_PREFIX + "SIFT_score"));
+			Assert.assertEquals("Q8NH21", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.VCF_INFO_PREFIX + "Uniprot_acc"));
+			Assert.assertEquals("ENST00000534990,ENST00000335137", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.VCF_INFO_PREFIX + "Ensembl_transcriptid"));
 
 			cmd.endAnnotate();
 		} catch (Exception e) {
