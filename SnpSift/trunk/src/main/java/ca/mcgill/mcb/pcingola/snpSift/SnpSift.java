@@ -158,6 +158,7 @@ public class SnpSift {
 		else if (command.startsWith("JOIN")) cmd = new SnpSiftCmdJoin(args);
 		else if (command.startsWith("RM")) cmd = new SnpSiftCmdRemoveReferenceGenotypes(args);
 		else if (command.startsWith("SIF")) cmd = new SnpSiftCmdAnnotateSortedSift(args);
+		else if (command.startsWith("SPLITCHR")) cmd = new SnpSiftCmdSplitChr(args);
 		else if (command.startsWith("TS")) cmd = new SnpSiftCmdTsTv(args);
 		else if (command.startsWith("VARTYPE")) cmd = new SnpSiftCmdVarType(args);
 		else usage("Unknown command '" + command + "'");
@@ -245,11 +246,12 @@ public class SnpSift {
 				+ "\n\tgwasCat       : Annotate using GWAS catalog" //
 				+ "\n\thwe           : Calculate Hardy-Weimberg parameters and perform a godness of fit test." //
 				+ "\n\tintervals     : Keep variants that intersect with intervals." //
-				+ "\n\tintIdx        : Keep variants that intersect with intervals. Creates an index (only for large VCF file and only a few intervals to retrieve)" //
+				+ "\n\tintIdx        : Keep variants that intersect with intervals. Index-based method: Used for large VCF file and a few intervals to retrieve" //
 				+ "\n\tjoin          : Join files by genomic region." //
 				+ "\n\trmRefGen      : Remove reference genotypes." //
 				+ "\n\ttstv          : Calculate transiton to transversion ratio." //
 				+ "\n\tsift          : Annotate using SIFT scores from a VCF file." //
+				+ "\n\tsplitChr      : Split VCF by chromosome." //
 				+ "\n\tvarType       : Annotate variant type (SNP,MNP,INS,DEL or MIXED)." //
 		);
 		System.exit(1);
