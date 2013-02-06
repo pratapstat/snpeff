@@ -111,7 +111,7 @@ public class SnpSiftCmdSplitChr extends SnpSift {
 				}
 			}
 
-			out.close();
+			if (out != null) out.close();
 		} catch (IOException e) {
 			throw new RuntimeException("Error writing data!");
 		}
