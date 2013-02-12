@@ -43,29 +43,6 @@ public class SnpSiftCmdVarType extends SnpSift {
 	}
 
 	/**
-	 * Annotate entries
-	 */
-	public void annotate() {
-		if (verbose) Timer.showStdErr("Annotating variants type entries from: '" + vcfFile + "'");
-
-		VcfFileIterator vcf = new VcfFileIterator(vcfFile);
-
-		boolean showHeader = true;
-		for (VcfEntry vcfEntry : vcf) {
-			// Show header?
-			if (showHeader) {
-				addHeader(vcf);
-				String headerStr = vcf.getVcfHeader().toString();
-				if (!headerStr.isEmpty()) System.out.println(headerStr);
-				showHeader = false;
-			}
-
-			annotate(vcfEntry);
-			System.out.println(vcfEntry);
-		}
-	}
-
-	/**
 	 * Annotate one entry
 	 * @param vcfEntry
 	 */
@@ -93,6 +70,30 @@ public class SnpSiftCmdVarType extends SnpSift {
 
 		if (args.length >= argNum) vcfFile = args[argNum++];
 		else usage("Missing 'file.vcf'");
+	}
+
+	/**
+	 * Annotate entries
+	 */
+	@Override
+	public void run() {
+		if (verbose) Timer.showStdErr("Annotating variants type entries from: '" + vcfFile + "'");
+
+		VcfFileIterator vcf = new VcfFileIterator(vcfFile);
+
+		boolean showHeader = true;
+		for (VcfEntry vcfEntry : vcf) {
+			// Show header?
+			if (showHeader) {
+				addHeader(vcf);
+				String headerStr = vcf.getVcfHeader().toString();
+				if (!headerStr.isEmpty()) System.out.println(headerStr);
+				showHeader = false;
+			}
+
+			annotate(vcfEntry);
+			System.out.println(vcfEntry);
+		}
 	}
 
 	/**
