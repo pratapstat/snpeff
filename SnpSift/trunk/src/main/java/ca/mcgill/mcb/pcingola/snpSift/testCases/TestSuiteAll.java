@@ -31,6 +31,7 @@ public class TestSuiteAll {
 		suite.addTestSuite(TestCasesDbNsfp.class);
 		suite.addTestSuite(TestCasesIntervals.class);
 		suite.addTestSuite(TestCasesExtractFields.class);
+		suite.addTestSuite(TestCasesSplit.class);
 
 		return suite;
 	}

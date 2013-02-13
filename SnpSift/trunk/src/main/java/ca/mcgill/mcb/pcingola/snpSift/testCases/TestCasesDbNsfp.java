@@ -18,8 +18,9 @@ public class TestCasesDbNsfp extends TestCase {
 
 	public void test_01() {
 		String vcfFileName = "test/test_dbNSFP_chr1_69134.vcf";
-		String args[] = { "-v", "test/dbNSFP2.0b3.chr1_69134.txt", "test/test_dbNSFP_chr1_69134.vcf" };
+		String args[] = { "test/dbNSFP2.0b3.chr1_69134.txt", "test/test_dbNSFP_chr1_69134.vcf" };
 		SnpSiftCmdAnnotateSortedDbNsfp cmd = new SnpSiftCmdAnnotateSortedDbNsfp(args);
+		cmd.setVerbose(true);
 
 		try {
 			cmd.initAnnotate();

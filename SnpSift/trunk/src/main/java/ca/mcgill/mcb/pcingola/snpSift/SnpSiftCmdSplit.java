@@ -3,6 +3,7 @@ package ca.mcgill.mcb.pcingola.snpSift;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import ca.mcgill.mcb.pcingola.fileIterator.LineFileIterator;
 import ca.mcgill.mcb.pcingola.util.Gpr;
@@ -22,9 +23,19 @@ public class SnpSiftCmdSplit extends SnpSift {
 	String vcfFile;
 	StringBuilder header = new StringBuilder();
 	int numLines;
+	ArrayList<String> fileNames;
 
 	public SnpSiftCmdSplit(String args[]) {
 		super(args, "split");
+		fileNames = new ArrayList<String>();
+	}
+
+	/**
+	 * Names of files created when splitting
+	 * @return
+	 */
+	public ArrayList<String> getFileNames() {
+		return fileNames;
 	}
 
 	/**
@@ -34,11 +45,13 @@ public class SnpSiftCmdSplit extends SnpSift {
 	 * @return
 	 */
 	BufferedWriter newFile(String baseName, String chr, int fileNumber) {
-
 		// File name
 		String outFileName = "";
 		if (numLines <= 0) outFileName = baseName + "." + chr + ".vcf"; // Splitting by chromosome
 		else outFileName = String.format("%s.%03d.vcf", baseName, fileNumber); // Splitting by number of lines
+
+		// Update list of file names
+		fileNames.add(outFileName);
 
 		if (verbose) {
 			System.err.println("");
@@ -88,7 +101,7 @@ public class SnpSiftCmdSplit extends SnpSift {
 
 		// Init
 		boolean isHeader = true;
-		int lineNum = 1, fileNum = 0;
+		int lineNum = 0, fileNum = 0;
 		String chrPrev = "";
 
 		// Open file and iterate
@@ -123,7 +136,7 @@ public class SnpSiftCmdSplit extends SnpSift {
 						out = newFile(baseName, chr, fileNum);
 						fileNum++;
 						chrPrev = chr;
-						lineNum = 1;
+						lineNum = 0;
 					}
 
 					// Write line
