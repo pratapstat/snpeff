@@ -77,8 +77,6 @@ public class SnpSiftCmdIntervals extends SnpSift {
 			// Argument starts with '-'?
 			if (args[i].startsWith("-")) {
 				if (args[i].equals("-h") || args[i].equalsIgnoreCase("-help")) usage(null);
-				else if (args[i].equals("-v")) verbose = true;
-				else if (args[i].equals("-q")) verbose = false;
 				else if (args[i].equals("-x")) exclude = true;
 				else if (args[i].equals("-i")) vcfFileName = args[++i];
 			} else bedFiles.add(args[i]);
@@ -147,7 +145,6 @@ public class SnpSiftCmdIntervals extends SnpSift {
 
 		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar intervals [-x] file_1.bed file_2.bed ... file_N.bed");
 		System.err.println("Options:");
-		System.err.println("\t\t-v        :\tBe verbose");
 		System.err.println("\t\t-i <file> :\tVCF file. Default STDIN");
 		System.err.println("\t\t-x        :\tExclude VCF entries in intervals");
 		System.exit(1);

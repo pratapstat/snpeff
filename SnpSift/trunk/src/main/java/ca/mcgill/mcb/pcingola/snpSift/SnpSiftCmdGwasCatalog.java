@@ -45,11 +45,6 @@ public class SnpSiftCmdGwasCatalog extends SnpSift {
 		int argNum = 0;
 		if (args.length == 0) usage(null);
 
-		if (args[argNum].equals("-v")) {
-			verbose = true;
-			argNum++;
-		}
-
 		if (args.length >= argNum) gwasCatalogFile = args[argNum++];
 		else usage("Missing 'gwasCatalog.txt'");
 
@@ -126,7 +121,7 @@ public class SnpSiftCmdGwasCatalog extends SnpSift {
 
 		showVersion();
 
-		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar gwasCat [-v] gwasCatalog.txt file.vcf > newFile.vcf.");
+		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar gwasCat gwasCatalog.txt file.vcf > newFile.vcf.");
 		System.exit(1);
 	}
 

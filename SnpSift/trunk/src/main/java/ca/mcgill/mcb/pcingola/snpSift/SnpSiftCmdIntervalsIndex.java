@@ -67,8 +67,6 @@ public class SnpSiftCmdIntervalsIndex extends SnpSift {
 	 */
 	@Override
 	public void parse(String[] args) {
-		verbose = false;
-
 		for (int i = 0; i < args.length; i++) {
 
 			// Argument starts with '-'?
@@ -76,8 +74,7 @@ public class SnpSiftCmdIntervalsIndex extends SnpSift {
 
 				if (args[i].equals("-if")) {
 					if ((i + 1) < args.length) inOffset = Gpr.parseIntSafe(args[++i]);
-				} else if (args[i].equals("-v")) verbose = true;
-				else if (args[i].equals("-c")) {
+				} else if (args[i].equals("-c")) {
 					listCommandLine = true;
 					inOffset = 1;
 				}

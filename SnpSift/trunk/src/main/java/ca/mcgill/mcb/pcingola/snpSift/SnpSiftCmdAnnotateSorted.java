@@ -423,8 +423,6 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 				+ "Options:\n" //
 				+ "\t-id          : Only annotate ID field (do not add INFO field).\n" //
 				+ "\t-info <list> : Annotate using a list of info fields (list is a comma separated list of fields). Default: ALL.\n" //
-				+ "\t-q           : Be quiet.\n" //
-				+ "\t-v           : Be verbose.\n" //
 		);
 		System.exit(1);
 	}

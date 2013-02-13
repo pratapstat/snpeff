@@ -157,8 +157,6 @@ public class SnpSiftCmdAnnotateMem extends SnpSiftCmdAnnotateSorted {
 				+ "Options:\n" //
 				+ "\t-id          : Only annotate ID field (do not add INFO field).\n" //
 				+ "\t-info <list> : Annotate using a list of info fields (list is a comma separated list of fields). Default: ALL.\n" //
-				+ "\t-q           : Be quiet.\n" //
-				+ "\t-v           : Be verbose.\n" //
 				+ "Note: It is assumed that the database file fits in memory." //
 		);
 		System.exit(1);

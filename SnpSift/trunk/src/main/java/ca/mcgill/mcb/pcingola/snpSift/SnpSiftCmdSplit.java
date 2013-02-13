@@ -9,11 +9,11 @@ import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.util.Timer;
 
 /**
- * Split a large VCF file by chromosome
+ * Split a large VCF file by chromosome or bby number of lines
  * 
  * @author pablocingolani
  */
-public class SnpSiftCmdSplitChr extends SnpSift {
+public class SnpSiftCmdSplit extends SnpSift {
 
 	public static final int SHOW = 1000;
 	public static final int SHOW_LINES = 100 * SHOW;
@@ -22,8 +22,8 @@ public class SnpSiftCmdSplitChr extends SnpSift {
 	String vcfFile;
 	StringBuilder header = new StringBuilder();
 
-	public SnpSiftCmdSplitChr(String args[]) {
-		super(args, "splitChr");
+	public SnpSiftCmdSplit(String args[]) {
+		super(args, "split");
 	}
 
 	/**
@@ -131,7 +131,9 @@ public class SnpSiftCmdSplitChr extends SnpSift {
 
 		showVersion();
 
-		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar splitChr [-v] file.vcf");
+		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar splitChr [-v] [-l <num>]file.vcf");
+		System.err.println("Options:");
+		System.err.println("\t-l <num>   : Split by number of lines instead of chromosomes.");
 		System.exit(1);
 	}
 }

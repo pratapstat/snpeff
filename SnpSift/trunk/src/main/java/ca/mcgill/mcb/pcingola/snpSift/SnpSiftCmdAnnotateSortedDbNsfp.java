@@ -259,14 +259,10 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 		for (int i = 0; i < args.length; i++) {
 			String arg = args[i];
 
-			if (arg.equals("-q")) verbose = false;
-			else if (arg.equals("-v")) verbose = true;
-			else if (arg.equals("-a")) annotateAll = true;
+			if (arg.equals("-a")) annotateAll = true;
 			else if (arg.equals("-f")) fieldsNamesToAdd = args[++i]; // Filed to be used
-			else if (arg.equals("-h") || arg.equals("--help")) usage(null);
 			else if (dbNsfpFileName == null) dbNsfpFileName = arg;
 			else if (vcfFileName == null) vcfFileName = arg;
-
 		}
 
 		// Sanity check
@@ -343,8 +339,6 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar " + command + " [-q|-v] [-a] dbNSFP.txt file.vcf > newFile.vcf\n" //
 				+ "Options:\n" //
 				+ "\t-a : Annotate all fields, even if the database has an empty value.\n" //
-				+ "\t-q : Be quiet.\n" //
-				+ "\t-v : Be verbose.\n" //
 				+ "\t-f : A comma sepparated list of fields to add. Default: '" + DEFAULT_FIELDS_NAMES_TO_ADD + "'.\n" //
 				+ "\t\tCurrently avaialbe fields are: \n" //
 				+ sbFields //

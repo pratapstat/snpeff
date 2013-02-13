@@ -158,12 +158,26 @@ public class SnpSift {
 		else if (command.startsWith("JOIN")) cmd = new SnpSiftCmdJoin(args);
 		else if (command.startsWith("RM")) cmd = new SnpSiftCmdRemoveReferenceGenotypes(args);
 		else if (command.startsWith("SIF")) cmd = new SnpSiftCmdAnnotateSortedSift(args);
-		else if (command.startsWith("SPLITCHR")) cmd = new SnpSiftCmdSplitChr(args);
+		else if (command.startsWith("SPLIT")) cmd = new SnpSiftCmdSplit(args);
 		else if (command.startsWith("TS")) cmd = new SnpSiftCmdTsTv(args);
 		else if (command.startsWith("VARTYPE")) cmd = new SnpSiftCmdVarType(args);
 		else usage("Unknown command '" + command + "'");
 
-		if (!help) cmd.run();
+		// Help? Show help and exit
+		if (help) {
+			cmd.usage(null);
+			return;
+		}
+
+		// Copy parsed parameters
+		cmd.verbose = verbose;
+		cmd.quiet = quiet;
+		cmd.debug = debug;
+		cmd.help = help;
+
+		// Execute command
+		cmd.run();
+
 	}
 
 	public void setDebug(boolean debug) {
@@ -251,7 +265,7 @@ public class SnpSift {
 				+ "\n\trmRefGen      : Remove reference genotypes." //
 				+ "\n\ttstv          : Calculate transiton to transversion ratio." //
 				+ "\n\tsift          : Annotate using SIFT scores from a VCF file." //
-				+ "\n\tsplitChr      : Split VCF by chromosome." //
+				+ "\n\tsplit         : Split VCF by chromosome." //
 				+ "\n\tvarType       : Annotate variant type (SNP,MNP,INS,DEL or MIXED)." //
 		);
 		System.exit(1);

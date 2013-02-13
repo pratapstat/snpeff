@@ -251,8 +251,6 @@ public class SnpSiftCmdFilter extends SnpSift {
 				else if (args[i].equals("-f") || args[i].equalsIgnoreCase("--file")) inputFile = args[++i];
 				else if (args[i].equals("-s") || args[i].equalsIgnoreCase("--set")) addSet(args[++i]);
 				else if (args[i].equals("-p") || args[i].equalsIgnoreCase("--pass")) usePassField = true;
-				else if (args[i].equals("-v")) verbose = true;
-				else if (args[i].equals("-q")) verbose = false;
 				else if (args[i].equals("-i") || args[i].equalsIgnoreCase("--filterId")) {
 					usePassField = true;
 					filterId = args[++i];
@@ -388,7 +386,6 @@ public class SnpSiftCmdFilter extends SnpSift {
 		System.err.println("\t-a|--addFilter <str>  : Add a string to FILTER VCF field if 'expression' is true. Default: '' (none)");
 		System.err.println("\t-e|--exprFile <file>  : Read expression from a file");
 		System.err.println("\t-f|--file <file>      : VCF input file. Default: STDIN");
-		System.err.println("\t-h|--help             : Show this help message");
 		System.err.println("\t-i|--filterId <str>   : ID for this filter (##FILTER tag in header and FILTER VCF field). Default: '" + filterId + "'");
 		System.err.println("\t-n|--inverse          : Inverse. Show lines that do not match filter expression");
 		System.err.println("\t-p|--pass             : Use 'PASS' field instead of filtering out VCF entries");

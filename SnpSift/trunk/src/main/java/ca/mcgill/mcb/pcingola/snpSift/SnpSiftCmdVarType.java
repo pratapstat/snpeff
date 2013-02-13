@@ -63,11 +63,6 @@ public class SnpSiftCmdVarType extends SnpSift {
 		int argNum = 0;
 		if (args.length == 0) usage(null);
 
-		if (args[argNum].equals("-v")) {
-			verbose = true;
-			argNum++;
-		}
-
 		if (args.length >= argNum) vcfFile = args[argNum++];
 		else usage("Missing 'file.vcf'");
 	}
@@ -109,7 +104,7 @@ public class SnpSiftCmdVarType extends SnpSift {
 
 		showVersion();
 
-		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar varType [-v] file.vcf > newFile.vcf.");
+		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar varType file.vcf > newFile.vcf.");
 		System.exit(1);
 	}
 }
