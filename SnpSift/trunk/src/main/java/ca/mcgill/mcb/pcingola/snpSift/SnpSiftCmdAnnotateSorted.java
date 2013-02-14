@@ -225,6 +225,7 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 		if (verbose) System.err.println("Index: " + fileName);
 		VcfFileIndexIntervals vcfFileIndexIntervals = new VcfFileIndexIntervals(fileName);
 		vcfFileIndexIntervals.setVerbose(verbose);
+		vcfFileIndexIntervals.setDebug(debug);
 		vcfFileIndexIntervals.open();
 		vcfFileIndexIntervals.index();
 		vcfFileIndexIntervals.close();

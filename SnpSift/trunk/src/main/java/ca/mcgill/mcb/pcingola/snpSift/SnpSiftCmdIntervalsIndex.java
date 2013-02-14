@@ -74,7 +74,7 @@ public class SnpSiftCmdIntervalsIndex extends SnpSift {
 
 				if (args[i].equals("-if")) {
 					if ((i + 1) < args.length) inOffset = Gpr.parseIntSafe(args[++i]);
-				} else if (args[i].equals("-c")) {
+				} else if (args[i].equals("-i")) {
 					listCommandLine = true;
 					inOffset = 1;
 				}
@@ -138,6 +138,7 @@ public class SnpSiftCmdIntervalsIndex extends SnpSift {
 
 		if (verbose) Timer.showStdErr("Indexing file '" + vcfFile + "'");
 		vf.setVerbose(verbose);
+		vf.setDebug(debug);
 		vf.open();
 		vf.index();
 		if (verbose) Timer.showStdErr("Done");
@@ -171,10 +172,10 @@ public class SnpSiftCmdIntervalsIndex extends SnpSift {
 
 		showVersion();
 
-		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar intidx [-if N] [-c] file.vcf ( file.bed | chr:start1-end1 chr:start2-end2 ... chr:startN-endN )");
+		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar intidx [-if N] [-i] file.vcf ( file.bed | chr:start1-end1 chr:start2-end2 ... chr:startN-endN )");
 		System.err.println("Option:");
 		System.err.println("\t-if <N>   : Input offset. Default 0 (i.e. zero-based coordinates).");
-		System.err.println("\t-c        : Genomic positions in command line instead of BED file (one-based coordinates).");
+		System.err.println("\t-i        : Genomic intervals in command line.");
 		System.exit(1);
 	}
 }
