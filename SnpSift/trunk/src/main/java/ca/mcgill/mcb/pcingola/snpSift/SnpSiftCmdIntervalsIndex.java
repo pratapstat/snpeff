@@ -11,7 +11,7 @@ import ca.mcgill.mcb.pcingola.interval.Genome;
 import ca.mcgill.mcb.pcingola.interval.SeqChange;
 import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.util.Timer;
-import ca.mcgill.mcb.pcingola.vcf.VcfFileIndexIntervals;
+import ca.mcgill.mcb.pcingola.vcf.FileIndexChrPos;
 
 /**
  * Filter variants that hit intervals
@@ -134,20 +134,21 @@ public class SnpSiftCmdIntervalsIndex extends SnpSift {
 		vcfFileIt.close();
 
 		// Open and index file		
-		VcfFileIndexIntervals vf = new VcfFileIndexIntervals(vcfFile);
+		// VcfFileIndexIntervals vf = new VcfFileIndexIntervals(vcfFile);
+		FileIndexChrPos fileIndexChrPos = new FileIndexChrPos(vcfFile);
 
 		if (verbose) Timer.showStdErr("Indexing file '" + vcfFile + "'");
-		vf.setVerbose(verbose);
-		vf.setDebug(debug);
-		vf.open();
-		vf.index();
+		fileIndexChrPos.setVerbose(verbose);
+		fileIndexChrPos.setDebug(debug);
+		fileIndexChrPos.open();
+		fileIndexChrPos.index();
 		if (verbose) Timer.showStdErr("Done");
 
 		// Find all intervals
 		for (SeqChange sc : seqChanges) {
 			try {
-				if (verbose) Timer.showStdErr("Finding interval: " + sc);
-				vf.dump(sc.getChromosomeName(), sc.getStart(), sc.getEnd());
+				if (verbose) Timer.showStdErr("Finding interval: " + sc.getChromosomeName() + ":" + (sc.getStart() + 1) + "-" + (sc.getEnd() + 1));
+				fileIndexChrPos.dump(sc.getChromosomeName(), sc.getStart(), sc.getEnd());
 			} catch (Throwable t) {
 				t.printStackTrace();
 			}
