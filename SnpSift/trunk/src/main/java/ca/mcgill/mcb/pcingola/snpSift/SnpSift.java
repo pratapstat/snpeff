@@ -161,6 +161,7 @@ public class SnpSift {
 		else if (command.startsWith("SPLIT")) cmd = new SnpSiftCmdSplit(args);
 		else if (command.startsWith("TS")) cmd = new SnpSiftCmdTsTv(args);
 		else if (command.startsWith("VARTYPE")) cmd = new SnpSiftCmdVarType(args);
+		else if (command.startsWith("PRIVATE")) cmd = new SnpSiftCmdPrivate(args);
 		else usage("Unknown command '" + command + "'");
 
 		// Help? Show help and exit
@@ -262,6 +263,7 @@ public class SnpSift {
 				+ "\n\tintervals     : Keep variants that intersect with intervals." //
 				+ "\n\tintIdx        : Keep variants that intersect with intervals. Index-based method: Used for large VCF file and a few intervals to retrieve" //
 				+ "\n\tjoin          : Join files by genomic region." //
+				+ "\n\tprivate       : Annotate if a variant is private to a family or group." //
 				+ "\n\trmRefGen      : Remove reference genotypes." //
 				+ "\n\ttstv          : Calculate transiton to transversion ratio." //
 				+ "\n\tsift          : Annotate using SIFT scores from a VCF file." //

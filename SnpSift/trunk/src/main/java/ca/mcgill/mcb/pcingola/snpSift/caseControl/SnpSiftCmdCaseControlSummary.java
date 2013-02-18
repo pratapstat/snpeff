@@ -3,11 +3,9 @@ package ca.mcgill.mcb.pcingola.snpSift.caseControl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import ca.mcgill.mcb.pcingola.collections.AutoHashMap;
-import ca.mcgill.mcb.pcingola.fileIterator.SeqChangeBedFileIterator;
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
 import ca.mcgill.mcb.pcingola.interval.Marker;
 import ca.mcgill.mcb.pcingola.interval.Markers;
@@ -16,7 +14,6 @@ import ca.mcgill.mcb.pcingola.interval.tree.IntervalForest;
 import ca.mcgill.mcb.pcingola.snpEffect.ChangeEffect;
 import ca.mcgill.mcb.pcingola.snpSift.SnpSift;
 import ca.mcgill.mcb.pcingola.snpSift.SnpSiftCmdAnnotateSortedDbNsfp;
-import ca.mcgill.mcb.pcingola.stats.CountByType;
 import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.util.Timer;
 import ca.mcgill.mcb.pcingola.vcf.VcfEffect;
@@ -33,25 +30,13 @@ import ca.mcgill.mcb.pcingola.vcf.VcfInfo;
  */
 public class SnpSiftCmdCaseControlSummary extends SnpSift {
 
-	/*
-	 *  From PLINK's manual: Affection status, by default, should be coded:
-	 *  		-9 missing 
-	 *  		0 missing
-	 *  		1 unaffected
-	 *  		2 affected
-	 */
-
-	public static final int PHENOTYPE_CASE = 2;
-	public static final int PHENOTYPE_CONTROL = 1;
-	public static final int PHENOTYPE_MISSING = 0;
-
 	public static FormatVersion formatVersion = null;
 
 	static Boolean CaseControl[] = { true, false };
 	static String VariantsAf[] = { "COMMON", "RARE" };
 
 	boolean headerSummary = true;
-	String caseControlFile, groupsFile, intervalsFile, vcfFile; // File names
+	String tpedFile, bedFile, vcfFile; // File names
 	HashMap<String, Boolean> caseControls; // Cases and controls 
 	HashMap<String, String> groups; // ID -> Group map
 	List<SeqChange> intervals; // Intervals to summarize
@@ -70,68 +55,70 @@ public class SnpSiftCmdCaseControlSummary extends SnpSift {
 	 */
 	void load() {
 
-		/**
-		 * Read cases & controls file
-		 * Format:	"id\tphenotype\n"
-		 */
-		Timer.showStdErr("Reading cases & controls from " + caseControlFile);
-		int countCase = 0, countCtrl = 0;
-		caseControls = new HashMap<String, Boolean>();
-		for (String line : Gpr.readFile(caseControlFile).split("\n")) {
-			String rec[] = line.split("\t");
+		//		/**
+		//		 * Read cases & controls file
+		//		 * Format:	"id\tphenotype\n"
+		//		 */
+		//		Timer.showStdErr("Reading cases & controls from " + tpedFile);
+		//		int countCase = 0, countCtrl = 0;
+		//		caseControls = new HashMap<String, Boolean>();
+		//		for (String line : Gpr.readFile(tpedFile).split("\n")) {
+		//			String rec[] = line.split("\t");
+		//
+		//			boolean isCase = Gpr.parseIntSafe(rec[1]) == PHENOTYPE_CASE;
+		//			caseControls.put(rec[0], isCase); // Add to hash
+		//
+		//			if (isCase) countCase++;
+		//			else countCtrl++;
+		//		}
+		//		Timer.showStdErr("Total : " + caseControls.size() + " entries. Cases: " + countCase + ", controls: " + countCtrl);
+		//
+		//		//---
+		//		// Read groups
+		//		// Format:	"id\tgroupName\n"	 (only one group per sample)
+		//		//---
+		//		Timer.showStdErr("Reading groups from " + groupsFile);
+		//		groups = new HashMap<String, String>();
+		//		HashSet<String> groupNames = new HashSet<String>();
+		//		CountByType countByType = new CountByType();
+		//		for (String line : Gpr.readFile(groupsFile).split("\n")) {
+		//			String rec[] = line.split("\t");
+		//			String id = rec[0];
+		//			String group = rec[1];
+		//
+		//			if ((group != null) && (!group.isEmpty())) {
+		//				groups.put(id, group);
+		//				groupNames.add(group);
+		//				countByType.inc(group);
+		//			}
+		//		}
+		//		Timer.showStdErr("Total : " + groups.size() + " entries.\n" + countByType);
+		//
+		//		// Sort group names
+		//		groupNamesSorted = new ArrayList<String>();
+		//		groupNamesSorted.addAll(groupNames);
+		//		Collections.sort(groupNamesSorted);
+		//
+		//		//---
+		//		// Load intervals
+		//		//---
+		//		Timer.showStdErr("Loading intervals from " + bedFile);
+		//		SeqChangeBedFileIterator bed = new SeqChangeBedFileIterator(bedFile);
+		//		intervals = bed.load();
+		//		Timer.showStdErr("Done. Number of intervals: " + intervals.size());
+		//		if (intervals.size() <= 0) {
+		//			System.err.println("Fatal error: No intervals!");
+		//			System.exit(1);
+		//		}
+		//
+		//		// Create interval forest
+		//		Timer.showStdErr("Building interval forest.");
+		//		intForest = new IntervalForest();
+		//		for (SeqChange sc : intervals)
+		//			intForest.add(sc);
+		//		intForest.build();
 
-			boolean isCase = Gpr.parseIntSafe(rec[1]) == PHENOTYPE_CASE;
-			caseControls.put(rec[0], isCase); // Add to hash
-
-			if (isCase) countCase++;
-			else countCtrl++;
-		}
-		Timer.showStdErr("Total : " + caseControls.size() + " entries. Cases: " + countCase + ", controls: " + countCtrl);
-
-		//---
-		// Read groups
-		// Format:	"id\tgroupName\n"	 (only one group per sample)
-		//---
-		Timer.showStdErr("Reading groups from " + groupsFile);
-		groups = new HashMap<String, String>();
-		HashSet<String> groupNames = new HashSet<String>();
-		CountByType countByType = new CountByType();
-		for (String line : Gpr.readFile(groupsFile).split("\n")) {
-			String rec[] = line.split("\t");
-			String id = rec[0];
-			String group = rec[1];
-
-			if ((group != null) && (!group.isEmpty())) {
-				groups.put(id, group);
-				groupNames.add(group);
-				countByType.inc(group);
-			}
-		}
-		Timer.showStdErr("Total : " + groups.size() + " entries.\n" + countByType);
-
-		// Sort group names
-		groupNamesSorted = new ArrayList<String>();
-		groupNamesSorted.addAll(groupNames);
-		Collections.sort(groupNamesSorted);
-
-		//---
-		// Load intervals
-		//---
-		Timer.showStdErr("Loading intervals from " + intervalsFile);
-		SeqChangeBedFileIterator bed = new SeqChangeBedFileIterator(intervalsFile);
-		intervals = bed.load();
-		Timer.showStdErr("Done. Number of intervals: " + intervals.size());
-		if (intervals.size() <= 0) {
-			System.err.println("Fatal error: No intervals!");
-			System.exit(1);
-		}
-
-		// Create interval forest
-		Timer.showStdErr("Building interval forest.");
-		intForest = new IntervalForest();
-		for (SeqChange sc : intervals)
-			intForest.add(sc);
-		intForest.build();
+		throw new RuntimeException("THIS HAS TO BE RE_IMPLEMENTED USING TPED FILE!!!");
 	}
 
 	/**
@@ -170,18 +157,16 @@ public class SnpSiftCmdCaseControlSummary extends SnpSift {
 				else if (args[argc].equals("-q")) verbose = false;
 				else usage("Unknown option '" + args[argc] + "'");
 
-			} else if (caseControlFile == null) caseControlFile = args[argc];
-			else if (groupsFile == null) groupsFile = args[argc];
-			else if (intervalsFile == null) intervalsFile = args[argc];
+			} else if (tpedFile == null) tpedFile = args[argc];
+			else if (bedFile == null) bedFile = args[argc];
 			else if (vcfFile == null) vcfFile = args[argc];
 
 		}
 
 		// Sanity check
-		if (caseControlFile == null) usage("Missing paramter 'caseControlFile'");
-		if (groupsFile == null) usage("Missing paramter 'groupsFile'");
-		if (intervalsFile == null) usage("Missing paramter 'intervalsFile'");
-		if (vcfFile == null) usage("Missing paramter 'vcfFile'");
+		if (tpedFile == null) usage("Missing paramter 'file.tped'");
+		if (bedFile == null) usage("Missing paramter 'file.bed'");
+		if (vcfFile == null) usage("Missing paramter 'file.vcf'");
 	}
 
 	/**
@@ -375,7 +360,12 @@ public class SnpSiftCmdCaseControlSummary extends SnpSift {
 
 		showVersion();
 
-		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar ccs [-v] [-q]  caseControlFile groupsFile bedFile vcfFile");
+		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar ccs [-v] [-q] file.tped file.bed file.vcf");
+		System.err.println("Where:");
+		System.err.println("\tfile.tped  : File with genotypes and groups informations (groups are in familyId)");
+		System.err.println("\tfile.bed   : File with regions of interest (intervals in BED format)");
+		System.err.println("\tfile.vcf   : A VCF file (variants and genotype data)");
+		System.err.println("\nOptions:");
 		System.err.println("\t-q       : Be quiet");
 		System.err.println("\t-v       : Be verbose");
 		System.exit(1);
