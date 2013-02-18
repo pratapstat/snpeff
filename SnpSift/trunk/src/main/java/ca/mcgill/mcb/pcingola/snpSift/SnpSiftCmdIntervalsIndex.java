@@ -148,7 +148,7 @@ public class SnpSiftCmdIntervalsIndex extends SnpSift {
 		for (SeqChange sc : seqChanges) {
 			try {
 				if (verbose) Timer.showStdErr("Finding interval: " + sc.getChromosomeName() + ":" + (sc.getStart() + 1) + "-" + (sc.getEnd() + 1));
-				fileIndexChrPos.dump(sc.getChromosomeName(), sc.getStart(), sc.getEnd());
+				fileIndexChrPos.dump(sc.getChromosomeName(), sc.getStart(), sc.getEnd(), false);
 			} catch (Throwable t) {
 				t.printStackTrace();
 			}
