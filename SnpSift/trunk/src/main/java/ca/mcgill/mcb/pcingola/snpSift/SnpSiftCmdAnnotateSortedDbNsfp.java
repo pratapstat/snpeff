@@ -11,8 +11,8 @@ import ca.mcgill.mcb.pcingola.fileIterator.DbNsfpFileIterator;
 import ca.mcgill.mcb.pcingola.fileIterator.SeekableBufferedReader;
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
 import ca.mcgill.mcb.pcingola.util.Timer;
+import ca.mcgill.mcb.pcingola.vcf.FileIndexChrPos;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
-import ca.mcgill.mcb.pcingola.vcf.VcfFileIndexIntervals;
 
 /**
  * Annotate a VCF file with dbNSFP. 
@@ -45,7 +45,7 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 	protected int count = 0;
 	protected int countAnnotated = 0;
 	protected DbNsfpFileIterator dbNsfpFile;
-	protected VcfFileIndexIntervals indexDb;
+	protected FileIndexChrPos indexDb;
 	protected VcfFileIterator vcfFile;
 	protected DbNsfpEntry currentDbEntry;
 	protected String prevChr = null;
@@ -154,14 +154,14 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 	 * @param fileName
 	 * @return
 	 */
-	private VcfFileIndexIntervals index(String fileName) {
+	private FileIndexChrPos index(String fileName) {
 		if (verbose) System.err.println("Index: " + fileName);
-		VcfFileIndexIntervals vcfFileIndexIntervals = new VcfFileIndexIntervals(fileName);
-		vcfFileIndexIntervals.setVerbose(verbose);
-		vcfFileIndexIntervals.open();
-		vcfFileIndexIntervals.index();
-		vcfFileIndexIntervals.close();
-		return vcfFileIndexIntervals;
+		FileIndexChrPos fileIndex = new FileIndexChrPos(fileName);
+		fileIndex.setVerbose(verbose);
+		fileIndex.open();
+		fileIndex.index();
+		fileIndex.close();
+		return fileIndex;
 	}
 
 	/**
