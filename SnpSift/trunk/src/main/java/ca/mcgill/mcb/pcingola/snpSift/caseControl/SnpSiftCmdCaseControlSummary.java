@@ -323,7 +323,6 @@ public class SnpSiftCmdCaseControlSummary extends SnpSift {
 				// Read header info
 				headerVcf = false;
 				sampleIds = parseSampleIds(vcf);
-				parseDbNsfpFields(vcf);
 			}
 
 			if (ve.getAlts().length > 1) Gpr.debug("Ignoring entry with more than one ALT:\t" + ve);

@@ -32,6 +32,7 @@ public class TestSuiteAll {
 		suite.addTestSuite(TestCasesIntervals.class);
 		suite.addTestSuite(TestCasesExtractFields.class);
 		suite.addTestSuite(TestCasesSplit.class);
+		suite.addTestSuite(TestCasesPrivate.class);
 
 		return suite;
 	}

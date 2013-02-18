@@ -1,22 +1,15 @@
 package ca.mcgill.mcb.pcingola.snpSift;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
-import ca.mcgill.mcb.pcingola.collections.AutoHashMap;
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
-import ca.mcgill.mcb.pcingola.interval.Marker;
-import ca.mcgill.mcb.pcingola.interval.SeqChange;
-import ca.mcgill.mcb.pcingola.interval.tree.IntervalForest;
-import ca.mcgill.mcb.pcingola.snpSift.caseControl.Summary;
-import ca.mcgill.mcb.pcingola.util.Gpr;
+import ca.mcgill.mcb.pcingola.ped.PedPedigree;
+import ca.mcgill.mcb.pcingola.ped.TfamEntry;
+import ca.mcgill.mcb.pcingola.stats.CountByType;
 import ca.mcgill.mcb.pcingola.util.Timer;
-import ca.mcgill.mcb.pcingola.vcf.VcfEffect.FormatVersion;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
-import ca.mcgill.mcb.pcingola.vcf.VcfHeader;
-import ca.mcgill.mcb.pcingola.vcf.VcfInfo;
+import ca.mcgill.mcb.pcingola.vcf.VcfGenotype;
 
 /**
  * Annotate if a variant is 'private'. I.e. only represented within a family (or group)
@@ -25,18 +18,13 @@ import ca.mcgill.mcb.pcingola.vcf.VcfInfo;
  */
 public class SnpSiftCmdPrivate extends SnpSift {
 
-	public static FormatVersion formatVersion = null;
+	public static final String INFO_PRIVATE_NAME = "Private";
 
 	boolean headerSummary = true;
-	String tpedFile, bedFile, vcfFile; // File names
-	HashMap<String, Boolean> caseControls; // Cases and controls 
-	HashMap<String, String> groups; // ID -> Group map
-	List<SeqChange> intervals; // Intervals to summarize
-	ArrayList<String> groupNamesSorted; // Group names sorted alphabetically
-	IntervalForest intForest; // Intervals
+	String tfamFile, vcfFile; // File names
+	String[] sampleNum2group;
 	List<String> sampleIds; // Sample IDs
-	AutoHashMap<Marker, Summary> summaryByInterval; // Summary by interval
-	ArrayList<String> infoFields; // Other info fields to include in summaries (per snp)
+	PedPedigree pedigree;
 
 	public SnpSiftCmdPrivate(String[] args) {
 		super(args, "private");
@@ -46,16 +34,24 @@ public class SnpSiftCmdPrivate extends SnpSift {
 	 * Parse a single VCF entry
 	 * @param ve
 	 */
-	void annotate(VcfEntry ve) {
+	boolean annotate(VcfEntry ve) {
+		String privateGorup = privateGroup(ve);
 
+		// Is there a private group?
+		if (privateGorup != null) {
+			ve.addInfo(INFO_PRIVATE_NAME, privateGorup);
+			return true;
+		}
+		return false;
 	}
 
 	/**
 	 * Load all data
 	 */
-	void load() {
-
-		throw new RuntimeException("THIS HAS TO BE RE_IMPLEMENTED USING TPED FILE!!!");
+	void loadTfam() {
+		if (verbose) Timer.showStdErr("Loading TFAM file '" + tfamFile + "'");
+		pedigree = new PedPedigree();
+		pedigree.loadTfam(tfamFile);
 	}
 
 	@Override
@@ -65,35 +61,17 @@ public class SnpSiftCmdPrivate extends SnpSift {
 		int nonOpts = -1;
 
 		for (int argc = 0; argc < args.length; argc++) {
-			if ((nonOpts < 0) && args[argc].startsWith("-")) { // Argument starts with '-'?
-
-				if (args[argc].equals("-h") || args[argc].equalsIgnoreCase("-help")) usage(null);
-				else if (args[argc].equals("-v")) verbose = true;
-				else if (args[argc].equals("-q")) verbose = false;
-				else usage("Unknown option '" + args[argc] + "'");
-
-			} else if (tpedFile == null) tpedFile = args[argc];
-			else if (bedFile == null) bedFile = args[argc];
+			if ((nonOpts < 0) && args[argc].startsWith("-")) {
+				// Argument starts with '-'? (all default arguments are processed by SnpSift
+				usage("Unknown option '" + args[argc] + "'");
+			} else if (tfamFile == null) tfamFile = args[argc];
 			else if (vcfFile == null) vcfFile = args[argc];
 
 		}
 
 		// Sanity check
-		if (tpedFile == null) usage("Missing paramter 'file.tped'");
-		if (bedFile == null) usage("Missing paramter 'file.bed'");
+		if (tfamFile == null) usage("Missing paramter 'file.tped'");
 		if (vcfFile == null) usage("Missing paramter 'file.vcf'");
-	}
-
-	/**
-	 * Parse DBNSFP fields to add to summary
-	 * @param vcf
-	 */
-	void parseDbNsfpFields(VcfFileIterator vcf) {
-		VcfHeader vcfHeader = vcf.getVcfHeader();
-		for (VcfInfo vcfInfo : vcfHeader.getVcfInfo())
-			if (vcfInfo.getId().startsWith(SnpSiftCmdAnnotateSortedDbNsfp.VCF_INFO_PREFIX)) infoFields.add(vcfInfo.getId());
-		Collections.sort(infoFields);
-
 	}
 
 	/**
@@ -101,60 +79,106 @@ public class SnpSiftCmdPrivate extends SnpSift {
 	 * @param vcf
 	 */
 	List<String> parseSampleIds(VcfFileIterator vcf) {
-		int missingCc = 0, missingGroups = 0;
+		// Get sample names
+		sampleIds = vcf.getSampleNames();
 
-		// Read IDs
-		List<String> sampleIds = vcf.getSampleNames();
+		// Initialize sampleNum2group mapping
+		CountByType countByGroup = new CountByType();
+		sampleNum2group = new String[sampleIds.size()];
+		int sampleNum = 0, missing = 0;
 		for (String id : sampleIds) {
-			if (!caseControls.containsKey(id)) missingCc++;
-			if (!groups.containsKey(id)) missingGroups++;
+			TfamEntry tfam = pedigree.get(id);
+			String groupId = "";
+
+			if (tfam == null) {
+				missing++;
+				System.err.println("WARNING: VCF sample '" + id + "' not found in TFAM file.");
+			} else groupId = tfam.getFamilyId();
+
+			// Assign group
+			sampleNum2group[sampleNum] = groupId;
+			countByGroup.inc(groupId);
+			sampleNum++;
 		}
 
-		Timer.showStdErr("Samples missing case/control info: " + missingCc);
-		Timer.showStdErr("Samples missing groups info: " + missingGroups);
+		if (missing == sampleIds.size()) throw new RuntimeException("All samples are missing in TFAM file!");
 
-		// Too many missing IDs? Error
-		if (((1.0 * missingCc) / sampleIds.size() > 0.5) || ((1.0 * missingCc) / sampleIds.size() > 0.5)) {
-			Timer.showStdErr("Fatal error: Too much missing data!");
-			System.exit(1);
-		}
-
-		// TODO: Test code, move somewhere else
-		VcfHeader vcfHeader = vcf.getVcfHeader();
-		for (VcfInfo vcfInfo : vcfHeader.getVcfInfo())
-			if (vcfInfo.getId().startsWith(SnpSiftCmdAnnotateSortedDbNsfp.VCF_INFO_PREFIX)) infoFields.add(vcfInfo.getId());
-		Collections.sort(infoFields);
+		// Show counts by group
+		if (verbose) System.err.println("Counts by group:\nGroup\tCount\n" + countByGroup);
 
 		return sampleIds;
 	}
 
 	/**
-	 * Run summary
+	 * Name of the group, if this variant private. Null otherwise
+	 * 
+	 * @param ve
+	 */
+	String privateGroup(VcfEntry ve) {
+		String groupPrev = null;
+		int sampleNum = 0;
+
+		for (VcfGenotype gen : ve) {
+			// Is this genotype a variant?
+			if (gen.isVariant()) {
+				String group = sampleNum2group[sampleNum]; // Group for this genotype
+
+				// Analyze groups
+				if (group.isEmpty()) {
+					// Nothing to do
+				} else if (groupPrev == null) groupPrev = group;
+				else if (!group.equals(groupPrev)) return null; // Variant present in another group? Then it is not private!
+			}
+
+			sampleNum++;
+		}
+
+		return groupPrev; // If there was at least one variant, then it was private
+	}
+
+	/**
+	 * Run annotations
 	 */
 	@Override
 	public void run() {
-		// Load intervals, phenotypes, etc.
-		load();
+		run(false);
+	}
 
-		// Initialize
-		summaryByInterval = new AutoHashMap<Marker, Summary>(new Summary());
-		infoFields = new ArrayList<String>();
-		headerSummary = true;
-		boolean headerVcf = true;
+	/**
+	 * Run annotations. Create a list of VcfEntries if 'createList' is true (use for test cases)
+	 */
+	public List<VcfEntry> run(boolean createList) {
+		// Load Tfam file
+		loadTfam();
 
 		// Read VCF
+		if (verbose) Timer.showStdErr("Annotating VCF file '" + vcfFile + "'");
+		int countLines = 0, countAnnotated = 0;
+		ArrayList<VcfEntry> vcfEntries = new ArrayList<VcfEntry>();
 		VcfFileIterator vcf = new VcfFileIterator(vcfFile);
 		for (VcfEntry ve : vcf) {
-			if (headerVcf) {
-				// Read header info
-				headerVcf = false;
+			// Read header info
+			if (vcf.isHeadeSection()) {
+				// Get sameple names
 				sampleIds = parseSampleIds(vcf);
-				parseDbNsfpFields(vcf);
+
+				// Update header
+				vcf.getVcfHeader().addLine("##INFO=<ID=" + INFO_PRIVATE_NAME + ",Number=1,Type=String,Description=\"If the variant is private (i.e. belongs only to one group or family) the group name is shown. Groups from file = '" + tfamFile + "'\">");
+
+				// Show header
+				if (!createList) System.out.println(vcf.getVcfHeader());
 			}
 
-			if (ve.getAlts().length > 1) Gpr.debug("Ignoring entry with more than one ALT:\t" + ve);
-			else annotate(ve);
+			if (annotate(ve)) countAnnotated++;
+			countLines++;
+
+			// Show (or add to list)
+			if (createList) vcfEntries.add(ve);
+			else System.out.println(ve);
 		}
+
+		if (verbose) Timer.showStdErr("Done.\n\tVCF entries: " + countLines + "\n\tVCF entries annotated: " + countAnnotated);
+		return vcfEntries;
 	}
 
 	/**
@@ -170,9 +194,9 @@ public class SnpSiftCmdPrivate extends SnpSift {
 
 		showVersion();
 
-		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar private file.tped file.vcf");
+		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar private file.tfam file.vcf");
 		System.err.println("Where:");
-		System.err.println("\tfile.tped  : File with genotypes and groups informations (groups are in familyId)");
+		System.err.println("\tfile.tfam  : File with genotypes and groups information (in PLINK's TFAM format)");
 		System.err.println("\tfile.vcf   : A VCF file (variants and genotype data)");
 		System.exit(1);
 	}
