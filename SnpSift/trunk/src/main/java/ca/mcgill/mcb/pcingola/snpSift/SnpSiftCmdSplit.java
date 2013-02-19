@@ -101,7 +101,7 @@ public class SnpSiftCmdSplit extends SnpSift {
 
 		// Init
 		boolean isHeader = true;
-		int lineNum = 0, fileNum = 0;
+		int lineNum = 1, fileNum = 0;
 		String chrPrev = "";
 
 		// Open file and iterate
@@ -128,7 +128,7 @@ public class SnpSiftCmdSplit extends SnpSift {
 
 					// New file? Split file?
 					if ((out == null) // No file created?
-							|| ((numLines > 0) && (numLines <= lineNum)) // Splitting by lines :  Number of lines reached?
+							|| ((numLines > 0) && (numLines < lineNum)) // Splitting by lines :  Number of lines reached?
 							|| ((numLines <= 0) && (!chr.equals(chrPrev))) // Splitting by chromosome split: Is this a new chromosome? 
 					) {
 						// Split file
@@ -136,7 +136,7 @@ public class SnpSiftCmdSplit extends SnpSift {
 						out = newFile(baseName, chr, fileNum);
 						fileNum++;
 						chrPrev = chr;
-						lineNum = 0;
+						lineNum = 1;
 					}
 
 					// Write line
@@ -167,9 +167,10 @@ public class SnpSiftCmdSplit extends SnpSift {
 		}
 
 		showVersion();
-		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar splitChr [-v] [-l <num>]file.vcf");
+		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar splitChr [-v] [-l <num>] [-n <num>] file.vcf");
 		System.err.println("Options:");
-		System.err.println("\t-l <num>   : Split by 'num' lines (instead of chromosomes).");
+		System.err.println("\t-l <num>   : Split by 'num' lines.");
+		System.err.println("\tDefault    : Split by chromosome (one file per chromosome).");
 		System.exit(1);
 	}
 }
