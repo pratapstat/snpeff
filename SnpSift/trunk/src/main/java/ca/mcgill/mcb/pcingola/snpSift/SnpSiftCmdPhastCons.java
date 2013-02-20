@@ -128,7 +128,7 @@ public class SnpSiftCmdPhastCons extends SnpSift {
 
 			double perc = (100.0 * countNonZero) / score.length;
 			System.err.println("");
-			Timer.showStdErr("Total non-zero scores: " + countNonZero + " / " + score.length + " [" + perc + "]");
+			Timer.showStdErr(String.format("Total non-zero scores: %d / %d [%.2f%%]", countNonZero, score.length, perc));
 		}
 
 		return index > 0;
