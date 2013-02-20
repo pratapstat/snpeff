@@ -18,7 +18,7 @@ import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
  * 
  * @author pcingola
  */
-public class SnpSiftCmpdPhastCons extends SnpSift {
+public class SnpSiftCmdPhastCons extends SnpSift {
 
 	// Wig fields
 	public static final String START_FIELD = "start=";
@@ -34,7 +34,7 @@ public class SnpSiftCmpdPhastCons extends SnpSift {
 	HashMap<String, Integer> chromoSize;
 	short score[];
 
-	public SnpSiftCmpdPhastCons(String[] args) {
+	public SnpSiftCmdPhastCons(String[] args) {
 		super(args, "phastCons");
 	}
 
@@ -80,14 +80,14 @@ public class SnpSiftCmpdPhastCons extends SnpSift {
 	 * @param chromo
 	 * @return
 	 */
-	boolean loadChromo(String chromo) {
+	boolean loadChromo(String chromo, VcfEntry ve) {
 		chromo = Chromosome.simpleName(chromo);
 		score = null;
 
 		// Find a file that matches a phastCons name
-		String wigFile = findPhastConsFile(phastConsDir, ".*/chr" + chromo + ".phastCons.\\d+way.wigFix");
+		String wigFile = findPhastConsFile(phastConsDir, ".*/chr" + chromo + ".phastCons.\\d+way.wigFix.*");
 		if ((wigFile == null) || !Gpr.exists(wigFile)) {
-			Timer.showStdErr("Cannot open PhastCons file '" + wigFile + "'");
+			Timer.showStdErr("Cannot open PhastCons file '" + wigFile + "' for chromosome '" + chromo + "'\n\tVcfEntry:\t" + ve);
 			return false;
 		}
 
@@ -198,7 +198,7 @@ public class SnpSiftCmpdPhastCons extends SnpSift {
 			// Do we need to load a database?
 			if (!chrPrev.equals(ve.getChromosomeName())) {
 				chrPrev = ve.getChromosomeName();
-				loadChromo(chrPrev);
+				loadChromo(chrPrev, ve);
 			}
 
 			// Annotate entry

@@ -162,7 +162,7 @@ public class SnpSift {
 		else if (command.startsWith("TS")) cmd = new SnpSiftCmdTsTv(args);
 		else if (command.startsWith("VARTYPE")) cmd = new SnpSiftCmdVarType(args);
 		else if (command.startsWith("PRIVATE")) cmd = new SnpSiftCmdPrivate(args);
-		else if (command.startsWith("PHASTCONS")) cmd = new SnpSiftCmpdPhastCons(args);
+		else if (command.startsWith("PHASTCONS")) cmd = new SnpSiftCmdPhastCons(args);
 		else usage("Unknown command '" + command + "'");
 
 		// Help? Show help and exit
@@ -254,7 +254,6 @@ public class SnpSift {
 				+ "\n\tannMem        : Annotate 'ID' from a database (e.g. dbSnp). Loads db in memory. Does not assume sorted entries." //
 				+ "\n\tcaseControl   : Compare how many variants are in 'case' and in 'control' groups. Also calculates p-values (Fisher exact test and Cochran-Armitage test)" //
 				+ "\n\tccs           : Case control summary. Case and control summaries by region, allele frequency and variant's functional effect." //
-				+ "\n\tcons          : Annotate using conservation scores (phastCons)." //
 				+ "\n\tcovMat        : Create an covariance matrix output (allele matrix as input)." //
 				+ "\n\tdbnsfp        : Annotate with multiple entries from dbNSFP. <EXPERIMENTAL>" //
 				+ "\n\textractFields : Extract fields from VCF file into tab separated format." //
@@ -264,6 +263,7 @@ public class SnpSift {
 				+ "\n\tintervals     : Keep variants that intersect with intervals." //
 				+ "\n\tintIdx        : Keep variants that intersect with intervals. Index-based method: Used for large VCF file and a few intervals to retrieve" //
 				+ "\n\tjoin          : Join files by genomic region." //
+				+ "\n\tphastCons     : Annotate using conservation scores (phastCons)." //
 				+ "\n\tprivate       : Annotate if a variant is private to a family or group." //
 				+ "\n\trmRefGen      : Remove reference genotypes." //
 				+ "\n\ttstv          : Calculate transiton to transversion ratio." //
