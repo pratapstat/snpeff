@@ -167,7 +167,7 @@ public class SnpSiftCmdSplit extends SnpSift {
 		}
 
 		showVersion();
-		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar splitChr [-v] [-l <num>] [-n <num>] file.vcf");
+		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar splitChr [-l <num>] [-n <num>] file.vcf");
 		System.err.println("Options:");
 		System.err.println("\t-l <num>   : Split by 'num' lines.");
 		System.err.println("\tDefault    : Split by chromosome (one file per chromosome).");

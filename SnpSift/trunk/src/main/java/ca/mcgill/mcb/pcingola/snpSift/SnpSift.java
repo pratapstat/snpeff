@@ -22,10 +22,10 @@ import flanagan.analysis.Stat;
  */
 public class SnpSift {
 
-	public static final String BUILD = "2013-02-12";
+	public static final String BUILD = "2013-02-19";
 
-	public static final String VERSION_MAJOR = "1.8";
-	public static final String REVISION = "c";
+	public static final String VERSION_MAJOR = "1.9";
+	public static final String REVISION = "";
 	public static final String VERSION_SHORT = VERSION_MAJOR + REVISION;
 	public static final String VERSION = VERSION_SHORT + " (build " + BUILD + "), by " + Pcingola.BY;
 
@@ -162,6 +162,7 @@ public class SnpSift {
 		else if (command.startsWith("TS")) cmd = new SnpSiftCmdTsTv(args);
 		else if (command.startsWith("VARTYPE")) cmd = new SnpSiftCmdVarType(args);
 		else if (command.startsWith("PRIVATE")) cmd = new SnpSiftCmdPrivate(args);
+		else if (command.startsWith("PHASTCONS")) cmd = new SnpSiftCmpdPhastCons(args);
 		else usage("Unknown command '" + command + "'");
 
 		// Help? Show help and exit
