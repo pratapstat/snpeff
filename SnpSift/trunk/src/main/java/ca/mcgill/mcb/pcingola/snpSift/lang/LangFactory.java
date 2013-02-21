@@ -20,6 +20,7 @@ import ca.mcgill.mcb.pcingola.snpSift.lang.condition.Le;
 import ca.mcgill.mcb.pcingola.snpSift.lang.condition.Lt;
 import ca.mcgill.mcb.pcingola.snpSift.lang.condition.Match;
 import ca.mcgill.mcb.pcingola.snpSift.lang.condition.Na;
+import ca.mcgill.mcb.pcingola.snpSift.lang.condition.Neq;
 import ca.mcgill.mcb.pcingola.snpSift.lang.condition.Not;
 import ca.mcgill.mcb.pcingola.snpSift.lang.condition.NotMatch;
 import ca.mcgill.mcb.pcingola.snpSift.lang.condition.Or;
@@ -103,6 +104,7 @@ public class LangFactory {
 			else if (leaveName.equalsIgnoreCase(">")) condition = new Gt(left, right);
 			else if (leaveName.equalsIgnoreCase(">=")) condition = new Ge(left, right);
 			else if (leaveName.equalsIgnoreCase("=")) condition = new Eq(left, right);
+			else if (leaveName.equalsIgnoreCase("!=")) condition = new Neq(left, right);
 			else if (leaveName.equalsIgnoreCase("=~")) condition = new Match(left, right);
 			else if (leaveName.equalsIgnoreCase("!~")) condition = new NotMatch(left, right);
 			else throw new RuntimeException("Unknown operator '" + leaveName + "'");
