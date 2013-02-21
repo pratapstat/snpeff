@@ -145,10 +145,12 @@ public class SnpSiftCmdIntervalsIndex extends SnpSift {
 		if (verbose) Timer.showStdErr("Done");
 
 		// Find all intervals
+		int scNum = 1;
 		for (SeqChange sc : seqChanges) {
 			try {
-				if (verbose) Timer.showStdErr("Finding interval: " + sc.getChromosomeName() + ":" + (sc.getStart() + 1) + "-" + (sc.getEnd() + 1));
+				if (verbose) Timer.showStdErr(scNum + " / " + seqChanges.size() + "\t\tFinding interval: " + sc.getChromosomeName() + ":" + (sc.getStart() + 1) + "-" + (sc.getEnd() + 1));
 				fileIndexChrPos.dump(sc.getChromosomeName(), sc.getStart(), sc.getEnd(), false);
+				scNum++;
 			} catch (Throwable t) {
 				t.printStackTrace();
 			}
