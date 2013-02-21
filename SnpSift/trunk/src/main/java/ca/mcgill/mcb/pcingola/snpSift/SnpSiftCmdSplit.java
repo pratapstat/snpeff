@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import ca.mcgill.mcb.pcingola.fileIterator.LineFileIterator;
+import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
 import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.util.Timer;
 
@@ -20,14 +21,14 @@ public class SnpSiftCmdSplit extends SnpSift {
 	public static final int SHOW_LINES = 100 * SHOW;
 	public static String exts[] = { ".vcf", ".vcf.gz" };
 
+	boolean join; // Join files (reverse of split)
 	String vcfFile;
 	StringBuilder header = new StringBuilder();
-	int numLines;
+	int numLines; // Number of lines to use when splitting
 	ArrayList<String> fileNames;
 
 	public SnpSiftCmdSplit(String args[]) {
 		super(args, "split");
-		fileNames = new ArrayList<String>();
 	}
 
 	/**
@@ -36,6 +37,40 @@ public class SnpSiftCmdSplit extends SnpSift {
 	 */
 	public ArrayList<String> getFileNames() {
 		return fileNames;
+	}
+
+	/**
+	 * Join files
+	 * @param createString : Create a string used for test cases) 
+	 * @return A string with the resulting file if createString is true. An empty string otherwise.
+	 */
+	public String join(boolean createString) {
+		boolean first = true;
+		StringBuilder sb = new StringBuilder();
+
+		// Iterate all files
+		for (String file : fileNames) {
+			if (first) {
+				// Show header from first file
+				VcfFileIterator vcf = new VcfFileIterator(file);
+				vcf.next();
+
+				if (createString) sb.append(vcf.getVcfHeader() + "\n");
+				else System.out.println(vcf.getVcfHeader());
+
+				first = false;
+				vcf.close();
+			}
+
+			// Dump file to STDOUT (remove header)
+			LineFileIterator lfi = new LineFileIterator(file);
+			for (String line : lfi)
+				if (!line.startsWith("#")) {
+					if (createString) sb.append(line + "\n");
+					else System.out.println(line);
+				}
+		}
+		return sb.toString();
 	}
 
 	/**
@@ -72,21 +107,33 @@ public class SnpSiftCmdSplit extends SnpSift {
 	 */
 	@Override
 	public void parse(String[] args) {
-		numLines = -1;
 		if (args.length == 0) usage(null);
 
+		// Initialize
+		numLines = -1;
+		fileNames = new ArrayList<String>();
+
+		// Parse args
 		for (int i = 0; i < args.length; i++) {
-			if (args[i].equals("-l")) {
+			if (args[i].equals("-j")) join = true;
+			else if (args[i].equals("-l")) {
 				// Parse number of lines
 				if ((i + 1) < args.length) {
 					String numStr = args[++i];
 					numLines = Gpr.parseIntSafe(numStr);
 					if (numLines <= 0) usage("Number of lines must be a positive number. num = '" + numStr + "'");
 				} else usage("Missing 'num' argument");
-			} else if (vcfFile == null) vcfFile = args[i];
+			} else if (vcfFile == null) {
+				if (join) fileNames.add(args[i]); // Joining? 
+				else vcfFile = args[i]; // Splitting?
+			}
 		}
 
-		if (vcfFile == null) usage("Missing 'file.vcf'");
+		// Sanity checks
+		if (join) {
+			if (numLines > 0) usage("Cannot use option '-l' when joining files (option '-j').");
+			if (fileNames.size() <= 1) usage("Cannot 'join' less than two files.");
+		} else if (vcfFile == null) usage("Missing 'file.vcf'");
 	}
 
 	/**
@@ -94,6 +141,14 @@ public class SnpSiftCmdSplit extends SnpSift {
 	 */
 	@Override
 	public void run() {
+		if (join) join(false);
+		else split();
+	}
+
+	/**
+	 * Split file
+	 */
+	void split() {
 		if (verbose) Timer.showStdErr("Splitting file '" + vcfFile + "'");
 
 		// Base file name
@@ -167,8 +222,9 @@ public class SnpSiftCmdSplit extends SnpSift {
 		}
 
 		showVersion();
-		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar splitChr [-l <num>] [-n <num>] file.vcf");
+		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar splitChr [-j] [-l <num>] [-n <num>] file.vcf [file_2.vcf ... file_N.vcf]");
 		System.err.println("Options:");
+		System.err.println("\t-j         : Join all files in command line (output = STDOUT).");
 		System.err.println("\t-l <num>   : Split by 'num' lines.");
 		System.err.println("\tDefault    : Split by chromosome (one file per chromosome).");
 		System.exit(1);

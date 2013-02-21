@@ -50,10 +50,6 @@ public class TestCasesSplit extends TestCase {
 		int numLines = 2;
 		String file = "test/test_split_01.vcf";
 
-		// Delete old files
-		(new File("test/test_split_01.Y.vcf")).delete();
-		(new File("test/test_split_01.19.vcf")).delete();
-
 		// Run command
 		String args[] = { "-l", numLines + "", file };
 		SnpSiftCmdSplit cmd = new SnpSiftCmdSplit(args);
@@ -68,4 +64,39 @@ public class TestCasesSplit extends TestCase {
 			Assert.assertEquals(numLines + 1, n); // We expect 'numLines' + 1 header line
 		}
 	}
+
+	/**
+	 * Split and join
+	 */
+	public void test_03() {
+		//---
+		// Split
+		//---
+		String file = "test/test_split_01.vcf";
+		String originalFile = Gpr.readFile(file);
+
+		// Delete old files
+		(new File("test/test_split_01.Y.vcf")).delete();
+		(new File("test/test_split_01.19.vcf")).delete();
+
+		// Run command
+		String args[] = { file };
+		SnpSiftCmdSplit cmd = new SnpSiftCmdSplit(args);
+		cmd.setVerbose(true);
+		cmd.setDebug(debug);
+		cmd.run();
+
+		//---
+		// Join
+		//---
+		String argsJoin[] = { "-j", "test/test_split_01.Y.vcf", "test/test_split_01.19.vcf" };
+		cmd = new SnpSiftCmdSplit(argsJoin);
+		cmd.setVerbose(true);
+		cmd.setDebug(debug);
+		String joinedFile = cmd.join(true);
+
+		Assert.assertEquals(originalFile, joinedFile);
+
+	}
+
 }
