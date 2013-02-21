@@ -40,7 +40,7 @@ public class SnpSiftCmdExtractFields extends SnpSift {
 		do {
 			// Get value
 			String value = field.getFieldString(vcfEntry);
-			values.append(value);
+			if (value != null) values.append(value);
 
 			// End of iteration?
 			if (fieldIterator.hasNext()) {
