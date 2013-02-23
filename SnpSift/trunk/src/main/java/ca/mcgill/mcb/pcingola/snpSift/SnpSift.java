@@ -252,7 +252,7 @@ public class SnpSift {
 				+ "\n\talleleMat     : Create an allele matrix output." //
 				+ "\n\tannotate      : Annotate 'ID' from a database (e.g. dbSnp). Assumes entries are sorted." //
 				+ "\n\tannMem        : Annotate 'ID' from a database (e.g. dbSnp). Loads db in memory. Does not assume sorted entries." //
-				+ "\n\tcaseControl   : Compare how many variants are in 'case' and in 'control' groups. Also calculates p-values (Fisher exact test and Cochran-Armitage test)" //
+				+ "\n\tcaseControl   : Compare how many variants are in 'case' and in 'control' groups; calculate p-values." //
 				+ "\n\tccs           : Case control summary. Case and control summaries by region, allele frequency and variant's functional effect." //
 				+ "\n\tcovMat        : Create an covariance matrix output (allele matrix as input)." //
 				+ "\n\tdbnsfp        : Annotate with multiple entries from dbNSFP. <EXPERIMENTAL>" //
