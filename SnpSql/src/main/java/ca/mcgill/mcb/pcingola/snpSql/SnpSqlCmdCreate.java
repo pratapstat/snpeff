@@ -22,8 +22,8 @@ import ca.mcgill.mcb.pcingola.vcf.VcfInfo;
 public class SnpSqlCmdCreate extends SnpSql {
 
 	public static boolean debug = false;
-	public static int BATCH_SIZE = 100;
-	public static int SHOW_EVERY = 100 * BATCH_SIZE;
+	public static int BATCH_SIZE = 1000;
+	public static int SHOW_EVERY = 10 * BATCH_SIZE;
 
 	String vcfFileName;
 	long entryId = 0, effectId = 0, tupleId = 0, tupleIntId = 0, tupleFloatId = 0;
@@ -202,8 +202,9 @@ public class SnpSqlCmdCreate extends SnpSql {
 				}
 			}
 
+			// Send last batch
 			Timer.showStdErr("VCF entries: " + entryId + "\tEffects: " + effectId + "\tInfo fields: " + (tupleId + tupleIntId + tupleFloatId) + "\tElapsed: " + t);
-			sendBatch(); // Send last batch
+			sendBatch();
 
 			Timer.showStdErr("Done.");
 			ok = true;

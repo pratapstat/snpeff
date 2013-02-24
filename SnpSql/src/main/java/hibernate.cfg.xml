@@ -4,16 +4,13 @@
 <hibernate-configuration>
 	<session-factory>
 		<!-- Connection properties -->
-		
-		<!--  HSQL driver -->
 		<property name="dialect">org.hibernate.dialect.HSQLDialect</property>
+
+		<!--  HSQL driver -->
 		<property name="connection.driver_class">org.hsqldb.jdbcDriver</property>
 		<property name="connection.username">sa</property>
 		<property name="connection.password"></property>
-		<!-- We set the URL programatically -->
-		<!--  <property name="connection.url">jdbc:hsqldb:hsql://localhost/snpsql</property>  -->
-		<!--  <property name="connection.url">jdbc:hsqldb:file:/Users/pcingola/snpSql/snpsql</property> --> 
-	
+		
         <!-- Enable Hibernate's automatic session context management -->
         <property name="current_session_context_class">thread</property>
 

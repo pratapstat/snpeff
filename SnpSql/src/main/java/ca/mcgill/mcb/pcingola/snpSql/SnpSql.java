@@ -16,11 +16,12 @@ import ca.mcgill.mcb.pcingola.util.Gpr;
  */
 public class SnpSql implements CommandLine {
 
+	public static final String SOFTWARE_NAME = "SnpSql";
 	public static final String BUILD = "2012-06-18";
 	public static final String VERSION_MAJOR = "0.1";
 	public static final String REVISION = "";
 	public static final String VERSION_SHORT = VERSION_MAJOR + REVISION;
-	public static final String VERSION = "SnpSql " + VERSION_SHORT + " (build " + BUILD + "), by " + Pcingola.BY;
+	public static final String VERSION = SOFTWARE_NAME + " " + VERSION_SHORT + " (build " + BUILD + "), by " + Pcingola.BY;
 
 	protected String command = "";
 	protected String[] args; // Arguments used to invoke this command
@@ -49,6 +50,7 @@ public class SnpSql implements CommandLine {
 	/**
 	 * Parse command line arguments
 	 */
+	@Override
 	public void parseArgs(String[] args) {
 		this.args = args;
 		if (args.length <= 0) usage("Missing command");
@@ -83,6 +85,7 @@ public class SnpSql implements CommandLine {
 		return reportValues;
 	}
 
+	@Override
 	public boolean run() {
 		boolean ok = false;
 		SnpSql snpSql = null;
@@ -118,7 +121,7 @@ public class SnpSql implements CommandLine {
 			}
 
 			// Report usage statistics 
-			if (log) LogStats.report(VERSION, ok, verbose, args, err, snpSql.reportValues());
+			if (log) LogStats.report(SOFTWARE_NAME, VERSION_SHORT, VERSION, ok, verbose, args, err, snpSql.reportValues());
 
 		} catch (Throwable t) {
 		}
@@ -132,6 +135,7 @@ public class SnpSql implements CommandLine {
 		databasePath = (dir == null ? "" : dir + "/") + database;
 	}
 
+	@Override
 	public void usage(String message) {
 		if (message != null) System.err.println("Error: " + message + "\n");
 		System.err.println("SnpSql version " + VERSION);
