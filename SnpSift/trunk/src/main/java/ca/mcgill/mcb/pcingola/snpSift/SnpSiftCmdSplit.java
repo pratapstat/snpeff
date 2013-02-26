@@ -198,7 +198,7 @@ public class SnpSiftCmdSplit extends SnpSift {
 					out.write(line);
 					out.write("\n");
 
-					Gpr.showMark(lineNum, SHOW);
+					if (verbose) Gpr.showMark(lineNum, SHOW);
 					lineNum++;
 				}
 			}
@@ -222,7 +222,7 @@ public class SnpSiftCmdSplit extends SnpSift {
 		}
 
 		showVersion();
-		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar splitChr [-j] [-l <num>] [-n <num>] file.vcf [file_2.vcf ... file_N.vcf]");
+		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar splitChr [-j] [-l <num>] file.vcf [file_2.vcf ... file_N.vcf]");
 		System.err.println("Options:");
 		System.err.println("\t-j         : Join all files in command line (output = STDOUT).");
 		System.err.println("\t-l <num>   : Split by 'num' lines.");
