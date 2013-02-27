@@ -72,6 +72,14 @@ public class TestCasesCaseControl extends TestCase {
 		checkCaseControlString("test/test.private.03.vcf", "--", "0,0,0", "0,1,1");
 	}
 
+	public void test_03_Str2() {
+		checkCaseControlString("test/test.private.03.vcf", "+-", "0,1,1", "0,0,0");
+	}
+
+	public void test_03_Str3() {
+		checkCaseControlString("test/test.private.03.vcf", "0+", "0,0,0", "0,0,0");
+	}
+
 	public void test_04() {
 		checkCaseControlTfam("test/test.private.04.vcf", "test/test.private.01.tfam", "0,0,0", "1,0,2");
 	}
