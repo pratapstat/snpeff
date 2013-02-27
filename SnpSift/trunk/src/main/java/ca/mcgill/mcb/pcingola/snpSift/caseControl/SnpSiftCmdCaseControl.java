@@ -28,6 +28,7 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 	String groups;
 	String fileName;
 	PedPedigree pedigree;
+	String name;
 
 	public SnpSiftCmdCaseControl(String args[]) {
 		super(args, "casecontrol");
@@ -40,8 +41,8 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 	@Override
 	protected List<String> addHeader() {
 		List<String> addh = super.addHeader();
-		addh.add("##INFO=<ID=" + VCF_INFO_CASE + ",Number=3,Type=Integer,Description=\"Number of variants in cases: Hom, Het, Count\">");
-		addh.add("##INFO=<ID=" + VCF_INFO_CONTROL + ",Number=3,Type=Integer,Description=\"Number of variants in controls: Hom, Het, Count\">");
+		addh.add("##INFO=<ID=" + VCF_INFO_CASE + name + ",Number=3,Type=Integer,Description=\"Number of variants in cases: Hom, Het, Count\">");
+		addh.add("##INFO=<ID=" + VCF_INFO_CONTROL + name + ",Number=3,Type=Integer,Description=\"Number of variants in controls: Hom, Het, Count\">");
 		return addh;
 	}
 
@@ -76,8 +77,8 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		}
 
 		// Add info fields
-		vcfEntry.addInfo(VCF_INFO_CASE, casesHom + "," + casesHet + "," + cases);
-		vcfEntry.addInfo(VCF_INFO_CONTROL, ctrlHom + "," + ctrlHet + "," + ctrl);
+		vcfEntry.addInfo(VCF_INFO_CASE + name, casesHom + "," + casesHet + "," + cases);
+		vcfEntry.addInfo(VCF_INFO_CONTROL + name, ctrlHom + "," + ctrlHet + "," + ctrl);
 	}
 
 	@Override
@@ -135,11 +136,9 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		if (args.length <= 0) usage(null);
 
 		for (int argc = 0; argc < args.length; argc++) {
-			if (args[argc].startsWith("-")) {
-				if (args[argc].equals("-tfam")) tfamFile = args[++argc];
-				else if ((groups == null) && isGroupString(args[argc])) groups = args[argc];
-				else usage("Unkown parameter '" + args[argc] + "'");
-			} else if ((groups == null) && isGroupString(args[argc])) groups = args[argc];
+			if (args[argc].equals("-tfam")) tfamFile = args[++argc];
+			else if (args[argc].equals("-name")) name = args[++argc];
+			else if ((groups == null) && isGroupString(args[argc])) groups = args[argc];
 			else if (fileName == null) fileName = args[argc];
 			else usage("Unkown parameter '" + args[argc] + "'");
 		}
@@ -147,6 +146,8 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		// Sanity check
 		if (fileName == null) usage("Missing paramter 'file.vcf'");
 		if ((groups == null) && (tfamFile == null)) usage("You must provide either a 'group' string or a TFAM file");
+
+		if (name == null) name = "";
 	}
 
 	/**
@@ -221,9 +222,10 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 
 		showVersion();
 
-		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar caseControl [-v] <CaseControlString> file.vcf");
+		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar caseControl [-v] [-name nameString] { -tfam file.tfam | <CaseControlString> } file.vcf");
 		System.err.println("Where:");
 		System.err.println("\t<CaseControlString> : A string of {'+', '-', '0'}, one per sample, to identify two groups (case='+', control='-', neutral='0')");
+		System.err.println("\t -name nameStr      : A name to be added after to 'Cases' or 'Controls' tags");
 		System.err.println("\t -tfam file.tfam    : A TFAM file having case/control informations (phenotype colmun)");
 		System.err.println("\tfile.vcf            : A VCF file (variants and genotype data)");
 		System.exit(1);
