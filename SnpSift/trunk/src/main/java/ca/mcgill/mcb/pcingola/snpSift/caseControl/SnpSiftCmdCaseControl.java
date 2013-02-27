@@ -185,6 +185,7 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 	 * @return A list of VcfEntry is createList is true
 	 */
 	public List<VcfEntry> run(boolean createList) {
+		showHeader = !createList;
 		ArrayList<VcfEntry> list = new ArrayList<VcfEntry>();
 		if (verbose) Timer.showStdErr("Annotating number of cases and controls : '" + fileName + "'");
 
