@@ -150,13 +150,8 @@ public class SnpSiftCmdCaseControlSummary extends SnpSift {
 		int nonOpts = -1;
 
 		for (int argc = 0; argc < args.length; argc++) {
-			if ((nonOpts < 0) && args[argc].startsWith("-")) { // Argument starts with '-'?
-
-				if (args[argc].equals("-h") || args[argc].equalsIgnoreCase("-help")) usage(null);
-				else if (args[argc].equals("-v")) verbose = true;
-				else if (args[argc].equals("-q")) verbose = false;
-				else usage("Unknown option '" + args[argc] + "'");
-
+			if ((nonOpts < 0) && args[argc].startsWith("-")) { // Argument starts with '-' (most of them parse in SnpSift class)
+				usage("Unknown option '" + args[argc] + "'");
 			} else if (tpedFile == null) tpedFile = args[argc];
 			else if (bedFile == null) bedFile = args[argc];
 			else if (vcfFile == null) vcfFile = args[argc];
@@ -359,9 +354,9 @@ public class SnpSiftCmdCaseControlSummary extends SnpSift {
 
 		showVersion();
 
-		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar ccs [-v] [-q] file.tped file.bed file.vcf");
+		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar ccs [-v] [-q] file.tfam file.bed file.vcf");
 		System.err.println("Where:");
-		System.err.println("\tfile.tped  : File with genotypes and groups informations (groups are in familyId)");
+		System.err.println("\tfile.tfam  : File with genotypes and groups informations (groups are in familyId)");
 		System.err.println("\tfile.bed   : File with regions of interest (intervals in BED format)");
 		System.err.println("\tfile.vcf   : A VCF file (variants and genotype data)");
 		System.err.println("\nOptions:");

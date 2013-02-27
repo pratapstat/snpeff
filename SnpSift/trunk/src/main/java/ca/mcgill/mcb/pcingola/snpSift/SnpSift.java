@@ -36,6 +36,7 @@ public class SnpSift {
 	protected boolean debug; // Debug mode
 	protected boolean quiet; // Be quiet
 	protected boolean log; // Log to server (statistics)
+	protected boolean showHeader = true;
 	protected String args[];
 	protected String command;
 	protected int numWorkers = Gpr.NUM_CORES; // Max number of threads (if multi-threaded version is available)
@@ -104,6 +105,17 @@ public class SnpSift {
 	public void fatalError(String message) {
 		System.err.println(message);
 		System.exit(-1);
+	}
+
+	/**
+	 * Handle VCF header related issues
+	 * @param vcf
+	 */
+	protected void handleVcfHeader(VcfFileIterator vcf) {
+		if (!vcf.isHeadeSection()) return;
+
+		addHeader(vcf); // Add lines to header
+		if (showHeader) System.out.println(vcf.getVcfHeader()); // Show header
 	}
 
 	/**
