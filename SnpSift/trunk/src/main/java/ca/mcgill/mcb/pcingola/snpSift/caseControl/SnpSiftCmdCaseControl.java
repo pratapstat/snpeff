@@ -138,7 +138,7 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		for (int argc = 0; argc < args.length; argc++) {
 			if (args[argc].equals("-tfam")) tfamFile = args[++argc];
 			else if (args[argc].equals("-name")) name = args[++argc];
-			else if ((groups == null) && isGroupString(args[argc])) groups = args[argc];
+			else if ((groups == null) && (tfamFile == null) && isGroupString(args[argc])) groups = args[argc];
 			else if (fileName == null) fileName = args[argc];
 			else usage("Unkown parameter '" + args[argc] + "'");
 		}
