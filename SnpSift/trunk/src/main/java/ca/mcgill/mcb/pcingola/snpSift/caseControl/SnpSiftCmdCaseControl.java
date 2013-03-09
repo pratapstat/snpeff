@@ -6,7 +6,10 @@ import java.util.List;
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
 import ca.mcgill.mcb.pcingola.ped.PedPedigree;
 import ca.mcgill.mcb.pcingola.ped.TfamEntry;
+import ca.mcgill.mcb.pcingola.probablility.CochranArmitageTest;
+import ca.mcgill.mcb.pcingola.probablility.FisherExactTest;
 import ca.mcgill.mcb.pcingola.snpSift.SnpSift;
+import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.util.Timer;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 import ca.mcgill.mcb.pcingola.vcf.VcfGenotype;
@@ -53,23 +56,39 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 	void annotate(VcfEntry vcfEntry) {
 		int casesHom = 0, casesHet = 0, cases = 0;
 		int ctrlHom = 0, ctrlHet = 0, ctrl = 0;
+		int nCase[] = new int[3];
+		int nControl[] = new int[3];
 
 		// Count genotypes
 		int idx = 0;
 		for (VcfGenotype gt : vcfEntry) {
-			if ((caseControl[idx] != null) && gt.isVariant()) {
-				if (caseControl[idx]) {
-					// Case sample
-					if (gt.isHomozygous()) casesHom++;
-					else casesHet++;
+			if ((caseControl[idx] != null)) {
 
-					cases += gt.getGenotypeCodeIgnoreMissing();
-				} else {
-					//Control sample
-					if (gt.isHomozygous()) ctrlHom++;
-					else ctrlHet++;
+				int code = gt.getGenotypeCode();
+				int codeMissing = gt.getGenotypeCodeIgnoreMissing();
 
-					ctrl += gt.getGenotypeCodeIgnoreMissing();
+				if (code >= 0) {
+					// Count a/a, a/A and A/A
+					if (caseControl[idx]) nCase[code]++;
+					else nControl[code]++;
+				}
+
+				if (gt.isVariant()) {
+					if (caseControl[idx]) {
+						// Case sample
+						if (gt.isMissing()) ; // Missing? => Do not count
+						else if (gt.isHomozygous()) casesHom++;
+						else casesHet++;
+
+						cases += codeMissing;
+					} else {
+						//Control sample
+						if (gt.isMissing()) ; // Missing? => Do not count
+						else if (gt.isHomozygous()) ctrlHom++;
+						else ctrlHet++;
+
+						ctrl += codeMissing;
+					}
 				}
 			}
 
@@ -79,6 +98,14 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		// Add info fields
 		vcfEntry.addInfo(VCF_INFO_CASE + name, casesHom + "," + casesHet + "," + cases);
 		vcfEntry.addInfo(VCF_INFO_CONTROL + name, ctrlHom + "," + ctrlHet + "," + ctrl);
+
+		swapMinorAllele(nControl, nCase);
+
+		//      vcfEntry.addInfo("CC_ALL", "" + pAllelic(nControl, nCase));
+		vcfEntry.addInfo("CC_DOM", "" + pDominant(nControl, nCase));
+		//      vcfEntry.addInfo("CC_REC", "" + pRecessive(nControl, nCase));
+		//      vcfEntry.addInfo("CC_COD", "" + pCodominant(nControl, nCase)); // Also called 'TREND'
+
 	}
 
 	@Override
@@ -131,6 +158,10 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		return groupsStr.replace('+', ' ').replace('-', ' ').replace('0', ' ').trim().isEmpty();
 	}
 
+	protected double pAllelic(int nControl[], int nCase[]) {
+		throw new RuntimeException("Unimplemented");
+	}
+
 	@Override
 	public void parse(String[] args) {
 		if (args.length <= 0) usage(null);
@@ -171,6 +202,48 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 	}
 
 	/**
+	 * Codominant model
+	 * @param nControl
+	 * @param nCase
+	 * @return
+	 */
+	protected double pCodominant(int nControl[], int nCase[]) {
+		return CochranArmitageTest.get().p(nControl, nCase, CochranArmitageTest.WEIGHT_CODOMINANT);
+	}
+
+	/**
+	* Dominant model
+	* @param nControl
+	* @param nCase
+	* @return
+	*/
+	protected double pDominant(int nControl[], int nCase[]) {
+		int k = nControl[0] + nControl[1];
+		int N = nControl[0] + nControl[1] + nControl[2] + nCase[0] + nCase[1] + nCase[2];
+		int D = nControl[0] + nControl[1] + nControl[2];
+		int n = nControl[0] + nControl[1] + nCase[0] + nCase[1];
+
+		double pdown = FisherExactTest.get().fisherExactTestDown(k, N, D, n);
+		double pup = FisherExactTest.get().fisherExactTestUp(k, N, D, n);
+
+		if (debug) {
+			Gpr.debug("Fisher\tk:" + k + "\tN:" + N + "\tD:" + D + "\tn:" + n + "\t\tp=" + pup + "\t" + pdown);
+
+			double fu = (nControl[1] + 2.0 * nControl[2]) / (2.0 * (nControl[0] + nControl[1] + nControl[2]));
+			Gpr.debug("F_U:\t" + fu);
+
+			double fa = (nCase[1] + 2.0 * nCase[2]) / (2.0 * (nCase[0] + nCase[1] + nCase[2]));
+			Gpr.debug("F_A:\t" + fa);
+		}
+
+		return Math.min(pup, pdown);
+	}
+
+	protected double pRecessive(int nControl[], int nCase[]) {
+		throw new RuntimeException("Unimplemented");
+	}
+
+	/**
 	 * Load a file compare calls
 	 * 
 	 * @param vcfFile
@@ -207,6 +280,26 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 
 		if (verbose) Timer.showStdErr("Done.");
 		return list;
+	}
+
+	/**
+	 * Swap counts if REF is minor allele (instead of ALT)
+	 * @param nControl
+	 * @param nCase
+	 */
+	void swapMinorAllele(int nControl[], int nCase[]) {
+		int refCount = 2 * nControl[0] + nControl[1] + 2 * nCase[0] + nCase[1];
+		int altCount = 2 * nControl[2] + nControl[1] + 2 * nCase[2] + nCase[1];
+
+		if (refCount < altCount) {
+			int tmp = nControl[0];
+			nControl[0] = nControl[2];
+			nControl[2] = tmp;
+
+			tmp = nCase[0];
+			nCase[0] = nCase[2];
+			nCase[2] = tmp;
+		}
 	}
 
 	/**
