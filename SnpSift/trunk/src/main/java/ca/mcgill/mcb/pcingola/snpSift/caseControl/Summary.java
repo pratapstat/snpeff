@@ -14,7 +14,7 @@ public class Summary {
 
 	CountByType countByType = new CountByType();
 
-	void count(String group, Boolean caseControl, ChangeEffect.FunctionalClass functClass, String variantAf, int increment) {
+	public void count(String group, Boolean caseControl, ChangeEffect.FunctionalClass functClass, String variantAf, int increment) {
 		String key = group + "\t" + caseControl + "\t" + functClass + "\t" + variantAf;
 		countByType.inc(key, increment);
 	}

@@ -32,8 +32,8 @@ public class SnpSiftCmdCaseControlSummary extends SnpSift {
 
 	public static FormatVersion formatVersion = null;
 
-	static Boolean CaseControl[] = { true, false };
-	static String VariantsAf[] = { "COMMON", "RARE" };
+	public static Boolean CaseControl[] = { true, false };
+	public static String VariantsAf[] = { "COMMON", "RARE" };
 
 	boolean headerSummary = true;
 	String tpedFile, bedFile, vcfFile; // File names
