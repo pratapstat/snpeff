@@ -25,6 +25,10 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 
 	public static final String VCF_INFO_CASE = "Cases";
 	public static final String VCF_INFO_CONTROL = "Controls";
+	public static final String VCF_INFO_CC_GENO = "CC_GENO";
+	public static final String VCF_INFO_CC_ALL = "CC_ALL";
+	public static final String VCF_INFO_CC_DOM = "CC_DOM";
+	public static final String VCF_INFO_CC_REC = "CC_REC";
 
 	Boolean caseControl[];
 	String tfamFile;
@@ -32,6 +36,8 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 	String fileName;
 	PedPedigree pedigree;
 	String name;
+	String posMin = "";
+	double pValueMin = 1.0;
 
 	public SnpSiftCmdCaseControl(String args[]) {
 		super(args, "casecontrol");
@@ -46,6 +52,10 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		List<String> addh = super.addHeader();
 		addh.add("##INFO=<ID=" + VCF_INFO_CASE + name + ",Number=3,Type=Integer,Description=\"Number of variants in cases: Hom, Het, Count\">");
 		addh.add("##INFO=<ID=" + VCF_INFO_CONTROL + name + ",Number=3,Type=Integer,Description=\"Number of variants in controls: Hom, Het, Count\">");
+		addh.add("##INFO=<ID=" + VCF_INFO_CC_DOM + name + ",Number=1,Type=Float,Description=\"p-value using dominant model (Fisher exact)\">");
+		addh.add("##INFO=<ID=" + VCF_INFO_CC_REC + name + ",Number=1,Type=Float,Description=\"p-value using recessive model (Fisher exact)\">");
+		addh.add("##INFO=<ID=" + VCF_INFO_CC_ALL + name + ",Number=1,Type=Float,Description=\"p-value using allele count model (Fisher exact)\">");
+		addh.add("##INFO=<ID=" + VCF_INFO_CC_GENO + name + ",Number=1,Type=Float,Description=\"p-value using genotype / codominant model (CochranArmitage)\">");
 		return addh;
 	}
 
@@ -99,13 +109,12 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		vcfEntry.addInfo(VCF_INFO_CASE + name, casesHom + "," + casesHet + "," + cases);
 		vcfEntry.addInfo(VCF_INFO_CONTROL + name, ctrlHom + "," + ctrlHet + "," + ctrl);
 
-		swapMinorAllele(nControl, nCase);
-
-		//      vcfEntry.addInfo("CC_ALL", "" + pAllelic(nControl, nCase));
-		vcfEntry.addInfo("CC_DOM", "" + pDominant(nControl, nCase));
-		//      vcfEntry.addInfo("CC_REC", "" + pRecessive(nControl, nCase));
-		//      vcfEntry.addInfo("CC_COD", "" + pCodominant(nControl, nCase)); // Also called 'TREND'
-
+		// Annotate pValues
+		vcfEntry.addInfo(VCF_INFO_CC_GENO + name, pValueStr(vcfEntry, pCodominant(nControl, nCase)));
+		swapMinorAllele(nControl, nCase); // Swap if minor allele is reference
+		vcfEntry.addInfo(VCF_INFO_CC_ALL + name, "" + pValueStr(vcfEntry, pAllelic(nControl, nCase)));
+		vcfEntry.addInfo(VCF_INFO_CC_DOM + name, "" + pValueStr(vcfEntry, pDominant(nControl, nCase)));
+		vcfEntry.addInfo(VCF_INFO_CC_REC + name, "" + pValueStr(vcfEntry, pRecessive(nControl, nCase)));
 	}
 
 	@Override
@@ -158,8 +167,39 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		return groupsStr.replace('+', ' ').replace('-', ' ').replace('0', ' ').trim().isEmpty();
 	}
 
+	/**
+	 * Allelic model: Count number of SNPs
+	 * @param nControl
+	 * @param nCase
+	 * @return
+	 */
 	protected double pAllelic(int nControl[], int nCase[]) {
-		throw new RuntimeException("Unimplemented");
+		int k = 2 * nCase[2] + nCase[1];
+		int N = 2 * (nControl[0] + nControl[1] + nControl[2] + nCase[0] + nCase[1] + nCase[2]);
+		int D = 2 * (nCase[0] + nCase[1] + nCase[2]); // All cases
+		int n = 2 * nControl[2] + nControl[1] + 2 * nCase[2] + nCase[1]; // A/A + A/a
+
+		double pdown = FisherExactTest.get().fisherExactTestDown(k, N, D, n);
+		double pup = FisherExactTest.get().fisherExactTestUp(k, N, D, n);
+
+		//		if (debug) {
+		//			Gpr.debug("Fisher\tk:" + k + "\tN:" + N + "\tD:" + D + "\tn:" + n //
+		//					+ "\t\tp=" + pup //
+		//					+ "\t" + pdown //
+		//					+ "\n\t" + FisherExactTest.get().toR(k, N, D, n, true) //
+		//					+ "\n\t" + FisherExactTest.get().toR(k, N, D, n, false) //
+		//					+ "\n\t" + k + "\t" + (D - k) ///
+		//					+ "\n\t" + (n - k) + "\t" + (N - D - (n - k)) ///
+		//			);
+		//
+		//			double fu = (nControl[1] + 2.0 * nControl[2]) / (2.0 * (nControl[0] + nControl[1] + nControl[2]));
+		//			Gpr.debug("F_U:\t" + fu);
+		//
+		//			double fa = (nCase[1] + 2.0 * nCase[2]) / (2.0 * (nCase[0] + nCase[1] + nCase[2]));
+		//			Gpr.debug("F_A:\t" + fa);
+		//		}
+
+		return Math.min(pup, pdown);
 	}
 
 	@Override
@@ -208,39 +248,98 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 	 * @return
 	 */
 	protected double pCodominant(int nControl[], int nCase[]) {
+		//		if (debug) {
+		//			Gpr.debug("CochranArmitageTest:\n" //
+		//					+ "\n\t" + nCase[0] + "\t" + nCase[1] + "\t" + nCase[2] //
+		//					+ "\n\t" + nControl[0] + "\t" + nControl[1] + "\t" + nControl[2] //
+		//			);
+		//		}
+
 		return CochranArmitageTest.get().p(nControl, nCase, CochranArmitageTest.WEIGHT_CODOMINANT);
 	}
 
 	/**
-	* Dominant model
+	* Dominant model: Either a/A or A/A causes the disease
 	* @param nControl
 	* @param nCase
 	* @return
 	*/
 	protected double pDominant(int nControl[], int nCase[]) {
-		int k = nControl[0] + nControl[1];
+		int k = nCase[2] + nCase[1]; // Cases A/A + A/a
 		int N = nControl[0] + nControl[1] + nControl[2] + nCase[0] + nCase[1] + nCase[2];
-		int D = nControl[0] + nControl[1] + nControl[2];
-		int n = nControl[0] + nControl[1] + nCase[0] + nCase[1];
+		int D = nCase[0] + nCase[1] + nCase[2]; // All cases
+		int n = nControl[2] + nControl[1] + nCase[2] + nCase[1]; // A/A + A/a
 
 		double pdown = FisherExactTest.get().fisherExactTestDown(k, N, D, n);
 		double pup = FisherExactTest.get().fisherExactTestUp(k, N, D, n);
 
-		if (debug) {
-			Gpr.debug("Fisher\tk:" + k + "\tN:" + N + "\tD:" + D + "\tn:" + n + "\t\tp=" + pup + "\t" + pdown);
-
-			double fu = (nControl[1] + 2.0 * nControl[2]) / (2.0 * (nControl[0] + nControl[1] + nControl[2]));
-			Gpr.debug("F_U:\t" + fu);
-
-			double fa = (nCase[1] + 2.0 * nCase[2]) / (2.0 * (nCase[0] + nCase[1] + nCase[2]));
-			Gpr.debug("F_A:\t" + fa);
-		}
+		//		if (debug) {
+		//			Gpr.debug("Fisher\tk:" + k + "\tN:" + N + "\tD:" + D + "\tn:" + n //
+		//					+ "\t\tp=" + pup //
+		//					+ "\t" + pdown //
+		//					+ "\n\t" + FisherExactTest.get().toR(k, N, D, n, true) //
+		//					+ "\n\t" + FisherExactTest.get().toR(k, N, D, n, false) //
+		//					+ "\n\t" + k + "\t" + (D - k) ///
+		//					+ "\n\t" + (n - k) + "\t" + (N - D - (n - k)) ///
+		//			);
+		//
+		//			double fu = (nControl[1] + 2.0 * nControl[2]) / (2.0 * (nControl[0] + nControl[1] + nControl[2]));
+		//			Gpr.debug("F_U:\t" + fu);
+		//
+		//			double fa = (nCase[1] + 2.0 * nCase[2]) / (2.0 * (nCase[0] + nCase[1] + nCase[2]));
+		//			Gpr.debug("F_A:\t" + fa);
+		//		}
 
 		return Math.min(pup, pdown);
 	}
 
+	/**
+	 * Recessive model: Only A/A causes the disease
+	 * @param nControl
+	 * @param nCase
+	 * @return
+	 */
 	protected double pRecessive(int nControl[], int nCase[]) {
-		throw new RuntimeException("Unimplemented");
+		int k = nCase[2]; // Cases A/A
+		int N = nControl[0] + nControl[1] + nControl[2] + nCase[0] + nCase[1] + nCase[2];
+		int D = nCase[0] + nCase[1] + nCase[2]; // All cases
+		int n = nControl[2] + nCase[2]; // A/A
+
+		double pdown = FisherExactTest.get().fisherExactTestDown(k, N, D, n);
+		double pup = FisherExactTest.get().fisherExactTestUp(k, N, D, n);
+
+		//		if (debug) {
+		//			Gpr.debug("Fisher\tk:" + k + "\tN:" + N + "\tD:" + D + "\tn:" + n //
+		//					+ "\t\tp=" + pup //
+		//					+ "\t" + pdown //
+		//					+ "\n\t" + FisherExactTest.get().toR(k, N, D, n, true) //
+		//					+ "\n\t" + k + "\t" + (D - k) ///
+		//					+ "\n\t" + (n - k) + "\t" + (N - D - (n - k)) ///
+		//			);
+		//
+		//			double fu = (nControl[1] + 2.0 * nControl[2]) / (2.0 * (nControl[0] + nControl[1] + nControl[2]));
+		//			Gpr.debug("F_U:\t" + fu);
+		//
+		//			double fa = (nCase[1] + 2.0 * nCase[2]) / (2.0 * (nCase[0] + nCase[1] + nCase[2]));
+		//			Gpr.debug("F_A:\t" + fa);
+		//		}
+
+		return Math.min(pup, pdown);
+	}
+
+	/**
+	 * Show p-value as a string and record minimum p-value
+	 * @param vcfEntry
+	 * @param p
+	 * @return
+	 */
+	String pValueStr(VcfEntry vcfEntry, double p) {
+		if ((p > 0) && (p < pValueMin)) {
+			pValueMin = p;
+			posMin = vcfEntry.getChromosomeName() + ":" + (vcfEntry.getStart() + 1);
+			if (verbose) Timer.showStdErr("Minimum p-value so far: " + pValueMin + "\tchr: " + vcfEntry.getChromosomeName() + "\tpos: " + (vcfEntry.getStart() + 1) + "\tid: " + vcfEntry.getId());
+		}
+		return String.format("%.3e", p);
 	}
 
 	/**
@@ -278,7 +377,9 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 			else System.out.println(vcfEntry);
 		}
 
-		if (verbose) Timer.showStdErr("Done.");
+		if (verbose) {
+			Timer.showStdErr("Done.\n\tMinimum pValue: " + pValueMin + "\tVcf entry: " + posMin);
+		}
 		return list;
 	}
 
@@ -292,6 +393,7 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		int altCount = 2 * nControl[2] + nControl[1] + 2 * nCase[2] + nCase[1];
 
 		if (refCount < altCount) {
+			if (debug) Gpr.debug("Swapping genotype counts");
 			int tmp = nControl[0];
 			nControl[0] = nControl[2];
 			nControl[2] = tmp;
