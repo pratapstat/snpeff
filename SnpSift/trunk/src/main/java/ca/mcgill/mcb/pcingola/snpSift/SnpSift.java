@@ -22,7 +22,7 @@ import flanagan.analysis.Stat;
  */
 public class SnpSift {
 
-	public static final String BUILD = "2013-02-26";
+	public static final String BUILD = "2013-03-14";
 
 	public static final String VERSION_MAJOR = "1.9";
 	public static final String REVISION = "";
