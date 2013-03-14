@@ -265,10 +265,10 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 	* @return
 	*/
 	protected double pDominant(int nControl[], int nCase[]) {
-		int k = nCase[2] + nCase[1]; // Cases A/A + A/a
+		int k = nCase[2] + nCase[1]; // Cases a/a + A/a
 		int N = nControl[0] + nControl[1] + nControl[2] + nCase[0] + nCase[1] + nCase[2];
 		int D = nCase[0] + nCase[1] + nCase[2]; // All cases
-		int n = nControl[2] + nControl[1] + nCase[2] + nCase[1]; // A/A + A/a
+		int n = nControl[2] + nControl[1] + nCase[2] + nCase[1]; // a/a + A/a
 
 		double pdown = FisherExactTest.get().fisherExactTestDown(k, N, D, n);
 		double pup = FisherExactTest.get().fisherExactTestUp(k, N, D, n);
@@ -300,10 +300,10 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 	 * @return
 	 */
 	protected double pRecessive(int nControl[], int nCase[]) {
-		int k = nCase[2]; // Cases A/A
+		int k = nCase[2]; // Cases a/a
 		int N = nControl[0] + nControl[1] + nControl[2] + nCase[0] + nCase[1] + nCase[2];
 		int D = nCase[0] + nCase[1] + nCase[2]; // All cases
-		int n = nControl[2] + nCase[2]; // A/A
+		int n = nControl[2] + nCase[2]; // a/a
 
 		double pdown = FisherExactTest.get().fisherExactTestDown(k, N, D, n);
 		double pup = FisherExactTest.get().fisherExactTestUp(k, N, D, n);
