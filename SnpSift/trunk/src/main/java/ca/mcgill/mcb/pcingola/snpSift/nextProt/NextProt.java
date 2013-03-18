@@ -65,7 +65,7 @@ public class NextProt {
 	public static final String ATTR_VALUE_ENSEMBL = "Ensembl";
 
 	public static final String OUT_TYPE = "TXT";
-	//	public static final String OUT_TYPE = "BED";
+	public static final String NEXT_PROT_DB_DIR = Gpr.HOME + "/snpEff/db/nextProt";
 
 	String xmlDirName;
 	Config config;
@@ -89,10 +89,10 @@ public class NextProt {
 	 */
 	public static void main(String[] args) {
 		Timer.showStdErr("Start");
-		String genome = "GRCh37.66";
+		String genome = "GRCh37.70";
 		if (debug) genome = "testHg3765Chr22";
 
-		String xmlDirName = Gpr.HOME + "/snpEff/nextProt/xml";
+		String xmlDirName = NEXT_PROT_DB_DIR + "/xml";
 
 		// Create nextprot
 		NextProt nextProt = new NextProt(genome);
@@ -633,7 +633,7 @@ public class NextProt {
 				trById.put(tr.getId(), tr);
 
 		// Open output and create title
-		String outputFileName = Gpr.HOME + "/snpEff/nextProt/nextProt_categories.txt";
+		String outputFileName = NEXT_PROT_DB_DIR + "/nextProt_categories.txt";
 		openOut(outputFileName);
 		if (OUT_TYPE.equals("TXT")) out("Gene Id\tID\tTranscript ID\tCategory\tDescription\tControlled Vocabulary (Main)\tControlled Vocabulary (other)\tFirst\tLast\tlen\tchr\tchrStart\tchrEnd\tSequence\ttr.Codon\ttr.AA"); // Title
 
