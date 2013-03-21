@@ -241,10 +241,10 @@ public class SnpSiftCmdConcordance extends SnpSift {
 			idx++;
 		}
 		// Show basic stats
-		System.out.println("Number of samples:");
-		System.out.println("\t" + vcf1.getSampleNames().size() + "\tFile " + vcfFileName1);
-		System.out.println("\t" + vcf2.getSampleNames().size() + "\tFile " + vcfFileName2);
-		System.out.println("\t" + shared + "\tBoth files");
+		System.out.println("# Number of samples:");
+		System.out.println("#\t" + vcf1.getSampleNames().size() + "\tFile " + vcfFileName1);
+		System.out.println("#\t" + vcf2.getSampleNames().size() + "\tFile " + vcfFileName2);
+		System.out.println("#\t" + shared + "\tBoth files");
 	}
 
 	@Override
@@ -320,7 +320,9 @@ public class SnpSiftCmdConcordance extends SnpSift {
 		// Show results
 		//---
 		showCounts(null, concordance);
-		System.out.println("\nErrors:\n" + errors);
+		System.out.println("\n# Errors:\n");
+		for (String l : errCount.keySet())
+			System.out.println("#\t" + l + "\t" + errCount.get(l));
 	}
 
 	/**
@@ -330,7 +332,7 @@ public class SnpSiftCmdConcordance extends SnpSift {
 	 */
 	void showCounts(VcfEntry ve, CountByType count) {
 		if (ve != null) System.out.print(ve.getChromosomeName() + "\t" + (ve.getStart() + 1) + "\t" + ve.getRef() + "\t" + ve.getAltsStr());
-		else System.out.print("Total\t\t\t");
+		else System.out.print("# Total\t\t\t");
 
 		for (String label : labels)
 			System.out.print("\t" + count.get(label));
