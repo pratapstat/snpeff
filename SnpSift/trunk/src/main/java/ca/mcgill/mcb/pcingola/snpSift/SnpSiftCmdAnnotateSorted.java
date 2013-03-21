@@ -136,7 +136,7 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 	}
 
 	/**
-	 * Annoptate a VCF entry
+	 * Annotate a VCF entry
 	 * @param vcf
 	 * @throws IOException
 	 */
