@@ -54,32 +54,32 @@ public class SnpSiftCmdConcordance extends SnpSift {
 		// Sanity checks
 		//---
 		if (ve1.getAlts().length > 1) {
-			errors.inc("Multiple ALT files in " + vcfFileName1);
+			errors(ve1, ve2, "Multiple ALT files in " + vcfFileName1);
 			return false;
 		}
 
 		if (ve2.getAlts().length > 1) {
-			errors.inc("Multiple ALT files in " + vcfFileName2);
+			errors(ve1, ve2, "Multiple ALT files in " + vcfFileName2);
 			return false;
 		}
 
 		if (!ve1.getAltsStr().equals(ve2.getAltsStr())) {
-			errors.inc("ALT field does not match");
+			errors(ve1, ve2, "ALT field does not match");
 			return false;
 		}
 
 		if (!ve1.getRef().equals(ve2.getRef())) {
-			errors.inc("REF field does not match");
+			errors(ve1, ve2, "REF field does not match");
 			return false;
 		}
 
 		if (!ve1.getChromosomeName().equals(ve2.getChromosomeName())) {
-			errors.inc("CHROMO field does not match");
+			errors(ve1, ve2, "CHROMO field does not match");
 			return false;
 		}
 
 		if (ve1.getStart() != ve2.getStart()) {
-			errors.inc("POS field does not match");
+			errors(ve1, ve2, "POS field does not match");
 			return false;
 		}
 
@@ -128,6 +128,17 @@ public class SnpSiftCmdConcordance extends SnpSift {
 		}
 
 		showCounts(ve1, count);
+	}
+
+	/**
+	 * Log and show errors
+	 * @param ve1
+	 * @param ve2
+	 * @param message
+	 */
+	void errors(VcfEntry ve1, VcfEntry ve2, String message) {
+		errors.inc(message);
+		if (verbose) System.err.println("ERROR: " + message + "\n\tVCF entry " + name1 + "\t" + ve1 + "\n\tVCF entry " + name2 + "\t" + ve2);
 	}
 
 	/**
@@ -320,7 +331,7 @@ public class SnpSiftCmdConcordance extends SnpSift {
 		// Show results
 		//---
 		showCounts(null, concordance);
-		System.out.println("# Errors:\n");
+		System.out.println("# Errors:");
 		for (String l : errors.keySet())
 			System.out.println("#\t" + l + "\t" + errors.get(l));
 	}
