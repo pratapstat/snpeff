@@ -320,9 +320,9 @@ public class SnpSiftCmdConcordance extends SnpSift {
 		// Show results
 		//---
 		showCounts(null, concordance);
-		System.out.println("\n# Errors:\n");
-		for (String l : errCount.keySet())
-			System.out.println("#\t" + l + "\t" + errCount.get(l));
+		System.out.println("# Errors:\n");
+		for (String l : errors.keySet())
+			System.out.println("#\t" + l + "\t" + errors.get(l));
 	}
 
 	/**
