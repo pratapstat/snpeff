@@ -273,8 +273,7 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 		for (int i = 0; i < args.length; i++) {
 			String arg = args[i];
 
-			if (arg.equals("-h") || arg.equals("--help")) usage(null);
-			else if (arg.equals("-id")) useInfoField = false;
+			if (arg.equals("-id")) useInfoField = false;
 			else if (arg.equals("-info")) {
 				useInfoField = true;
 				infoFields = args[++i].split(",");

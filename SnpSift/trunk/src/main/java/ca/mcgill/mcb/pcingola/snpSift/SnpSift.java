@@ -11,7 +11,6 @@ import ca.mcgill.mcb.pcingola.snpSift.caseControl.SnpSiftCmdCaseControlSummary;
 import ca.mcgill.mcb.pcingola.snpSift.hwe.SnpSiftCmdHwe;
 import ca.mcgill.mcb.pcingola.snpSift.matrix.SnpSiftCmdAlleleMatrix;
 import ca.mcgill.mcb.pcingola.snpSift.matrix.SnpSiftCmdCovarianceMatrix;
-import ca.mcgill.mcb.pcingola.snpSift.phatsCons.SnpSiftCmdConservation;
 import ca.mcgill.mcb.pcingola.util.Gpr;
 import flanagan.analysis.Stat;
 
@@ -158,7 +157,7 @@ public class SnpSift {
 		else if (command.startsWith("ANN")) cmd = new SnpSiftCmdAnnotateSorted(args);
 		else if (command.startsWith("CA")) cmd = new SnpSiftCmdCaseControl(args);
 		else if (command.startsWith("CCS")) cmd = new SnpSiftCmdCaseControlSummary(args);
-		else if (command.startsWith("CONS")) cmd = new SnpSiftCmdConservation(args);
+		else if (command.startsWith("CONC")) cmd = new SnpSiftCmdConcordance(args);
 		else if (command.startsWith("COVMAT")) cmd = new SnpSiftCmdCovarianceMatrix(args);
 		else if (command.startsWith("DBNSFP")) cmd = new SnpSiftCmdAnnotateSortedDbNsfp(args);
 		else if (command.startsWith("EX")) cmd = new SnpSiftCmdExtractFields(args);
@@ -266,6 +265,8 @@ public class SnpSift {
 				+ "\n\tannMem        : Annotate 'ID' from a database (e.g. dbSnp). Loads db in memory. Does not assume sorted entries." //
 				+ "\n\tcaseControl   : Compare how many variants are in 'case' and in 'control' groups; calculate p-values." //
 				+ "\n\tccs           : Case control summary. Case and control summaries by region, allele frequency and variant's functional effect." //
+				+ "\n\tconcordance   : Concordance metrics between two VCF files." //
+				+ "\n\tcovMat        : Create an covariance matrix output (allele matrix as input)." //
 				+ "\n\tcovMat        : Create an covariance matrix output (allele matrix as input)." //
 				+ "\n\tdbnsfp        : Annotate with multiple entries from dbNSFP. <EXPERIMENTAL>" //
 				+ "\n\textractFields : Extract fields from VCF file into tab separated format." //
