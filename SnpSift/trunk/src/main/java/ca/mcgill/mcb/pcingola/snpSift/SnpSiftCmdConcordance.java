@@ -40,6 +40,7 @@ public class SnpSiftCmdConcordance extends SnpSift {
 	AutoHashMap<String, CountByType> concordanceBySample = new AutoHashMap<String, CountByType>(new CountByType());
 	ArrayList<String> labels;
 	FileIndexChrPos indexVcf;
+	StringBuilder summary = new StringBuilder();
 
 	protected VcfEntry latestVcfEntry = null;
 
@@ -122,7 +123,7 @@ public class SnpSiftCmdConcordance extends SnpSift {
 			idx2++;
 		}
 
-		showCounts(count, ve1, null);
+		System.out.print(showCounts(count, ve1, null));
 	}
 
 	/**
@@ -262,10 +263,10 @@ public class SnpSiftCmdConcordance extends SnpSift {
 			idx++;
 		}
 		// Show basic stats
-		System.out.println("# Number of samples:");
-		System.out.println("#\t" + vcf1.getSampleNames().size() + "\tFile " + vcfFileName1);
-		System.out.println("#\t" + vcf2.getSampleNames().size() + "\tFile " + vcfFileName2);
-		System.out.println("#\t" + shared + "\tBoth files");
+		summary("# Number of samples:");
+		summary("#\t" + vcf1.getSampleNames().size() + "\tFile " + vcfFileName1);
+		summary("#\t" + vcf2.getSampleNames().size() + "\tFile " + vcfFileName2);
+		summary("#\t" + shared + "\tBoth files");
 	}
 
 	@Override
@@ -348,21 +349,31 @@ public class SnpSiftCmdConcordance extends SnpSift {
 		//---
 
 		// Show totals
-		showCounts(concordance, null, null);
+		System.out.print(showCounts(concordance, null, null));
 
-		// Show totals by sample
-		System.out.println("#\n# Totals by sample\n" + titleBySample);
-		// Sort sample by name
-		ArrayList<String> sampleNames = new ArrayList<String>();
+		// Write summary file
+		String summaryFile = "concordance_" + name1 + "_" + name2 + ".summary.txt"; // Write to file
+		Timer.showStdErr("Writing summary file '" + summaryFile + "'");
+		if (!errors.isEmpty()) { // Add errors (if any)
+			summary("# Errors:");
+			for (String l : errors.keySet())
+				summary("\t" + l + "\t" + errors.get(l));
+		}
+		Gpr.toFile(summaryFile, summary);
+
+		// Write 'by sample' file
+		String bySampleFile = "concordance" + name1 + "_" + name2 + ".by_sample.txt"; // Write to file
+		Timer.showStdErr("Writing concordance by sample to file '" + bySampleFile + "'");
+
+		StringBuilder bySample = new StringBuilder();
+		bySample.append(titleBySample + "\n"); // Add title
+		ArrayList<String> sampleNames = new ArrayList<String>(); // Sort samples by name
 		sampleNames.addAll(concordanceBySample.keySet());
 		Collections.sort(sampleNames);
 		for (String sample : sampleNames)
-			showCounts(concordanceBySample.get(sample), null, sample);
+			bySample.append(showCounts(concordanceBySample.get(sample), null, sample)); // Add all samples
 
-		// Show error  
-		System.out.println("# Errors:");
-		for (String l : errors.keySet())
-			System.out.println("#\t" + l + "\t" + errors.get(l));
+		Gpr.toFile(bySampleFile, bySample); // Write file
 	}
 
 	/**
@@ -370,14 +381,27 @@ public class SnpSiftCmdConcordance extends SnpSift {
 	 * @param ve
 	 * @param count
 	 */
-	void showCounts(CountByType count, VcfEntry ve, String rowTitle) {
-		if (ve != null) System.out.print(ve.getChromosomeName() + "\t" + (ve.getStart() + 1) + "\t" + ve.getRef() + "\t" + ve.getAltsStr());
-		else if (rowTitle != null) System.out.print(rowTitle);
-		else System.out.print("# Total\t\t\t");
+	String showCounts(CountByType count, VcfEntry ve, String rowTitle) {
+		StringBuilder sb = new StringBuilder();
+
+		if (ve != null) sb.append(ve.getChromosomeName() + "\t" + (ve.getStart() + 1) + "\t" + ve.getRef() + "\t" + ve.getAltsStr());
+		else if (rowTitle != null) sb.append(rowTitle);
+		else sb.append("# Total\t\t\t");
 
 		for (String label : labels)
-			System.out.print("\t" + count.get(label));
-		System.out.println("");
+			sb.append("\t" + count.get(label));
+		sb.append("\n");
+
+		return sb.toString();
+	}
+
+	/**
+	 * Add to summary (and show in verbose mode)
+	 * @param message
+	 */
+	void summary(String message) {
+		summary.append(message + "\n");
+		if (verbose) System.err.println(message);
 	}
 
 	/**
