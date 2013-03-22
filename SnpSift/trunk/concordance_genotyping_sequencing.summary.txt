@@ -1,4 +1,4 @@
-# Number of samples:
-#	929	File /home/pcingola/snpEff/conc/genotyping.vcf
-#	583	File /home/pcingola/snpEff/conc/sequencing.vcf
-#	514	Both files
+Number of samples:
+	929	File /home/pcingola/snpEff/conc/genotyping.vcf
+	583	File /home/pcingola/snpEff/conc/sequencing.vcf
+	514	Both files

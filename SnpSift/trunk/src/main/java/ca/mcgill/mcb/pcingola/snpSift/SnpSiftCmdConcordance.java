@@ -263,10 +263,10 @@ public class SnpSiftCmdConcordance extends SnpSift {
 			idx++;
 		}
 		// Show basic stats
-		summary("# Number of samples:");
-		summary("#\t" + vcf1.getSampleNames().size() + "\tFile " + vcfFileName1);
-		summary("#\t" + vcf2.getSampleNames().size() + "\tFile " + vcfFileName2);
-		summary("#\t" + shared + "\tBoth files");
+		summary("Number of samples:");
+		summary("\t" + vcf1.getSampleNames().size() + "\tFile " + vcfFileName1);
+		summary("\t" + vcf2.getSampleNames().size() + "\tFile " + vcfFileName2);
+		summary("\t" + shared + "\tBoth files");
 	}
 
 	@Override
@@ -362,7 +362,7 @@ public class SnpSiftCmdConcordance extends SnpSift {
 		Gpr.toFile(summaryFile, summary);
 
 		// Write 'by sample' file
-		String bySampleFile = "concordance" + name1 + "_" + name2 + ".by_sample.txt"; // Write to file
+		String bySampleFile = "concordance_" + name1 + "_" + name2 + ".by_sample.txt"; // Write to file
 		Timer.showStdErr("Writing concordance by sample to file '" + bySampleFile + "'");
 
 		StringBuilder bySample = new StringBuilder();
