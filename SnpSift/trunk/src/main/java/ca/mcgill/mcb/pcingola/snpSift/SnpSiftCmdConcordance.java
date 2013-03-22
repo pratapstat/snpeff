@@ -2,8 +2,10 @@ package ca.mcgill.mcb.pcingola.snpSift;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
+import ca.mcgill.mcb.pcingola.collections.AutoHashMap;
 import ca.mcgill.mcb.pcingola.fileIterator.SeekableBufferedReader;
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
 import ca.mcgill.mcb.pcingola.stats.CountByType;
@@ -32,8 +34,10 @@ public class SnpSiftCmdConcordance extends SnpSift {
 	String name1, name2;
 	String chrPrev = "";
 	int[] idx2toidx1; // How sample 2 index maps to sample 1 index
+	String[] sampleNameIdx2;
 	CountByType errors = new CountByType();
 	CountByType concordance = new CountByType();
+	AutoHashMap<String, CountByType> concordanceBySample = new AutoHashMap<String, CountByType>(new CountByType());
 	ArrayList<String> labels;
 	FileIndexChrPos indexVcf;
 
@@ -100,34 +104,37 @@ public class SnpSiftCmdConcordance extends SnpSift {
 
 		// Compare all genotypes from ve2 to the corresponding genotype in ve1
 		for (VcfGenotype gen2 : ve2) {
+			// Get sample index on vcf1
+			int idx1 = idx2toidx1[idx2];
 
-			if (gen2.isMissing()) {
-				String label = GENOTYPE_MISSING + SEP + name2;
-				concordance.inc(label);
-				count.inc(label);
-			} else {
-				int idx1 = idx2toidx1[idx2];
-				if (idx1 >= 0) {
+			// Does vcf1 also have this sample?
+			if (idx1 >= 0) {
+				// OK, we can calculate concordance
+				CountByType countBySample = concordanceBySample.get(sampleNameIdx2[idx2]);
+
+				if (gen2.isMissing()) concordanceCount(GENOTYPE_MISSING + SEP + name2, count, countBySample);
+				else {
 					VcfGenotype gen1 = ve1.getVcfGenotype(idx1);
-					if (gen1.isMissing()) {
-						String label = GENOTYPE_MISSING + SEP + name1;
-						concordance.inc(label);
-						count.inc(label);
-					} else {
-						int score1 = gen1.getGenotypeCode();
-						int score2 = gen2.getGenotypeCode();
-
-						String label = GENOTYPE_CHANGE + score1 + SEP + score2;
-						concordance.inc(label);
-						count.inc(label);
-					}
+					if (gen1.isMissing()) concordanceCount(GENOTYPE_MISSING + SEP + name1, count, countBySample);
+					else concordanceCount(GENOTYPE_CHANGE + gen1.getGenotypeCode() + SEP + gen2.getGenotypeCode(), count, countBySample);
 				}
 			}
-
 			idx2++;
 		}
 
-		showCounts(ve1, count);
+		showCounts(count, ve1, null);
+	}
+
+	/**
+	 * Update counters
+	 * @param label
+	 * @param count
+	 * @param countBySample
+	 */
+	void concordanceCount(String label, CountByType count, CountByType countBySample) {
+		concordance.inc(label);
+		count.inc(label);
+		countBySample.inc(label);
 	}
 
 	/**
@@ -238,6 +245,7 @@ public class SnpSiftCmdConcordance extends SnpSift {
 		// Map sample names to sample number
 		HashMap<String, Integer> vcf2Name2Idx = new HashMap<String, Integer>();
 		idx2toidx1 = new int[vcf2.getSampleNames().size()];
+		sampleNameIdx2 = new String[vcf2.getSampleNames().size()];
 		idx = 0;
 		int shared = 0;
 		for (String sampleName : vcf2.getSampleNames()) {
@@ -246,6 +254,8 @@ public class SnpSiftCmdConcordance extends SnpSift {
 			if (vcf1Name2Idx.containsKey(sampleName)) {
 				shared++;
 				idx2toidx1[idx] = vcf1Name2Idx.get(sampleName); // Assign to index mapping array
+				sampleNameIdx2[idx] = sampleName;
+				concordanceBySample.getOrCreate(sampleName); // Initialize autoHash
 				if (debug) System.err.println("\tMap\tSamlple " + sampleName + "\tvcf2[" + idx + "]\t->\tvcf1[" + idx2toidx1[idx] + "]");
 			} else idx2toidx1[idx] = -1;
 
@@ -296,17 +306,23 @@ public class SnpSiftCmdConcordance extends SnpSift {
 		//---
 		// Create labels and show title
 		//---
-		System.out.print("chr\tpos\tref\talt");
+		StringBuilder title = new StringBuilder();
+		StringBuilder titleBySample = new StringBuilder();
+		title.append("chr\tpos\tref\talt");
+		titleBySample.append("sample");
 		labels = new ArrayList<String>();
 		for (int s1 = 0; s1 <= 2; s1++)
 			for (int s2 = 0; s2 <= 2; s2++) {
 				String label = GENOTYPE_CHANGE + s1 + SEP + s2;
 				labels.add(label);
-				System.out.print("\t" + label);
+				title.append("\t" + label);
+				titleBySample.append("\t" + label);
 			}
 		labels.add(GENOTYPE_MISSING + SEP + name1);
 		labels.add(GENOTYPE_MISSING + SEP + name2);
-		System.out.println("\t" + GENOTYPE_MISSING + SEP + name1 + "\t" + GENOTYPE_MISSING + SEP + name2);
+		title.append("\t" + GENOTYPE_MISSING + SEP + name1 + "\t" + GENOTYPE_MISSING + SEP + name2);
+		titleBySample.append("\t" + GENOTYPE_MISSING + SEP + name1 + "\t" + GENOTYPE_MISSING + SEP + name2);
+		System.out.println(title);
 
 		//---
 		// Iterate on larger file
@@ -330,7 +346,20 @@ public class SnpSiftCmdConcordance extends SnpSift {
 		//---
 		// Show results
 		//---
-		showCounts(null, concordance);
+
+		// Show totals
+		showCounts(concordance, null, null);
+
+		// Show totals by sample
+		System.out.println("#\n# Totals by sample\n" + titleBySample);
+		// Sort sample by name
+		ArrayList<String> sampleNames = new ArrayList<String>();
+		sampleNames.addAll(concordanceBySample.keySet());
+		Collections.sort(sampleNames);
+		for (String sample : sampleNames)
+			showCounts(concordanceBySample.get(sample), null, sample);
+
+		// Show error  
 		System.out.println("# Errors:");
 		for (String l : errors.keySet())
 			System.out.println("#\t" + l + "\t" + errors.get(l));
@@ -341,8 +370,9 @@ public class SnpSiftCmdConcordance extends SnpSift {
 	 * @param ve
 	 * @param count
 	 */
-	void showCounts(VcfEntry ve, CountByType count) {
+	void showCounts(CountByType count, VcfEntry ve, String rowTitle) {
 		if (ve != null) System.out.print(ve.getChromosomeName() + "\t" + (ve.getStart() + 1) + "\t" + ve.getRef() + "\t" + ve.getAltsStr());
+		else if (rowTitle != null) System.out.print(rowTitle);
 		else System.out.print("# Total\t\t\t");
 
 		for (String label : labels)
