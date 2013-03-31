@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import ca.mcgill.mcb.pcingola.collections.AutoHashMap;
 import ca.mcgill.mcb.pcingola.fileIterator.SeekableBufferedReader;
@@ -33,6 +34,7 @@ public class SnpSiftCmdConcordance extends SnpSift {
 	String vcfFileName1, vcfFileName2;
 	String name1, name2;
 	String chrPrev = "";
+	String restrictSamplesFile;
 	int[] idx2toidx1; // How sample 2 index maps to sample 1 index
 	String[] sampleNameIdx2;
 	CountByType errors = new CountByType();
@@ -41,6 +43,7 @@ public class SnpSiftCmdConcordance extends SnpSift {
 	ArrayList<String> labels;
 	FileIndexChrPos indexVcf;
 	StringBuilder summary = new StringBuilder();
+	HashSet<String> restrictSamples;
 
 	protected VcfEntry latestVcfEntry = null;
 
@@ -217,7 +220,8 @@ public class SnpSiftCmdConcordance extends SnpSift {
 		for (int i = 0; i < args.length; i++) {
 			String arg = args[i];
 
-			if (vcfFileName1 == null) vcfFileName1 = arg;
+			if (args[i].equals("-s")) restrictSamplesFile = args[++i];
+			else if (vcfFileName1 == null) vcfFileName1 = arg;
 			else if (vcfFileName2 == null) vcfFileName2 = arg;
 		}
 
@@ -252,25 +256,36 @@ public class SnpSiftCmdConcordance extends SnpSift {
 		for (String sampleName : vcf2.getSampleNames()) {
 			vcf2Name2Idx.put(sampleName, idx);
 
-			if (vcf1Name2Idx.containsKey(sampleName)) {
-				shared++;
-				idx2toidx1[idx] = vcf1Name2Idx.get(sampleName); // Assign to index mapping array
-				sampleNameIdx2[idx] = sampleName;
-				concordanceBySample.getOrCreate(sampleName); // Initialize autoHash
-				if (debug) System.err.println("\tMap\tSamlple " + sampleName + "\tvcf2[" + idx + "]\t->\tvcf1[" + idx2toidx1[idx] + "]");
+			if ((restrictSamples == null) || restrictSamples.contains(sampleName)) {
+				if (vcf1Name2Idx.containsKey(sampleName)) {
+					shared++;
+					idx2toidx1[idx] = vcf1Name2Idx.get(sampleName); // Assign to index mapping array
+					sampleNameIdx2[idx] = sampleName;
+					concordanceBySample.getOrCreate(sampleName); // Initialize autoHash
+					if (debug) System.err.println("\tMap\tSamlple " + sampleName + "\tvcf2[" + idx + "]\t->\tvcf1[" + idx2toidx1[idx] + "]");
+				} else idx2toidx1[idx] = -1;
 			} else idx2toidx1[idx] = -1;
 
 			idx++;
 		}
+
 		// Show basic stats
 		summary("Number of samples:");
 		summary("\t" + vcf1.getSampleNames().size() + "\tFile " + vcfFileName1);
 		summary("\t" + vcf2.getSampleNames().size() + "\tFile " + vcfFileName2);
+		if (restrictSamples != null) summary("\t" + restrictSamples.size() + "\tFile " + restrictSamplesFile);
 		summary("\t" + shared + "\tBoth files");
 	}
 
 	@Override
 	public void run() {
+		// Read samples file
+		if (restrictSamplesFile != null) {
+			restrictSamples = new HashSet<String>();
+			for (String s : Gpr.readFile(restrictSamplesFile).split("\n"))
+				restrictSamples.add(s.trim());
+		}
+
 		// Assign labels
 		name1 = Gpr.removeExt(Gpr.baseName(vcfFileName1));
 		name2 = Gpr.removeExt(Gpr.baseName(vcfFileName2));
@@ -417,6 +432,8 @@ public class SnpSiftCmdConcordance extends SnpSift {
 
 		showVersion();
 		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar " + command + " [options] genotype.vcf sequencing.vcf\n");
+		System.err.println("Options:\n");
+		System.err.println("\t -s <file>  : Only use sample IDs in file (format: one sample ID per line).");
 		System.exit(1);
 	}
 
