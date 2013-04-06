@@ -3,17 +3,22 @@ package ca.mcgill.mcb.pcingola.snpSift.caseControl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import ca.mcgill.mcb.pcingola.collections.AutoHashMap;
+import ca.mcgill.mcb.pcingola.fileIterator.SeqChangeBedFileIterator;
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
 import ca.mcgill.mcb.pcingola.interval.Marker;
 import ca.mcgill.mcb.pcingola.interval.Markers;
 import ca.mcgill.mcb.pcingola.interval.SeqChange;
 import ca.mcgill.mcb.pcingola.interval.tree.IntervalForest;
+import ca.mcgill.mcb.pcingola.ped.PedPedigree;
+import ca.mcgill.mcb.pcingola.ped.TfamEntry;
 import ca.mcgill.mcb.pcingola.snpEffect.ChangeEffect;
 import ca.mcgill.mcb.pcingola.snpSift.SnpSift;
 import ca.mcgill.mcb.pcingola.snpSift.SnpSiftCmdAnnotateSortedDbNsfp;
+import ca.mcgill.mcb.pcingola.stats.CountByType;
 import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.util.Timer;
 import ca.mcgill.mcb.pcingola.vcf.VcfEffect;
@@ -35,8 +40,9 @@ public class SnpSiftCmdCaseControlSummary extends SnpSift {
 	public static Boolean CaseControl[] = { true, false };
 	public static String VariantsAf[] = { "COMMON", "RARE" };
 
+	PedPedigree pedPedigree;
 	boolean headerSummary = true;
-	String tpedFile, bedFile, vcfFile; // File names
+	String tfamFile, bedFile, vcfFile; // File names
 	HashMap<String, Boolean> caseControls; // Cases and controls 
 	HashMap<String, String> groups; // ID -> Group map
 	List<SeqChange> intervals; // Intervals to summarize
@@ -54,71 +60,63 @@ public class SnpSiftCmdCaseControlSummary extends SnpSift {
 	 * Load all data
 	 */
 	void load() {
+		/**
+		 * Read cases & controls file
+		 * Format:	"id\tphenotype\n"
+		 */
+		Timer.showStdErr("Reading cases & controls from " + tfamFile);
+		pedPedigree = new PedPedigree(tfamFile);
 
-		//		/**
-		//		 * Read cases & controls file
-		//		 * Format:	"id\tphenotype\n"
-		//		 */
-		//		Timer.showStdErr("Reading cases & controls from " + tpedFile);
-		//		int countCase = 0, countCtrl = 0;
-		//		caseControls = new HashMap<String, Boolean>();
-		//		for (String line : Gpr.readFile(tpedFile).split("\n")) {
-		//			String rec[] = line.split("\t");
-		//
-		//			boolean isCase = Gpr.parseIntSafe(rec[1]) == PHENOTYPE_CASE;
-		//			caseControls.put(rec[0], isCase); // Add to hash
-		//
-		//			if (isCase) countCase++;
-		//			else countCtrl++;
-		//		}
-		//		Timer.showStdErr("Total : " + caseControls.size() + " entries. Cases: " + countCase + ", controls: " + countCtrl);
-		//
-		//		//---
-		//		// Read groups
-		//		// Format:	"id\tgroupName\n"	 (only one group per sample)
-		//		//---
-		//		Timer.showStdErr("Reading groups from " + groupsFile);
-		//		groups = new HashMap<String, String>();
-		//		HashSet<String> groupNames = new HashSet<String>();
-		//		CountByType countByType = new CountByType();
-		//		for (String line : Gpr.readFile(groupsFile).split("\n")) {
-		//			String rec[] = line.split("\t");
-		//			String id = rec[0];
-		//			String group = rec[1];
-		//
-		//			if ((group != null) && (!group.isEmpty())) {
-		//				groups.put(id, group);
-		//				groupNames.add(group);
-		//				countByType.inc(group);
-		//			}
-		//		}
-		//		Timer.showStdErr("Total : " + groups.size() + " entries.\n" + countByType);
-		//
-		//		// Sort group names
-		//		groupNamesSorted = new ArrayList<String>();
-		//		groupNamesSorted.addAll(groupNames);
-		//		Collections.sort(groupNamesSorted);
-		//
-		//		//---
-		//		// Load intervals
-		//		//---
-		//		Timer.showStdErr("Loading intervals from " + bedFile);
-		//		SeqChangeBedFileIterator bed = new SeqChangeBedFileIterator(bedFile);
-		//		intervals = bed.load();
-		//		Timer.showStdErr("Done. Number of intervals: " + intervals.size());
-		//		if (intervals.size() <= 0) {
-		//			System.err.println("Fatal error: No intervals!");
-		//			System.exit(1);
-		//		}
-		//
-		//		// Create interval forest
-		//		Timer.showStdErr("Building interval forest.");
-		//		intForest = new IntervalForest();
-		//		for (SeqChange sc : intervals)
-		//			intForest.add(sc);
-		//		intForest.build();
+		int countCase = 0, countCtrl = 0;
+		caseControls = new HashMap<String, Boolean>();
+		for (TfamEntry te : pedPedigree) {
+			caseControls.put(te.getId(), te.isCase()); // Add to hash
+			if (te.isCase()) countCase++;
+			else countCtrl++;
+		}
+		Timer.showStdErr("Total : " + caseControls.size() + " entries. Cases: " + countCase + ", controls: " + countCtrl);
 
-		throw new RuntimeException("THIS HAS TO BE RE_IMPLEMENTED USING TPED FILE!!!");
+		//---
+		// Parse groups (families) 
+		//---
+		groups = new HashMap<String, String>();
+		HashSet<String> groupNames = new HashSet<String>();
+		CountByType countByType = new CountByType();
+		for (TfamEntry te : pedPedigree) {
+			String id = te.getId();
+			String group = te.getFamilyId();
+
+			if ((group != null) && (!group.isEmpty())) {
+				groups.put(id, group);
+				groupNames.add(group);
+				countByType.inc(group);
+			}
+		}
+		Timer.showStdErr("Total : " + groups.size() + " entries.\n" + countByType);
+
+		// Sort group names
+		groupNamesSorted = new ArrayList<String>();
+		groupNamesSorted.addAll(groupNames);
+		Collections.sort(groupNamesSorted);
+
+		//---
+		// Load intervals
+		//---
+		Timer.showStdErr("Loading intervals from " + bedFile);
+		SeqChangeBedFileIterator bed = new SeqChangeBedFileIterator(bedFile);
+		intervals = bed.load();
+		Timer.showStdErr("Done. Number of intervals: " + intervals.size());
+		if (intervals.size() <= 0) {
+			System.err.println("Fatal error: No intervals!");
+			System.exit(1);
+		}
+
+		// Create interval forest
+		Timer.showStdErr("Building interval forest.");
+		intForest = new IntervalForest();
+		for (SeqChange sc : intervals)
+			intForest.add(sc);
+		intForest.build();
 	}
 
 	/**
@@ -152,14 +150,14 @@ public class SnpSiftCmdCaseControlSummary extends SnpSift {
 		for (int argc = 0; argc < args.length; argc++) {
 			if ((nonOpts < 0) && args[argc].startsWith("-")) { // Argument starts with '-' (most of them parse in SnpSift class)
 				usage("Unknown option '" + args[argc] + "'");
-			} else if (tpedFile == null) tpedFile = args[argc];
+			} else if (tfamFile == null) tfamFile = args[argc];
 			else if (bedFile == null) bedFile = args[argc];
 			else if (vcfFile == null) vcfFile = args[argc];
 
 		}
 
 		// Sanity check
-		if (tpedFile == null) usage("Missing paramter 'file.tped'");
+		if (tfamFile == null) usage("Missing paramter 'file.tped'");
 		if (bedFile == null) usage("Missing paramter 'file.bed'");
 		if (vcfFile == null) usage("Missing paramter 'file.vcf'");
 	}
@@ -190,8 +188,8 @@ public class SnpSiftCmdCaseControlSummary extends SnpSift {
 			if (!groups.containsKey(id)) missingGroups++;
 		}
 
-		Timer.showStdErr("Samples missing case/control info: " + missingCc);
-		Timer.showStdErr("Samples missing groups info: " + missingGroups);
+		Timer.showStdErr("Samples missing case/control info : " + missingCc);
+		Timer.showStdErr("Samples missing groups info       : " + missingGroups);
 
 		// Too many missing IDs? Error
 		if (((1.0 * missingCc) / sampleIds.size() > 0.5) || ((1.0 * missingCc) / sampleIds.size() > 0.5)) {

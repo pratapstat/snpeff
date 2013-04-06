@@ -267,7 +267,6 @@ public class SnpSift {
 				+ "\n\tccs           : Case control summary. Case and control summaries by region, allele frequency and variant's functional effect." //
 				+ "\n\tconcordance   : Concordance metrics between two VCF files." //
 				+ "\n\tcovMat        : Create an covariance matrix output (allele matrix as input)." //
-				+ "\n\tcovMat        : Create an covariance matrix output (allele matrix as input)." //
 				+ "\n\tdbnsfp        : Annotate with multiple entries from dbNSFP. <EXPERIMENTAL>" //
 				+ "\n\textractFields : Extract fields from VCF file into tab separated format." //
 				+ "\n\tfilter        : Filter using arbitrary expressions" //
