@@ -111,9 +111,13 @@ public class SnpSiftCmdPhastCons extends SnpSift {
 					if (f.startsWith(START_FIELD)) {
 						String value = f.substring(START_FIELD.length());
 						index = Gpr.parseIntSafe(value) - 1; // Wig files coordinates are 1-based. Reference http://genome.ucsc.edu/goldenPath/help/wiggle.html
-						Gpr.showMark(countHeaders++, SHOW_EVERY);
+						if (verbose) Gpr.showMark(countHeaders++, SHOW_EVERY);
 					}
 				}
+			} else if (index >= score.length) {
+				// Out of chromosome?
+				Timer.showStdErr("PhastCons index out of chromosome boundaries.\n\tIndex: " + index + "\n\tChromosome length: " + score.length);
+				break;
 			} else {
 				score[index] = (short) (Gpr.parseFloatSafe(line) * 1000);
 				index++;
