@@ -137,7 +137,10 @@ public class SnpSiftCmdCaseControlSummary extends SnpSift {
 			}
 			maf = ((double) ac) / count;
 		}
-		if (maf > 0.5) maf = 1.0 - maf; // Always use the Minor Allele Frequency
+
+		// Always use the Minor Allele Frequency
+		if (maf > 0.5) maf = 1.0 - maf;
+
 		return maf;
 	}
 
