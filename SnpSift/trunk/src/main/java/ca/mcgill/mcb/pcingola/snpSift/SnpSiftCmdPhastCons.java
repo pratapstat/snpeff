@@ -116,7 +116,10 @@ public class SnpSiftCmdPhastCons extends SnpSift {
 				}
 			} else if (index >= score.length) {
 				// Out of chromosome?
-				Timer.showStdErr("PhastCons index out of chromosome boundaries.\n\tIndex: " + index + "\n\tChromosome length: " + score.length);
+				Timer.showStdErr("PhastCons index out of chromosome boundaries." //
+						+ "\n\tIndex             : " + index //
+						+ "\n\tChromosome length : " + score.length //
+				);
 				break;
 			} else {
 				score[index] = (short) (Gpr.parseFloatSafe(line) * 1000);

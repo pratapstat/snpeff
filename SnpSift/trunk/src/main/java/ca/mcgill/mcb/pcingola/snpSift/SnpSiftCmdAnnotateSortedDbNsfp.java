@@ -35,7 +35,7 @@ import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 
 	public static final String VCF_INFO_PREFIX = "dbnsfp";
-	public static final String DEFAULT_FIELDS_NAMES_TO_ADD = "Ensembl_transcriptid,Uniprot_acc,Interpro_domain,SIFT_score,Polyphen2_HVAR_pred,GERP++_NR,GERP++_RS,29way_logOdds,1000Gp1_AF,1000Gp1_AFR_AF,1000Gp1_EUR_AF,1000Gp1_AMR_AF,1000Gp1_ASN_AF,ESP5400_AA_AF,ESP5400_EA_AF";
+	public static final String DEFAULT_FIELDS_NAMES_TO_ADD = "Ensembl_transcriptid,Uniprot_acc,Interpro_domain,SIFT_score,Polyphen2_HVAR_pred,GERP++_NR,GERP++_RS,29way_logOdds,1000Gp1_AF,1000Gp1_AFR_AF,1000Gp1_EUR_AF,1000Gp1_AMR_AF,1000Gp1_ASN_AF,ESP6500_AA_AF,ESP6500_EA_AF";
 
 	protected Map<String, String> fieldsToAdd;
 	protected Map<String, String> fieldsDescription;
@@ -225,9 +225,13 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 		fieldsDescription.put("1000Gp1_AMR_AF", "Alternative allele frequency in the 1000Gp1 American descendent samples.");
 		fieldsDescription.put("1000Gp1_ASN_AC", "Alternative allele counts in the 1000Gp1 Asian descendent samples.");
 		fieldsDescription.put("1000Gp1_ASN_AF", "Alternative allele frequency in the 1000Gp1 Asian descendent samples.");
-		fieldsDescription.put("ESP5400_AA_AF", "Alternative allele frequency in the Afrian American samples of the NHLBI GO Exome Sequencing Project (ESP5400 data set).");
-		fieldsDescription.put("ESP5400_EA_AF", "Alternative allele frequency in the European American samples of the NHLBI GO Exome Sequencing Project (ESP5400 data set).");
-
+		//		fieldsDescription.put("ESP5400_AA_AF", "Alternative allele frequency in the Afrian American samples of the NHLBI GO Exome Sequencing Project (ESP5400 data set).");
+		//		fieldsDescription.put("ESP5400_EA_AF", "Alternative allele frequency in the European American samples of the NHLBI GO Exome Sequencing Project (ESP5400 data set).");
+		fieldsDescription.put("ESP6500_AA_AF", "Alternative allele frequency in the Afrian American samples of the NHLBI GO Exome Sequencing Project (ESP6500 data set).");
+		fieldsDescription.put("ESP6500_EA_AF", "Alternative allele frequency in the European American samples of the NHLBI GO Exome Sequencing Project (ESP6500 data set).");
+		fieldsDescription.put("MutationAssessor_score", "MutationAssessor functional impact combined score");
+		fieldsDescription.put("MutationAssessor_pred", "MutationAssessor functional impact of a variant : predicted functional (high, medium), predicted non-functional (low, neutral)");
+		fieldsDescription.put("FATHMM_score", "FATHMM default score (weighted for human inherited-disease mutations with Disease Ontology); If a score is smaller than -1.5 the corresponding NS is predicted as \"D(AMAGING)\"; otherwise it is predicted as \"T(OLERATED)\". If there's more than one scores associated with the same NS due to isoforms, the smallest score (most damaging) was used.");
 	}
 
 	/**

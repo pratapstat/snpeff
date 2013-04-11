@@ -13,12 +13,12 @@ import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.util.Timer;
 import ca.mcgill.mcb.pcingola.vcf.VcfEffect;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
-import ca.mcgill.mcb.pcingola.vcf.VcfGenotype;
 
 public class ZzzAffectedSamples {
 
 	public static final String VCF_INFO_FREQ_TYPE = "FREQ";
 	public static final String VCF_INFO_FREQ_SINGLETON = "Singleton";
+	public static final int MIN_NON_ZERO_COUNTS = 3;
 
 	HashMap<String, VariantCounter> varCounters;
 	List<String> sampleNames;
@@ -48,7 +48,7 @@ public class ZzzAffectedSamples {
 	VariantCounter getVarCounter(String geneName, VcfEntry ve) {
 		VariantCounter varCounter = varCounters.get(geneName);
 		if (varCounter == null) {
-			varCounter = new VariantCounter(ve);
+			varCounter = new VariantCounter(ve.getVcfGenotypes().size());
 			varCounters.put(geneName, varCounter);
 		}
 		return varCounter;
@@ -63,33 +63,27 @@ public class ZzzAffectedSamples {
 			if (sampleNames == null) sampleNames = ve.getVcfFileIterator().getVcfHeader().getSampleNames();
 
 			// Only singletons
-			if (ve.isSingleton()) {
+			if (!ve.isSingleton()) continue;
 
-				// Genes counted in this entry
-				HashSet<String> genesCounted = new HashSet<String>();
+			// Genes counted in this entry
+			HashSet<String> genesCounted = new HashSet<String>();
 
-				for (VcfEffect veff : ve.parseEffects()) {
-					if ((veff.getImpact() == ChangeEffect.EffectImpact.HIGH) || (veff.getImpact() == ChangeEffect.EffectImpact.MODERATE)) {
-						// if (veff.getImpact() == ChangeEffect.EffectImpact.HIGH) {
-						String geneName = ve.getChromosomeName() + "\t" + veff.getGene();
+			for (VcfEffect veff : ve.parseEffects()) {
+				if ((veff.getImpact() == ChangeEffect.EffectImpact.HIGH) || (veff.getImpact() == ChangeEffect.EffectImpact.MODERATE)) {
+					//if (veff.getImpact() == ChangeEffect.EffectImpact.HIGH) {
+					String geneName = ve.getChromosomeName() + "\t" + veff.getGene();
 
-						// Do not count twice
-						if (!genesCounted.contains(geneName)) {
-							genesCounted.add(geneName);
-
-							// Get counter for this gene
-							VariantCounter varCounter = getVarCounter(geneName, ve);
-
-							// Increment all genotypes that have a variant
-							int idx = 0;
-							for (VcfGenotype gen : ve) {
-								if (gen.isVariant()) varCounter.incGenotype(idx);
-								idx++;
-							}
-						}
+					// Do not count twice
+					VariantCounter variantCounter = getVarCounter(geneName, ve);
+					if (!genesCounted.contains(geneName)) {
+						variantCounter.parseGenotypes(ve); // Increment all genotypes that have a variant
+						genesCounted.add(geneName);
 					}
+
+					variantCounter.addEffect(veff.toString());
 				}
 			}
+
 		}
 
 		Timer.showStdErr("Done");
@@ -107,12 +101,14 @@ public class ZzzAffectedSamples {
 		System.out.print("Chromosome\tGeneName\tAffected samples");
 		for (String sample : sampleNames)
 			System.out.print("\t" + sample);
-		System.out.println("");
+		System.out.println("\tEffects");
 
 		// Show info
 		for (String gene : genes) {
 			VariantCounter vc = varCounters.get(gene);
-			System.out.println(gene + "\t" + vc);
+			if (vc.countNonZeroGenotypes() > MIN_NON_ZERO_COUNTS) System.out.println(gene + "\t" + vc);
 		}
+
+		System.out.println("Total\t" + genes.size());
 	}
 }
