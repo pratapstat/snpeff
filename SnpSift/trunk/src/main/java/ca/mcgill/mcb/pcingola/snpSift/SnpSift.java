@@ -167,13 +167,14 @@ public class SnpSift {
 		else if (command.startsWith("INTIDX")) cmd = new SnpSiftCmdIntervalsIndex(args);
 		else if (command.startsWith("IN")) cmd = new SnpSiftCmdIntervals(args);
 		else if (command.startsWith("JOIN")) cmd = new SnpSiftCmdJoin(args);
-		else if (command.startsWith("RM")) cmd = new SnpSiftCmdRemoveReferenceGenotypes(args);
 		else if (command.startsWith("SIF")) cmd = new SnpSiftCmdAnnotateSortedSift(args);
 		else if (command.startsWith("SPLIT")) cmd = new SnpSiftCmdSplit(args);
 		else if (command.startsWith("TS")) cmd = new SnpSiftCmdTsTv(args);
 		else if (command.startsWith("VARTYPE")) cmd = new SnpSiftCmdVarType(args);
 		else if (command.startsWith("PRIVATE")) cmd = new SnpSiftCmdPrivate(args);
 		else if (command.startsWith("PHASTCONS")) cmd = new SnpSiftCmdPhastCons(args);
+		else if (command.startsWith("RMINFO")) cmd = new SnpSiftCmdRmInfo(args);
+		else if (command.startsWith("RMREF")) cmd = new SnpSiftCmdRemoveReferenceGenotypes(args);
 		else usage("Unknown command '" + command + "'");
 
 		// Help? Show help and exit
@@ -278,9 +279,10 @@ public class SnpSift {
 				+ "\n\tphastCons     : Annotate using conservation scores (phastCons)." //
 				+ "\n\tprivate       : Annotate if a variant is private to a family or group." //
 				+ "\n\trmRefGen      : Remove reference genotypes." //
-				+ "\n\ttstv          : Calculate transiton to transversion ratio." //
+				+ "\n\trmInfo        : Remove INFO fields." //
 				+ "\n\tsift          : Annotate using SIFT scores from a VCF file." //
 				+ "\n\tsplit         : Split VCF by chromosome." //
+				+ "\n\ttstv          : Calculate transiton to transversion ratio." //
 				+ "\n\tvarType       : Annotate variant type (SNP,MNP,INS,DEL or MIXED)." //
 		);
 		System.exit(1);
