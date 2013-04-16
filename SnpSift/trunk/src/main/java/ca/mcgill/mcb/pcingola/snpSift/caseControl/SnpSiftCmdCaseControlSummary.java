@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import ca.mcgill.mcb.pcingola.collections.AutoHashMap;
-import ca.mcgill.mcb.pcingola.fileIterator.SeqChangeBedFileIterator;
+import ca.mcgill.mcb.pcingola.fileIterator.BedFileIterator;
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
 import ca.mcgill.mcb.pcingola.interval.Marker;
 import ca.mcgill.mcb.pcingola.interval.Markers;
@@ -103,7 +103,7 @@ public class SnpSiftCmdCaseControlSummary extends SnpSift {
 		// Load intervals
 		//---
 		Timer.showStdErr("Loading intervals from " + bedFile);
-		SeqChangeBedFileIterator bed = new SeqChangeBedFileIterator(bedFile);
+		BedFileIterator bed = new BedFileIterator(bedFile);
 		intervals = bed.load();
 		Timer.showStdErr("Done. Number of intervals: " + intervals.size());
 		if (intervals.size() <= 0) {

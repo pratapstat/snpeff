@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import ca.mcgill.mcb.pcingola.fileIterator.SeqChangeBedFileIterator;
+import ca.mcgill.mcb.pcingola.fileIterator.BedFileIterator;
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
 import ca.mcgill.mcb.pcingola.interval.Genome;
 import ca.mcgill.mcb.pcingola.interval.Markers;
@@ -52,7 +52,7 @@ public class SnpSiftCmdIntervals extends SnpSift {
 		for (String bedFileName : bedFiles) {
 			if (verbose) Timer.showStdErr("Reading filter interval file '" + bedFileName + "'");
 
-			SeqChangeBedFileIterator bedFile = new SeqChangeBedFileIterator(bedFileName, genome, 0);
+			BedFileIterator bedFile = new BedFileIterator(bedFileName, genome, 0);
 			bedFile.setCreateChromos(true);
 
 			List<SeqChange> seqChanges = bedFile.load();
