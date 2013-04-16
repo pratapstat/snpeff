@@ -27,7 +27,7 @@ public class SnpSiftCmdPhastCons extends SnpSift {
 	// VCF INFO FILED
 	public static final String VCF_INFO_PHASTCONS_FIELD = "PhastCons";
 
-	public static final int SHOW_EVERY = 10;
+	public static final int SHOW_EVERY = 1000;
 
 	String phastConsDir;
 	String vcfFile;
