@@ -124,6 +124,15 @@ public class SnpSift {
 	}
 
 	/**
+	 * Is this a command line option (e.g. "-tfam" is a command line option, but "-" means STDIN)
+	 * @param arg
+	 * @return
+	 */
+	protected boolean isOpt(String arg) {
+		return arg.startsWith("-") && (arg.length() > 1);
+	}
+
+	/**
 	 * Parse command line arguments
 	 */
 	public void parse(String[] args) {

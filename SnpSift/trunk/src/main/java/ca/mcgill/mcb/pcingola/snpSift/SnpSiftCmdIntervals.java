@@ -75,7 +75,7 @@ public class SnpSiftCmdIntervals extends SnpSift {
 		bedFiles = new LinkedList<String>();
 		for (int i = 0; i < args.length; i++) {
 			// Argument starts with '-'?
-			if (args[i].startsWith("-")) {
+			if (isOpt(args[i])) {
 				if (args[i].equals("-h") || args[i].equalsIgnoreCase("-help")) usage(null);
 				else if (args[i].equals("-x")) exclude = true;
 				else if (args[i].equals("-i")) vcfFileName = args[++i];

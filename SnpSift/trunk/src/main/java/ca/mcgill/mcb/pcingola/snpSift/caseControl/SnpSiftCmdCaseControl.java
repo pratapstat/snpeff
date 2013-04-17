@@ -142,7 +142,7 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 			}
 
 			// Abort?
-			if (errors > 0) throw new RuntimeException("VCF samples are missing in TFAM file.");
+			if (errors > (sampleIds.size() / 2)) throw new RuntimeException("VCF samples are missing in TFAM file. Too many errors, aboting!");
 		}
 
 		// Sanity check
@@ -181,23 +181,6 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 
 		double pdown = FisherExactTest.get().fisherExactTestDown(k, N, D, n);
 		double pup = FisherExactTest.get().fisherExactTestUp(k, N, D, n);
-
-		//		if (debug) {
-		//			Gpr.debug("Fisher\tk:" + k + "\tN:" + N + "\tD:" + D + "\tn:" + n //
-		//					+ "\t\tp=" + pup //
-		//					+ "\t" + pdown //
-		//					+ "\n\t" + FisherExactTest.get().toR(k, N, D, n, true) //
-		//					+ "\n\t" + FisherExactTest.get().toR(k, N, D, n, false) //
-		//					+ "\n\t" + k + "\t" + (D - k) ///
-		//					+ "\n\t" + (n - k) + "\t" + (N - D - (n - k)) ///
-		//			);
-		//
-		//			double fu = (nControl[1] + 2.0 * nControl[2]) / (2.0 * (nControl[0] + nControl[1] + nControl[2]));
-		//			Gpr.debug("F_U:\t" + fu);
-		//
-		//			double fa = (nCase[1] + 2.0 * nCase[2]) / (2.0 * (nCase[0] + nCase[1] + nCase[2]));
-		//			Gpr.debug("F_A:\t" + fa);
-		//		}
 
 		return Math.min(pup, pdown);
 	}
@@ -248,13 +231,6 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 	 * @return
 	 */
 	protected double pCodominant(int nControl[], int nCase[]) {
-		//		if (debug) {
-		//			Gpr.debug("CochranArmitageTest:\n" //
-		//					+ "\n\t" + nCase[0] + "\t" + nCase[1] + "\t" + nCase[2] //
-		//					+ "\n\t" + nControl[0] + "\t" + nControl[1] + "\t" + nControl[2] //
-		//			);
-		//		}
-
 		return CochranArmitageTest.get().p(nControl, nCase, CochranArmitageTest.WEIGHT_CODOMINANT);
 	}
 
@@ -273,23 +249,6 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		double pdown = FisherExactTest.get().fisherExactTestDown(k, N, D, n);
 		double pup = FisherExactTest.get().fisherExactTestUp(k, N, D, n);
 
-		//		if (debug) {
-		//			Gpr.debug("Fisher\tk:" + k + "\tN:" + N + "\tD:" + D + "\tn:" + n //
-		//					+ "\t\tp=" + pup //
-		//					+ "\t" + pdown //
-		//					+ "\n\t" + FisherExactTest.get().toR(k, N, D, n, true) //
-		//					+ "\n\t" + FisherExactTest.get().toR(k, N, D, n, false) //
-		//					+ "\n\t" + k + "\t" + (D - k) ///
-		//					+ "\n\t" + (n - k) + "\t" + (N - D - (n - k)) ///
-		//			);
-		//
-		//			double fu = (nControl[1] + 2.0 * nControl[2]) / (2.0 * (nControl[0] + nControl[1] + nControl[2]));
-		//			Gpr.debug("F_U:\t" + fu);
-		//
-		//			double fa = (nCase[1] + 2.0 * nCase[2]) / (2.0 * (nCase[0] + nCase[1] + nCase[2]));
-		//			Gpr.debug("F_A:\t" + fa);
-		//		}
-
 		return Math.min(pup, pdown);
 	}
 
@@ -307,22 +266,6 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 
 		double pdown = FisherExactTest.get().fisherExactTestDown(k, N, D, n);
 		double pup = FisherExactTest.get().fisherExactTestUp(k, N, D, n);
-
-		//		if (debug) {
-		//			Gpr.debug("Fisher\tk:" + k + "\tN:" + N + "\tD:" + D + "\tn:" + n //
-		//					+ "\t\tp=" + pup //
-		//					+ "\t" + pdown //
-		//					+ "\n\t" + FisherExactTest.get().toR(k, N, D, n, true) //
-		//					+ "\n\t" + k + "\t" + (D - k) ///
-		//					+ "\n\t" + (n - k) + "\t" + (N - D - (n - k)) ///
-		//			);
-		//
-		//			double fu = (nControl[1] + 2.0 * nControl[2]) / (2.0 * (nControl[0] + nControl[1] + nControl[2]));
-		//			Gpr.debug("F_U:\t" + fu);
-		//
-		//			double fa = (nCase[1] + 2.0 * nCase[2]) / (2.0 * (nCase[0] + nCase[1] + nCase[2]));
-		//			Gpr.debug("F_A:\t" + fa);
-		//		}
 
 		return Math.min(pup, pdown);
 	}

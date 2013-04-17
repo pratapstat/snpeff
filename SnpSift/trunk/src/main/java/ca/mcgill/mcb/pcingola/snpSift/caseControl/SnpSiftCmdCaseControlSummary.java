@@ -148,15 +148,11 @@ public class SnpSiftCmdCaseControlSummary extends SnpSift {
 	public void parse(String[] args) {
 		if (args.length <= 0) usage(null);
 
-		int nonOpts = -1;
-
 		for (int argc = 0; argc < args.length; argc++) {
-			if ((nonOpts < 0) && args[argc].startsWith("-")) { // Argument starts with '-' (most of them parse in SnpSift class)
-				usage("Unknown option '" + args[argc] + "'");
-			} else if (tfamFile == null) tfamFile = args[argc];
+			if (isOpt(args[argc])) usage("Unknown option '" + args[argc] + "'"); // Argument starts with '-' (most of them parse in SnpSift class)
+			else if (tfamFile == null) tfamFile = args[argc];
 			else if (bedFile == null) bedFile = args[argc];
 			else if (vcfFile == null) vcfFile = args[argc];
-
 		}
 
 		// Sanity check

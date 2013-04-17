@@ -70,7 +70,7 @@ public class SnpSiftCmdIntervalsIndex extends SnpSift {
 		for (int i = 0; i < args.length; i++) {
 
 			// Argument starts with '-'?
-			if (args[i].startsWith("-")) {
+			if (isOpt(args[i])) {
 
 				if (args[i].equals("-if")) {
 					if ((i + 1) < args.length) inOffset = Gpr.parseIntSafe(args[++i]);

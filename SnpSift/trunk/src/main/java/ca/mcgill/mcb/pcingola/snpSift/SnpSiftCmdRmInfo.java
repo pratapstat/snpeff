@@ -28,7 +28,7 @@ public class SnpSiftCmdRmInfo extends SnpSift {
 		for (int i = 0; i < args.length; i++) {
 			String arg = args[i];
 
-			if (arg.startsWith("-")) usage("Unknown option " + arg);
+			if (isOpt(arg)) usage("Unknown option " + arg);
 			else if (vcfFileName == null) vcfFileName = arg;
 			else infos.add(arg);
 		}
