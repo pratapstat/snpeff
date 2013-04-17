@@ -25,9 +25,7 @@ public class SnpSiftCmdRmInfo extends SnpSift {
 		infos = new HashSet<String>();
 		if (args.length == 0) usage(null);
 
-		for (int i = 0; i < args.length; i++) {
-			String arg = args[i];
-
+		for (String arg : args) {
 			if (isOpt(arg)) usage("Unknown option " + arg);
 			else if (vcfFileName == null) vcfFileName = arg;
 			else infos.add(arg);
