@@ -69,7 +69,7 @@ public class SnpSiftCmdJoin extends SnpSift {
 			GenericMarker m = new GenericMarker(marker.getParent(), marker.getStart() - add, marker.getEnd() + add, marker.getId());
 
 			// Any intersection?
-			Markers markers = snpEffectPredictor.intersects(m);
+			Markers markers = snpEffectPredictor.query(m);
 			if (markers.size() > 0) {
 				int min = Integer.MAX_VALUE;
 				GenericMarker gmMin = null;
@@ -210,7 +210,7 @@ public class SnpSiftCmdJoin extends SnpSift {
 		// Find which markers intersect
 		int countIntersect = 0;
 		for (GenericMarker m : list[0]) {
-			Markers markers = snpEffectPredictor.intersects(m);
+			Markers markers = snpEffectPredictor.query(m);
 			if (markers.size() > 0) {
 				countIntersect++;
 
