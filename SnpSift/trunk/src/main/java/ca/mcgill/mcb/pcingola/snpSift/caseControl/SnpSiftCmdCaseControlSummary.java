@@ -67,14 +67,16 @@ public class SnpSiftCmdCaseControlSummary extends SnpSift {
 		Timer.showStdErr("Reading cases & controls from " + tfamFile);
 		pedPedigree = new PedPedigree(tfamFile);
 
-		int countCase = 0, countCtrl = 0;
+		int countCase = 0, countCtrl = 0, countMissing = 0;
 		caseControls = new HashMap<String, Boolean>();
 		for (TfamEntry te : pedPedigree) {
-			caseControls.put(te.getId(), te.isCase()); // Add to hash
+			if (te.isCase() | te.isControl()) caseControls.put(te.getId(), te.isCase()); // Add to hash (do not add if 'missing'
+
 			if (te.isCase()) countCase++;
-			else countCtrl++;
+			else if (te.isControl()) countCtrl++;
+			else countMissing++;
 		}
-		Timer.showStdErr("Total : " + caseControls.size() + " entries. Cases: " + countCase + ", controls: " + countCtrl);
+		Timer.showStdErr("Total : " + caseControls.size() + " entries. Cases: " + countCase + ", controls: " + countCtrl + ", missing: " + countMissing);
 
 		//---
 		// Parse groups (families) 
@@ -244,14 +246,17 @@ public class SnpSiftCmdCaseControlSummary extends SnpSift {
 				String group = groups.get(id);
 				Boolean caseControl = caseControls.get(id);
 
-				int count = ve.getVcfGenotype(sampleNum).getGenotypeCode();
-				if (count > 0) {
-					summary.count(group, caseControl, funcClass, variantAf, count); // Update summary for this variant
+				// Should we ignore this entry?
+				if (caseControl != null) {
+					int count = ve.getVcfGenotype(sampleNum).getGenotypeCode();
+					if (count > 0) {
+						summary.count(group, caseControl, funcClass, variantAf, count); // Update summary for this variant
 
-					// Update all intersecting intervals
-					for (Marker interval : intersect) {
-						Summary summaryInt = summaryByInterval.getOrCreate(interval); // Get (or create) summary
-						summaryInt.count(group, caseControl, funcClass, variantAf, count); // Update summary 
+						// Update all intersecting intervals
+						for (Marker interval : intersect) {
+							Summary summaryInt = summaryByInterval.getOrCreate(interval); // Get (or create) summary
+							summaryInt.count(group, caseControl, funcClass, variantAf, count); // Update summary 
+						}
 					}
 				}
 

@@ -148,12 +148,23 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		// Sanity check
 		if (caseControl.length != vcf.getVcfHeader().getSampleNames().size()) throw new RuntimeException("Number of case control entries specified does not match number of samples in VCF file");
 
-		// Show 
+		// Show details 
 		if (debug) {
 			System.err.println("\tSample\tCase");
 			int idx = 0;
 			for (String sid : vcf.getVcfHeader().getSampleNames())
 				System.err.println("\t" + sid + "\t" + caseControl[idx++]);
+		}
+
+		// Show overview 
+		if (verbose) {
+			int countCase = 0, countCtrl = 0, countIgnored = 0;
+			for (Boolean cc : caseControl) {
+				if (cc == null) countIgnored++;
+				else if (cc) countCase++;
+				else countCtrl++;
+			}
+			Timer.showStdErr("Total : " + caseControl.length + " entries. Cases: " + countCase + ", controls: " + countCtrl + ", ignored: " + countIgnored);
 		}
 
 	}
