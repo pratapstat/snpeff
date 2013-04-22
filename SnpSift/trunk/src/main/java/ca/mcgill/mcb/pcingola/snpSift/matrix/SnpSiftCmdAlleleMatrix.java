@@ -79,14 +79,17 @@ public class SnpSiftCmdAlleleMatrix extends SnpSift {
 		for (VcfEntry ve : vcf) {
 			StringBuilder sbcodes = new StringBuilder();
 			int countNonRef = processStr(ve, sbcodes);
-			System.out.println(ve.getChromosomeName() //
-					+ "\t" + (ve.getStart() + 1) //
-					+ "\t" + ve.getId() //
-					+ "\t" + ve.getRef() //
-					+ "\t" + ve.getAltsStr() //
-					+ "\t" + countNonRef //
-					+ "\t" + sbcodes.toString() //
-			);
+
+			if (countNonRef > 0) // Any non-reference?
+				System.out.println(ve.getChromosomeName() //
+						+ "\t" + (ve.getStart() + 1) //
+						//	+ "\t" + ve.getId() //
+						+ "\t" + ve.getRef() //
+						+ "\t" + ve.getAltsStr() //
+						//	+ "\t" + ve.getQuality() //
+						//	+ "\t" + ve.getInfoStr() //
+						+ "\t" + sbcodes.toString() //
+				);
 			if (verbose) Gpr.showMark(i++, SHOW_EVERY);
 		}
 
