@@ -43,57 +43,28 @@ public class SnpSiftCmdAlleleMatrix extends SnpSift {
 	}
 
 	/**
-	 * Process a VCF entry
-	 * @param vcfEntry
-	 * @return null if the entry is not suitable
-	 */
-	public int[] processInt(VcfEntry vcfEntry) {
-		if (!vcfEntry.isSnp()) return null;
-
-		// Init
-		int i = 0;
-		int scores[] = new int[vcfEntry.getVcfGenotypes().size()];
-
-		// For every sample 
-		for (VcfGenotype vcfGen : vcfEntry.getVcfGenotypes()) {
-			int gens[] = vcfGen.getGenotype();
-
-			if (gens == null) return null; // Missing all genotypes? Do not show
-			else if (gens.length != 2) return null; // More (or less) than two genotypes?
-			else {
-				for (int g : gens)
-					if ((g < 0) || (g > 1)) return null; // Missing one genotype? Do not show
-			}
-
-			// Calculate score
-			int genScore = gens[0] + gens[1];
-
-			// Sanity check
-			if ((genScore < 0) || (genScore > 2)) throw new RuntimeException("Fatal error: Out of range. genCode=" + genScore + "\t" + vcfGen + "\n\t" + vcfEntry);
-
-			scores[i++] = genScore;
-		}
-
-		return scores;
-	}
-
-	/**
 	 * Process a VCF entry and return a string (tab separated values)
 	 * @param vcfEntry
 	 * @return
 	 */
-	public String processStr(VcfEntry vcfEntry) {
-		int scores[] = processInt(vcfEntry);
-
-		if (scores == null) return null;
-
-		StringBuilder sb = new StringBuilder();
+	public int processStr(VcfEntry vcfEntry, StringBuilder sbcodes) {
+		// Add all genotype codes
 		String sep = "";
-		for (int sc : scores) {
-			sb.append(sep + sc);
+		int countNonRef = 0;
+		for (VcfGenotype gen : vcfEntry.getVcfGenotypes()) {
+			int score = gen.getGenotypeCode();
+
+			String sc = ".";
+			if (score >= 0) {
+				sc = Integer.toString(score);
+				if (score > 0) countNonRef++;
+			}
+
+			sbcodes.append(sep + sc);
 			sep = SEPARATOR;
 		}
-		return sb.toString();
+
+		return countNonRef;
 	}
 
 	/**
@@ -101,25 +72,25 @@ public class SnpSiftCmdAlleleMatrix extends SnpSift {
 	 */
 	@Override
 	public void run() {
-		Timer.showStdErr("Processing file '" + vcfFile + "'");
+		if (verbose) Timer.showStdErr("Processing file '" + vcfFile + "'");
 
 		int i = 1;
 		VcfFileIterator vcf = new VcfFileIterator(vcfFile);
 		for (VcfEntry ve : vcf) {
-			String out = processStr(ve);
-			if (out != null) {
-				System.out.println(ve.getChromosomeName() //
-						+ "\t" + (ve.getStart() + 1) //
-						+ "\t" + ve.getId() //
-						+ "\t" + ve.getRef() //
-						+ "\t" + ve.getAltsStr() //
-						+ "\t" + out //
-				);
-			}
-			Gpr.showMark(i++, SHOW_EVERY);
+			StringBuilder sbcodes = new StringBuilder();
+			int countNonRef = processStr(ve, sbcodes);
+			System.out.println(ve.getChromosomeName() //
+					+ "\t" + (ve.getStart() + 1) //
+					+ "\t" + ve.getId() //
+					+ "\t" + ve.getRef() //
+					+ "\t" + ve.getAltsStr() //
+					+ "\t" + countNonRef //
+					+ "\t" + sbcodes.toString() //
+			);
+			if (verbose) Gpr.showMark(i++, SHOW_EVERY);
 		}
 
-		Timer.showStdErr("Done");
+		if (verbose) Timer.showStdErr("Done");
 	}
 
 	/**
