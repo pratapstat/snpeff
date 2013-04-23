@@ -37,9 +37,6 @@ public class SnpSiftCmdIntersect extends SnpSift {
 		HashSet<Marker> done = new HashSet<Marker>();
 		done.add(m);
 
-		if (m.getId().equals("MACS_peak_3973")) //
-			Gpr.debug("Debug!");
-
 		int numIntersect = 1;
 		boolean updated;
 		do {
