@@ -174,7 +174,8 @@ public class SnpSift {
 		else if (command.startsWith("GWASCAT")) cmd = new SnpSiftCmdGwasCatalog(args);
 		else if (command.startsWith("HW")) cmd = new SnpSiftCmdHwe(args);
 		else if (command.startsWith("INTIDX")) cmd = new SnpSiftCmdIntervalsIndex(args);
-		else if (command.startsWith("IN")) cmd = new SnpSiftCmdIntervals(args);
+		else if (command.startsWith("INTERS")) cmd = new SnpSiftCmdIntersect(args);
+		else if (command.startsWith("INTERV")) cmd = new SnpSiftCmdIntervals(args);
 		else if (command.startsWith("JOIN")) cmd = new SnpSiftCmdJoin(args);
 		else if (command.startsWith("SIF")) cmd = new SnpSiftCmdAnnotateSortedSift(args);
 		else if (command.startsWith("SPLIT")) cmd = new SnpSiftCmdSplit(args);
