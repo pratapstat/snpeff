@@ -17,55 +17,6 @@ import ca.mcgill.mcb.pcingola.util.Timer;
  */
 public class SnpSiftCmdIntersect extends SnpSift {
 
-	class MarkerIntersect implements Cloneable {
-		int countIntersects = 0;
-		Marker marker;
-		HashSet<String> intersected;
-
-		MarkerIntersect(Marker marker) {
-			this.marker = marker;
-			intersected = new HashSet<String>();
-			intersected.add(key(marker));
-		}
-
-		MarkerIntersect(Marker marker, MarkerIntersect mi) {
-			this.marker = marker;
-			this.intersected = new HashSet<String>();
-			this.intersected.addAll(mi.intersected);
-			this.intersected.add(key(marker));
-		}
-
-		boolean done(Marker m) {
-			return intersected.contains(key(m));
-		}
-
-		MarkerIntersect intersect(Marker m) {
-			try {
-				Marker mm = marker.intersect(m);
-				mm.setId(marker.getId() + "+" + m.getId()); // Update ID
-				MarkerIntersect mi = new MarkerIntersect(mm, this);
-				mi.intersected.add(key(m));
-				return mi;
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		}
-
-		String key(Marker m) {
-			return m.getChromosomeName() + ":" + m.getStart() + "-" + m.getEnd();
-		}
-
-		@Override
-		public String toString() {
-			StringBuilder sb = new StringBuilder();
-			sb.append("Marker: " + marker + "\nIntersected: ");
-			for (String i : intersected)
-				sb.append(i + "\t");
-			sb.append("\n");
-			return sb.toString();
-		}
-	}
-
 	int cluster;
 	int minOverlap;
 	boolean intersect;
@@ -83,29 +34,45 @@ public class SnpSiftCmdIntersect extends SnpSift {
 	 * @return
 	 */
 	Marker intersect(Marker m) {
-		HashSet<MarkerIntersect> results = new HashSet<MarkerIntersect>();
-		MarkerIntersect mi = new MarkerIntersect(m);
-		intersect(mi, results);
+		HashSet<Marker> done = new HashSet<Marker>();
+		done.add(m);
 
-		for (MarkerIntersect res : results)
-			System.out.println(res);
+		if (m.getId().equals("MACS_peak_3973")) //
+			Gpr.debug("Debug!");
 
-		return null;
-	}
+		int numIntersect = 1;
+		boolean updated;
+		do {
+			updated = false;
 
-	void intersect(MarkerIntersect mi, HashSet<MarkerIntersect> results) {
-		boolean intersect = false;
-		for (IntervalForest forest : forests) {
-			Markers query = forest.query(mi.marker);
+			// For every forest...
+			for (IntervalForest forest : forests) {
+				Markers query = forest.query(m); // Query intersecting intervals
 
-			for (Marker q : query)
-				if (!mi.done(q)) {
-					intersect(mi.intersect(q), results);
-					intersect = true;
+				// For all results..
+				for (Marker q : query) {
+
+					// Analyze each result only once.
+					if (!done.contains(q)) {
+						// Check minimum number of bases that overlap
+						if (m.intersectSize(q) >= minOverlap) { // Note: Once marker 'm' has been updated, new query results might not even intersect
+							numIntersect++;
+							String newId = m.getId() + "+" + q.getId();
+
+							// Intersection or union?
+							if (intersect) m = m.intersect(q);
+							else m = m.union(q);
+
+							m.setId(newId);
+						}
+					}
 				}
-		}
+			}
+		} while (updated);
 
-		if (!intersect) results.add(mi);
+		// Check number of 'clustered' markers
+		if (numIntersect >= cluster) return m;
+		return null;
 	}
 
 	@Override
@@ -121,11 +88,13 @@ public class SnpSiftCmdIntersect extends SnpSift {
 		for (int argc = 0; argc < args.length; argc++) {
 			if (isOpt(args[argc])) {
 				String arg = args[argc].toLowerCase();
+
 				if (arg.equals("-intersect")) intersect = true;
 				else if (arg.equals("-union")) intersect = false;
-				else if (arg.equals("-minOverlap")) minOverlap = Gpr.parseIntSafe(args[++argc]);
+				else if (arg.equals("-minoverlap")) minOverlap = Gpr.parseIntSafe(args[++argc]);
 				else if (arg.equals("-cluster")) cluster = Gpr.parseIntSafe(args[++argc]);
 				else usage("Unknown option '" + args[argc] + "'");
+
 			} else fileNames.add(args[argc]);
 		}
 
@@ -160,7 +129,7 @@ public class SnpSiftCmdIntersect extends SnpSift {
 			// Add markers to 'all'
 			markersAll.add(markers);
 		}
-		if (verbose) Timer.showStdErr("Total number of markers : " + markersAll.size());
+		if (verbose) Timer.showStdErr("Total number of markers (all files) : " + markersAll.size());
 
 		//---
 		// Intersect
@@ -174,13 +143,14 @@ public class SnpSiftCmdIntersect extends SnpSift {
 			// Any results? Show them
 			if (mi != null) {
 				// Output marker data (if not already done)
-				String key = mi.getChromosomeName() + "\t" + (mi.getStart() + 1) + "\t" + (mi.getEnd() + 1) + "\t" + mi.getId();
+				String key = mi.getChromosomeName() + "\t" + (mi.getStart() + 1) + "\t" + (mi.getEnd() + 1);
 				if (!done.contains(key)) {
-					System.out.println(key);
+					System.out.println(key + "\t" + mi.getId());
 					done.add(key);
 				}
 			}
 		}
+		if (verbose) Timer.showStdErr("Total number of markers intersected : " + done.size());
 	}
 
 	/**
