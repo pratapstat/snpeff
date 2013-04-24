@@ -3,7 +3,6 @@ package ca.mcgill.mcb.pcingola.snpSift;
 import java.util.List;
 
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
-import ca.mcgill.mcb.pcingola.interval.Genome;
 import ca.mcgill.mcb.pcingola.util.Timer;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 import ca.mcgill.mcb.pcingola.vcf.VcfGenotype;
@@ -19,8 +18,17 @@ public class SnpSiftCmdRemoveReferenceGenotypes extends SnpSift {
 	public static final int SHOW_EVERY = 1000;
 	public static final int SHOW_EVERY_NL = 100 * SHOW_EVERY;
 
+	String vcfFileName;
+
 	public SnpSiftCmdRemoveReferenceGenotypes(String[] args) {
 		super(args, "RemoveReferenceGenotypes");
+	}
+
+	@Override
+	public void parse(String[] args) {
+		if (args.length <= 0) vcfFileName = "-";
+		else if (args.length == 1) vcfFileName = args[0];
+		else usage("Too many arguments");
 	}
 
 	/**
@@ -29,8 +37,7 @@ public class SnpSiftCmdRemoveReferenceGenotypes extends SnpSift {
 	@Override
 	public void run() {
 		Timer.showStdErr("Reading STDIN");
-		Genome genome = new Genome("genome");
-		VcfFileIterator vcfFile = new VcfFileIterator("-", genome);
+		VcfFileIterator vcfFile = new VcfFileIterator(vcfFileName);
 		vcfFile.setCreateChromos(true); // Create chromosomes when needed
 
 		// Read all vcfEntries
@@ -77,7 +84,9 @@ public class SnpSiftCmdRemoveReferenceGenotypes extends SnpSift {
 	@Override
 	public void usage(String errMsg) {
 		if (errMsg != null) System.err.println("Error: " + errMsg);
-		System.err.println("Usage: cat file.vcf | java -jar " + SnpSift.class.getSimpleName() + "" + ".jar rmRefGen > file_noref.vcf");
+		System.err.println("Usage: cat file.vcf | java -jar " + SnpSift.class.getSimpleName() + "" + ".jar rmRefGen [file.vcf] > file_noref.vcf");
+		System.err.println("Options: ");
+		System.err.println("\t file.vcf : Input VCF file. Default : STDIN");
 		System.exit(1);
 	}
 }
