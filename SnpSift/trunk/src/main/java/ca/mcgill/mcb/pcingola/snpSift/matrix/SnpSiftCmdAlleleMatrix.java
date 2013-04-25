@@ -77,19 +77,25 @@ public class SnpSiftCmdAlleleMatrix extends SnpSift {
 		int i = 1;
 		VcfFileIterator vcf = new VcfFileIterator(vcfFile);
 		for (VcfEntry ve : vcf) {
-			StringBuilder sbcodes = new StringBuilder();
-			int countNonRef = processStr(ve, sbcodes);
+			if (vcf.isHeadeSection()) {
+				System.out.print("#CHROM\tPOS\tREF\tALT");
+				for (String sample : vcf.getVcfHeader().getSampleNames())
+					System.out.print("\t" + sample);
+				System.out.println("");
+			}
 
-			if (countNonRef > 0) // Any non-reference?
-				System.out.println(ve.getChromosomeName() //
-						+ "\t" + (ve.getStart() + 1) //
-						//	+ "\t" + ve.getId() //
-						+ "\t" + ve.getRef() //
-						+ "\t" + ve.getAltsStr() //
-						//	+ "\t" + ve.getQuality() //
-						//	+ "\t" + ve.getInfoStr() //
-						+ "\t" + sbcodes.toString() //
-				);
+			StringBuilder sbcodes = new StringBuilder();
+			processStr(ve, sbcodes);
+
+			System.out.println(ve.getChromosomeName() //
+					+ "\t" + (ve.getStart() + 1) //
+					//	+ "\t" + ve.getId() //
+					+ "\t" + ve.getRef() //
+					+ "\t" + ve.getAltsStr() //
+					//	+ "\t" + ve.getQuality() //
+					//	+ "\t" + ve.getInfoStr() //
+					+ "\t" + sbcodes.toString() //
+			);
 			if (verbose) Gpr.showMark(i++, SHOW_EVERY);
 		}
 
