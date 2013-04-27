@@ -191,8 +191,8 @@ public class SnpSiftCmdFilter extends SnpSift {
 			all &= eval;
 			any |= eval;
 
-			if ((fieldIterator.getType() == Field.TYPE_ALL) && !all) return all;
-			if ((fieldIterator.getType() == Field.TYPE_ANY) && any) return any;
+			if ((fieldIterator.getType() == Field.TYPE_ALL) && !all) return inverse ^ all;
+			if ((fieldIterator.getType() == Field.TYPE_ANY) && any) return inverse ^ any;
 
 			if (fieldIterator.hasNext()) fieldIterator.next(); // End of iteration?
 			else break;
@@ -323,7 +323,7 @@ public class SnpSiftCmdFilter extends SnpSift {
 		int entryNum = 0;
 		for (VcfEntry vcfEntry : vcfFile) {
 			// Show header before first entry
-			if (entryNum == 0) {
+			if (vcfFile.isHeadeSection()) {
 				addHeader();
 				if (!createList) {
 					String headerStr = vcfFile.getVcfHeader().toString();
@@ -348,7 +348,7 @@ public class SnpSiftCmdFilter extends SnpSift {
 				else addVcfFilter(vcfEntry, filterId); // Filter not passed? Show filter name
 			}
 
-			// Add or delete dtrings from filter field
+			// Add or delete strings from filter field
 			if (eval) {
 				if (addFilterField != null) addVcfFilter(vcfEntry, addFilterField); // Filter passed? Add to FILTER field
 				if (rmFilterField != null) delVcfFilter(vcfEntry, rmFilterField); // Filter passed? Delete string from FILTER field

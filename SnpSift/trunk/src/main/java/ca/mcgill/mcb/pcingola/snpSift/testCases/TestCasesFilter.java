@@ -897,4 +897,28 @@ public class TestCasesFilter extends TestCase {
 		}
 	}
 
+	/**
+	 * Inverse FILTER strings
+	 */
+	public void test_40() {
+		verbose = true;
+
+		// Filter data
+		String expression = "( EFF[*].EFFECT = 'SPLICE_SITE_ACCEPTOR' )";
+		String vcfFile = "test/test_jim.vcf";
+		String args[] = { "-f", vcfFile, "-n", expression }; // FILTER iNverse 
+		SnpSiftCmdFilter vcfFilter = new SnpSiftCmdFilter(args);
+		List<VcfEntry> list = vcfFilter.filter(vcfFile, expression, true);
+
+		// Check that it satisfies the condition
+		System.out.println("Expression: '" + expression + "'");
+		Assert.assertNotNull(list);
+		Assert.assertTrue(list.size() == 1);
+
+		// Check result (hould be only one entry)
+		VcfEntry vcfEntry = list.get(0);
+		if (verbose) System.out.println(vcfEntry.getFilterPass() + "\t" + vcfEntry);
+		Assert.assertEquals(219134272, vcfEntry.getStart());
+	}
+
 }
