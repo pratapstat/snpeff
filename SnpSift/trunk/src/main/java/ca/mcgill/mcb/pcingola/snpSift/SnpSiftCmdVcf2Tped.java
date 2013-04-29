@@ -132,9 +132,9 @@ public class SnpSiftCmdVcf2Tped extends SnpSift {
 		System.err.println("\t-useMissing    : Use entries with missing genotypes (otherwise they are filtered out). Default: " + (useMissing == UseMissing.MISSING));
 		System.err.println("\t-useMissingRef : Use entries with missing genotypes marking them as 'reference' instead of 'missing'. Default: " + (useMissing == UseMissing.REFERENCE));
 		System.err.println("Parameters:");
-		System.err.println("\tfile.tfam  : File with genotypes and groups information (in PLINK's TFAM format)");
-		System.err.println("\tfile.vcf   : A VCF file (variants and genotype data)");
-		System.err.println("\toutputName : Base name for the new TPED and TFAM files.");
+		System.err.println("\tfile.tfam      : File with genotypes and groups information (in PLINK's TFAM format)");
+		System.err.println("\tfile.vcf       : A VCF file (variants and genotype data)");
+		System.err.println("\toutputName     : Base name for the new TPED and TFAM files.");
 		System.exit(1);
 	}
 
