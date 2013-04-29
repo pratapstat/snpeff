@@ -185,6 +185,7 @@ public class SnpSift {
 		else if (command.startsWith("PHASTCONS")) cmd = new SnpSiftCmdPhastCons(args);
 		else if (command.startsWith("RMINFO")) cmd = new SnpSiftCmdRmInfo(args);
 		else if (command.startsWith("RMREF")) cmd = new SnpSiftCmdRemoveReferenceGenotypes(args);
+		else if (command.startsWith("VCF2TPED")) cmd = new SnpSiftCmdVcf2Tped(args);
 		else usage("Unknown command '" + command + "'");
 
 		// Help? Show help and exit
@@ -270,7 +271,8 @@ public class SnpSift {
 
 		showVersion();
 
-		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar [annotate|filter|caseControl|tstv|hwe|intervals|rmRefGen] params..." //
+		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar [command] params..." //
+				+ "\nCommand is one of:" //
 				+ "\n\talleleMat     : Create an allele matrix output." //
 				+ "\n\tannotate      : Annotate 'ID' from a database (e.g. dbSnp). Assumes entries are sorted." //
 				+ "\n\tannMem        : Annotate 'ID' from a database (e.g. dbSnp). Loads db in memory. Does not assume sorted entries." //
@@ -295,6 +297,7 @@ public class SnpSift {
 				+ "\n\tsplit         : Split VCF by chromosome." //
 				+ "\n\ttstv          : Calculate transiton to transversion ratio." //
 				+ "\n\tvarType       : Annotate variant type (SNP,MNP,INS,DEL or MIXED)." //
+				+ "\n\tvcf2tped      : Convert VCF to TPED." //
 		);
 		System.exit(1);
 	}
