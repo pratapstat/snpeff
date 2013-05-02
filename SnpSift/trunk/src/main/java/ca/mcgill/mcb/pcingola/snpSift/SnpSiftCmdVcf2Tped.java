@@ -31,7 +31,7 @@ public class SnpSiftCmdVcf2Tped extends SnpSift {
 	boolean onlySnp; // Only use SNPs in VCF files
 	boolean onlyBiAllelic; // Only use bi-allelic variants.
 	boolean force; // Overwrite new files if they exist
-	UseMissing useMissing = UseMissing.DO_NOT_USE; // Do not use genotypes having missing values
+	UseMissing useMissing; // Do not use genotypes having missing values
 	String vcfFile, tfamFile;
 	String outputFileName;
 	String outTpedFile, outTfamFile;
@@ -48,6 +48,16 @@ public class SnpSiftCmdVcf2Tped extends SnpSift {
 		if (verbose) Timer.showStdErr("Loading TFAM file '" + tfamFile + "'");
 		pedigree = new PedPedigree();
 		pedigree.loadTfam(tfamFile);
+	}
+
+	/**
+	 * Default parameters
+	 */
+	public void init() {
+		onlySnp = false; // Only use SNPs in VCF files
+		onlyBiAllelic = false; // Only use bi-allelic variants.
+		force = false; // Overwrite files
+		useMissing = UseMissing.MISSING; // Use missing genotypes
 	}
 
 	@Override
@@ -185,8 +195,8 @@ public class SnpSiftCmdVcf2Tped extends SnpSift {
 
 						int pos = ve.getStart() + 1;
 						String chr = ve.getChromosomeName();
-						String id = "id_" + vcf.getLineNum(); // Create a unique ID
-						if ((id == null) || id.isEmpty()) id = chr + ":" + pos;
+						String id = chr + "_" + pos;
+						// String id = "id_" + vcf.getLineNum(); // Create a unique ID
 
 						tpedLine.append(chr + " "); // Chromosome
 						tpedLine.append(id + " "); // Identifier
