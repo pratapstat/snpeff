@@ -31,6 +31,7 @@ public class SnpSiftCmdVcf2Tped extends SnpSift {
 	boolean onlySnp; // Only use SNPs in VCF files
 	boolean onlyBiAllelic; // Only use bi-allelic variants.
 	boolean force; // Overwrite new files if they exist
+	boolean useNumbers; // Use numbers instead of letters
 	UseMissing useMissing; // Do not use genotypes having missing values
 	String vcfFile, tfamFile;
 	String outputFileName;
@@ -42,22 +43,24 @@ public class SnpSiftCmdVcf2Tped extends SnpSift {
 	}
 
 	/**
+	 * Default parameters
+	 */
+	@Override
+	public void init() {
+		onlySnp = false; // Only use SNPs in VCF files
+		onlyBiAllelic = false; // Only use bi-allelic variants.
+		force = false; // Overwrite files
+		useNumbers = false;
+		useMissing = UseMissing.MISSING; // Use missing genotypes
+	}
+
+	/**
 	 * Load all data
 	 */
 	void loadTfam() {
 		if (verbose) Timer.showStdErr("Loading TFAM file '" + tfamFile + "'");
 		pedigree = new PedPedigree();
 		pedigree.loadTfam(tfamFile);
-	}
-
-	/**
-	 * Default parameters
-	 */
-	public void init() {
-		onlySnp = false; // Only use SNPs in VCF files
-		onlyBiAllelic = false; // Only use bi-allelic variants.
-		force = false; // Overwrite files
-		useMissing = UseMissing.MISSING; // Use missing genotypes
 	}
 
 	@Override
@@ -67,6 +70,7 @@ public class SnpSiftCmdVcf2Tped extends SnpSift {
 		for (int argc = 0; argc < args.length; argc++) {
 			if (args[argc].equals("-useMissingRef")) useMissing = UseMissing.REFERENCE;
 			else if (args[argc].equals("-useMissing")) useMissing = UseMissing.MISSING;
+			else if (args[argc].equalsIgnoreCase("-num")) useNumbers = true;
 			else if (args[argc].equalsIgnoreCase("-onlySnp")) onlySnp = true;
 			else if (args[argc].equalsIgnoreCase("-onlyBiAllelic")) onlyBiAllelic = true;
 			else if (args[argc].equalsIgnoreCase("-f")) force = true;
@@ -110,15 +114,28 @@ public class SnpSiftCmdVcf2Tped extends SnpSift {
 	 * 			  Yes, it's an awful hack. YOu've been warned!
 	 */
 	String snpGenotype(VcfEntry ve, VcfGenotype gen, int genoNum) {
+		String base = "";
+
 		if (ve.isSnp()) {
-			if (genoNum < 0) return ve.getRef(); // Reference
-			return gen.getGenotype(genoNum);
+			// SNPs
+			if (genoNum < 0) base = ve.getRef(); // Reference
+			else base = gen.getGenotype(genoNum);
+		} else {
+			// Indel, MNP or other subsitutions
+			// Create fake SNP "A -> T" and map InDel values to it
+			if (genoNum < 0) base = "A"; // Reference
+			else if (gen.getGenotype(genoNum).equals(ve.getRef())) base = "A"; // ALT[genoNum] == REF 
+			else base = "T"; // ALT[genoNum] != REF
 		}
 
-		// Create fake SNP "A -> T" and map InDel values to it
-		if (genoNum < 0) return "A"; // Reference
-		if (gen.getGenotype(genoNum).equals(ve.getRef())) return "A"; // ALT[genoNum] == REF 
-		return "T"; // ALT[genoNum] != REF
+		if (!useNumbers) return base;
+
+		// Convert to numbers
+		if (base.equalsIgnoreCase("A")) return "1";
+		if (base.equalsIgnoreCase("C")) return "2";
+		if (base.equalsIgnoreCase("G")) return "3";
+		if (base.equalsIgnoreCase("T")) return "4";
+		return "0";
 	}
 
 	/**
@@ -137,6 +154,7 @@ public class SnpSiftCmdVcf2Tped extends SnpSift {
 		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar vcf2tped [options] file.tfam file.vcf outputName");
 		System.err.println("Options:");
 		System.err.println("\t-f             : Force. Overwrite new files if they exist. Default: " + force);
+		System.err.println("\t-num           : Use only numbers {1, 2, 3, 4} instead of bases {A, C, G, T}. Default: " + useNumbers);
 		System.err.println("\t-onlySnp       : Use only SNPs when converting VCF to TPED. Default: " + onlySnp);
 		System.err.println("\t-onlyBiAllelic : Use only bi-allelic variants. Default: " + onlyBiAllelic);
 		System.err.println("\t-useMissing    : Use entries with missing genotypes (otherwise they are filtered out). Default: " + (useMissing == UseMissing.MISSING));
@@ -200,7 +218,7 @@ public class SnpSiftCmdVcf2Tped extends SnpSift {
 
 						tpedLine.append(chr + " "); // Chromosome
 						tpedLine.append(id + " "); // Identifier
-						tpedLine.append("0 "); // Genetic distance in Moragans
+						tpedLine.append("0 "); // Genetic distance in Morgans (0 = missing)
 						tpedLine.append(pos + " "); // Base pair position
 
 						// Add all genotypes
