@@ -8,10 +8,7 @@ import ca.mcgill.mcb.pcingola.util.Timer;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 
 /**
- * Annotate a VCF file with ID from another VCF file (database)
- * 
- * Loads db file in memory, thus it makes no assumption about order.
- * Requires tons of memory
+ * Annotate a VCF file with variant type
  * 
  * @author pablocingolani
  */
