@@ -96,8 +96,8 @@ public class SnpSiftCmdGeneSets extends SnpSift {
 		if (args.length == 0) usage(null);
 
 		// Parse arguments
-		if (args.length >= argNum) msigdb = args[argNum++];
-		if (args.length >= argNum) vcfFile = args[argNum++];
+		if (args.length > argNum) msigdb = args[argNum++];
+		if (args.length > argNum) vcfFile = args[argNum++];
 
 		// Sanity check
 		if (msigdb == null) usage("Missing 'msigdb.gmt'");
