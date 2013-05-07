@@ -64,7 +64,6 @@ public class SnpSiftCmdGeneSets extends SnpSift {
 					for (GeneSet gs : geneSetsByGene) {
 						String geneSetName = gs.getName();
 						sets.add(geneSetName);
-						countByGeneSet.inc(geneSetName);
 					}
 				}
 			}
@@ -72,6 +71,10 @@ public class SnpSiftCmdGeneSets extends SnpSift {
 
 		// Anything to annotate?
 		if ((sets != null) && !sets.isEmpty()) {
+			// Count
+			for (String geneSetName : sets)
+				countByGeneSet.inc(geneSetName);
+
 			// Sort
 			ArrayList<String> setsSorted = new ArrayList<String>();
 			setsSorted.addAll(sets);
