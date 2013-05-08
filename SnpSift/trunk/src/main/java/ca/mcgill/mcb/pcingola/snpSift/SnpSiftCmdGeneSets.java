@@ -59,7 +59,7 @@ public class SnpSiftCmdGeneSets extends SnpSift {
 				if (sets == null) sets = new HashSet<String>();
 
 				// Find all gene sets that this gene belongs to
-				List<GeneSet> geneSetsByGene = geneSets.getGeneSetsByGene(gene);
+				HashSet<GeneSet> geneSetsByGene = geneSets.getGeneSetsByGene(gene);
 				if (geneSetsByGene != null) {
 					for (GeneSet gs : geneSetsByGene) {
 						String geneSetName = gs.getName();
