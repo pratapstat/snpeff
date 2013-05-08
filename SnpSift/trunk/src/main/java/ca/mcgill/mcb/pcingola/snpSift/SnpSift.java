@@ -21,10 +21,10 @@ import flanagan.analysis.Stat;
  */
 public class SnpSift {
 
-	public static final String BUILD = "2013-04-26";
+	public static final String BUILD = "2013-05-07";
 
 	public static final String VERSION_MAJOR = "1.9";
-	public static final String REVISION = "d";
+	public static final String REVISION = "e";
 	public static final String VERSION_SHORT = VERSION_MAJOR + REVISION;
 	public static final String VERSION = VERSION_SHORT + " (build " + BUILD + "), by " + Pcingola.BY;
 
@@ -284,6 +284,7 @@ public class SnpSift {
 				+ "\n\tdbnsfp        : Annotate with multiple entries from dbNSFP. <EXPERIMENTAL>" //
 				+ "\n\textractFields : Extract fields from VCF file into tab separated format." //
 				+ "\n\tfilter        : Filter using arbitrary expressions" //
+				+ "\n\tgeneSets      : Annotate using MSigDb gene sets (MSigDb includes: GO, KEGG, Reactome, BioCarta, etc.)" //
 				+ "\n\tgwasCat       : Annotate using GWAS catalog" //
 				+ "\n\thwe           : Calculate Hardy-Weimberg parameters and perform a godness of fit test." //
 				+ "\n\tintersect     : Intersect intervals (genomic regions)." //

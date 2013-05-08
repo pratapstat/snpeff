@@ -34,7 +34,7 @@ import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
  */
 public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 
-	public static final String VCF_INFO_PREFIX = "dbnsfp";
+	public static final String VCF_INFO_PREFIX = "dbNSFP_";
 	public static final String DEFAULT_FIELDS_NAMES_TO_ADD = "Ensembl_transcriptid,Uniprot_acc,Interpro_domain,SIFT_score,Polyphen2_HVAR_pred,GERP++_NR,GERP++_RS,29way_logOdds,1000Gp1_AF,1000Gp1_AFR_AF,1000Gp1_EUR_AF,1000Gp1_AMR_AF,1000Gp1_ASN_AF,ESP6500_AA_AF,ESP6500_EA_AF";
 
 	protected Map<String, String> fieldsToAdd;
@@ -210,7 +210,7 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 		fieldsDescription.put("MutationTaster_pred", "MutationTaster prediction, 'A' ('disease_causing_automatic'), 'D' ('disease_causing'), 'N' ('polymorphism') or 'P' ('polymorphism_automatic')");
 		fieldsDescription.put("GERP++_NR", "GERP++ neutral rate");
 		fieldsDescription.put("GERP++_RS", "GERP++ RS score, the larger the score, the more conserved the site.");
-		fieldsDescription.put("PhyloP_score", "PhyloP score, the larger the score, the more conserved the site.");
+		fieldsDescription.put("phyloP", "PhyloP score, the larger the score, the more conserved the site.");
 		fieldsDescription.put("29way_pi", "The estimated stationary distribution of A, C, G and T at the site, using SiPhy algorithm based on 29 mammals genomes. ");
 		fieldsDescription.put("29way_logOdds", "SiPhy score based on 29 mammals genomes. The larger the score, the more conserved the site.");
 		fieldsDescription.put("LRT_Omega", "estimated nonsynonymous-to-synonymous-rate ratio (¦Ø, reported by LRT)");
