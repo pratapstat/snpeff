@@ -46,7 +46,7 @@ public class FieldGenotype extends FieldSub {
 		value = vcfGenotype.get(name);
 
 		// Not found? Should we raise an exception?
-		if (value == null) throw new RuntimeException("Error: Genotype field '" + name + "' not available in this entry.\n\t" + this);
+		if ((value == null) && exceptionIfNotFound) throw new RuntimeException("Error: Genotype field '" + name + "' not available in this entry.\n\t" + this);
 
 		return value;
 	}
