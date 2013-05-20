@@ -11,6 +11,7 @@ import ca.mcgill.mcb.pcingola.snpSift.caseControl.SnpSiftCmdCaseControlSummary;
 import ca.mcgill.mcb.pcingola.snpSift.hwe.SnpSiftCmdHwe;
 import ca.mcgill.mcb.pcingola.snpSift.matrix.SnpSiftCmdAlleleMatrix;
 import ca.mcgill.mcb.pcingola.snpSift.matrix.SnpSiftCmdCovarianceMatrix;
+import ca.mcgill.mcb.pcingola.snpSift.matrix.SnpSiftCmdGt;
 import ca.mcgill.mcb.pcingola.util.Gpr;
 import flanagan.analysis.Stat;
 
@@ -187,6 +188,7 @@ public class SnpSift {
 		else if (command.startsWith("RMREF")) cmd = new SnpSiftCmdRemoveReferenceGenotypes(args);
 		else if (command.startsWith("VCF2TPED")) cmd = new SnpSiftCmdVcf2Tped(args);
 		else if (command.startsWith("GENESETS")) cmd = new SnpSiftCmdGeneSets(args);
+		else if (command.startsWith("GT")) cmd = new SnpSiftCmdGt(args);
 		else usage("Unknown command '" + command + "'");
 
 		// Help? Show help and exit
@@ -285,6 +287,7 @@ public class SnpSift {
 				+ "\n\textractFields : Extract fields from VCF file into tab separated format." //
 				+ "\n\tfilter        : Filter using arbitrary expressions" //
 				+ "\n\tgeneSets      : Annotate using MSigDb gene sets (MSigDb includes: GO, KEGG, Reactome, BioCarta, etc.)" //
+				+ "\n\tgt            : Add Genotype to INFO fields and remove genotype fields when possible." //
 				+ "\n\tgwasCat       : Annotate using GWAS catalog" //
 				+ "\n\thwe           : Calculate Hardy-Weimberg parameters and perform a godness of fit test." //
 				+ "\n\tintersect     : Intersect intervals (genomic regions)." //
