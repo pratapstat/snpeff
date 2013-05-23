@@ -115,6 +115,8 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 		for (String fieldKey : fieldsToAdd.keySet()) {
 			boolean empty = true;
 			info.setLength(0);
+
+			// For each ALT
 			for (String alt : vcf.getAlts()) {
 				Map<String, String> values = currentDbEntry.getAltAlelleValues(alt);
 				if (info.length() > 0) info.append(',');
@@ -139,6 +141,20 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 
 		currentDbEntry = null;
 		if (annotated) countAnnotated++;
+	}
+
+	/**
+	 * Check that all fields to add are available
+	 * @throws IOException
+	 */
+	public void checkFieldsToAdd() throws IOException {
+		// Check that all fields have a descriptor (used in VCF header)
+		for (String filedName : dbNsfpFile.getFieldNames())
+			if (fieldsDescription.get(filedName) == null) System.err.println("WARNING: Filed (column) '" + filedName + "' does not have an approriate file descriptor.");
+
+		// Check that all "field to add" are in the database
+		for (String fieldKey : fieldsToAdd.keySet())
+			if (!dbNsfpFile.hasField(fieldKey)) fatalError("dbNsfp does not have field '" + fieldKey + "' (file '" + dbNsfpFileName + "')");
 	}
 
 	/**
@@ -178,13 +194,13 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 		 */
 		fieldsDescription = new HashMap<String, String>();
 		// The first four fields are not used:
-		//		fieldsDescription.put("chr", "chromosome number");
-		//		fieldsDescription.put("pos(1-based)", "physical position on the chromosome as to hg19 (1-based coordinate)");
-		//		fieldsDescription.put("ref", "reference nucleotide allele (as on the + strand)");
-		//		fieldsDescription.put("alt", "alternative nucleotide allele (as on the + strand)");
+		fieldsDescription.put("chr", "chromosome number");
+		fieldsDescription.put("pos(1-coor)", "physical position on the chromosome as to hg19 (1-based coordinate)");
+		fieldsDescription.put("ref", "reference nucleotide allele (as on the + strand)");
+		fieldsDescription.put("alt", "alternative nucleotide allele (as on the + strand)");
 		fieldsDescription.put("aaref", "reference amino acid");
 		fieldsDescription.put("aaalt", "alternative amino acid");
-		fieldsDescription.put("hg18_pos(1-based)", "physical position on the chromosome as to hg18 (1-based coordinate)");
+		fieldsDescription.put("hg18_pos(1-coor)", "physical position on the chromosome as to hg18 (1-based coordinate)");
 		fieldsDescription.put("genename", "gene name");
 		fieldsDescription.put("Uniprot_acc", "Uniprot accession number. Multiple entries separated by ';'.");
 		fieldsDescription.put("Uniprot_id", "Uniprot ID number. Multiple entries separated by ';'.");
@@ -240,6 +256,8 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 	 */
 	public void initAnnotate() throws IOException {
 		vcfFile = new VcfFileIterator(vcfFileName);
+
+		// Check and open dbNsfp
 		dbNsfpFile = new DbNsfpFileIterator(new SeekableBufferedReader(dbNsfpFileName));
 
 		indexDb = index(dbNsfpFileName);
@@ -278,21 +296,27 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 	public void run() {
 		if (verbose) Timer.showStdErr("Annotating entries from: '" + dbNsfpFileName + "'");
 
+		// Initialize annotations
 		try {
 			initAnnotate();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 
+		// Annotate VCF file
 		boolean showHeader = true;
 		for (VcfEntry vcfEntry : vcfFile) {
 			try {
 				// Show header?
 				if (showHeader) {
+					// Add VCF header
 					addHeader(vcfFile);
 					String headerStr = vcfFile.getVcfHeader().toString();
 					if (!headerStr.isEmpty()) System.out.println(headerStr);
 					showHeader = false;
+
+					// Check that the fields we want to add are actually in the database
+					checkFieldsToAdd();
 				}
 
 				// Annotate

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * DbNSFP database: 
@@ -20,6 +21,7 @@ import java.util.Map;
  * @author lletourn
  */
 public class DbNsfpFileIterator extends MarkerFileIterator<DbNsfpEntry> {
+
 	@SuppressWarnings("unchecked")
 	static private class StringTokenizer {
 
@@ -86,9 +88,11 @@ public class DbNsfpFileIterator extends MarkerFileIterator<DbNsfpEntry> {
 		}
 	}
 
+	public static final String COLUMN_CHR_NAME = "chr";
+	public static final String COLUMN_POS_NAME = "pos(1-coor)";
+
 	private final TObjectIntHashMap<String> columnNames = new TObjectIntHashMap<String>();
 	private int chromosomeIdx;
-
 	private int startIdx;
 
 	/**
@@ -122,6 +126,21 @@ public class DbNsfpFileIterator extends MarkerFileIterator<DbNsfpEntry> {
 		super(reader, 1);
 	}
 
+	public Set<String> getFieldNames() {
+		if (columnNames.size() == 0) parseHeader(null);
+		return columnNames.keySet();
+	}
+
+	/**
+	 * Do we have a column 'colName'?
+	 * @param filedName
+	 * @return
+	 */
+	public boolean hasField(String filedName) {
+		if (columnNames.size() == 0) parseHeader(null);
+		return columnNames.containsKey(filedName);
+	}
+
 	private DbNsfpEntry parseEntry(List<String[]> linesForEntry) {
 		Map<String, Map<String, String>> values = new HashMap<String, Map<String, String>>();
 
@@ -141,6 +160,38 @@ public class DbNsfpFileIterator extends MarkerFileIterator<DbNsfpEntry> {
 		return entry;
 	}
 
+	/**
+	 * Parse header line
+	 * @param line
+	 */
+	void parseHeader(String line) {
+		// No line provided? Read one
+		if (line == null) {
+			try {
+				if (ready()) line = readLine();
+				else throw new RuntimeException("Error reading (parsing header) from file '" + fileName + "'.");
+			} catch (IOException e) {
+				throw new RuntimeException("Error reading file '" + fileName + "'. Line ignored:\n\tLine (" + lineNum + "):\t'" + line + "'");
+			}
+		}
+
+		// Parse column names
+		line = line.substring(1); // Remove first '#' character
+		String values[] = split(line, '\t');
+
+		// Add all column names to hash
+		for (int idx = 0; idx < values.length; idx++) {
+			columnNames.put(values[idx].trim(), idx);
+
+			// Chromosome and position column numbers
+			if (values[idx].equals(COLUMN_CHR_NAME)) chromosomeIdx = idx;
+			else if (values[idx].equals(COLUMN_POS_NAME)) startIdx = idx;
+		}
+
+		// Errors?
+		if (chromosomeIdx == -1 || startIdx == -1) throw new RuntimeException("Missing '" + COLUMN_CHR_NAME + "' and/or '" + COLUMN_POS_NAME + "' columns in dbNSFP file");
+	}
+
 	@Override
 	protected DbNsfpEntry readNext() {
 		// Read another entry from the file
@@ -150,17 +201,13 @@ public class DbNsfpFileIterator extends MarkerFileIterator<DbNsfpEntry> {
 				line = readLine();
 				if (line == null) return null; // End of file?
 
+				// Do we need to parse header?
 				if (columnNames.size() == 0) {
-					line = line.substring(1);
-					String values[] = split(line, '\t');
-					for (int idx = 0; idx < values.length; idx++) {
-						columnNames.put(values[idx], idx);
-						if (values[idx].equals("chr")) chromosomeIdx = idx;
-						else if (values[idx].equals("pos(1-coor)")) startIdx = idx;
-					}
-					if (chromosomeIdx == -1 || startIdx == -1) { throw new RuntimeException("Missing 'chr' and/or 'os(1-coor)' columns in dbNSFP file"); }
+					parseHeader(line);
 					continue;
 				}
+
+				// Parse data
 				String values[] = split(line, '\t');
 				if (linesForEntry.size() > 0) {
 					String currentValues[] = linesForEntry.get(0);
