@@ -33,6 +33,7 @@ public class TestSuiteAll {
 		suite.addTestSuite(TestCasesExtractFields.class);
 		suite.addTestSuite(TestCasesSplit.class);
 		suite.addTestSuite(TestCasesPrivate.class);
+		suite.addTestSuite(TestCasesGt.class);
 
 		return suite;
 	}

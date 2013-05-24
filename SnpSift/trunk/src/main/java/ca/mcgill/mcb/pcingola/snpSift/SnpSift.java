@@ -6,6 +6,7 @@ import java.util.List;
 
 import ca.mcgill.mcb.pcingola.Pcingola;
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
+import ca.mcgill.mcb.pcingola.snpEffect.commandLine.SnpEff;
 import ca.mcgill.mcb.pcingola.snpSift.caseControl.SnpSiftCmdCaseControl;
 import ca.mcgill.mcb.pcingola.snpSift.caseControl.SnpSiftCmdCaseControlSummary;
 import ca.mcgill.mcb.pcingola.snpSift.hwe.SnpSiftCmdHwe;
@@ -22,12 +23,14 @@ import flanagan.analysis.Stat;
  */
 public class SnpSift {
 
-	public static final String BUILD = "2013-05-23";
-
-	public static final String VERSION_MAJOR = "1.9";
-	public static final String REVISION = "e";
+	// Version info (in sync with SnpEff)
+	public static final String BUILD = SnpEff.BUILD;
+	public static final String SOFTWARE_NAME = "SnpSift";
+	public static final String VERSION_MAJOR = SnpEff.VERSION_MAJOR;
+	public static final String REVISION = SnpEff.REVISION;
 	public static final String VERSION_SHORT = VERSION_MAJOR + REVISION;
-	public static final String VERSION = VERSION_SHORT + " (build " + BUILD + "), by " + Pcingola.BY;
+	public static final String VERSION_NO_NAME = VERSION_SHORT + " (build " + BUILD + "), by " + Pcingola.BY;
+	public static final String VERSION = SOFTWARE_NAME + " " + VERSION_NO_NAME;
 
 	public static final int MAX_ERRORS = 10; // Report an error no more than X times
 
