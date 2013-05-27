@@ -30,6 +30,7 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 
 	protected boolean suppressOutput = false; // Do not show output (used for debugging and test cases)
 	protected boolean useInfoField; // Use all info fields
+	protected boolean useId; // Annotate ID fields
 	protected int countBadRef = 0;
 	protected String chrPrev = "";
 	protected String vcfDbFileName;
@@ -56,8 +57,8 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 	protected boolean addAnnotation(VcfEntry vcf) {
 		boolean annotated = false;
 
-		// Is this change in db?
-		String id = findDbId(vcf);
+		// Is this entry in db?
+		String id = useId ? findDbId(vcf) : null;
 		String infoStr = useInfoField ? findDbInfo(vcf) : null;
 
 		if (id != null) {
@@ -72,7 +73,7 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 			}
 		}
 
-		// Add INFO fields
+		// Add INFO fields (if any)
 		if (infoStr != null) {
 			vcf.addInfo(infoStr);
 			annotated = true;
@@ -141,6 +142,7 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 	 * @throws IOException
 	 */
 	public boolean annotate(VcfEntry vcf) throws IOException {
+
 		// Do we have to seek in db file?
 		String chr = vcf.getChromosomeName();
 		if (!chr.equals(chrPrev)) {
@@ -238,6 +240,7 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 	@Override
 	public void init() {
 		useInfoField = true; // Default: Use INFO fields
+		useId = true; // Annotate ID fields
 	}
 
 	/**
@@ -273,10 +276,14 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 		for (int i = 0; i < args.length; i++) {
 			String arg = args[i];
 
-			if (arg.equals("-id")) useInfoField = false;
-			else if (arg.equals("-info")) {
-				useInfoField = true;
-				infoFields = args[++i].split(",");
+			// Command line option?
+			if (isOpt(arg)) {
+				if (arg.equals("-id")) useInfoField = false;
+				else if (arg.equals("-info")) {
+					useInfoField = true;
+					infoFields = args[++i].split(",");
+				} else if (arg.equals("-noId")) useId = false;
+				else usage("Unknown command line option '" + arg + "'");
 			} else if (vcfDbFileName == null) vcfDbFileName = arg;
 			else if (vcfFileName == null) vcfFileName = arg;
 		}
@@ -422,6 +429,7 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar " + command + " [options] database.vcf file.vcf > newFile.vcf\n" //
 				+ "Options:\n" //
 				+ "\t-id          : Only annotate ID field (do not add INFO field).\n" //
+				+ "\t-noId        : Do not annotate ID field.\n" //
 				+ "\t-info <list> : Annotate using a list of info fields (list is a comma separated list of fields). Default: ALL.\n" //
 		);
 		System.exit(1);

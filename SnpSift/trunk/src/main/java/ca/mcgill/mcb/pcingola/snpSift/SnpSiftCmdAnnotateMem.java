@@ -40,8 +40,8 @@ public class SnpSiftCmdAnnotateMem extends SnpSiftCmdAnnotateSorted {
 		boolean annotated = false;
 		for (int i = 0; i < vcfEntry.getAlts().length; i++) {
 			String key = key(vcfEntry, i);
-			String id = dbId.get(key);
 
+			String id = useId ? dbId.get(key) : null;
 			String info = (useInfoField ? dbInfo.get(key) : null);
 
 			// Add ID
@@ -54,7 +54,7 @@ public class SnpSiftCmdAnnotateMem extends SnpSiftCmdAnnotateSorted {
 				}
 			}
 
-			// Add INFO strings
+			// Add INFO fields
 			if (info != null) {
 				vcfEntry.addInfo(info);
 				annotated = true;

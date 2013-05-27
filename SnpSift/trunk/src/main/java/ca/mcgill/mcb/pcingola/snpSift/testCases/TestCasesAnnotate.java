@@ -142,4 +142,30 @@ public class TestCasesAnnotate extends TestCase {
 		Assert.assertEquals("PREVIOUS=annotation;TEST=yes;AF=0.002;AN=488;ABE=0.678", vcf.getInfoStr());
 	}
 
+	/**
+	 * Annotate only some info fields
+	 * @throws IOException 
+	 */
+	public void test_08() throws IOException {
+		String dbFileName = "./test/db_test_06.vcf";
+		String fileName = "./test/annotate_06.vcf";
+		System.out.println("Annotate: " + dbFileName + "\t" + fileName);
+
+		// Create command line
+		String args[] = { "-noId", dbFileName, fileName };
+
+		// Get SnpSift ready
+		SnpSiftCmdAnnotateSorted vcfAnnotate = new SnpSiftCmdAnnotateSorted(args);
+		vcfAnnotate.setSuppressOutput(true);
+		vcfAnnotate.initAnnotate();
+
+		// Get first VCF entrie and annotate it
+		VcfFileIterator vcfFile = new VcfFileIterator(fileName);
+		VcfEntry vcfEntry = vcfFile.next();
+		vcfAnnotate.annotate(vcfEntry);
+
+		// Check that new ID was NOT added
+		Assert.assertEquals("OLD_ID", vcfEntry.getId());
+	}
+
 }
