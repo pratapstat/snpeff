@@ -143,7 +143,7 @@ public class TestCasesAnnotate extends TestCase {
 	}
 
 	/**
-	 * Annotate only some info fields
+	 * Do not annotate ID column
 	 * @throws IOException 
 	 */
 	public void test_08() throws IOException {
@@ -159,13 +159,78 @@ public class TestCasesAnnotate extends TestCase {
 		vcfAnnotate.setSuppressOutput(true);
 		vcfAnnotate.initAnnotate();
 
-		// Get first VCF entrie and annotate it
+		// Get first VCF entry and annotate it
 		VcfFileIterator vcfFile = new VcfFileIterator(fileName);
 		VcfEntry vcfEntry = vcfFile.next();
 		vcfAnnotate.annotate(vcfEntry);
 
 		// Check that new ID was NOT added
 		Assert.assertEquals("OLD_ID", vcfEntry.getId());
+	}
+
+	/**
+	 * Annotate only some info fields
+	 * @throws IOException 
+	 */
+	public void test_09() throws IOException {
+		String dbFileName = "./test/db_test_09.vcf";
+		String fileName = "./test/annotate_09.vcf";
+		System.out.println("Annotate: " + dbFileName + "\t" + fileName);
+
+		// Create command line
+		String args[] = { "-info", "GMAF,AC", dbFileName, fileName };
+
+		// Get SnpSift ready
+		SnpSiftCmdAnnotateSorted vcfAnnotate = new SnpSiftCmdAnnotateSorted(args);
+		vcfAnnotate.setSuppressOutput(true);
+		vcfAnnotate.setSaveOutput(true);
+		vcfAnnotate.run();
+
+		// Make sure output header for "GMAF" is present.
+		// Also make sure implicit headers are not (e.g. AC)
+		String out = vcfAnnotate.getOutput();
+		boolean hasGmaf = false;
+		boolean hasAc = false;
+		for (String line : out.split("\n")) {
+			hasGmaf |= line.startsWith("##INFO=<ID=GMAF");
+			hasAc |= line.startsWith("##INFO=<ID=AC");
+		}
+
+		Assert.assertEquals(true, hasGmaf);
+		Assert.assertEquals(false, hasAc);
+	}
+
+	/**
+	 * Annotate only some info fields
+	 * @throws IOException 
+	 */
+	public void test_11() throws IOException {
+		String dbFileName = "./test/db_test_11.vcf";
+		String fileName = "./test/annotate_11.vcf";
+		System.out.println("Annotate: " + dbFileName + "\t" + fileName);
+
+		// Create command line
+		String args[] = { "-info", "GMAF,AC", dbFileName, fileName };
+
+		// Get SnpSift ready
+		SnpSiftCmdAnnotateSorted vcfAnnotate = new SnpSiftCmdAnnotateSorted(args);
+		vcfAnnotate.setSuppressOutput(true);
+		vcfAnnotate.setSaveOutput(true);
+		vcfAnnotate.run();
+
+		// Make sure output header for "GMAF" is present ONLY ONCE.
+		// Also make sure implicit headers are not (e.g. AC)
+		String out = vcfAnnotate.getOutput();
+		System.out.println(out);
+		int hasGmaf = 0;
+		int hasAc = 0;
+		for (String line : out.split("\n")) {
+			if (line.startsWith("##INFO=<ID=GMAF")) hasGmaf++;
+			if (line.startsWith("##INFO=<ID=AC")) hasAc++;
+		}
+
+		Assert.assertEquals(1, hasGmaf);
+		Assert.assertEquals(0, hasAc);
 	}
 
 }

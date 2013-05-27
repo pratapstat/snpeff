@@ -40,10 +40,12 @@ public class SnpSift {
 	protected boolean quiet; // Be quiet
 	protected boolean log; // Log to server (statistics)
 	protected boolean showHeader = true;
+	protected boolean saveOutput = false; // Save output to buffer (instead of printing it to STDOUT)
+	protected boolean suppressOutput = false; // Do not show output (used for debugging and test cases)
 	protected String args[];
 	protected String command;
 	protected int numWorkers = Gpr.NUM_CORES; // Max number of threads (if multi-threaded version is available)
-
+	protected StringBuilder output = new StringBuilder();
 	protected HashMap<String, Integer> errCount;
 
 	/**
@@ -110,6 +112,10 @@ public class SnpSift {
 		System.exit(-1);
 	}
 
+	public String getOutput() {
+		return output.toString();
+	}
+
 	/**
 	 * Handle VCF header related issues
 	 * @param vcf
@@ -157,6 +163,15 @@ public class SnpSift {
 		}
 
 		this.args = argsList.toArray(new String[0]);;
+	}
+
+	/**
+	 * Print to screen or save to output buffer
+	 * @param o
+	 */
+	void print(Object o) {
+		if (saveOutput) output.append(o.toString() + "\n");
+		else if (!suppressOutput) System.out.println(o.toString());
 	}
 
 	/** 
@@ -217,6 +232,10 @@ public class SnpSift {
 
 	public void setQuiet(boolean quiet) {
 		this.quiet = quiet;
+	}
+
+	public void setSaveOutput(boolean saveOutput) {
+		this.saveOutput = saveOutput;
 	}
 
 	public void setVerbose(boolean verbose) {

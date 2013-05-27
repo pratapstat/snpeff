@@ -28,19 +28,18 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 	public static final int SHOW = 10000;
 	public static final int SHOW_LINES = 100 * SHOW;
 
-	protected boolean suppressOutput = false; // Do not show output (used for debugging and test cases)
-	protected boolean useInfoField; // Use all info fields
-	protected boolean useId; // Annotate ID fields
-	protected int countBadRef = 0;
 	protected String chrPrev = "";
-	protected String vcfDbFileName;
-	protected String vcfFileName;
-	protected String infoFields[]; // Use only info fields
-	protected VcfEntry latestVcfDb = null;
+	protected int countBadRef = 0;
 	protected HashMap<String, String> dbId = new HashMap<String, String>();
 	protected HashMap<String, String> dbInfo = new HashMap<String, String>();
 	protected FileIndexChrPos indexDb;
+	protected String infoFields[]; // Use only info fields
+	protected VcfEntry latestVcfDb = null;
+	protected boolean useId; // Annotate ID fields
+	protected boolean useInfoField; // Use all info fields
+	protected String vcfDbFileName;
 	protected VcfFileIterator vcfFile, vcfDbFile;
+	protected String vcfFileName;
 
 	public SnpSiftCmdAnnotateSorted(String args[]) {
 		super(args, "annotate");
@@ -129,8 +128,15 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 		if (useInfoField) {
 			VcfFileIterator vcfDb = new VcfFileIterator(vcfDbFileName);
 			VcfHeader vcfDbHeader = vcfDb.readHeader();
-			for (VcfInfo vcfInfo : vcfDbHeader.getVcfInfo())
-				newHeaders.add(vcfInfo.toString());
+
+			// Add all corresponding INFO headers
+			for (VcfInfo vcfInfo : vcfDbHeader.getVcfInfo()) {
+				// Add header entry only 
+				if (isAnnotateInfo(vcfInfo) // Add if it is being used 
+						&& !vcfInfo.isImplicit() //  AND it is not an "implicit" header (i.e. created automatically by VcfHeader class)
+						&& (vcfFile.getVcfHeader().getVcfInfo(vcfInfo.getId()) == null) // AND it is not already added
+				) newHeaders.add(vcfInfo.toString());
+			}
 		}
 
 		return newHeaders;
@@ -257,6 +263,22 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 	}
 
 	/**
+	 * Are we annotating using this info field?
+	 * @param vcfInfo
+	 * @return
+	 */
+	boolean isAnnotateInfo(VcfInfo vcfInfo) {
+		// All fields seleceted?
+		if (infoFields == null) return true;
+
+		// Check if specified field is present
+		for (String info : infoFields)
+			if (vcfInfo.getId().equals(info)) return true;
+
+		return false;
+	}
+
+	/**
 	 * Create a hash key
 	 * @param vcfDbEntry
 	 * @param altIndex
@@ -355,14 +377,14 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 					showHeader = false;
 					addHeader(vcfFile);
 					String headerStr = vcfFile.getVcfHeader().toString();
-					if (!headerStr.isEmpty()) System.out.println(headerStr);
+					if (!headerStr.isEmpty()) print(headerStr);
 				}
 
 				// Annotate
 				boolean annotated = annotate(vcfEntry);
 
 				// Show
-				if (!suppressOutput) System.out.println(vcfEntry);
+				print(vcfEntry);
 
 				if (annotated) countAnnotated++;
 				count++;
