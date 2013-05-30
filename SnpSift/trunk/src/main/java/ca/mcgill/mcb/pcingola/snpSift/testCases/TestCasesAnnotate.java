@@ -262,4 +262,35 @@ public class TestCasesAnnotate extends TestCase {
 		Assert.assertEquals("NEW_ID", vcfEntry.getId());
 	}
 
+	/**
+	 * Annotate using "reserved" VCF fields (e.g. "AA" )
+	 * Header should be added if it doesn't exits.
+	 * 
+	 * @throws IOException 
+	 */
+	public void test_13() throws IOException {
+		String dbFileName = "./test/db_test_13.vcf";
+		String fileName = "./test/annotate_13.vcf";
+		System.out.println("Annotate: " + dbFileName + "\t" + fileName);
+
+		// Create command line
+		String args[] = { "-info", "AA", dbFileName, fileName };
+
+		// Get SnpSift ready
+		SnpSiftCmdAnnotateSorted vcfAnnotate = new SnpSiftCmdAnnotateSorted(args);
+		vcfAnnotate.setSuppressOutput(true);
+		vcfAnnotate.setSaveOutput(true);
+		vcfAnnotate.run();
+
+		// Make sure output header for "AA" is present ONLY ONCE.
+		// Also make sure implicit headers are not (e.g. AC)
+		String out = vcfAnnotate.getOutput();
+		System.out.println(out);
+		int hasAa = 0;
+		for (String line : out.split("\n"))
+			if (line.startsWith("##INFO=<ID=AA")) hasAa++;
+
+		Assert.assertEquals(1, hasAa);
+	}
+
 }

@@ -131,12 +131,16 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 			VcfHeader vcfDbHeader = vcfDb.readHeader();
 
 			// Add all corresponding INFO headers
-			for (VcfInfo vcfInfo : vcfDbHeader.getVcfInfo()) {
-				// Add header entry only 
-				if (isAnnotateInfo(vcfInfo) // Add if it is being used 
-						&& !vcfInfo.isImplicit() //  AND it is not an "implicit" header (i.e. created automatically by VcfHeader class)
-						&& (vcfFile.getVcfHeader().getVcfInfo(vcfInfo.getId()) == null) // AND it is not already added
-				) newHeaders.add(vcfInfo.toString());
+			for (VcfInfo vcfInfoDb : vcfDbHeader.getVcfInfo()) {
+
+				// Get same vcfInfo from file to annotate
+				VcfInfo vcfInfoFile = vcfFile.getVcfHeader().getVcfInfo(vcfInfoDb.getId());
+
+				// Add header entry only if... 
+				if (isAnnotateInfo(vcfInfoDb) // Add if it is being used to annotate 
+						&& !vcfInfoDb.isImplicit() //  AND it is not an "implicit" header in Db (i.e. created automatically by VcfHeader class)
+						&& ((vcfInfoFile == null) || vcfInfoFile.isImplicit()) // AND it is not already added OR is already added, but it is implicit
+				) newHeaders.add(vcfInfoDb.toString());
 			}
 		}
 
