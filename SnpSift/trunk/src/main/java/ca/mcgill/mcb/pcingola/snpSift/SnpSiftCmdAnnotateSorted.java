@@ -37,6 +37,7 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 	protected VcfEntry latestVcfDb = null;
 	protected boolean useId; // Annotate ID fields
 	protected boolean useInfoField; // Use all info fields
+	protected boolean useRefAlt;
 	protected String vcfDbFileName;
 	protected VcfFileIterator vcfFile, vcfDbFile;
 	protected String vcfFileName;
@@ -247,6 +248,7 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 	public void init() {
 		useInfoField = true; // Default: Use INFO fields
 		useId = true; // Annotate ID fields
+		useRefAlt = true; // Use REF and ALT fields when comparing
 	}
 
 	/**
@@ -285,7 +287,8 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 	 * @return
 	 */
 	String key(VcfEntry vcfDbEntry, int altIndex) {
-		return vcfDbEntry.getChromosomeName() + ":" + vcfDbEntry.getStart() + "_" + vcfDbEntry.getRef() + "/" + vcfDbEntry.getAlts()[altIndex];
+		if (useRefAlt) return vcfDbEntry.getChromosomeName() + ":" + vcfDbEntry.getStart() + "_" + vcfDbEntry.getRef() + "/" + vcfDbEntry.getAlts()[altIndex];
+		return vcfDbEntry.getChromosomeName() + ":" + vcfDbEntry.getStart();
 	}
 
 	/**
@@ -305,6 +308,7 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 					useInfoField = true;
 					infoFields = args[++i].split(",");
 				} else if (arg.equals("-noId")) useId = false;
+				else if (arg.equals("-noRef")) useRefAlt = false;
 				else usage("Unknown command line option '" + arg + "'");
 			} else if (vcfDbFileName == null) vcfDbFileName = arg;
 			else if (vcfFileName == null) vcfFileName = arg;
@@ -448,13 +452,13 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 		}
 
 		showVersion();
-		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar " + command + " [options] database.vcf file.vcf > newFile.vcf\n" //
-				+ "Options:\n" //
-				+ "\t-id          : Only annotate ID field (do not add INFO field).\n" //
-				+ "\t-noId        : Do not annotate ID field.\n" //
-				+ "\t-info <list> : Annotate using a list of info fields (list is a comma separated list of fields). Default: ALL.\n" //
-		);
+		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar " + command + " [options] database.vcf file.vcf > newFile.vcf");
+		System.err.println("Options:");
+		System.err.println("\t-id          : Only annotate ID field (do not add INFO field). Default: " + !useInfoField);
+		System.err.println("\t-noAlt       : Do not use REF and ALT fields when comparing database.vcf entries to file.vcf entries. Default: " + !useRefAlt);
+		System.err.println("\t-noId        : Do not annotate ID field. Defaul: " + !useId);
+		System.err.println("\t-info <list> : Annotate using a list of info fields (list is a comma separated list of fields). Default: ALL.");
+
 		System.exit(1);
 	}
-
 }

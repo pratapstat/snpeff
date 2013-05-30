@@ -6,6 +6,7 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
 import ca.mcgill.mcb.pcingola.snpSift.SnpSiftCmdAnnotateSorted;
+import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 
 /**
@@ -231,6 +232,34 @@ public class TestCasesAnnotate extends TestCase {
 
 		Assert.assertEquals(1, hasGmaf);
 		Assert.assertEquals(0, hasAc);
+	}
+
+	/**
+	 * Annotate without REF/ALT fields
+	 * 
+	 * @throws IOException 
+	 */
+	public void test_12() throws IOException {
+		String dbFileName = "./test/db_test_12.vcf";
+		String fileName = "./test/annotate_12.vcf";
+		System.out.println("Annotate: " + dbFileName + "\t" + fileName);
+
+		// Create command line
+		String args[] = { "-noRef", dbFileName, fileName };
+
+		// Get SnpSift ready
+		SnpSiftCmdAnnotateSorted vcfAnnotate = new SnpSiftCmdAnnotateSorted(args);
+		vcfAnnotate.setSuppressOutput(true);
+		vcfAnnotate.initAnnotate();
+
+		// Get first VCF entry and annotate it
+		VcfFileIterator vcfFile = new VcfFileIterator(fileName);
+		VcfEntry vcfEntry = vcfFile.next();
+		vcfAnnotate.annotate(vcfEntry);
+		Gpr.debug(vcfEntry);
+
+		// Check that new ID was NOT added
+		Assert.assertEquals("NEW_ID", vcfEntry.getId());
 	}
 
 }
