@@ -245,7 +245,7 @@ public class TestCasesAnnotate extends TestCase {
 		System.out.println("Annotate: " + dbFileName + "\t" + fileName);
 
 		// Create command line
-		String args[] = { "-noRef", dbFileName, fileName };
+		String args[] = { "-noAlt", dbFileName, fileName };
 
 		// Get SnpSift ready
 		SnpSiftCmdAnnotateSorted vcfAnnotate = new SnpSiftCmdAnnotateSorted(args);

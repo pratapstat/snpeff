@@ -312,7 +312,7 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 					useInfoField = true;
 					infoFields = args[++i].split(",");
 				} else if (arg.equals("-noId")) useId = false;
-				else if (arg.equals("-noRef")) useRefAlt = false;
+				else if (arg.equals("-noAlt")) useRefAlt = false;
 				else usage("Unknown command line option '" + arg + "'");
 			} else if (vcfDbFileName == null) vcfDbFileName = arg;
 			else if (vcfFileName == null) vcfFileName = arg;
