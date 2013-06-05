@@ -247,7 +247,7 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 		fieldsDescription.put("ESP6500_EA_AF", "Alternative allele frequency in the European American samples of the NHLBI GO Exome Sequencing Project (ESP6500 data set).");
 		fieldsDescription.put("MutationAssessor_score", "MutationAssessor functional impact combined score");
 		fieldsDescription.put("MutationAssessor_pred", "MutationAssessor functional impact of a variant : predicted functional (high, medium), predicted non-functional (low, neutral)");
-		fieldsDescription.put("FATHMM_score", "FATHMM default score (weighted for human inherited-disease mutations with Disease Ontology); If a score is smaller than -1.5 the corresponding NS is predicted as \"D(AMAGING)\"; otherwise it is predicted as \"T(OLERATED)\". If there's more than one scores associated with the same NS due to isoforms, the smallest score (most damaging) was used.");
+		fieldsDescription.put("FATHMM_score", "FATHMM default score (weighted for human inherited-disease mutations with Disease Ontology); If a score is smaller than -1.5 the corresponding NS is predicted as D(AMAGING); otherwise it is predicted as T(OLERATED). If there's more than one scores associated with the same NS due to isoforms, the smallest score (most damaging) was used.");
 	}
 
 	/**
