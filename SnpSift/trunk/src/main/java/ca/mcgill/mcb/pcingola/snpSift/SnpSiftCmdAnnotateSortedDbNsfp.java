@@ -10,6 +10,7 @@ import ca.mcgill.mcb.pcingola.fileIterator.DbNsfpEntry;
 import ca.mcgill.mcb.pcingola.fileIterator.DbNsfpFileIterator;
 import ca.mcgill.mcb.pcingola.fileIterator.SeekableBufferedReader;
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
+import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.util.Timer;
 import ca.mcgill.mcb.pcingola.vcf.FileIndexChrPos;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
@@ -74,14 +75,19 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 	 */
 	public void annotate(VcfEntry vcf) throws IOException {
 		if (currentDbEntry == null) {
+			// Read DB entry
 			currentDbEntry = dbNsfpFile.next();
 			if (currentDbEntry == null) { return; }
 			if (prevChr == null) prevChr = currentDbEntry.getChromosomeName();
 		}
 
-		// Do we have to seek to new chromosome in db file?
+		//---
+		// Seek to new chromosome in DB file?
+		//---
 		String chr = vcf.getChromosomeName();
 		if (!chr.equals(prevChr)) {
+			if (debug) System.err.println("Seeking to chromosome '" + chr + "'");
+
 			// Get to the beginning of the new chromosome
 			long start = indexDb.getStart(chr);
 
@@ -97,19 +103,29 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 			currentDbEntry = null;
 		}
 
-		// Seek to chromosomal position in db
+		//---
+		// Seek to position in db (within chr)
+		//---
+		int count = 1;
+		if (debug) System.err.println("Looking for " + vcf.getChromosomeName() + ":" + vcf.getStart() + ". Current DB: " + currentDbEntry.getChromosomeName() + ":" + currentDbEntry.getStart() + " : ");
 		while (true) {
 			if (currentDbEntry == null) {
 				currentDbEntry = dbNsfpFile.next();
-				// Test for EOF, passed through chromosome without finding position, position not annotated
-				if (currentDbEntry == null || !currentDbEntry.getChromosomeName().equals(vcf.getChromosomeName()) || vcf.getStart() < currentDbEntry.getStart()) { return; }
+				if (currentDbEntry == null) return; // Test for EOF in database
 			}
 
+			// Passed through chromosome without finding position OR position not annotated?
+			if (!currentDbEntry.getChromosomeName().equals(vcf.getChromosomeName()) || vcf.getStart() < currentDbEntry.getStart()) return;
+
+			// Found the entry
 			if (vcf.getStart() == currentDbEntry.getStart()) break;
+			if (debug) Gpr.showMark(count++, 100);
 			currentDbEntry = null;
 		}
 
+		//---
 		// Add all INFO fields that refer to this allele
+		//---
 		boolean annotated = false;
 		StringBuilder info = new StringBuilder();
 		for (String fieldKey : fieldsToAdd.keySet()) {
