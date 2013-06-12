@@ -2,6 +2,7 @@ package ca.mcgill.mcb.pcingola.snpSift.testCases;
 
 import java.util.ArrayList;
 
+import junit.framework.Assert;
 import junit.framework.TestCase;
 import ca.mcgill.mcb.pcingola.snpSift.matrix.SnpSiftCmdGt;
 import ca.mcgill.mcb.pcingola.util.Gpr;
@@ -61,8 +62,13 @@ public class TestCasesGt extends TestCase {
 			if (!line.startsWith("#")) un.add(line);
 
 		// Compare original to uncompressed
+		boolean diff = false;
 		for (int i = 0; i < ori.size(); i++) {
-			if (!ori.get(i).equals(un.get(i))) System.err.println("Line " + i + " differs:\n\t'" + ori.get(i) + "'\n\t'" + un.get(i) + "'");
+			if (!ori.get(i).equals(un.get(i))) {
+				System.err.println("Line " + i + " differs:\n\t'" + ori.get(i) + "'\n\t'" + un.get(i) + "'");
+				diff = true;
+			}
 		}
+		Assert.assertEquals(false, diff); // We expect no differences.
 	}
 }
