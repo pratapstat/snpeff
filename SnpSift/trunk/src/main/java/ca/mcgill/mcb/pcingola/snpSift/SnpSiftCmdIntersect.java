@@ -140,7 +140,7 @@ public class SnpSiftCmdIntersect extends SnpSift {
 			// Any results? Show them
 			if (mi != null) {
 				// Output marker data (if not already done)
-				String key = mi.getChromosomeName() + "\t" + (mi.getStart() + 1) + "\t" + (mi.getEnd() + 1);
+				String key = mi.getChromosomeName() + "\t" + mi.getStart() + "\t" + (mi.getEnd() + 1);
 				if (!done.contains(key)) {
 					System.out.println(key + "\t" + mi.getId());
 					done.add(key);
