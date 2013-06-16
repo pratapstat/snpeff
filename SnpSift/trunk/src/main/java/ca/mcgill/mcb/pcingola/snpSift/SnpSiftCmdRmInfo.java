@@ -15,6 +15,7 @@ public class SnpSiftCmdRmInfo extends SnpSift {
 
 	String vcfFileName;
 	HashSet<String> infos;
+	boolean rmId;
 
 	public SnpSiftCmdRmInfo(String[] args) {
 		super(args, "rmInfo");
@@ -23,16 +24,20 @@ public class SnpSiftCmdRmInfo extends SnpSift {
 	@Override
 	public void parse(String[] args) {
 		infos = new HashSet<String>();
+		rmId = false;
+
 		if (args.length == 0) usage(null);
 
 		for (String arg : args) {
-			if (isOpt(arg)) usage("Unknown option " + arg);
-			else if (vcfFileName == null) vcfFileName = arg;
+			if (isOpt(arg)) {
+				if (arg.equals("-id")) rmId = true;
+				else usage("Unknown option " + arg);
+			} else if (vcfFileName == null) vcfFileName = arg;
 			else infos.add(arg);
 		}
 
 		// Sanity check
-		if (infos.size() <= 0) usage("No INFO field names provided.");
+		if ((infos.size() <= 0) && (!rmId)) usage("No INFO field names provided.");
 	}
 
 	/**
@@ -52,9 +57,11 @@ public class SnpSiftCmdRmInfo extends SnpSift {
 				if (!headerStr.isEmpty()) System.out.println(headerStr);
 			}
 
-			for (String info : infos) {
+			for (String info : infos)
 				vcfEntry.rmInfo(info);
-			}
+
+			if (rmId) vcfEntry.setId("");
+
 			// Show entry
 			System.out.println(vcfEntry);
 			entryNum++;
