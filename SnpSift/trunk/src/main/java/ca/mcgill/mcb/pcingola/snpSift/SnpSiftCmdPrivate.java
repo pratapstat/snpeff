@@ -18,8 +18,6 @@ import ca.mcgill.mcb.pcingola.vcf.VcfGenotype;
  */
 public class SnpSiftCmdPrivate extends SnpSift {
 
-	public static final String INFO_PRIVATE_NAME = "Private";
-
 	boolean headerSummary = true;
 	String tfamFile, vcfFile; // File names
 	String[] sampleNum2group;
@@ -39,7 +37,7 @@ public class SnpSiftCmdPrivate extends SnpSift {
 
 		// Is there a private group?
 		if (privateGorup != null) {
-			ve.addInfo(INFO_PRIVATE_NAME, privateGorup);
+			ve.addInfo(VcfEntry.VCF_INFO_PRIVATE, privateGorup);
 			return true;
 		}
 		return false;
@@ -158,7 +156,7 @@ public class SnpSiftCmdPrivate extends SnpSift {
 				sampleIds = parseSampleIds(vcf);
 
 				// Update header
-				vcf.getVcfHeader().addLine("##INFO=<ID=" + INFO_PRIVATE_NAME + ",Number=1,Type=String,Description=\"If the variant is private (i.e. belongs only to one group or family) the group name is shown. Groups from file = '" + tfamFile + "'\">");
+				vcf.getVcfHeader().addLine("##INFO=<ID=" + VcfEntry.VCF_INFO_PRIVATE + ",Number=1,Type=String,Description=\"If the variant is private (i.e. belongs only to one group or family) the group name is shown. Groups from file = '" + tfamFile + "'\">");
 
 				// Show header
 				if (!createList) System.out.println(vcf.getVcfHeader());

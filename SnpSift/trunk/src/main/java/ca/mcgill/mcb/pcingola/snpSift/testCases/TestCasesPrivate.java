@@ -23,8 +23,8 @@ public class TestCasesPrivate extends TestCase {
 		for (VcfEntry ve : vcfEntries) {
 			System.out.println(ve);
 
-			if (!isPrivate && (ve.getInfo(SnpSiftCmdPrivate.INFO_PRIVATE_NAME) != null)) throw new RuntimeException("This should not be a 'private' variant!");
-			if (isPrivate && (ve.getInfo(SnpSiftCmdPrivate.INFO_PRIVATE_NAME) == null)) throw new RuntimeException("This should be a 'private' variant!");
+			if (!isPrivate && (ve.getInfo(VcfEntry.VCF_INFO_PRIVATE) != null)) throw new RuntimeException("This should not be a 'private' variant!");
+			if (isPrivate && (ve.getInfo(VcfEntry.VCF_INFO_PRIVATE) == null)) throw new RuntimeException("This should be a 'private' variant!");
 		}
 	}
 
