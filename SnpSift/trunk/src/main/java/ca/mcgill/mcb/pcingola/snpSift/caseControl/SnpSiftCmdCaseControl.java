@@ -277,7 +277,7 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 
 		double pdown = FisherExactTest.get().fisherExactTestDown(k, N, D, n);
 		double pup = FisherExactTest.get().fisherExactTestUp(k, N, D, n);
-		Gpr.debug("Fisher:\tk:" + k + "\tN:" + N + "\tD:" + D + "\tn:" + n);
+		Gpr.debug("Fisher:\tk:" + k + "\tN:" + N + "\tD:" + D + "\tn:" + n + "\t" + pup + "\t" + pdown);
 
 		return Math.min(pup, pdown);
 	}
