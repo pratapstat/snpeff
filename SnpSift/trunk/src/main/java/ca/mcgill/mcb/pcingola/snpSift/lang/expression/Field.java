@@ -105,7 +105,8 @@ public class Field extends Expression {
 	 */
 	public String getFieldString(VcfEntry vcfEntry) {
 		// Field from first 10 columns
-		if (name.equals("CHROM")) return vcfEntry.getChromosomeName();
+		// if (name.equals("CHROM")) return vcfEntry.getChromosomeName();
+		if (name.equals("CHROM")) return vcfEntry.getChromosomeNameOri();
 		if (name.equals("ID")) return vcfEntry.getId();
 		if (name.equals("REF")) return vcfEntry.getRef();
 		if (name.equals("ALT")) return vcfEntry.getAltsStr();
