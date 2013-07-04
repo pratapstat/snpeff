@@ -207,6 +207,7 @@ public class SnpSift {
 		else if (command.startsWith("VCF2TPED")) cmd = new SnpSiftCmdVcf2Tped(args);
 		else if (command.startsWith("GENESETS")) cmd = new SnpSiftCmdGeneSets(args);
 		else if (command.startsWith("GT")) cmd = new SnpSiftCmdGt(args);
+		else if (command.startsWith("SIMPLIFYINDELS")) cmd = new SnpSiftCmdSimplifyIndels(args);
 		else usage("Unknown command '" + command + "'");
 
 		// Help? Show help and exit
