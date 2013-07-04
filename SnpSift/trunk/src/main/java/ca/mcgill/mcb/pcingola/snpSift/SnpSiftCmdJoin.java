@@ -19,7 +19,7 @@ import ca.mcgill.mcb.pcingola.util.Timer;
  */
 public class SnpSiftCmdJoin extends SnpSift {
 
-	boolean verbose, showEmpty, showAll, showClosest;
+	boolean showEmpty, showAll, showClosest;
 	String file[];
 	int inOffset[], colChr[], colStart[], colEnd[];
 
