@@ -5,7 +5,6 @@ import java.util.List;
 import ca.mcgill.mcb.pcingola.fileIterator.NeedlemanWunsch;
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
 import ca.mcgill.mcb.pcingola.interval.SeqChange;
-import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 
 /**
@@ -105,8 +104,6 @@ public class SnpSiftCmdSimplifyIndels extends SnpSift {
 			return ve.toString();
 		}
 
-		Gpr.debug(nw);
-
 		// Calculate new fields
 		int pos = ve.getStart() + startDiff;
 		String ref = "", alt = "";
@@ -146,14 +143,6 @@ public class SnpSiftCmdSimplifyIndels extends SnpSift {
 		showVersion();
 
 		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar SimplifyIndels [options] file.vcf");
-		System.err.println("Options:");
-		System.err.println("\t-if1 <num>       : Offset for file1 (e.g. 1 if coordinates are one-based. Default: 1");
-		System.err.println("\t-if2 <num>       : Offset for file2 (e.g. 2 if coordinates are one-based. Default: 1");
-		System.err.println("\t-cols1 <colDef>  : Column definition for file 1. Format: chrCol,startCol,endCol (e.g. '1,2,3'). Shortcuts 'bed' or 'vcf' are allowed. Default: 'vcf'");
-		System.err.println("\t-cols2 <colDef>  : Column definition for file 2. Format: chrCol,startCol,endCol (e.g. '1,2,3'). Shortcuts 'bed' or 'vcf' are allowed. Default: 'vcf'");
-		System.err.println("\t-all             : For each interval, show all intersecting. Default: show only one (largest intersection)");
-		System.err.println("\t-closest         : Show closest intervals in file2 if none intersect. Default: off");
-		System.err.println("\t-empty           : Show intervals in file1 even if they do not intersect with any other interval. Default: off");
 		System.exit(1);
 	}
 }
