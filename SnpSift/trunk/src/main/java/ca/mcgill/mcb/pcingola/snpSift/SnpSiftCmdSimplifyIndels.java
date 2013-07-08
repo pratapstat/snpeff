@@ -1,10 +1,7 @@
 package ca.mcgill.mcb.pcingola.snpSift;
 
-import java.util.List;
-
 import ca.mcgill.mcb.pcingola.fileIterator.NeedlemanWunsch;
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
-import ca.mcgill.mcb.pcingola.interval.SeqChange;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 
 /**
@@ -66,19 +63,11 @@ public class SnpSiftCmdSimplifyIndels extends SnpSift {
 			if (vcf.isHeadeSection()) System.out.println(vcf.getVcfHeader());
 
 			if (ve.isInDel()) {
-				// Simplify the indel, if possible
-				List<SeqChange> seqChanges = ve.seqChanges();
-
-				// We can only simplify when there is only one InDel 
-				if (ve.isMultipleAlts()) {
-					// Multi-allelic InDels? I'm too lazy to simplify it...(show as it is)
-					System.out.println(ve);
-				} else {
-					// Simplify & Print
-					System.out.println(simplifyInDel(ve));
-				}
+				// We simplify if there is only one InDel 
+				if (ve.isMultipleAlts()) System.out.println(ve); // Multi-allelic InDels? I'm too lazy to simplify it...(show as it is)
+				else System.out.println(simplifyInDel(ve)); // Simplify & Print
 			} else {
-				// Not an indel? Cannot simplify (show as it is)
+				// Not an indel? Cannot simplify: show as it is (I could try to simplify it, but I'm lazy)
 				System.out.println(ve);
 			}
 		}
@@ -107,10 +96,12 @@ public class SnpSiftCmdSimplifyIndels extends SnpSift {
 		// Calculate new fields
 		int pos = ve.getStart() + startDiff;
 		String ref = "", alt = "";
-		if (ve.getRef().length() > ve.getAltsStr().length()) {
+		if (ve.getRef().length() < ve.getAltsStr().length()) {
+			// Insertion
 			if (startDiff > 0) ref = "" + ve.getRef().charAt(startDiff - 1);
 			alt = ref + nw.getAlignment().substring(1);
 		} else {
+			// Deletion
 			if (startDiff > 0) alt = "" + ve.getRef().charAt(startDiff - 1);
 			ref = alt + nw.getAlignment().substring(1);
 		}
