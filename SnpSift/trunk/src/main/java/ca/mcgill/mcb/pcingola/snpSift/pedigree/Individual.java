@@ -3,6 +3,7 @@ package ca.mcgill.mcb.pcingola.snpSift.pedigree;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 
 import ca.mcgill.mcb.pcingola.ped.Sex;
@@ -18,6 +19,7 @@ import ca.mcgill.mcb.pcingola.ped.TfamEntry;
 public class Individual implements Comparable<Individual> {
 
 	HashSet<Individual> childs;
+	ArrayList<Individual> childsSorted;
 	int order = Integer.MIN_VALUE;
 	int depth = -1;
 	int descendants = Integer.MIN_VALUE;
@@ -45,6 +47,7 @@ public class Individual implements Comparable<Individual> {
 
 	protected void addChild(Individual ind) {
 		childs.add(ind);
+		childsSorted = null;
 	}
 
 	/**
@@ -86,7 +89,12 @@ public class Individual implements Comparable<Individual> {
 	}
 
 	public Collection<Individual> getChilds() {
-		return childs;
+		if (childsSorted == null) {
+			childsSorted = new ArrayList<Individual>();
+			childsSorted.addAll(childs);
+			Collections.sort(childsSorted);
+		}
+		return childsSorted;
 	}
 
 	/**
@@ -98,11 +106,11 @@ public class Individual implements Comparable<Individual> {
 		ArrayList<Individual> sharedChilds = new ArrayList<Individual>();
 
 		if (spouse != null) {
-			sharedChilds.addAll(childs);
+			sharedChilds.addAll(getChilds());
 			sharedChilds.retainAll(spouse.getChilds());
 		} else {
 			// Look for child where the other parent os not in the pedigree (i.e. is null)
-			for (Individual ch : childs)
+			for (Individual ch : getChilds())
 				if ((ch.getMother() == null) || (ch.getFather() == null)) sharedChilds.add(ch);
 		}
 		return sharedChilds;
@@ -203,6 +211,7 @@ public class Individual implements Comparable<Individual> {
 
 	protected void removeChild(Individual ind) {
 		childs.remove(ind);
+		childsSorted = null;
 	}
 
 	Individual rootMother() {
@@ -297,7 +306,7 @@ public class Individual implements Comparable<Individual> {
 		sb.append(id + " ");
 		if (!childs.isEmpty()) {
 			sb.append("[ ");
-			for (Individual ch : childs)
+			for (Individual ch : getChilds())
 				sb.append(ch.toStringTree() + ",");
 			sb.deleteCharAt(sb.length() - 1);
 			sb.append("]");
