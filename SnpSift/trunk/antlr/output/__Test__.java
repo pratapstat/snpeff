@@ -13,7 +13,7 @@ public class __Test__ {
 
         VcfFilterParser g = new VcfFilterParser(tokens, 49100, null);
         try {
-            g.var();
+            g.main();
         } catch (RecognitionException e) {
             e.printStackTrace();
         }

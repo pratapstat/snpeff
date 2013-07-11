@@ -1,4 +1,4 @@
-// $ANTLR 3.4 /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g 2013-01-03 17:34:15
+// $ANTLR 3.4 /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g 2013-07-11 12:22:11
 
 package ca.mcgill.mcb.pcingola.snpSift.antlr;
 
@@ -107,7 +107,7 @@ public TreeAdaptor getTreeAdaptor() {
     return adaptor;
 }
     public String[] getTokenNames() { return VcfFilterParser.tokenNames; }
-    public String getGrammarFileName() { return "/home/pcingola/workspace/SnpSift/antlr/VcfFilter.g"; }
+    public String getGrammarFileName() { return "/Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g"; }
 
 
     public static class main_return extends ParserRuleReturnScope {
@@ -117,7 +117,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "main"
-    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:87:1: main : f= condition -> ^( CONDITION $f) ;
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:87:1: main : f= condition -> ^( CONDITION $f) ;
     public final VcfFilterParser.main_return main() throws RecognitionException {
         VcfFilterParser.main_return retval = new VcfFilterParser.main_return();
         retval.start = input.LT(1);
@@ -130,8 +130,8 @@ public TreeAdaptor getTreeAdaptor() {
 
         RewriteRuleSubtreeStream stream_condition=new RewriteRuleSubtreeStream(adaptor,"rule condition");
         try {
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:87:7: (f= condition -> ^( CONDITION $f) )
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:87:9: f= condition
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:87:7: (f= condition -> ^( CONDITION $f) )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:87:9: f= condition
             {
             pushFollow(FOLLOW_condition_in_main375);
             f=condition();
@@ -154,7 +154,7 @@ public TreeAdaptor getTreeAdaptor() {
             root_0 = (Object)adaptor.nil();
             // 87:21: -> ^( CONDITION $f)
             {
-                // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:87:24: ^( CONDITION $f)
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:87:24: ^( CONDITION $f)
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot(
@@ -202,7 +202,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "condition"
-    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:89:1: condition : subcondition ( boolOperator ^ subcondition )* ;
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:89:1: condition : subcondition ( boolOperator ^ subcondition )* ;
     public final VcfFilterParser.condition_return condition() throws RecognitionException {
         VcfFilterParser.condition_return retval = new VcfFilterParser.condition_return();
         retval.start = input.LT(1);
@@ -219,8 +219,8 @@ public TreeAdaptor getTreeAdaptor() {
 
 
         try {
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:89:11: ( subcondition ( boolOperator ^ subcondition )* )
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:89:13: subcondition ( boolOperator ^ subcondition )*
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:89:11: ( subcondition ( boolOperator ^ subcondition )* )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:89:13: subcondition ( boolOperator ^ subcondition )*
             {
             root_0 = (Object)adaptor.nil();
 
@@ -232,7 +232,7 @@ public TreeAdaptor getTreeAdaptor() {
 
             adaptor.addChild(root_0, subcondition1.getTree());
 
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:89:26: ( boolOperator ^ subcondition )*
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:89:26: ( boolOperator ^ subcondition )*
             loop1:
             do {
                 int alt1=2;
@@ -245,7 +245,7 @@ public TreeAdaptor getTreeAdaptor() {
 
                 switch (alt1) {
             	case 1 :
-            	    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:89:27: boolOperator ^ subcondition
+            	    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:89:27: boolOperator ^ subcondition
             	    {
             	    pushFollow(FOLLOW_boolOperator_in_condition395);
             	    boolOperator2=boolOperator();
@@ -301,7 +301,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "subcondition"
-    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:90:1: subcondition : ( '!' ^)? ( bare | paren ) ;
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:90:1: subcondition : ( '!' ^)? ( bare | paren ) ;
     public final VcfFilterParser.subcondition_return subcondition() throws RecognitionException {
         VcfFilterParser.subcondition_return retval = new VcfFilterParser.subcondition_return();
         retval.start = input.LT(1);
@@ -318,13 +318,13 @@ public TreeAdaptor getTreeAdaptor() {
         Object char_literal4_tree=null;
 
         try {
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:90:14: ( ( '!' ^)? ( bare | paren ) )
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:90:16: ( '!' ^)? ( bare | paren )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:90:14: ( ( '!' ^)? ( bare | paren ) )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:90:16: ( '!' ^)? ( bare | paren )
             {
             root_0 = (Object)adaptor.nil();
 
 
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:90:16: ( '!' ^)?
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:90:16: ( '!' ^)?
             int alt2=2;
             int LA2_0 = input.LA(1);
 
@@ -366,7 +366,7 @@ public TreeAdaptor getTreeAdaptor() {
                         }
                         }
                         break;
-                    case 49:
+                    case 48:
                         {
                         int LA2_5 = input.LA(3);
 
@@ -382,31 +382,19 @@ public TreeAdaptor getTreeAdaptor() {
                                     if ( (LA2_25==ID) ) {
                                         int LA2_29 = input.LA(7);
 
-                                        if ( (LA2_29==53) ) {
-                                            int LA2_33 = input.LA(8);
-
-                                            if ( (LA2_33==FLOAT||LA2_33==38||(LA2_33 >= 45 && LA2_33 <= 47)) ) {
-                                                int LA2_34 = input.LA(9);
-
-                                                if ( (LA2_34==54) ) {
-                                                    int LA2_35 = input.LA(10);
-
-                                                    if ( ((LA2_35 >= 33 && LA2_35 <= 34)||(LA2_35 >= 39 && LA2_35 <= 44)||LA2_35==61) ) {
-                                                        alt2=1;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        else if ( ((LA2_29 >= 33 && LA2_29 <= 34)||(LA2_29 >= 39 && LA2_29 <= 44)||LA2_29==61) ) {
+                                        if ( ((LA2_29 >= 33 && LA2_29 <= 34)||(LA2_29 >= 39 && LA2_29 <= 44)||LA2_29==61) ) {
                                             alt2=1;
                                         }
                                     }
                                 }
                             }
                         }
+                        else if ( ((LA2_5 >= 33 && LA2_5 <= 34)||(LA2_5 >= 39 && LA2_5 <= 44)||LA2_5==61) ) {
+                            alt2=1;
+                        }
                         }
                         break;
-                    case 48:
+                    case 50:
                         {
                         int LA2_6 = input.LA(3);
 
@@ -429,9 +417,12 @@ public TreeAdaptor getTreeAdaptor() {
                                 }
                             }
                         }
+                        else if ( ((LA2_6 >= 33 && LA2_6 <= 34)||(LA2_6 >= 39 && LA2_6 <= 44)||LA2_6==61) ) {
+                            alt2=1;
+                        }
                         }
                         break;
-                    case 50:
+                    case 51:
                         {
                         int LA2_7 = input.LA(3);
 
@@ -454,9 +445,12 @@ public TreeAdaptor getTreeAdaptor() {
                                 }
                             }
                         }
+                        else if ( ((LA2_7 >= 33 && LA2_7 <= 34)||(LA2_7 >= 39 && LA2_7 <= 44)||LA2_7==61) ) {
+                            alt2=1;
+                        }
                         }
                         break;
-                    case 51:
+                    case 49:
                         {
                         int LA2_8 = input.LA(3);
 
@@ -472,7 +466,22 @@ public TreeAdaptor getTreeAdaptor() {
                                     if ( (LA2_28==ID) ) {
                                         int LA2_32 = input.LA(7);
 
-                                        if ( ((LA2_32 >= 33 && LA2_32 <= 34)||(LA2_32 >= 39 && LA2_32 <= 44)||LA2_32==61) ) {
+                                        if ( (LA2_32==53) ) {
+                                            int LA2_33 = input.LA(8);
+
+                                            if ( (LA2_33==FLOAT||LA2_33==38||(LA2_33 >= 45 && LA2_33 <= 47)) ) {
+                                                int LA2_34 = input.LA(9);
+
+                                                if ( (LA2_34==54) ) {
+                                                    int LA2_35 = input.LA(10);
+
+                                                    if ( ((LA2_35 >= 33 && LA2_35 <= 34)||(LA2_35 >= 39 && LA2_35 <= 44)||LA2_35==61) ) {
+                                                        alt2=1;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        else if ( ((LA2_32 >= 33 && LA2_32 <= 34)||(LA2_32 >= 39 && LA2_32 <= 44)||LA2_32==61) ) {
                                             alt2=1;
                                         }
                                     }
@@ -524,7 +533,7 @@ public TreeAdaptor getTreeAdaptor() {
             }
             switch (alt2) {
                 case 1 :
-                    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:90:17: '!' ^
+                    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:90:17: '!' ^
                     {
                     char_literal4=(Token)match(input,32,FOLLOW_32_in_subcondition408); 
                     char_literal4_tree = 
@@ -539,7 +548,7 @@ public TreeAdaptor getTreeAdaptor() {
             }
 
 
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:90:24: ( bare | paren )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:90:24: ( bare | paren )
             int alt3=2;
             int LA3_0 = input.LA(1);
 
@@ -558,7 +567,7 @@ public TreeAdaptor getTreeAdaptor() {
             }
             switch (alt3) {
                 case 1 :
-                    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:90:25: bare
+                    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:90:25: bare
                     {
                     pushFollow(FOLLOW_bare_in_subcondition414);
                     bare5=bare();
@@ -570,7 +579,7 @@ public TreeAdaptor getTreeAdaptor() {
                     }
                     break;
                 case 2 :
-                    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:90:32: paren
+                    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:90:32: paren
                     {
                     pushFollow(FOLLOW_paren_in_subcondition418);
                     paren6=paren();
@@ -616,7 +625,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "bare"
-    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:91:1: bare : ( unaryExpr | binaryExpr | functionBoolean );
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:91:1: bare : ( unaryExpr | binaryExpr | functionBoolean );
     public final VcfFilterParser.bare_return bare() throws RecognitionException {
         VcfFilterParser.bare_return retval = new VcfFilterParser.bare_return();
         retval.start = input.LT(1);
@@ -633,7 +642,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
         try {
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:91:7: ( unaryExpr | binaryExpr | functionBoolean )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:91:7: ( unaryExpr | binaryExpr | functionBoolean )
             int alt4=3;
             switch ( input.LA(1) ) {
             case 32:
@@ -714,11 +723,11 @@ public TreeAdaptor getTreeAdaptor() {
 
                 }
                 break;
-            case 49:
+            case 48:
                 {
-                int LA4_3 = input.LA(2);
-
-                if ( (LA4_3==53) ) {
+                switch ( input.LA(2) ) {
+                case 53:
+                    {
                     int LA4_13 = input.LA(3);
 
                     if ( (LA4_13==FLOAT||LA4_13==38||(LA4_13 >= 45 && LA4_13 <= 47)) ) {
@@ -728,6 +737,252 @@ public TreeAdaptor getTreeAdaptor() {
                             int LA4_25 = input.LA(5);
 
                             if ( (LA4_25==ID) ) {
+                                int LA4_29 = input.LA(6);
+
+                                if ( ((LA4_29 >= 33 && LA4_29 <= 34)||(LA4_29 >= 39 && LA4_29 <= 44)) ) {
+                                    alt4=2;
+                                }
+                                else if ( (LA4_29==61) ) {
+                                    alt4=3;
+                                }
+                                else {
+                                    NoViableAltException nvae =
+                                        new NoViableAltException("", 4, 29, input);
+
+                                    throw nvae;
+
+                                }
+                            }
+                            else {
+                                NoViableAltException nvae =
+                                    new NoViableAltException("", 4, 25, input);
+
+                                throw nvae;
+
+                            }
+                        }
+                        else {
+                            NoViableAltException nvae =
+                                new NoViableAltException("", 4, 19, input);
+
+                            throw nvae;
+
+                        }
+                    }
+                    else {
+                        NoViableAltException nvae =
+                            new NoViableAltException("", 4, 13, input);
+
+                        throw nvae;
+
+                    }
+                    }
+                    break;
+                case 33:
+                case 34:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                    {
+                    alt4=2;
+                    }
+                    break;
+                case 61:
+                    {
+                    alt4=3;
+                    }
+                    break;
+                default:
+                    NoViableAltException nvae =
+                        new NoViableAltException("", 4, 3, input);
+
+                    throw nvae;
+
+                }
+
+                }
+                break;
+            case 50:
+                {
+                switch ( input.LA(2) ) {
+                case 53:
+                    {
+                    int LA4_14 = input.LA(3);
+
+                    if ( (LA4_14==FLOAT||LA4_14==38||(LA4_14 >= 45 && LA4_14 <= 47)) ) {
+                        int LA4_20 = input.LA(4);
+
+                        if ( (LA4_20==55) ) {
+                            int LA4_26 = input.LA(5);
+
+                            if ( (LA4_26==ID) ) {
+                                int LA4_30 = input.LA(6);
+
+                                if ( ((LA4_30 >= 33 && LA4_30 <= 34)||(LA4_30 >= 39 && LA4_30 <= 44)) ) {
+                                    alt4=2;
+                                }
+                                else if ( (LA4_30==61) ) {
+                                    alt4=3;
+                                }
+                                else {
+                                    NoViableAltException nvae =
+                                        new NoViableAltException("", 4, 30, input);
+
+                                    throw nvae;
+
+                                }
+                            }
+                            else {
+                                NoViableAltException nvae =
+                                    new NoViableAltException("", 4, 26, input);
+
+                                throw nvae;
+
+                            }
+                        }
+                        else {
+                            NoViableAltException nvae =
+                                new NoViableAltException("", 4, 20, input);
+
+                            throw nvae;
+
+                        }
+                    }
+                    else {
+                        NoViableAltException nvae =
+                            new NoViableAltException("", 4, 14, input);
+
+                        throw nvae;
+
+                    }
+                    }
+                    break;
+                case 33:
+                case 34:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                    {
+                    alt4=2;
+                    }
+                    break;
+                case 61:
+                    {
+                    alt4=3;
+                    }
+                    break;
+                default:
+                    NoViableAltException nvae =
+                        new NoViableAltException("", 4, 4, input);
+
+                    throw nvae;
+
+                }
+
+                }
+                break;
+            case 51:
+                {
+                switch ( input.LA(2) ) {
+                case 53:
+                    {
+                    int LA4_15 = input.LA(3);
+
+                    if ( (LA4_15==FLOAT||LA4_15==38||(LA4_15 >= 45 && LA4_15 <= 47)) ) {
+                        int LA4_21 = input.LA(4);
+
+                        if ( (LA4_21==55) ) {
+                            int LA4_27 = input.LA(5);
+
+                            if ( (LA4_27==ID) ) {
+                                int LA4_31 = input.LA(6);
+
+                                if ( ((LA4_31 >= 33 && LA4_31 <= 34)||(LA4_31 >= 39 && LA4_31 <= 44)) ) {
+                                    alt4=2;
+                                }
+                                else if ( (LA4_31==61) ) {
+                                    alt4=3;
+                                }
+                                else {
+                                    NoViableAltException nvae =
+                                        new NoViableAltException("", 4, 31, input);
+
+                                    throw nvae;
+
+                                }
+                            }
+                            else {
+                                NoViableAltException nvae =
+                                    new NoViableAltException("", 4, 27, input);
+
+                                throw nvae;
+
+                            }
+                        }
+                        else {
+                            NoViableAltException nvae =
+                                new NoViableAltException("", 4, 21, input);
+
+                            throw nvae;
+
+                        }
+                    }
+                    else {
+                        NoViableAltException nvae =
+                            new NoViableAltException("", 4, 15, input);
+
+                        throw nvae;
+
+                    }
+                    }
+                    break;
+                case 33:
+                case 34:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                    {
+                    alt4=2;
+                    }
+                    break;
+                case 61:
+                    {
+                    alt4=3;
+                    }
+                    break;
+                default:
+                    NoViableAltException nvae =
+                        new NoViableAltException("", 4, 5, input);
+
+                    throw nvae;
+
+                }
+
+                }
+                break;
+            case 49:
+                {
+                int LA4_6 = input.LA(2);
+
+                if ( (LA4_6==53) ) {
+                    int LA4_16 = input.LA(3);
+
+                    if ( (LA4_16==FLOAT||LA4_16==38||(LA4_16 >= 45 && LA4_16 <= 47)) ) {
+                        int LA4_22 = input.LA(4);
+
+                        if ( (LA4_22==55) ) {
+                            int LA4_28 = input.LA(5);
+
+                            if ( (LA4_28==ID) ) {
                                 switch ( input.LA(6) ) {
                                 case 53:
                                     {
@@ -789,201 +1044,12 @@ public TreeAdaptor getTreeAdaptor() {
                                     break;
                                 default:
                                     NoViableAltException nvae =
-                                        new NoViableAltException("", 4, 29, input);
-
-                                    throw nvae;
-
-                                }
-
-                            }
-                            else {
-                                NoViableAltException nvae =
-                                    new NoViableAltException("", 4, 25, input);
-
-                                throw nvae;
-
-                            }
-                        }
-                        else {
-                            NoViableAltException nvae =
-                                new NoViableAltException("", 4, 19, input);
-
-                            throw nvae;
-
-                        }
-                    }
-                    else {
-                        NoViableAltException nvae =
-                            new NoViableAltException("", 4, 13, input);
-
-                        throw nvae;
-
-                    }
-                }
-                else {
-                    NoViableAltException nvae =
-                        new NoViableAltException("", 4, 3, input);
-
-                    throw nvae;
-
-                }
-                }
-                break;
-            case 48:
-                {
-                int LA4_4 = input.LA(2);
-
-                if ( (LA4_4==53) ) {
-                    int LA4_14 = input.LA(3);
-
-                    if ( (LA4_14==FLOAT||LA4_14==38||(LA4_14 >= 45 && LA4_14 <= 47)) ) {
-                        int LA4_20 = input.LA(4);
-
-                        if ( (LA4_20==55) ) {
-                            int LA4_26 = input.LA(5);
-
-                            if ( (LA4_26==ID) ) {
-                                int LA4_30 = input.LA(6);
-
-                                if ( ((LA4_30 >= 33 && LA4_30 <= 34)||(LA4_30 >= 39 && LA4_30 <= 44)) ) {
-                                    alt4=2;
-                                }
-                                else if ( (LA4_30==61) ) {
-                                    alt4=3;
-                                }
-                                else {
-                                    NoViableAltException nvae =
-                                        new NoViableAltException("", 4, 30, input);
-
-                                    throw nvae;
-
-                                }
-                            }
-                            else {
-                                NoViableAltException nvae =
-                                    new NoViableAltException("", 4, 26, input);
-
-                                throw nvae;
-
-                            }
-                        }
-                        else {
-                            NoViableAltException nvae =
-                                new NoViableAltException("", 4, 20, input);
-
-                            throw nvae;
-
-                        }
-                    }
-                    else {
-                        NoViableAltException nvae =
-                            new NoViableAltException("", 4, 14, input);
-
-                        throw nvae;
-
-                    }
-                }
-                else {
-                    NoViableAltException nvae =
-                        new NoViableAltException("", 4, 4, input);
-
-                    throw nvae;
-
-                }
-                }
-                break;
-            case 50:
-                {
-                int LA4_5 = input.LA(2);
-
-                if ( (LA4_5==53) ) {
-                    int LA4_15 = input.LA(3);
-
-                    if ( (LA4_15==FLOAT||LA4_15==38||(LA4_15 >= 45 && LA4_15 <= 47)) ) {
-                        int LA4_21 = input.LA(4);
-
-                        if ( (LA4_21==55) ) {
-                            int LA4_27 = input.LA(5);
-
-                            if ( (LA4_27==ID) ) {
-                                int LA4_31 = input.LA(6);
-
-                                if ( ((LA4_31 >= 33 && LA4_31 <= 34)||(LA4_31 >= 39 && LA4_31 <= 44)) ) {
-                                    alt4=2;
-                                }
-                                else if ( (LA4_31==61) ) {
-                                    alt4=3;
-                                }
-                                else {
-                                    NoViableAltException nvae =
-                                        new NoViableAltException("", 4, 31, input);
-
-                                    throw nvae;
-
-                                }
-                            }
-                            else {
-                                NoViableAltException nvae =
-                                    new NoViableAltException("", 4, 27, input);
-
-                                throw nvae;
-
-                            }
-                        }
-                        else {
-                            NoViableAltException nvae =
-                                new NoViableAltException("", 4, 21, input);
-
-                            throw nvae;
-
-                        }
-                    }
-                    else {
-                        NoViableAltException nvae =
-                            new NoViableAltException("", 4, 15, input);
-
-                        throw nvae;
-
-                    }
-                }
-                else {
-                    NoViableAltException nvae =
-                        new NoViableAltException("", 4, 5, input);
-
-                    throw nvae;
-
-                }
-                }
-                break;
-            case 51:
-                {
-                int LA4_6 = input.LA(2);
-
-                if ( (LA4_6==53) ) {
-                    int LA4_16 = input.LA(3);
-
-                    if ( (LA4_16==FLOAT||LA4_16==38||(LA4_16 >= 45 && LA4_16 <= 47)) ) {
-                        int LA4_22 = input.LA(4);
-
-                        if ( (LA4_22==55) ) {
-                            int LA4_28 = input.LA(5);
-
-                            if ( (LA4_28==ID) ) {
-                                int LA4_32 = input.LA(6);
-
-                                if ( ((LA4_32 >= 33 && LA4_32 <= 34)||(LA4_32 >= 39 && LA4_32 <= 44)) ) {
-                                    alt4=2;
-                                }
-                                else if ( (LA4_32==61) ) {
-                                    alt4=3;
-                                }
-                                else {
-                                    NoViableAltException nvae =
                                         new NoViableAltException("", 4, 32, input);
 
                                     throw nvae;
 
                                 }
+
                             }
                             else {
                                 NoViableAltException nvae =
@@ -1118,7 +1184,7 @@ public TreeAdaptor getTreeAdaptor() {
 
             switch (alt4) {
                 case 1 :
-                    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:91:9: unaryExpr
+                    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:91:9: unaryExpr
                     {
                     root_0 = (Object)adaptor.nil();
 
@@ -1133,7 +1199,7 @@ public TreeAdaptor getTreeAdaptor() {
                     }
                     break;
                 case 2 :
-                    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:91:21: binaryExpr
+                    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:91:21: binaryExpr
                     {
                     root_0 = (Object)adaptor.nil();
 
@@ -1148,7 +1214,7 @@ public TreeAdaptor getTreeAdaptor() {
                     }
                     break;
                 case 3 :
-                    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:91:34: functionBoolean
+                    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:91:34: functionBoolean
                     {
                     root_0 = (Object)adaptor.nil();
 
@@ -1193,7 +1259,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "paren"
-    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:92:1: paren : '(' ! condition ')' !;
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:92:1: paren : '(' ! condition ')' !;
     public final VcfFilterParser.paren_return paren() throws RecognitionException {
         VcfFilterParser.paren_return retval = new VcfFilterParser.paren_return();
         retval.start = input.LT(1);
@@ -1210,8 +1276,8 @@ public TreeAdaptor getTreeAdaptor() {
         Object char_literal12_tree=null;
 
         try {
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:92:9: ( '(' ! condition ')' !)
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:92:11: '(' ! condition ')' !
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:92:9: ( '(' ! condition ')' !)
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:92:11: '(' ! condition ')' !
             {
             root_0 = (Object)adaptor.nil();
 
@@ -1258,7 +1324,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "binaryExpr"
-    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:95:1: binaryExpr : l= expression o= binOperator r= expression -> ^( OP_BINARY $o $l $r) ;
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:95:1: binaryExpr : l= expression o= binOperator r= expression -> ^( OP_BINARY $o $l $r) ;
     public final VcfFilterParser.binaryExpr_return binaryExpr() throws RecognitionException {
         VcfFilterParser.binaryExpr_return retval = new VcfFilterParser.binaryExpr_return();
         retval.start = input.LT(1);
@@ -1276,8 +1342,8 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleSubtreeStream stream_expression=new RewriteRuleSubtreeStream(adaptor,"rule expression");
         RewriteRuleSubtreeStream stream_binOperator=new RewriteRuleSubtreeStream(adaptor,"rule binOperator");
         try {
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:95:12: (l= expression o= binOperator r= expression -> ^( OP_BINARY $o $l $r) )
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:95:14: l= expression o= binOperator r= expression
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:95:12: (l= expression o= binOperator r= expression -> ^( OP_BINARY $o $l $r) )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:95:14: l= expression o= binOperator r= expression
             {
             pushFollow(FOLLOW_expression_in_binaryExpr462);
             l=expression();
@@ -1301,7 +1367,7 @@ public TreeAdaptor getTreeAdaptor() {
             stream_expression.add(r.getTree());
 
             // AST REWRITE
-            // elements: o, r, l
+            // elements: r, o, l
             // token labels: 
             // rule labels: retval, r, o, l
             // token list labels: 
@@ -1316,7 +1382,7 @@ public TreeAdaptor getTreeAdaptor() {
             root_0 = (Object)adaptor.nil();
             // 95:57: -> ^( OP_BINARY $o $l $r)
             {
-                // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:95:60: ^( OP_BINARY $o $l $r)
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:95:60: ^( OP_BINARY $o $l $r)
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot(
@@ -1368,7 +1434,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "unaryExpr"
-    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:96:1: unaryExpr : o= uniOperator e= expression -> ^( OP_UNARY $o $e) ;
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:96:1: unaryExpr : o= uniOperator e= expression -> ^( OP_UNARY $o $e) ;
     public final VcfFilterParser.unaryExpr_return unaryExpr() throws RecognitionException {
         VcfFilterParser.unaryExpr_return retval = new VcfFilterParser.unaryExpr_return();
         retval.start = input.LT(1);
@@ -1384,8 +1450,8 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleSubtreeStream stream_expression=new RewriteRuleSubtreeStream(adaptor,"rule expression");
         RewriteRuleSubtreeStream stream_uniOperator=new RewriteRuleSubtreeStream(adaptor,"rule uniOperator");
         try {
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:96:11: (o= uniOperator e= expression -> ^( OP_UNARY $o $e) )
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:96:13: o= uniOperator e= expression
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:96:11: (o= uniOperator e= expression -> ^( OP_UNARY $o $e) )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:96:13: o= uniOperator e= expression
             {
             pushFollow(FOLLOW_uniOperator_in_unaryExpr497);
             o=uniOperator();
@@ -1416,7 +1482,7 @@ public TreeAdaptor getTreeAdaptor() {
             root_0 = (Object)adaptor.nil();
             // 96:44: -> ^( OP_UNARY $o $e)
             {
-                // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:96:47: ^( OP_UNARY $o $e)
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:96:47: ^( OP_UNARY $o $e)
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot(
@@ -1466,7 +1532,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "boolOperator"
-    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:99:1: boolOperator : ( '&' | '|' );
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:99:1: boolOperator : ( '&' | '|' );
     public final VcfFilterParser.boolOperator_return boolOperator() throws RecognitionException {
         VcfFilterParser.boolOperator_return retval = new VcfFilterParser.boolOperator_return();
         retval.start = input.LT(1);
@@ -1479,8 +1545,8 @@ public TreeAdaptor getTreeAdaptor() {
         Object set13_tree=null;
 
         try {
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:99:16: ( '&' | '|' )
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:99:16: ( '&' | '|' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:
             {
             root_0 = (Object)adaptor.nil();
 
@@ -1531,7 +1597,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "binOperator"
-    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:100:1: binOperator : ( '=' | '>=' | '>' | '<=' | '<' | '!=' | '=~' | '!~' );
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:100:1: binOperator : ( '=' | '>=' | '>' | '<=' | '<' | '!=' | '=~' | '!~' );
     public final VcfFilterParser.binOperator_return binOperator() throws RecognitionException {
         VcfFilterParser.binOperator_return retval = new VcfFilterParser.binOperator_return();
         retval.start = input.LT(1);
@@ -1544,8 +1610,8 @@ public TreeAdaptor getTreeAdaptor() {
         Object set14_tree=null;
 
         try {
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:100:15: ( '=' | '>=' | '>' | '<=' | '<' | '!=' | '=~' | '!~' )
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:100:15: ( '=' | '>=' | '>' | '<=' | '<' | '!=' | '=~' | '!~' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:
             {
             root_0 = (Object)adaptor.nil();
 
@@ -1596,7 +1662,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "uniOperator"
-    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:101:1: uniOperator : ( '!' | 'na' | 'exists' );
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:101:1: uniOperator : ( '!' | 'na' | 'exists' );
     public final VcfFilterParser.uniOperator_return uniOperator() throws RecognitionException {
         VcfFilterParser.uniOperator_return retval = new VcfFilterParser.uniOperator_return();
         retval.start = input.LT(1);
@@ -1609,8 +1675,8 @@ public TreeAdaptor getTreeAdaptor() {
         Object set15_tree=null;
 
         try {
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:101:15: ( '!' | 'na' | 'exists' )
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:101:15: ( '!' | 'na' | 'exists' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:
             {
             root_0 = (Object)adaptor.nil();
 
@@ -1661,7 +1727,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "expression"
-    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:104:1: expression : ( var | functionEntry | literalFloat | literalString );
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:104:1: expression : ( var | functionEntry | literalFloat | literalString );
     public final VcfFilterParser.expression_return expression() throws RecognitionException {
         VcfFilterParser.expression_return retval = new VcfFilterParser.expression_return();
         retval.start = input.LT(1);
@@ -1680,7 +1746,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
         try {
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:104:12: ( var | functionEntry | literalFloat | literalString )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:104:12: ( var | functionEntry | literalFloat | literalString )
             int alt5=4;
             switch ( input.LA(1) ) {
             case ID:
@@ -1720,7 +1786,7 @@ public TreeAdaptor getTreeAdaptor() {
 
             switch (alt5) {
                 case 1 :
-                    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:104:14: var
+                    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:104:14: var
                     {
                     root_0 = (Object)adaptor.nil();
 
@@ -1735,7 +1801,7 @@ public TreeAdaptor getTreeAdaptor() {
                     }
                     break;
                 case 2 :
-                    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:105:6: functionEntry
+                    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:105:6: functionEntry
                     {
                     root_0 = (Object)adaptor.nil();
 
@@ -1750,7 +1816,7 @@ public TreeAdaptor getTreeAdaptor() {
                     }
                     break;
                 case 3 :
-                    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:106:6: literalFloat
+                    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:106:6: literalFloat
                     {
                     root_0 = (Object)adaptor.nil();
 
@@ -1765,7 +1831,7 @@ public TreeAdaptor getTreeAdaptor() {
                     }
                     break;
                 case 4 :
-                    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:107:6: literalString
+                    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:107:6: literalString
                     {
                     root_0 = (Object)adaptor.nil();
 
@@ -1810,7 +1876,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "literalFloat"
-    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:110:1: literalFloat : f= FLOAT -> ^( LITERAL_NUMBER $f) ;
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:110:1: literalFloat : f= FLOAT -> ^( LITERAL_NUMBER $f) ;
     public final VcfFilterParser.literalFloat_return literalFloat() throws RecognitionException {
         VcfFilterParser.literalFloat_return retval = new VcfFilterParser.literalFloat_return();
         retval.start = input.LT(1);
@@ -1824,8 +1890,8 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleTokenStream stream_FLOAT=new RewriteRuleTokenStream(adaptor,"token FLOAT");
 
         try {
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:110:14: (f= FLOAT -> ^( LITERAL_NUMBER $f) )
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:110:16: f= FLOAT
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:110:14: (f= FLOAT -> ^( LITERAL_NUMBER $f) )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:110:16: f= FLOAT
             {
             f=(Token)match(input,FLOAT,FOLLOW_FLOAT_in_literalFloat638);  
             stream_FLOAT.add(f);
@@ -1845,7 +1911,7 @@ public TreeAdaptor getTreeAdaptor() {
             root_0 = (Object)adaptor.nil();
             // 110:31: -> ^( LITERAL_NUMBER $f)
             {
-                // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:110:34: ^( LITERAL_NUMBER $f)
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:110:34: ^( LITERAL_NUMBER $f)
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot(
@@ -1893,7 +1959,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "literalString"
-    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:111:1: literalString : s= STRING -> ^( LITERAL_STRING $s) ;
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:111:1: literalString : s= STRING -> ^( LITERAL_STRING $s) ;
     public final VcfFilterParser.literalString_return literalString() throws RecognitionException {
         VcfFilterParser.literalString_return retval = new VcfFilterParser.literalString_return();
         retval.start = input.LT(1);
@@ -1907,8 +1973,8 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleTokenStream stream_STRING=new RewriteRuleTokenStream(adaptor,"token STRING");
 
         try {
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:111:15: (s= STRING -> ^( LITERAL_STRING $s) )
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:111:17: s= STRING
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:111:15: (s= STRING -> ^( LITERAL_STRING $s) )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:111:17: s= STRING
             {
             s=(Token)match(input,STRING,FOLLOW_STRING_in_literalString663);  
             stream_STRING.add(s);
@@ -1928,7 +1994,7 @@ public TreeAdaptor getTreeAdaptor() {
             root_0 = (Object)adaptor.nil();
             // 111:32: -> ^( LITERAL_STRING $s)
             {
-                // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:111:35: ^( LITERAL_STRING $s)
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:111:35: ^( LITERAL_STRING $s)
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot(
@@ -1976,7 +2042,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "var"
-    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:114:1: var : ( varField | varSubfield | varGenotypeSub | varGenotypeSubArray | varEffSub | varLofSub | varNmdSub );
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:114:1: var : ( varField | varSubfield | varGenotypeSub | varGenotypeSubArray | varEffSub | varLofSub | varNmdSub );
     public final VcfFilterParser.var_return var() throws RecognitionException {
         VcfFilterParser.var_return retval = new VcfFilterParser.var_return();
         retval.start = input.LT(1);
@@ -2001,7 +2067,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
         try {
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:114:8: ( varField | varSubfield | varGenotypeSub | varGenotypeSubArray | varEffSub | varLofSub | varNmdSub )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:114:8: ( varField | varSubfield | varGenotypeSub | varGenotypeSubArray | varEffSub | varLofSub | varNmdSub )
             int alt6=7;
             switch ( input.LA(1) ) {
             case ID:
@@ -2023,59 +2089,15 @@ public TreeAdaptor getTreeAdaptor() {
                 }
                 }
                 break;
-            case 49:
+            case 48:
                 {
                 int LA6_2 = input.LA(2);
 
                 if ( (LA6_2==53) ) {
-                    int LA6_8 = input.LA(3);
-
-                    if ( (LA6_8==FLOAT||LA6_8==38||(LA6_8 >= 45 && LA6_8 <= 47)) ) {
-                        int LA6_9 = input.LA(4);
-
-                        if ( (LA6_9==55) ) {
-                            int LA6_10 = input.LA(5);
-
-                            if ( (LA6_10==ID) ) {
-                                int LA6_11 = input.LA(6);
-
-                                if ( (LA6_11==53) ) {
-                                    alt6=4;
-                                }
-                                else if ( (LA6_11==EOF||(LA6_11 >= 33 && LA6_11 <= 35)||LA6_11==37||(LA6_11 >= 39 && LA6_11 <= 44)||LA6_11==61||LA6_11==67) ) {
-                                    alt6=3;
-                                }
-                                else {
-                                    NoViableAltException nvae =
-                                        new NoViableAltException("", 6, 11, input);
-
-                                    throw nvae;
-
-                                }
-                            }
-                            else {
-                                NoViableAltException nvae =
-                                    new NoViableAltException("", 6, 10, input);
-
-                                throw nvae;
-
-                            }
-                        }
-                        else {
-                            NoViableAltException nvae =
-                                new NoViableAltException("", 6, 9, input);
-
-                            throw nvae;
-
-                        }
-                    }
-                    else {
-                        NoViableAltException nvae =
-                            new NoViableAltException("", 6, 8, input);
-
-                        throw nvae;
-
-                    }
+                    alt6=5;
+                }
+                else if ( (LA6_2==EOF||(LA6_2 >= 33 && LA6_2 <= 35)||LA6_2==37||(LA6_2 >= 39 && LA6_2 <= 44)||LA6_2==61||LA6_2==67) ) {
+                    alt6=1;
                 }
                 else {
                     NoViableAltException nvae =
@@ -2086,19 +2108,105 @@ public TreeAdaptor getTreeAdaptor() {
                 }
                 }
                 break;
-            case 48:
-                {
-                alt6=5;
-                }
-                break;
             case 50:
                 {
-                alt6=6;
+                int LA6_3 = input.LA(2);
+
+                if ( (LA6_3==53) ) {
+                    alt6=6;
+                }
+                else if ( (LA6_3==EOF||(LA6_3 >= 33 && LA6_3 <= 35)||LA6_3==37||(LA6_3 >= 39 && LA6_3 <= 44)||LA6_3==61||LA6_3==67) ) {
+                    alt6=1;
+                }
+                else {
+                    NoViableAltException nvae =
+                        new NoViableAltException("", 6, 3, input);
+
+                    throw nvae;
+
+                }
                 }
                 break;
             case 51:
                 {
-                alt6=7;
+                int LA6_4 = input.LA(2);
+
+                if ( (LA6_4==53) ) {
+                    alt6=7;
+                }
+                else if ( (LA6_4==EOF||(LA6_4 >= 33 && LA6_4 <= 35)||LA6_4==37||(LA6_4 >= 39 && LA6_4 <= 44)||LA6_4==61||LA6_4==67) ) {
+                    alt6=1;
+                }
+                else {
+                    NoViableAltException nvae =
+                        new NoViableAltException("", 6, 4, input);
+
+                    throw nvae;
+
+                }
+                }
+                break;
+            case 49:
+                {
+                int LA6_5 = input.LA(2);
+
+                if ( (LA6_5==53) ) {
+                    int LA6_11 = input.LA(3);
+
+                    if ( (LA6_11==FLOAT||LA6_11==38||(LA6_11 >= 45 && LA6_11 <= 47)) ) {
+                        int LA6_12 = input.LA(4);
+
+                        if ( (LA6_12==55) ) {
+                            int LA6_13 = input.LA(5);
+
+                            if ( (LA6_13==ID) ) {
+                                int LA6_14 = input.LA(6);
+
+                                if ( (LA6_14==53) ) {
+                                    alt6=4;
+                                }
+                                else if ( (LA6_14==EOF||(LA6_14 >= 33 && LA6_14 <= 35)||LA6_14==37||(LA6_14 >= 39 && LA6_14 <= 44)||LA6_14==61||LA6_14==67) ) {
+                                    alt6=3;
+                                }
+                                else {
+                                    NoViableAltException nvae =
+                                        new NoViableAltException("", 6, 14, input);
+
+                                    throw nvae;
+
+                                }
+                            }
+                            else {
+                                NoViableAltException nvae =
+                                    new NoViableAltException("", 6, 13, input);
+
+                                throw nvae;
+
+                            }
+                        }
+                        else {
+                            NoViableAltException nvae =
+                                new NoViableAltException("", 6, 12, input);
+
+                            throw nvae;
+
+                        }
+                    }
+                    else {
+                        NoViableAltException nvae =
+                            new NoViableAltException("", 6, 11, input);
+
+                        throw nvae;
+
+                    }
+                }
+                else {
+                    NoViableAltException nvae =
+                        new NoViableAltException("", 6, 5, input);
+
+                    throw nvae;
+
+                }
                 }
                 break;
             default:
@@ -2111,7 +2219,7 @@ public TreeAdaptor getTreeAdaptor() {
 
             switch (alt6) {
                 case 1 :
-                    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:114:10: varField
+                    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:114:10: varField
                     {
                     root_0 = (Object)adaptor.nil();
 
@@ -2126,7 +2234,7 @@ public TreeAdaptor getTreeAdaptor() {
                     }
                     break;
                 case 2 :
-                    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:114:21: varSubfield
+                    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:114:21: varSubfield
                     {
                     root_0 = (Object)adaptor.nil();
 
@@ -2141,7 +2249,7 @@ public TreeAdaptor getTreeAdaptor() {
                     }
                     break;
                 case 3 :
-                    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:114:35: varGenotypeSub
+                    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:114:35: varGenotypeSub
                     {
                     root_0 = (Object)adaptor.nil();
 
@@ -2156,7 +2264,7 @@ public TreeAdaptor getTreeAdaptor() {
                     }
                     break;
                 case 4 :
-                    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:114:52: varGenotypeSubArray
+                    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:114:52: varGenotypeSubArray
                     {
                     root_0 = (Object)adaptor.nil();
 
@@ -2171,7 +2279,7 @@ public TreeAdaptor getTreeAdaptor() {
                     }
                     break;
                 case 5 :
-                    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:114:74: varEffSub
+                    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:114:74: varEffSub
                     {
                     root_0 = (Object)adaptor.nil();
 
@@ -2186,7 +2294,7 @@ public TreeAdaptor getTreeAdaptor() {
                     }
                     break;
                 case 6 :
-                    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:114:86: varLofSub
+                    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:114:86: varLofSub
                     {
                     root_0 = (Object)adaptor.nil();
 
@@ -2201,7 +2309,7 @@ public TreeAdaptor getTreeAdaptor() {
                     }
                     break;
                 case 7 :
-                    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:114:98: varNmdSub
+                    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:114:98: varNmdSub
                     {
                     root_0 = (Object)adaptor.nil();
 
@@ -2246,7 +2354,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "varField"
-    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:115:1: varField : i= ID -> ^( VAR_FIELD $i) ;
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:115:1: varField : (i= ID |i= 'EFF' |i= 'LOF' |i= 'NMD' -> ^( VAR_FIELD $i) );
     public final VcfFilterParser.varField_return varField() throws RecognitionException {
         VcfFilterParser.varField_return retval = new VcfFilterParser.varField_return();
         retval.start = input.LT(1);
@@ -2257,49 +2365,128 @@ public TreeAdaptor getTreeAdaptor() {
         Token i=null;
 
         Object i_tree=null;
-        RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
+        RewriteRuleTokenStream stream_51=new RewriteRuleTokenStream(adaptor,"token 51");
 
         try {
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:115:11: (i= ID -> ^( VAR_FIELD $i) )
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:115:13: i= ID
-            {
-            i=(Token)match(input,ID,FOLLOW_ID_in_varField725);  
-            stream_ID.add(i);
-
-
-            // AST REWRITE
-            // elements: i
-            // token labels: i
-            // rule labels: retval
-            // token list labels: 
-            // rule list labels: 
-            // wildcard labels: 
-            retval.tree = root_0;
-            RewriteRuleTokenStream stream_i=new RewriteRuleTokenStream(adaptor,"token i",i);
-            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
-
-            root_0 = (Object)adaptor.nil();
-            // 115:24: -> ^( VAR_FIELD $i)
-            {
-                // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:115:27: ^( VAR_FIELD $i)
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:115:11: (i= ID |i= 'EFF' |i= 'LOF' |i= 'NMD' -> ^( VAR_FIELD $i) )
+            int alt7=4;
+            switch ( input.LA(1) ) {
+            case ID:
                 {
-                Object root_1 = (Object)adaptor.nil();
-                root_1 = (Object)adaptor.becomeRoot(
-                (Object)adaptor.create(VAR_FIELD, "VAR_FIELD")
-                , root_1);
-
-                adaptor.addChild(root_1, stream_i.nextNode());
-
-                adaptor.addChild(root_0, root_1);
+                alt7=1;
                 }
+                break;
+            case 48:
+                {
+                alt7=2;
+                }
+                break;
+            case 50:
+                {
+                alt7=3;
+                }
+                break;
+            case 51:
+                {
+                alt7=4;
+                }
+                break;
+            default:
+                NoViableAltException nvae =
+                    new NoViableAltException("", 7, 0, input);
+
+                throw nvae;
 
             }
 
+            switch (alt7) {
+                case 1 :
+                    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:115:13: i= ID
+                    {
+                    root_0 = (Object)adaptor.nil();
 
-            retval.tree = root_0;
+
+                    i=(Token)match(input,ID,FOLLOW_ID_in_varField725); 
+                    i_tree = 
+                    (Object)adaptor.create(i)
+                    ;
+                    adaptor.addChild(root_0, i_tree);
+
+
+                    }
+                    break;
+                case 2 :
+                    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:115:20: i= 'EFF'
+                    {
+                    root_0 = (Object)adaptor.nil();
+
+
+                    i=(Token)match(input,48,FOLLOW_48_in_varField731); 
+                    i_tree = 
+                    (Object)adaptor.create(i)
+                    ;
+                    adaptor.addChild(root_0, i_tree);
+
+
+                    }
+                    break;
+                case 3 :
+                    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:115:30: i= 'LOF'
+                    {
+                    root_0 = (Object)adaptor.nil();
+
+
+                    i=(Token)match(input,50,FOLLOW_50_in_varField737); 
+                    i_tree = 
+                    (Object)adaptor.create(i)
+                    ;
+                    adaptor.addChild(root_0, i_tree);
+
+
+                    }
+                    break;
+                case 4 :
+                    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:115:40: i= 'NMD'
+                    {
+                    i=(Token)match(input,51,FOLLOW_51_in_varField743);  
+                    stream_51.add(i);
+
+
+                    // AST REWRITE
+                    // elements: i
+                    // token labels: i
+                    // rule labels: retval
+                    // token list labels: 
+                    // rule list labels: 
+                    // wildcard labels: 
+                    retval.tree = root_0;
+                    RewriteRuleTokenStream stream_i=new RewriteRuleTokenStream(adaptor,"token i",i);
+                    RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+
+                    root_0 = (Object)adaptor.nil();
+                    // 115:50: -> ^( VAR_FIELD $i)
+                    {
+                        // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:115:53: ^( VAR_FIELD $i)
+                        {
+                        Object root_1 = (Object)adaptor.nil();
+                        root_1 = (Object)adaptor.becomeRoot(
+                        (Object)adaptor.create(VAR_FIELD, "VAR_FIELD")
+                        , root_1);
+
+                        adaptor.addChild(root_1, stream_i.nextNode());
+
+                        adaptor.addChild(root_0, root_1);
+                        }
+
+                    }
+
+
+                    retval.tree = root_0;
+
+                    }
+                    break;
 
             }
-
             retval.stop = input.LT(-1);
 
 
@@ -2329,7 +2516,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "varSubfield"
-    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:116:1: varSubfield : i= ID '[' n= index ']' -> ^( VAR_SUBFIELD $i $n) ;
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:116:1: varSubfield : i= ID '[' n= index ']' -> ^( VAR_SUBFIELD $i $n) ;
     public final VcfFilterParser.varSubfield_return varSubfield() throws RecognitionException {
         VcfFilterParser.varSubfield_return retval = new VcfFilterParser.varSubfield_return();
         retval.start = input.LT(1);
@@ -2351,25 +2538,25 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleTokenStream stream_54=new RewriteRuleTokenStream(adaptor,"token 54");
         RewriteRuleSubtreeStream stream_index=new RewriteRuleSubtreeStream(adaptor,"rule index");
         try {
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:116:14: (i= ID '[' n= index ']' -> ^( VAR_SUBFIELD $i $n) )
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:116:16: i= ID '[' n= index ']'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:116:14: (i= ID '[' n= index ']' -> ^( VAR_SUBFIELD $i $n) )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:116:16: i= ID '[' n= index ']'
             {
-            i=(Token)match(input,ID,FOLLOW_ID_in_varSubfield750);  
+            i=(Token)match(input,ID,FOLLOW_ID_in_varSubfield764);  
             stream_ID.add(i);
 
 
-            char_literal27=(Token)match(input,53,FOLLOW_53_in_varSubfield752);  
+            char_literal27=(Token)match(input,53,FOLLOW_53_in_varSubfield766);  
             stream_53.add(char_literal27);
 
 
-            pushFollow(FOLLOW_index_in_varSubfield756);
+            pushFollow(FOLLOW_index_in_varSubfield770);
             n=index();
 
             state._fsp--;
 
             stream_index.add(n.getTree());
 
-            char_literal28=(Token)match(input,54,FOLLOW_54_in_varSubfield758);  
+            char_literal28=(Token)match(input,54,FOLLOW_54_in_varSubfield772);  
             stream_54.add(char_literal28);
 
 
@@ -2388,7 +2575,7 @@ public TreeAdaptor getTreeAdaptor() {
             root_0 = (Object)adaptor.nil();
             // 116:41: -> ^( VAR_SUBFIELD $i $n)
             {
-                // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:116:44: ^( VAR_SUBFIELD $i $n)
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:116:44: ^( VAR_SUBFIELD $i $n)
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot(
@@ -2438,7 +2625,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "varGenotype"
-    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:117:1: varGenotype : 'GEN' '[' g= index ']' -> ^( VAR_GENOTYPE $g) ;
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:117:1: varGenotype : 'GEN' '[' g= index ']' -> ^( VAR_GENOTYPE $g) ;
     public final VcfFilterParser.varGenotype_return varGenotype() throws RecognitionException {
         VcfFilterParser.varGenotype_return retval = new VcfFilterParser.varGenotype_return();
         retval.start = input.LT(1);
@@ -2460,25 +2647,25 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleTokenStream stream_54=new RewriteRuleTokenStream(adaptor,"token 54");
         RewriteRuleSubtreeStream stream_index=new RewriteRuleSubtreeStream(adaptor,"rule index");
         try {
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:117:14: ( 'GEN' '[' g= index ']' -> ^( VAR_GENOTYPE $g) )
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:117:16: 'GEN' '[' g= index ']'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:117:14: ( 'GEN' '[' g= index ']' -> ^( VAR_GENOTYPE $g) )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:117:16: 'GEN' '[' g= index ']'
             {
-            string_literal29=(Token)match(input,49,FOLLOW_49_in_varGenotype782);  
+            string_literal29=(Token)match(input,49,FOLLOW_49_in_varGenotype796);  
             stream_49.add(string_literal29);
 
 
-            char_literal30=(Token)match(input,53,FOLLOW_53_in_varGenotype784);  
+            char_literal30=(Token)match(input,53,FOLLOW_53_in_varGenotype798);  
             stream_53.add(char_literal30);
 
 
-            pushFollow(FOLLOW_index_in_varGenotype788);
+            pushFollow(FOLLOW_index_in_varGenotype802);
             g=index();
 
             state._fsp--;
 
             stream_index.add(g.getTree());
 
-            char_literal31=(Token)match(input,54,FOLLOW_54_in_varGenotype790);  
+            char_literal31=(Token)match(input,54,FOLLOW_54_in_varGenotype804);  
             stream_54.add(char_literal31);
 
 
@@ -2496,7 +2683,7 @@ public TreeAdaptor getTreeAdaptor() {
             root_0 = (Object)adaptor.nil();
             // 117:43: -> ^( VAR_GENOTYPE $g)
             {
-                // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:117:46: ^( VAR_GENOTYPE $g)
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:117:46: ^( VAR_GENOTYPE $g)
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot(
@@ -2544,7 +2731,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "varGenotypeSub"
-    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:118:1: varGenotypeSub : 'GEN' '[' g= index '].' i= ID -> ^( VAR_GENOTYPE_SUB $g $i) ;
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:118:1: varGenotypeSub : 'GEN' '[' g= index '].' i= ID -> ^( VAR_GENOTYPE_SUB $g $i) ;
     public final VcfFilterParser.varGenotypeSub_return varGenotypeSub() throws RecognitionException {
         VcfFilterParser.varGenotypeSub_return retval = new VcfFilterParser.varGenotypeSub_return();
         retval.start = input.LT(1);
@@ -2569,34 +2756,34 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleTokenStream stream_53=new RewriteRuleTokenStream(adaptor,"token 53");
         RewriteRuleSubtreeStream stream_index=new RewriteRuleSubtreeStream(adaptor,"rule index");
         try {
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:118:17: ( 'GEN' '[' g= index '].' i= ID -> ^( VAR_GENOTYPE_SUB $g $i) )
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:118:19: 'GEN' '[' g= index '].' i= ID
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:118:17: ( 'GEN' '[' g= index '].' i= ID -> ^( VAR_GENOTYPE_SUB $g $i) )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:118:19: 'GEN' '[' g= index '].' i= ID
             {
-            string_literal32=(Token)match(input,49,FOLLOW_49_in_varGenotypeSub812);  
+            string_literal32=(Token)match(input,49,FOLLOW_49_in_varGenotypeSub826);  
             stream_49.add(string_literal32);
 
 
-            char_literal33=(Token)match(input,53,FOLLOW_53_in_varGenotypeSub814);  
+            char_literal33=(Token)match(input,53,FOLLOW_53_in_varGenotypeSub828);  
             stream_53.add(char_literal33);
 
 
-            pushFollow(FOLLOW_index_in_varGenotypeSub818);
+            pushFollow(FOLLOW_index_in_varGenotypeSub832);
             g=index();
 
             state._fsp--;
 
             stream_index.add(g.getTree());
 
-            string_literal34=(Token)match(input,55,FOLLOW_55_in_varGenotypeSub820);  
+            string_literal34=(Token)match(input,55,FOLLOW_55_in_varGenotypeSub834);  
             stream_55.add(string_literal34);
 
 
-            i=(Token)match(input,ID,FOLLOW_ID_in_varGenotypeSub824);  
+            i=(Token)match(input,ID,FOLLOW_ID_in_varGenotypeSub838);  
             stream_ID.add(i);
 
 
             // AST REWRITE
-            // elements: g, i
+            // elements: i, g
             // token labels: i
             // rule labels: g, retval
             // token list labels: 
@@ -2610,7 +2797,7 @@ public TreeAdaptor getTreeAdaptor() {
             root_0 = (Object)adaptor.nil();
             // 118:50: -> ^( VAR_GENOTYPE_SUB $g $i)
             {
-                // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:118:53: ^( VAR_GENOTYPE_SUB $g $i)
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:118:53: ^( VAR_GENOTYPE_SUB $g $i)
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot(
@@ -2660,7 +2847,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "varGenotypeSubArray"
-    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:119:1: varGenotypeSubArray : 'GEN' '[' g= index '].' i= ID '[' n= index ']' -> ^( VAR_GENOTYPE_SUB_ARRAY $g $i $n) ;
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:119:1: varGenotypeSubArray : 'GEN' '[' g= index '].' i= ID '[' n= index ']' -> ^( VAR_GENOTYPE_SUB_ARRAY $g $i $n) ;
     public final VcfFilterParser.varGenotypeSubArray_return varGenotypeSubArray() throws RecognitionException {
         VcfFilterParser.varGenotypeSubArray_return retval = new VcfFilterParser.varGenotypeSubArray_return();
         retval.start = input.LT(1);
@@ -2692,49 +2879,49 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleTokenStream stream_54=new RewriteRuleTokenStream(adaptor,"token 54");
         RewriteRuleSubtreeStream stream_index=new RewriteRuleSubtreeStream(adaptor,"rule index");
         try {
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:119:21: ( 'GEN' '[' g= index '].' i= ID '[' n= index ']' -> ^( VAR_GENOTYPE_SUB_ARRAY $g $i $n) )
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:119:23: 'GEN' '[' g= index '].' i= ID '[' n= index ']'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:119:21: ( 'GEN' '[' g= index '].' i= ID '[' n= index ']' -> ^( VAR_GENOTYPE_SUB_ARRAY $g $i $n) )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:119:23: 'GEN' '[' g= index '].' i= ID '[' n= index ']'
             {
-            string_literal35=(Token)match(input,49,FOLLOW_49_in_varGenotypeSubArray846);  
+            string_literal35=(Token)match(input,49,FOLLOW_49_in_varGenotypeSubArray860);  
             stream_49.add(string_literal35);
 
 
-            char_literal36=(Token)match(input,53,FOLLOW_53_in_varGenotypeSubArray848);  
+            char_literal36=(Token)match(input,53,FOLLOW_53_in_varGenotypeSubArray862);  
             stream_53.add(char_literal36);
 
 
-            pushFollow(FOLLOW_index_in_varGenotypeSubArray852);
+            pushFollow(FOLLOW_index_in_varGenotypeSubArray866);
             g=index();
 
             state._fsp--;
 
             stream_index.add(g.getTree());
 
-            string_literal37=(Token)match(input,55,FOLLOW_55_in_varGenotypeSubArray854);  
+            string_literal37=(Token)match(input,55,FOLLOW_55_in_varGenotypeSubArray868);  
             stream_55.add(string_literal37);
 
 
-            i=(Token)match(input,ID,FOLLOW_ID_in_varGenotypeSubArray858);  
+            i=(Token)match(input,ID,FOLLOW_ID_in_varGenotypeSubArray872);  
             stream_ID.add(i);
 
 
-            char_literal38=(Token)match(input,53,FOLLOW_53_in_varGenotypeSubArray861);  
+            char_literal38=(Token)match(input,53,FOLLOW_53_in_varGenotypeSubArray875);  
             stream_53.add(char_literal38);
 
 
-            pushFollow(FOLLOW_index_in_varGenotypeSubArray865);
+            pushFollow(FOLLOW_index_in_varGenotypeSubArray879);
             n=index();
 
             state._fsp--;
 
             stream_index.add(n.getTree());
 
-            char_literal39=(Token)match(input,54,FOLLOW_54_in_varGenotypeSubArray867);  
+            char_literal39=(Token)match(input,54,FOLLOW_54_in_varGenotypeSubArray881);  
             stream_54.add(char_literal39);
 
 
             // AST REWRITE
-            // elements: g, n, i
+            // elements: i, g, n
             // token labels: i
             // rule labels: g, retval, n
             // token list labels: 
@@ -2749,7 +2936,7 @@ public TreeAdaptor getTreeAdaptor() {
             root_0 = (Object)adaptor.nil();
             // 119:69: -> ^( VAR_GENOTYPE_SUB_ARRAY $g $i $n)
             {
-                // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:119:72: ^( VAR_GENOTYPE_SUB_ARRAY $g $i $n)
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:119:72: ^( VAR_GENOTYPE_SUB_ARRAY $g $i $n)
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot(
@@ -2801,7 +2988,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "varEffSub"
-    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:120:1: varEffSub : 'EFF' '[' g= index '].' i= ID -> ^( VAR_EFF_SUB $g $i) ;
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:120:1: varEffSub : 'EFF' '[' g= index '].' i= ID -> ^( VAR_EFF_SUB $g $i) ;
     public final VcfFilterParser.varEffSub_return varEffSub() throws RecognitionException {
         VcfFilterParser.varEffSub_return retval = new VcfFilterParser.varEffSub_return();
         retval.start = input.LT(1);
@@ -2826,34 +3013,34 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleTokenStream stream_53=new RewriteRuleTokenStream(adaptor,"token 53");
         RewriteRuleSubtreeStream stream_index=new RewriteRuleSubtreeStream(adaptor,"rule index");
         try {
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:120:12: ( 'EFF' '[' g= index '].' i= ID -> ^( VAR_EFF_SUB $g $i) )
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:120:14: 'EFF' '[' g= index '].' i= ID
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:120:12: ( 'EFF' '[' g= index '].' i= ID -> ^( VAR_EFF_SUB $g $i) )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:120:14: 'EFF' '[' g= index '].' i= ID
             {
-            string_literal40=(Token)match(input,48,FOLLOW_48_in_varEffSub891);  
+            string_literal40=(Token)match(input,48,FOLLOW_48_in_varEffSub905);  
             stream_48.add(string_literal40);
 
 
-            char_literal41=(Token)match(input,53,FOLLOW_53_in_varEffSub893);  
+            char_literal41=(Token)match(input,53,FOLLOW_53_in_varEffSub907);  
             stream_53.add(char_literal41);
 
 
-            pushFollow(FOLLOW_index_in_varEffSub897);
+            pushFollow(FOLLOW_index_in_varEffSub911);
             g=index();
 
             state._fsp--;
 
             stream_index.add(g.getTree());
 
-            string_literal42=(Token)match(input,55,FOLLOW_55_in_varEffSub899);  
+            string_literal42=(Token)match(input,55,FOLLOW_55_in_varEffSub913);  
             stream_55.add(string_literal42);
 
 
-            i=(Token)match(input,ID,FOLLOW_ID_in_varEffSub903);  
+            i=(Token)match(input,ID,FOLLOW_ID_in_varEffSub917);  
             stream_ID.add(i);
 
 
             // AST REWRITE
-            // elements: g, i
+            // elements: i, g
             // token labels: i
             // rule labels: g, retval
             // token list labels: 
@@ -2867,7 +3054,7 @@ public TreeAdaptor getTreeAdaptor() {
             root_0 = (Object)adaptor.nil();
             // 120:45: -> ^( VAR_EFF_SUB $g $i)
             {
-                // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:120:48: ^( VAR_EFF_SUB $g $i)
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:120:48: ^( VAR_EFF_SUB $g $i)
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot(
@@ -2917,7 +3104,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "varLofSub"
-    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:121:1: varLofSub : 'LOF' '[' g= index '].' i= ID -> ^( VAR_LOF_SUB $g $i) ;
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:121:1: varLofSub : 'LOF' '[' g= index '].' i= ID -> ^( VAR_LOF_SUB $g $i) ;
     public final VcfFilterParser.varLofSub_return varLofSub() throws RecognitionException {
         VcfFilterParser.varLofSub_return retval = new VcfFilterParser.varLofSub_return();
         retval.start = input.LT(1);
@@ -2942,34 +3129,34 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleTokenStream stream_50=new RewriteRuleTokenStream(adaptor,"token 50");
         RewriteRuleSubtreeStream stream_index=new RewriteRuleSubtreeStream(adaptor,"rule index");
         try {
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:121:12: ( 'LOF' '[' g= index '].' i= ID -> ^( VAR_LOF_SUB $g $i) )
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:121:14: 'LOF' '[' g= index '].' i= ID
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:121:12: ( 'LOF' '[' g= index '].' i= ID -> ^( VAR_LOF_SUB $g $i) )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:121:14: 'LOF' '[' g= index '].' i= ID
             {
-            string_literal43=(Token)match(input,50,FOLLOW_50_in_varLofSub926);  
+            string_literal43=(Token)match(input,50,FOLLOW_50_in_varLofSub940);  
             stream_50.add(string_literal43);
 
 
-            char_literal44=(Token)match(input,53,FOLLOW_53_in_varLofSub928);  
+            char_literal44=(Token)match(input,53,FOLLOW_53_in_varLofSub942);  
             stream_53.add(char_literal44);
 
 
-            pushFollow(FOLLOW_index_in_varLofSub932);
+            pushFollow(FOLLOW_index_in_varLofSub946);
             g=index();
 
             state._fsp--;
 
             stream_index.add(g.getTree());
 
-            string_literal45=(Token)match(input,55,FOLLOW_55_in_varLofSub934);  
+            string_literal45=(Token)match(input,55,FOLLOW_55_in_varLofSub948);  
             stream_55.add(string_literal45);
 
 
-            i=(Token)match(input,ID,FOLLOW_ID_in_varLofSub938);  
+            i=(Token)match(input,ID,FOLLOW_ID_in_varLofSub952);  
             stream_ID.add(i);
 
 
             // AST REWRITE
-            // elements: i, g
+            // elements: g, i
             // token labels: i
             // rule labels: g, retval
             // token list labels: 
@@ -2983,7 +3170,7 @@ public TreeAdaptor getTreeAdaptor() {
             root_0 = (Object)adaptor.nil();
             // 121:45: -> ^( VAR_LOF_SUB $g $i)
             {
-                // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:121:48: ^( VAR_LOF_SUB $g $i)
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:121:48: ^( VAR_LOF_SUB $g $i)
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot(
@@ -3033,7 +3220,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "varNmdSub"
-    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:122:1: varNmdSub : 'NMD' '[' g= index '].' i= ID -> ^( VAR_NMD_SUB $g $i) ;
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:122:1: varNmdSub : 'NMD' '[' g= index '].' i= ID -> ^( VAR_NMD_SUB $g $i) ;
     public final VcfFilterParser.varNmdSub_return varNmdSub() throws RecognitionException {
         VcfFilterParser.varNmdSub_return retval = new VcfFilterParser.varNmdSub_return();
         retval.start = input.LT(1);
@@ -3058,29 +3245,29 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleTokenStream stream_53=new RewriteRuleTokenStream(adaptor,"token 53");
         RewriteRuleSubtreeStream stream_index=new RewriteRuleSubtreeStream(adaptor,"rule index");
         try {
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:122:12: ( 'NMD' '[' g= index '].' i= ID -> ^( VAR_NMD_SUB $g $i) )
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:122:14: 'NMD' '[' g= index '].' i= ID
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:122:12: ( 'NMD' '[' g= index '].' i= ID -> ^( VAR_NMD_SUB $g $i) )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:122:14: 'NMD' '[' g= index '].' i= ID
             {
-            string_literal46=(Token)match(input,51,FOLLOW_51_in_varNmdSub961);  
+            string_literal46=(Token)match(input,51,FOLLOW_51_in_varNmdSub975);  
             stream_51.add(string_literal46);
 
 
-            char_literal47=(Token)match(input,53,FOLLOW_53_in_varNmdSub963);  
+            char_literal47=(Token)match(input,53,FOLLOW_53_in_varNmdSub977);  
             stream_53.add(char_literal47);
 
 
-            pushFollow(FOLLOW_index_in_varNmdSub967);
+            pushFollow(FOLLOW_index_in_varNmdSub981);
             g=index();
 
             state._fsp--;
 
             stream_index.add(g.getTree());
 
-            string_literal48=(Token)match(input,55,FOLLOW_55_in_varNmdSub969);  
+            string_literal48=(Token)match(input,55,FOLLOW_55_in_varNmdSub983);  
             stream_55.add(string_literal48);
 
 
-            i=(Token)match(input,ID,FOLLOW_ID_in_varNmdSub973);  
+            i=(Token)match(input,ID,FOLLOW_ID_in_varNmdSub987);  
             stream_ID.add(i);
 
 
@@ -3099,7 +3286,7 @@ public TreeAdaptor getTreeAdaptor() {
             root_0 = (Object)adaptor.nil();
             // 122:45: -> ^( VAR_NMD_SUB $g $i)
             {
-                // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:122:48: ^( VAR_NMD_SUB $g $i)
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:122:48: ^( VAR_NMD_SUB $g $i)
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot(
@@ -3149,7 +3336,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "functionEntry"
-    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:125:1: functionEntry : f= functionEntryName '(' ')' -> ^( FUNCTION_ENTRY $f) ;
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:125:1: functionEntry : f= functionEntryName '(' ')' -> ^( FUNCTION_ENTRY $f) ;
     public final VcfFilterParser.functionEntry_return functionEntry() throws RecognitionException {
         VcfFilterParser.functionEntry_return retval = new VcfFilterParser.functionEntry_return();
         retval.start = input.LT(1);
@@ -3168,21 +3355,21 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleTokenStream stream_37=new RewriteRuleTokenStream(adaptor,"token 37");
         RewriteRuleSubtreeStream stream_functionEntryName=new RewriteRuleSubtreeStream(adaptor,"rule functionEntryName");
         try {
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:125:16: (f= functionEntryName '(' ')' -> ^( FUNCTION_ENTRY $f) )
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:125:18: f= functionEntryName '(' ')'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:125:16: (f= functionEntryName '(' ')' -> ^( FUNCTION_ENTRY $f) )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:125:18: f= functionEntryName '(' ')'
             {
-            pushFollow(FOLLOW_functionEntryName_in_functionEntry1000);
+            pushFollow(FOLLOW_functionEntryName_in_functionEntry1014);
             f=functionEntryName();
 
             state._fsp--;
 
             stream_functionEntryName.add(f.getTree());
 
-            char_literal49=(Token)match(input,36,FOLLOW_36_in_functionEntry1002);  
+            char_literal49=(Token)match(input,36,FOLLOW_36_in_functionEntry1016);  
             stream_36.add(char_literal49);
 
 
-            char_literal50=(Token)match(input,37,FOLLOW_37_in_functionEntry1004);  
+            char_literal50=(Token)match(input,37,FOLLOW_37_in_functionEntry1018);  
             stream_37.add(char_literal50);
 
 
@@ -3200,7 +3387,7 @@ public TreeAdaptor getTreeAdaptor() {
             root_0 = (Object)adaptor.nil();
             // 125:49: -> ^( FUNCTION_ENTRY $f)
             {
-                // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:125:52: ^( FUNCTION_ENTRY $f)
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:125:52: ^( FUNCTION_ENTRY $f)
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot(
@@ -3248,7 +3435,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "functionEntryName"
-    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:126:1: functionEntryName : ( 'countHom' | 'countHet' | 'countVariant' | 'countRef' );
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:126:1: functionEntryName : ( 'countHom' | 'countHet' | 'countVariant' | 'countRef' );
     public final VcfFilterParser.functionEntryName_return functionEntryName() throws RecognitionException {
         VcfFilterParser.functionEntryName_return retval = new VcfFilterParser.functionEntryName_return();
         retval.start = input.LT(1);
@@ -3261,8 +3448,8 @@ public TreeAdaptor getTreeAdaptor() {
         Object set51_tree=null;
 
         try {
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:126:19: ( 'countHom' | 'countHet' | 'countVariant' | 'countRef' )
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:126:19: ( 'countHom' | 'countHet' | 'countVariant' | 'countRef' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:
             {
             root_0 = (Object)adaptor.nil();
 
@@ -3313,7 +3500,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "functionBoolean"
-    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:129:1: functionBoolean : ( functionGenotypeBool | functionBooleanSet );
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:129:1: functionBoolean : ( functionGenotypeBool | functionBooleanSet );
     public final VcfFilterParser.functionBoolean_return functionBoolean() throws RecognitionException {
         VcfFilterParser.functionBoolean_return retval = new VcfFilterParser.functionBoolean_return();
         retval.start = input.LT(1);
@@ -3328,31 +3515,31 @@ public TreeAdaptor getTreeAdaptor() {
 
 
         try {
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:129:18: ( functionGenotypeBool | functionBooleanSet )
-            int alt7=2;
-            int LA7_0 = input.LA(1);
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:129:18: ( functionGenotypeBool | functionBooleanSet )
+            int alt8=2;
+            int LA8_0 = input.LA(1);
 
-            if ( ((LA7_0 >= 62 && LA7_0 <= 65)) ) {
-                alt7=1;
+            if ( ((LA8_0 >= 62 && LA8_0 <= 65)) ) {
+                alt8=1;
             }
-            else if ( (LA7_0==FLOAT||LA7_0==ID||LA7_0==STRING||(LA7_0 >= 48 && LA7_0 <= 51)||(LA7_0 >= 56 && LA7_0 <= 59)) ) {
-                alt7=2;
+            else if ( (LA8_0==FLOAT||LA8_0==ID||LA8_0==STRING||(LA8_0 >= 48 && LA8_0 <= 51)||(LA8_0 >= 56 && LA8_0 <= 59)) ) {
+                alt8=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("", 7, 0, input);
+                    new NoViableAltException("", 8, 0, input);
 
                 throw nvae;
 
             }
-            switch (alt7) {
+            switch (alt8) {
                 case 1 :
-                    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:129:20: functionGenotypeBool
+                    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:129:20: functionGenotypeBool
                     {
                     root_0 = (Object)adaptor.nil();
 
 
-                    pushFollow(FOLLOW_functionGenotypeBool_in_functionBoolean1045);
+                    pushFollow(FOLLOW_functionGenotypeBool_in_functionBoolean1059);
                     functionGenotypeBool52=functionGenotypeBool();
 
                     state._fsp--;
@@ -3362,12 +3549,12 @@ public TreeAdaptor getTreeAdaptor() {
                     }
                     break;
                 case 2 :
-                    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:130:7: functionBooleanSet
+                    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:130:7: functionBooleanSet
                     {
                     root_0 = (Object)adaptor.nil();
 
 
-                    pushFollow(FOLLOW_functionBooleanSet_in_functionBoolean1054);
+                    pushFollow(FOLLOW_functionBooleanSet_in_functionBoolean1068);
                     functionBooleanSet53=functionBooleanSet();
 
                     state._fsp--;
@@ -3407,7 +3594,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "functionBooleanSet"
-    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:134:1: functionBooleanSet : e= expression f= 'in' 'SET' '[' i= index ']' -> ^( FUNCTION_BOOL_SET $f $i $e) ;
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:134:1: functionBooleanSet : e= expression f= 'in' 'SET' '[' i= index ']' -> ^( FUNCTION_BOOL_SET $f $i $e) ;
     public final VcfFilterParser.functionBooleanSet_return functionBooleanSet() throws RecognitionException {
         VcfFilterParser.functionBooleanSet_return retval = new VcfFilterParser.functionBooleanSet_return();
         retval.start = input.LT(1);
@@ -3435,41 +3622,41 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleSubtreeStream stream_expression=new RewriteRuleSubtreeStream(adaptor,"rule expression");
         RewriteRuleSubtreeStream stream_index=new RewriteRuleSubtreeStream(adaptor,"rule index");
         try {
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:134:20: (e= expression f= 'in' 'SET' '[' i= index ']' -> ^( FUNCTION_BOOL_SET $f $i $e) )
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:134:22: e= expression f= 'in' 'SET' '[' i= index ']'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:134:20: (e= expression f= 'in' 'SET' '[' i= index ']' -> ^( FUNCTION_BOOL_SET $f $i $e) )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:134:22: e= expression f= 'in' 'SET' '[' i= index ']'
             {
-            pushFollow(FOLLOW_expression_in_functionBooleanSet1070);
+            pushFollow(FOLLOW_expression_in_functionBooleanSet1084);
             e=expression();
 
             state._fsp--;
 
             stream_expression.add(e.getTree());
 
-            f=(Token)match(input,61,FOLLOW_61_in_functionBooleanSet1074);  
+            f=(Token)match(input,61,FOLLOW_61_in_functionBooleanSet1088);  
             stream_61.add(f);
 
 
-            string_literal54=(Token)match(input,52,FOLLOW_52_in_functionBooleanSet1076);  
+            string_literal54=(Token)match(input,52,FOLLOW_52_in_functionBooleanSet1090);  
             stream_52.add(string_literal54);
 
 
-            char_literal55=(Token)match(input,53,FOLLOW_53_in_functionBooleanSet1078);  
+            char_literal55=(Token)match(input,53,FOLLOW_53_in_functionBooleanSet1092);  
             stream_53.add(char_literal55);
 
 
-            pushFollow(FOLLOW_index_in_functionBooleanSet1082);
+            pushFollow(FOLLOW_index_in_functionBooleanSet1096);
             i=index();
 
             state._fsp--;
 
             stream_index.add(i.getTree());
 
-            char_literal56=(Token)match(input,54,FOLLOW_54_in_functionBooleanSet1084);  
+            char_literal56=(Token)match(input,54,FOLLOW_54_in_functionBooleanSet1098);  
             stream_54.add(char_literal56);
 
 
             // AST REWRITE
-            // elements: i, f, e
+            // elements: i, e, f
             // token labels: f
             // rule labels: retval, e, i
             // token list labels: 
@@ -3484,7 +3671,7 @@ public TreeAdaptor getTreeAdaptor() {
             root_0 = (Object)adaptor.nil();
             // 134:66: -> ^( FUNCTION_BOOL_SET $f $i $e)
             {
-                // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:134:69: ^( FUNCTION_BOOL_SET $f $i $e)
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:134:69: ^( FUNCTION_BOOL_SET $f $i $e)
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot(
@@ -3536,7 +3723,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "functionGenotypeBool"
-    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:137:1: functionGenotypeBool : f= functionGenotypeBoolName '(' g= varGenotype ')' -> ^( FUNCTION_BOOL_GENOTYPE $f $g) ;
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:137:1: functionGenotypeBool : f= functionGenotypeBoolName '(' g= varGenotype ')' -> ^( FUNCTION_BOOL_GENOTYPE $f $g) ;
     public final VcfFilterParser.functionGenotypeBool_return functionGenotypeBool() throws RecognitionException {
         VcfFilterParser.functionGenotypeBool_return retval = new VcfFilterParser.functionGenotypeBool_return();
         retval.start = input.LT(1);
@@ -3558,28 +3745,28 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleSubtreeStream stream_functionGenotypeBoolName=new RewriteRuleSubtreeStream(adaptor,"rule functionGenotypeBoolName");
         RewriteRuleSubtreeStream stream_varGenotype=new RewriteRuleSubtreeStream(adaptor,"rule varGenotype");
         try {
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:137:22: (f= functionGenotypeBoolName '(' g= varGenotype ')' -> ^( FUNCTION_BOOL_GENOTYPE $f $g) )
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:137:24: f= functionGenotypeBoolName '(' g= varGenotype ')'
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:137:22: (f= functionGenotypeBoolName '(' g= varGenotype ')' -> ^( FUNCTION_BOOL_GENOTYPE $f $g) )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:137:24: f= functionGenotypeBoolName '(' g= varGenotype ')'
             {
-            pushFollow(FOLLOW_functionGenotypeBoolName_in_functionGenotypeBool1112);
+            pushFollow(FOLLOW_functionGenotypeBoolName_in_functionGenotypeBool1126);
             f=functionGenotypeBoolName();
 
             state._fsp--;
 
             stream_functionGenotypeBoolName.add(f.getTree());
 
-            char_literal57=(Token)match(input,36,FOLLOW_36_in_functionGenotypeBool1114);  
+            char_literal57=(Token)match(input,36,FOLLOW_36_in_functionGenotypeBool1128);  
             stream_36.add(char_literal57);
 
 
-            pushFollow(FOLLOW_varGenotype_in_functionGenotypeBool1118);
+            pushFollow(FOLLOW_varGenotype_in_functionGenotypeBool1132);
             g=varGenotype();
 
             state._fsp--;
 
             stream_varGenotype.add(g.getTree());
 
-            char_literal58=(Token)match(input,37,FOLLOW_37_in_functionGenotypeBool1120);  
+            char_literal58=(Token)match(input,37,FOLLOW_37_in_functionGenotypeBool1134);  
             stream_37.add(char_literal58);
 
 
@@ -3598,7 +3785,7 @@ public TreeAdaptor getTreeAdaptor() {
             root_0 = (Object)adaptor.nil();
             // 137:73: -> ^( FUNCTION_BOOL_GENOTYPE $f $g)
             {
-                // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:137:76: ^( FUNCTION_BOOL_GENOTYPE $f $g)
+                // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:137:76: ^( FUNCTION_BOOL_GENOTYPE $f $g)
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot(
@@ -3648,7 +3835,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "functionGenotypeBoolName"
-    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:138:1: functionGenotypeBoolName : ( 'isHom' | 'isHet' | 'isVariant' | 'isRef' );
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:138:1: functionGenotypeBoolName : ( 'isHom' | 'isHet' | 'isVariant' | 'isRef' );
     public final VcfFilterParser.functionGenotypeBoolName_return functionGenotypeBoolName() throws RecognitionException {
         VcfFilterParser.functionGenotypeBoolName_return retval = new VcfFilterParser.functionGenotypeBoolName_return();
         retval.start = input.LT(1);
@@ -3661,8 +3848,8 @@ public TreeAdaptor getTreeAdaptor() {
         Object set59_tree=null;
 
         try {
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:138:26: ( 'isHom' | 'isHet' | 'isVariant' | 'isRef' )
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:138:26: ( 'isHom' | 'isHet' | 'isVariant' | 'isRef' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:
             {
             root_0 = (Object)adaptor.nil();
 
@@ -3713,7 +3900,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
     // $ANTLR start "index"
-    // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:141:1: index : ( FLOAT | '*' | 'ANY' | '?' | 'ALL' );
+    // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:141:1: index : ( FLOAT | '*' | 'ANY' | '?' | 'ALL' );
     public final VcfFilterParser.index_return index() throws RecognitionException {
         VcfFilterParser.index_return retval = new VcfFilterParser.index_return();
         retval.start = input.LT(1);
@@ -3726,8 +3913,8 @@ public TreeAdaptor getTreeAdaptor() {
         Object set60_tree=null;
 
         try {
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:141:9: ( FLOAT | '*' | 'ANY' | '?' | 'ALL' )
-            // /home/pcingola/workspace/SnpSift/antlr/VcfFilter.g:
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:141:9: ( FLOAT | '*' | 'ANY' | '?' | 'ALL' )
+            // /Users/pablocingolani/Documents/workspace/SnpSift/antlr/VcfFilter.g:
             {
             root_0 = (Object)adaptor.nil();
 
@@ -3807,56 +3994,59 @@ public TreeAdaptor getTreeAdaptor() {
     public static final BitSet FOLLOW_varLofSub_in_var711 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_varNmdSub_in_var715 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ID_in_varField725 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ID_in_varSubfield750 = new BitSet(new long[]{0x0020000000000000L});
-    public static final BitSet FOLLOW_53_in_varSubfield752 = new BitSet(new long[]{0x0000E04000000100L});
-    public static final BitSet FOLLOW_index_in_varSubfield756 = new BitSet(new long[]{0x0040000000000000L});
-    public static final BitSet FOLLOW_54_in_varSubfield758 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_49_in_varGenotype782 = new BitSet(new long[]{0x0020000000000000L});
-    public static final BitSet FOLLOW_53_in_varGenotype784 = new BitSet(new long[]{0x0000E04000000100L});
-    public static final BitSet FOLLOW_index_in_varGenotype788 = new BitSet(new long[]{0x0040000000000000L});
-    public static final BitSet FOLLOW_54_in_varGenotype790 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_49_in_varGenotypeSub812 = new BitSet(new long[]{0x0020000000000000L});
-    public static final BitSet FOLLOW_53_in_varGenotypeSub814 = new BitSet(new long[]{0x0000E04000000100L});
-    public static final BitSet FOLLOW_index_in_varGenotypeSub818 = new BitSet(new long[]{0x0080000000000000L});
-    public static final BitSet FOLLOW_55_in_varGenotypeSub820 = new BitSet(new long[]{0x0000000000001000L});
-    public static final BitSet FOLLOW_ID_in_varGenotypeSub824 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_49_in_varGenotypeSubArray846 = new BitSet(new long[]{0x0020000000000000L});
-    public static final BitSet FOLLOW_53_in_varGenotypeSubArray848 = new BitSet(new long[]{0x0000E04000000100L});
-    public static final BitSet FOLLOW_index_in_varGenotypeSubArray852 = new BitSet(new long[]{0x0080000000000000L});
-    public static final BitSet FOLLOW_55_in_varGenotypeSubArray854 = new BitSet(new long[]{0x0000000000001000L});
-    public static final BitSet FOLLOW_ID_in_varGenotypeSubArray858 = new BitSet(new long[]{0x0020000000000000L});
-    public static final BitSet FOLLOW_53_in_varGenotypeSubArray861 = new BitSet(new long[]{0x0000E04000000100L});
-    public static final BitSet FOLLOW_index_in_varGenotypeSubArray865 = new BitSet(new long[]{0x0040000000000000L});
-    public static final BitSet FOLLOW_54_in_varGenotypeSubArray867 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_48_in_varEffSub891 = new BitSet(new long[]{0x0020000000000000L});
-    public static final BitSet FOLLOW_53_in_varEffSub893 = new BitSet(new long[]{0x0000E04000000100L});
-    public static final BitSet FOLLOW_index_in_varEffSub897 = new BitSet(new long[]{0x0080000000000000L});
-    public static final BitSet FOLLOW_55_in_varEffSub899 = new BitSet(new long[]{0x0000000000001000L});
-    public static final BitSet FOLLOW_ID_in_varEffSub903 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_50_in_varLofSub926 = new BitSet(new long[]{0x0020000000000000L});
-    public static final BitSet FOLLOW_53_in_varLofSub928 = new BitSet(new long[]{0x0000E04000000100L});
-    public static final BitSet FOLLOW_index_in_varLofSub932 = new BitSet(new long[]{0x0080000000000000L});
-    public static final BitSet FOLLOW_55_in_varLofSub934 = new BitSet(new long[]{0x0000000000001000L});
-    public static final BitSet FOLLOW_ID_in_varLofSub938 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_51_in_varNmdSub961 = new BitSet(new long[]{0x0020000000000000L});
-    public static final BitSet FOLLOW_53_in_varNmdSub963 = new BitSet(new long[]{0x0000E04000000100L});
-    public static final BitSet FOLLOW_index_in_varNmdSub967 = new BitSet(new long[]{0x0080000000000000L});
-    public static final BitSet FOLLOW_55_in_varNmdSub969 = new BitSet(new long[]{0x0000000000001000L});
-    public static final BitSet FOLLOW_ID_in_varNmdSub973 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_functionEntryName_in_functionEntry1000 = new BitSet(new long[]{0x0000001000000000L});
-    public static final BitSet FOLLOW_36_in_functionEntry1002 = new BitSet(new long[]{0x0000002000000000L});
-    public static final BitSet FOLLOW_37_in_functionEntry1004 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_functionGenotypeBool_in_functionBoolean1045 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_functionBooleanSet_in_functionBoolean1054 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_expression_in_functionBooleanSet1070 = new BitSet(new long[]{0x2000000000000000L});
-    public static final BitSet FOLLOW_61_in_functionBooleanSet1074 = new BitSet(new long[]{0x0010000000000000L});
-    public static final BitSet FOLLOW_52_in_functionBooleanSet1076 = new BitSet(new long[]{0x0020000000000000L});
-    public static final BitSet FOLLOW_53_in_functionBooleanSet1078 = new BitSet(new long[]{0x0000E04000000100L});
-    public static final BitSet FOLLOW_index_in_functionBooleanSet1082 = new BitSet(new long[]{0x0040000000000000L});
-    public static final BitSet FOLLOW_54_in_functionBooleanSet1084 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_functionGenotypeBoolName_in_functionGenotypeBool1112 = new BitSet(new long[]{0x0000001000000000L});
-    public static final BitSet FOLLOW_36_in_functionGenotypeBool1114 = new BitSet(new long[]{0x0002000000000000L});
-    public static final BitSet FOLLOW_varGenotype_in_functionGenotypeBool1118 = new BitSet(new long[]{0x0000002000000000L});
-    public static final BitSet FOLLOW_37_in_functionGenotypeBool1120 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_48_in_varField731 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_50_in_varField737 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_51_in_varField743 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ID_in_varSubfield764 = new BitSet(new long[]{0x0020000000000000L});
+    public static final BitSet FOLLOW_53_in_varSubfield766 = new BitSet(new long[]{0x0000E04000000100L});
+    public static final BitSet FOLLOW_index_in_varSubfield770 = new BitSet(new long[]{0x0040000000000000L});
+    public static final BitSet FOLLOW_54_in_varSubfield772 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_49_in_varGenotype796 = new BitSet(new long[]{0x0020000000000000L});
+    public static final BitSet FOLLOW_53_in_varGenotype798 = new BitSet(new long[]{0x0000E04000000100L});
+    public static final BitSet FOLLOW_index_in_varGenotype802 = new BitSet(new long[]{0x0040000000000000L});
+    public static final BitSet FOLLOW_54_in_varGenotype804 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_49_in_varGenotypeSub826 = new BitSet(new long[]{0x0020000000000000L});
+    public static final BitSet FOLLOW_53_in_varGenotypeSub828 = new BitSet(new long[]{0x0000E04000000100L});
+    public static final BitSet FOLLOW_index_in_varGenotypeSub832 = new BitSet(new long[]{0x0080000000000000L});
+    public static final BitSet FOLLOW_55_in_varGenotypeSub834 = new BitSet(new long[]{0x0000000000001000L});
+    public static final BitSet FOLLOW_ID_in_varGenotypeSub838 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_49_in_varGenotypeSubArray860 = new BitSet(new long[]{0x0020000000000000L});
+    public static final BitSet FOLLOW_53_in_varGenotypeSubArray862 = new BitSet(new long[]{0x0000E04000000100L});
+    public static final BitSet FOLLOW_index_in_varGenotypeSubArray866 = new BitSet(new long[]{0x0080000000000000L});
+    public static final BitSet FOLLOW_55_in_varGenotypeSubArray868 = new BitSet(new long[]{0x0000000000001000L});
+    public static final BitSet FOLLOW_ID_in_varGenotypeSubArray872 = new BitSet(new long[]{0x0020000000000000L});
+    public static final BitSet FOLLOW_53_in_varGenotypeSubArray875 = new BitSet(new long[]{0x0000E04000000100L});
+    public static final BitSet FOLLOW_index_in_varGenotypeSubArray879 = new BitSet(new long[]{0x0040000000000000L});
+    public static final BitSet FOLLOW_54_in_varGenotypeSubArray881 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_48_in_varEffSub905 = new BitSet(new long[]{0x0020000000000000L});
+    public static final BitSet FOLLOW_53_in_varEffSub907 = new BitSet(new long[]{0x0000E04000000100L});
+    public static final BitSet FOLLOW_index_in_varEffSub911 = new BitSet(new long[]{0x0080000000000000L});
+    public static final BitSet FOLLOW_55_in_varEffSub913 = new BitSet(new long[]{0x0000000000001000L});
+    public static final BitSet FOLLOW_ID_in_varEffSub917 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_50_in_varLofSub940 = new BitSet(new long[]{0x0020000000000000L});
+    public static final BitSet FOLLOW_53_in_varLofSub942 = new BitSet(new long[]{0x0000E04000000100L});
+    public static final BitSet FOLLOW_index_in_varLofSub946 = new BitSet(new long[]{0x0080000000000000L});
+    public static final BitSet FOLLOW_55_in_varLofSub948 = new BitSet(new long[]{0x0000000000001000L});
+    public static final BitSet FOLLOW_ID_in_varLofSub952 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_51_in_varNmdSub975 = new BitSet(new long[]{0x0020000000000000L});
+    public static final BitSet FOLLOW_53_in_varNmdSub977 = new BitSet(new long[]{0x0000E04000000100L});
+    public static final BitSet FOLLOW_index_in_varNmdSub981 = new BitSet(new long[]{0x0080000000000000L});
+    public static final BitSet FOLLOW_55_in_varNmdSub983 = new BitSet(new long[]{0x0000000000001000L});
+    public static final BitSet FOLLOW_ID_in_varNmdSub987 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_functionEntryName_in_functionEntry1014 = new BitSet(new long[]{0x0000001000000000L});
+    public static final BitSet FOLLOW_36_in_functionEntry1016 = new BitSet(new long[]{0x0000002000000000L});
+    public static final BitSet FOLLOW_37_in_functionEntry1018 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_functionGenotypeBool_in_functionBoolean1059 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_functionBooleanSet_in_functionBoolean1068 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_expression_in_functionBooleanSet1084 = new BitSet(new long[]{0x2000000000000000L});
+    public static final BitSet FOLLOW_61_in_functionBooleanSet1088 = new BitSet(new long[]{0x0010000000000000L});
+    public static final BitSet FOLLOW_52_in_functionBooleanSet1090 = new BitSet(new long[]{0x0020000000000000L});
+    public static final BitSet FOLLOW_53_in_functionBooleanSet1092 = new BitSet(new long[]{0x0000E04000000100L});
+    public static final BitSet FOLLOW_index_in_functionBooleanSet1096 = new BitSet(new long[]{0x0040000000000000L});
+    public static final BitSet FOLLOW_54_in_functionBooleanSet1098 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_functionGenotypeBoolName_in_functionGenotypeBool1126 = new BitSet(new long[]{0x0000001000000000L});
+    public static final BitSet FOLLOW_36_in_functionGenotypeBool1128 = new BitSet(new long[]{0x0002000000000000L});
+    public static final BitSet FOLLOW_varGenotype_in_functionGenotypeBool1132 = new BitSet(new long[]{0x0000002000000000L});
+    public static final BitSet FOLLOW_37_in_functionGenotypeBool1134 = new BitSet(new long[]{0x0000000000000002L});
 
 }

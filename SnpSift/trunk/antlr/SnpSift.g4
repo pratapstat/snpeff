@@ -112,7 +112,7 @@ literalString	:	s=STRING							-> ^(LITERAL_STRING $s);
 	
 // Variables
 var 			:	varField | varSubfield | varGenotypeSub | varGenotypeSubArray | varEffSub | varLofSub | varNmdSub;
-varField		:	i=ID | i='EFF' | i='LOF' | i='NMD'			-> ^(VAR_FIELD $i);
+varField		:	i=ID							-> ^(VAR_FIELD $i);
 varSubfield		:	i=ID '[' n=index ']'					-> ^(VAR_SUBFIELD $i $n);
 varGenotype		:	'GEN' '[' g=index ']' 					-> ^(VAR_GENOTYPE $g);
 varGenotypeSub		:	'GEN' '[' g=index '].' i=ID				-> ^(VAR_GENOTYPE_SUB $g $i);
