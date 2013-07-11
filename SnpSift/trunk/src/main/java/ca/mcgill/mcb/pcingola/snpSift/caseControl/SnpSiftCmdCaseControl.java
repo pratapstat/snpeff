@@ -288,10 +288,11 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 	 * @return
 	 */
 	String pValueStr(VcfEntry vcfEntry, double p) {
+		if (verbose && (p > 0) && (p < 1.0) && (p <= pValueMin)) Timer.showStdErr("Minimum p-value so far: " + pValueMin + "\tchr: " + vcfEntry.getChromosomeName() + "\tpos: " + (vcfEntry.getStart() + 1) + "\tid: " + vcfEntry.getId());
+
 		if ((p > 0) && (p < pValueMin)) {
 			pValueMin = p;
 			posMin = vcfEntry.getChromosomeName() + ":" + (vcfEntry.getStart() + 1);
-			if (verbose) Timer.showStdErr("Minimum p-value so far: " + pValueMin + "\tchr: " + vcfEntry.getChromosomeName() + "\tpos: " + (vcfEntry.getStart() + 1) + "\tid: " + vcfEntry.getId());
 		}
 		return String.format("%.3e", p);
 	}
