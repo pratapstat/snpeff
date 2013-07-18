@@ -40,6 +40,7 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 
 	protected Map<String, String> fieldsToAdd;
 	protected Map<String, String> fieldsDescription;
+	protected Map<String, String> fieldsType;
 	protected boolean annotateAll; // Annotate empty fields as well?
 	protected String dbNsfpFileName;
 	protected String vcfFileName;
@@ -64,8 +65,9 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 	@Override
 	protected void addHeader(VcfFileIterator vcfFile) {
 		super.addHeader(vcfFile);
-		for (String key : fieldsToAdd.keySet())
+		for (String key : fieldsToAdd.keySet()) {
 			vcfFile.getVcfHeader().addLine("##INFO=<ID=" + VCF_INFO_PREFIX + key + ",Number=A,Type=String,Description=\"" + fieldsToAdd.get(key) + "\">");
+		}
 	}
 
 	/**
@@ -208,6 +210,7 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 		 * Reference: http://dbnsfp.houstonbioinformatics.org/dbNSFPzip/dbNSFP2.0b3.readme.txt
 		 * FIXME: It is a terrible idea to hard-code this...I will regret it soon.
 		 */
+
 		fieldsDescription = new HashMap<String, String>();
 		// The first four fields are not used:
 		fieldsDescription.put("chr", "chromosome number");
@@ -264,6 +267,8 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 		fieldsDescription.put("MutationAssessor_score", "MutationAssessor functional impact combined score");
 		fieldsDescription.put("MutationAssessor_pred", "MutationAssessor functional impact of a variant : predicted functional (high, medium), predicted non-functional (low, neutral)");
 		fieldsDescription.put("FATHMM_score", "FATHMM default score (weighted for human inherited-disease mutations with Disease Ontology); If a score is smaller than -1.5 the corresponding NS is predicted as D(AMAGING); otherwise it is predicted as T(OLERATED). If there's more than one scores associated with the same NS due to isoforms, the smallest score (most damaging) was used.");
+
+		// Field type
 	}
 
 	/**
