@@ -6,9 +6,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import ca.mcgill.mcb.pcingola.fileIterator.BedFileIterator;
 import ca.mcgill.mcb.pcingola.fileIterator.LineFileIterator;
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
 import ca.mcgill.mcb.pcingola.interval.Chromosome;
+import ca.mcgill.mcb.pcingola.interval.Marker;
+import ca.mcgill.mcb.pcingola.interval.SeqChange;
 import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.util.Timer;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
@@ -29,6 +32,10 @@ public class SnpSiftCmdPhastCons extends SnpSift {
 
 	public static final int SHOW_EVERY = 1000;
 
+	boolean bed;
+	boolean extract;
+	int minBases;
+	double minScore;
 	String phastConsDir;
 	String vcfFile;
 	HashMap<String, Integer> chromoSize;
@@ -39,12 +46,21 @@ public class SnpSiftCmdPhastCons extends SnpSift {
 	}
 
 	/**
+	 * Annotate and show in BED format
+	 * @param seqChange
+	 */
+	void annotateBed(SeqChange seqChange) {
+		float score = score(seqChange);
+		printBed(seqChange, score);
+	}
+
+	/**
 	 * Annotate VcfEntry 
 	 * @param ve
 	 */
-	void annotate(VcfEntry ve) {
+	void annotateVcf(VcfEntry ve) {
 		float score = score(ve);
-		if (score > 0.0f) ve.addInfo(VCF_INFO_PHASTCONS_FIELD, String.format("%.3f", score));
+		if (score > minScore) ve.addInfo(VCF_INFO_PHASTCONS_FIELD, String.format("%.3f", score));
 	}
 
 	/**
@@ -55,6 +71,54 @@ public class SnpSiftCmdPhastCons extends SnpSift {
 	int chromoSize(String chromo) {
 		Integer len = chromoSize.get(Chromosome.simpleName(chromo));
 		return len == null ? 0 : len;
+	}
+
+	/**
+	 * Extract sub-intervals having at least 'minBases' and 'minScore' average conservation
+	 * @param seqChange
+	 */
+	void extractBed(SeqChange seqChange) {
+		for (int start = seqChange.getStart(); start <= (seqChange.getEnd() - minBases); start++) {
+			// Find best interval starting at 'start'
+			SeqChange sc = extractBed(seqChange, start);
+			if (sc == null) continue; // Nothing found
+
+			// Show interval
+			printBed(sc, score(sc));
+
+			start = sc.getEnd() + 1; // Move after interval's end 
+		}
+	}
+
+	/**
+	 * Get the longest interval starting at 'start' that has at least 'minBases' and 'minScore'
+	 * 
+	 * @param seqChange
+	 * @param start
+	 * @return
+	 */
+	SeqChange extractBed(SeqChange seqChange, int start) {
+		int prevEnd = -1;
+		int end = start + minBases - 1;
+
+		SeqChange scPrev = new SeqChange(seqChange.getParent(), start, end, seqChange.getId());
+		SeqChange sc = scPrev;
+		float score = score(sc);
+		if (score <= minScore) return null;
+
+		// Try to get a larger interval
+		while (score > minScore) {
+			scPrev = sc;
+			prevEnd = end;
+
+			end++;
+			sc = new SeqChange(seqChange.getParent(), start, end, seqChange.getId());
+
+			score = score(sc);
+		}
+
+		if (prevEnd > 0) return scPrev;
+		return null;
 	}
 
 	/**
@@ -75,19 +139,25 @@ public class SnpSiftCmdPhastCons extends SnpSift {
 		return null;
 	}
 
+	@Override
+	public void init() {
+		minScore = 0.0;
+		bed = false;
+	}
+
 	/**
 	 * Load a phastcons file for this chromosome
 	 * @param chromo
 	 * @return
 	 */
-	boolean loadChromo(String chromo, VcfEntry ve) {
+	boolean loadChromo(String chromo, Marker marker) {
 		chromo = Chromosome.simpleName(chromo);
 		score = null;
 
 		// Find a file that matches a phastCons name
 		String wigFile = findPhastConsFile(phastConsDir, ".*/chr" + chromo + ".phastCons.\\d+way.wigFix.*");
 		if ((wigFile == null) || !Gpr.exists(wigFile)) {
-			Timer.showStdErr("Cannot open PhastCons file '" + wigFile + "' for chromosome '" + chromo + "'\n\tVcfEntry:\t" + ve);
+			Timer.showStdErr("Cannot open PhastCons file '" + wigFile + "' for chromosome '" + chromo + "'\n\tEntry:\t" + marker);
 			return false;
 		}
 
@@ -149,7 +219,7 @@ public class SnpSiftCmdPhastCons extends SnpSift {
 	 */
 	void loadFaidx() {
 		String file = phastConsDir + "/genome.fai";
-		if (!Gpr.exists(file)) { throw new RuntimeException("Cannot fins fasta index file '" + file + "'\n\tYOu can create one by running 'samtools faidx' command and copying the resulting index file to " + file + "\n\n"); }
+		if (!Gpr.exists(file)) { throw new RuntimeException("Cannot find fasta index file '" + file + "'\n\tYou can create one by running 'samtools faidx' command and copying the resulting index file to " + file + "\n\n"); }
 
 		// Read and parse file
 		chromoSize = new HashMap<String, Integer>();
@@ -165,9 +235,49 @@ public class SnpSiftCmdPhastCons extends SnpSift {
 
 	@Override
 	public void parse(String[] args) {
-		if (args.length != 2) usage(null);
-		phastConsDir = args[0];
-		vcfFile = args[1];
+		if (args.length == 0) usage(null);
+
+		for (int argNum = 0; argNum < args.length; argNum++) {
+			String arg = args[argNum];
+
+			if (isOpt(arg)) {
+				// Command line options
+				if (arg.equals("-bed")) bed = true;
+				else if (arg.equalsIgnoreCase("-minScore")) {
+					if (argNum >= args.length) usage("Missing 'minScore' number");
+					minScore = Gpr.parseDoubleSafe(args[++argNum]);
+				} else if (arg.equalsIgnoreCase("-extract")) {
+					if (argNum >= args.length) usage("Missing 'extract' number");
+					extract = true;
+					minBases = Gpr.parseIntSafe(args[++argNum]);
+				} else usage("Unknown command line option '" + arg + "'");
+			} else {
+				if (phastConsDir == null) phastConsDir = args[argNum];
+				else if (vcfFile == null) vcfFile = args[argNum];
+			}
+		}
+
+		// Sanity check
+		if (phastConsDir == null) usage("Missing 'phastConsDir' parameter.");
+		if (vcfFile == null) usage("Missing 'inputFile' parameter.");
+		if (extract && (minBases <= 0)) usage("Number of bases to extract should be greater than zero.");
+	}
+
+	/**
+	 * Print an interval in BED format (and a score)
+	 * @param seqChange
+	 * @param score
+	 */
+	void printBed(SeqChange seqChange, float score) {
+		System.out.print(seqChange.getChromosomeName() //
+				+ "\t" + (seqChange.getStart()) //
+				+ "\t" + (seqChange.getEnd() + 1) // End base is not included in BED format
+				+ "\t" + seqChange.getId() //
+		);
+
+		if (score > minScore) System.out.print(String.format("\t%.3f", score));
+
+		System.out.println("");
 	}
 
 	/**
@@ -189,6 +299,38 @@ public class SnpSiftCmdPhastCons extends SnpSift {
 		// Load chromosome lengths
 		loadFaidx();
 
+		// Run on BED file?
+		if (bed) {
+			runBed();
+			return new ArrayList<VcfEntry>();
+		}
+
+		// Run VCF
+		return runVcf(createList);
+	}
+
+	void runBed() {
+		BedFileIterator bedFile = new BedFileIterator(vcfFile);
+		String chrPrev = "";
+		for (SeqChange sc : bedFile) {
+			// Do we need to load a database?
+			if (!chrPrev.equals(sc.getChromosomeName())) {
+				chrPrev = sc.getChromosomeName();
+				loadChromo(chrPrev, sc);
+			}
+
+			// Annotate entry
+			if (extract) extractBed(sc);
+			else annotateBed(sc);
+		}
+	}
+
+	/**
+	 * Run on VCF file
+	 * @param createList
+	 * @return
+	 */
+	List<VcfEntry> runVcf(boolean createList) {
 		// Iterate over file
 		ArrayList<VcfEntry> list = new ArrayList<VcfEntry>();
 		VcfFileIterator vcf = new VcfFileIterator(vcfFile);
@@ -209,7 +351,7 @@ public class SnpSiftCmdPhastCons extends SnpSift {
 			}
 
 			// Annotate entry
-			annotate(ve);
+			annotateVcf(ve);
 
 			// Show or add to list
 			if (createList) list.add(ve);
@@ -221,23 +363,23 @@ public class SnpSiftCmdPhastCons extends SnpSift {
 
 	/**
 	 * Score for this entry
-	 * @param ve
+	 * @param marker
 	 * @return
 	 */
-	float score(VcfEntry ve) {
-		int pos = ve.getEnd();
-		if ((score == null) || (pos >= score.length)) return 0.0f;
+	float score(Marker marker) {
+		int pos = marker.getEnd();
+		if ((score == null) || (pos >= score.length)) return Float.MIN_VALUE;
 
 		// Is this a SNP? i.e. only one base
-		if (ve.size() == 1) return score[ve.getStart()] / 1000.0f;
+		if (marker.size() == 1) return score[marker.getStart()] / 1000.0f;
 
 		// More then one base length? 
 		// Return the average score of all those bases
 		int sum = 0;
-		for (int p = ve.getStart(); p <= ve.getEnd(); p++)
+		for (int p = marker.getStart(); p <= marker.getEnd(); p++)
 			sum += score[p];
 
-		return sum / (1000.0f * ve.size());
+		return sum / (1000.0f * marker.size());
 	}
 
 	/**
@@ -252,7 +394,13 @@ public class SnpSiftCmdPhastCons extends SnpSift {
 		}
 
 		showVersion();
-		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar path/to/phastCons/dir file.vcf");
+		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar [options] path/to/phastCons/dir inputFile");
+		System.err.println("Arguments:");
+		System.err.println("\tinputFile       : VCF or BED file.");
+		System.err.println("Options:");
+		System.err.println("\t-bed            : Input is a BED file.");
+		System.err.println("\t-extract <num>  : Extract sub intervals of at least 'num' bases, having a conservarion score of at least 'minScore'. Only when input is a BED file.");
+		System.err.println("\t-minScore <num> : Only annotate is score is greater to 'num'. Default: " + minScore);
 		System.exit(1);
 	}
 
