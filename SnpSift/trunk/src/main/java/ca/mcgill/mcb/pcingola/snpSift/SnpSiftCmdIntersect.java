@@ -128,6 +128,10 @@ public class SnpSiftCmdIntersect extends SnpSift {
 		}
 		if (verbose) Timer.showStdErr("Total number of markers (all files) : " + markersAll.size());
 
+		// Show header
+		System.out.println("# " + SnpSift.VERSION);
+		System.out.println("# Command line: " + commandLineStr());
+
 		//---
 		// Intersect
 		//---
