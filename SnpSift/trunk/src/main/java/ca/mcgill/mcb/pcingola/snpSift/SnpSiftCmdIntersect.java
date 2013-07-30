@@ -172,7 +172,7 @@ public class SnpSiftCmdIntersect extends SnpSift {
 			// Add markers to 'all'
 			markersNotAll.add(markers);
 		}
-		if (verbose) Timer.showStdErr("Total number of 'NOT' markers (all files) : " + markersNotAll.size());
+		if (verbose && !notFileNames.isEmpty()) Timer.showStdErr("Total number of 'NOT' markers (all files) : " + markersNotAll.size());
 
 		// Show header
 		System.out.println("# " + SnpSift.VERSION);
