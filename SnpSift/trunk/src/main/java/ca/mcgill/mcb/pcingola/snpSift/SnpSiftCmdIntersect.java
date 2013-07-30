@@ -35,6 +35,8 @@ public class SnpSiftCmdIntersect extends SnpSift {
 	 * @return
 	 */
 	Marker intersect(Marker m) {
+		if (forests.size() == 1) return m; // Nothing to do?
+
 		HashSet<Marker> done = new HashSet<Marker>();
 		done.add(m);
 
@@ -75,15 +77,15 @@ public class SnpSiftCmdIntersect extends SnpSift {
 
 	/**
 	 * Does it intersect with any 'NOT' file
-	 * @param mi
+	 * @param marker
 	 * @return
 	 */
-	boolean isNot(Marker mi) {
+	boolean isNot(Marker marker) {
 		if (notForests.isEmpty()) return false;
 
 		// Intersects any forest? => true
 		for (IntervalForest intfor : notForests)
-			if (!intfor.query(mi).isEmpty()) return true;
+			if (!intfor.query(marker).isEmpty()) return true;
 
 		return false;
 	}
@@ -188,9 +190,10 @@ public class SnpSiftCmdIntersect extends SnpSift {
 
 			// Any results? Show them
 			if (mi != null) {
+				// Does it intersect a 'not' interval? Don't show.
 				if (isNot(mi)) {
 					coutFilteredOut++;
-					continue; // Does it intersect a 'not' interval? Don't show.
+					continue;
 				}
 
 				// Output marker data (if not already done)
