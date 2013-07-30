@@ -21,8 +21,9 @@ public class SnpSiftCmdIntersect extends SnpSift {
 	int minOverlap;
 	boolean intersect;
 	List<String> fileNames;
-
+	List<String> notFileNames;
 	List<IntervalForest> forests;
+	List<IntervalForest> notForests;
 
 	public SnpSiftCmdIntersect(String[] args) {
 		super(args, "intersect");
@@ -34,6 +35,8 @@ public class SnpSiftCmdIntersect extends SnpSift {
 	 * @return
 	 */
 	Marker intersect(Marker m) {
+		if (forests.size() == 1) return m; // Nothing to do?
+
 		HashSet<Marker> done = new HashSet<Marker>();
 		done.add(m);
 
@@ -72,6 +75,21 @@ public class SnpSiftCmdIntersect extends SnpSift {
 		return null;
 	}
 
+	/**
+	 * Does it intersect with any 'NOT' file
+	 * @param marker
+	 * @return
+	 */
+	boolean isNot(Marker marker) {
+		if (notForests.isEmpty()) return false;
+
+		// Intersects any forest? => true
+		for (IntervalForest intfor : notForests)
+			if (!intfor.query(marker).isEmpty()) return true;
+
+		return false;
+	}
+
 	@Override
 	public void parse(String[] args) {
 		if (args.length <= 0) usage(null);
@@ -81,6 +99,7 @@ public class SnpSiftCmdIntersect extends SnpSift {
 		cluster = 2;
 		minOverlap = 1;
 		fileNames = new ArrayList<String>();
+		notFileNames = new ArrayList<String>();
 
 		for (int argc = 0; argc < args.length; argc++) {
 			if (isOpt(args[argc])) {
@@ -90,13 +109,14 @@ public class SnpSiftCmdIntersect extends SnpSift {
 				else if (arg.equals("-union")) intersect = false;
 				else if (arg.equals("-minoverlap")) minOverlap = Gpr.parseIntSafe(args[++argc]);
 				else if (arg.equals("-cluster")) cluster = Gpr.parseIntSafe(args[++argc]);
+				else if (arg.equals("-not")) notFileNames.add(args[++argc]);
 				else usage("Unknown option '" + args[argc] + "'");
 
 			} else fileNames.add(args[argc]);
 		}
 
 		// Sanity check
-		if (fileNames.size() <= 1) usage("Missing files to intersect");
+		if (fileNames.size() < 1) usage("Missing files to intersect");
 	}
 
 	/**
@@ -108,7 +128,11 @@ public class SnpSiftCmdIntersect extends SnpSift {
 		// Initialize
 		//---
 		Markers markersAll = new Markers();
+		Markers markersNotAll = new Markers();
 
+		//---
+		// Loading intervals from files
+		//---
 		forests = new ArrayList<IntervalForest>();
 		for (String fileName : fileNames) {
 			// Load file
@@ -128,6 +152,28 @@ public class SnpSiftCmdIntersect extends SnpSift {
 		}
 		if (verbose) Timer.showStdErr("Total number of markers (all files) : " + markersAll.size());
 
+		//---
+		// Loading 'NOT' intervals from files
+		//---
+		notForests = new ArrayList<IntervalForest>();
+		for (String fileName : notFileNames) {
+			// Load file
+			if (verbose) Timer.showStdErr("Loading 'NOT' file '" + fileName + "'");
+			Markers markers = Markers.readMarkers(fileName);
+			if (verbose) Timer.showStdErr("Done. Marers in file : " + markers.size());
+
+			// Create forest
+			IntervalForest ifor = new IntervalForest();
+			ifor.add(markers);
+			ifor.build();
+			notForests.add(ifor);
+			if (verbose) Timer.showStdErr("Interval forest added.");
+
+			// Add markers to 'all'
+			markersNotAll.add(markers);
+		}
+		if (verbose && !notFileNames.isEmpty()) Timer.showStdErr("Total number of 'NOT' markers (all files) : " + markersNotAll.size());
+
 		// Show header
 		System.out.println("# " + SnpSift.VERSION);
 		System.out.println("# Command line: " + commandLineStr());
@@ -135,6 +181,7 @@ public class SnpSiftCmdIntersect extends SnpSift {
 		//---
 		// Intersect
 		//---
+		int coutFilteredOut = 0;
 		HashSet<String> done = new HashSet<String>();
 		markersAll.sort();
 		for (Marker m : markersAll) {
@@ -143,6 +190,12 @@ public class SnpSiftCmdIntersect extends SnpSift {
 
 			// Any results? Show them
 			if (mi != null) {
+				// Does it intersect a 'not' interval? Don't show.
+				if (isNot(mi)) {
+					coutFilteredOut++;
+					continue;
+				}
+
 				// Output marker data (if not already done)
 				String key = mi.getChromosomeName() + "\t" + mi.getStart() + "\t" + (mi.getEnd() + 1);
 				if (!done.contains(key)) {
@@ -151,7 +204,8 @@ public class SnpSiftCmdIntersect extends SnpSift {
 				}
 			}
 		}
-		if (verbose) Timer.showStdErr("Total number of markers intersected : " + done.size());
+
+		if (verbose) Timer.showStdErr("Total number of markers intersected : " + done.size() + (coutFilteredOut > 0 ? "\n\tFiltered out : " + coutFilteredOut : ""));
 	}
 
 	/**
@@ -173,6 +227,7 @@ public class SnpSiftCmdIntersect extends SnpSift {
 		System.err.println("\t-cluster <num>    : An interval has to intersect at least 'num' intervals (from other files) to be considered. Default: " + cluster);
 		System.err.println("\t-intersect        : Report the intersection of all intervals. Default: " + intersect);
 		System.err.println("\t-union            : Report the union of all intervals. Default: " + !intersect);
+		System.err.println("\t-not <file>       : Only report if it does NOT intersect with any interval in this file (i.e. filter out if intersects)");
 		System.exit(1);
 	}
 }
