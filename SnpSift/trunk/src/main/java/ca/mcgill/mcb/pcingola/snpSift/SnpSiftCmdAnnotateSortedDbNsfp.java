@@ -145,13 +145,16 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 			// For each ALT
 			for (String alt : vcf.getAlts()) {
 				Map<String, String> values = currentDbEntry.getAltAlelleValues(alt);
-				if (info.length() > 0) info.append(',');
 
-				if (values == null) info.append('.');
-				else {
+				if (values != null) {
 					String val = values.get(fieldKey);
-					if (val == null || val.isEmpty() || val.equals(".")) info.append('.');
-					else {
+					if (val == null) {
+						// No value: Don't add		
+					} else if (val.isEmpty() || val.equals(".")) {
+						// Empty: Mark as 'empty'
+						empty = true;
+					} else {
+						if (info.length() > 0) info.append(',');
 						info.append(val);
 						empty = false;
 					}
@@ -159,7 +162,10 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 			}
 
 			if (annotateAll || !empty) {
-				String infoStr = info.toString().replace(';', ',').replace('\t', '_').replace(' ', '_'); // Make sure all characters are valid for VCF field
+				String infoStr = info.toString();
+				if (infoStr.isEmpty()) infoStr = ".";
+				infoStr = infoStr.replace(';', ',').replace('\t', '_').replace(' ', '_'); // Make sure all characters are valid for VCF field
+
 				vcf.addInfo(VCF_INFO_PREFIX + fieldKey, infoStr);
 				annotated = true;
 			}
