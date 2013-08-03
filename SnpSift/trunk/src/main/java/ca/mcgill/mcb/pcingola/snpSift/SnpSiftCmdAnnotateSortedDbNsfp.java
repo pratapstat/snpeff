@@ -14,6 +14,7 @@ import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.util.Timer;
 import ca.mcgill.mcb.pcingola.vcf.FileIndexChrPos;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
+import ca.mcgill.mcb.pcingola.vcf.VcfInfoType;
 
 /**
  * Annotate a VCF file with dbNSFP. 
@@ -65,8 +66,15 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 	@Override
 	protected void addHeader(VcfFileIterator vcfFile) {
 		super.addHeader(vcfFile);
-		for (String key : fieldsToAdd.keySet()) {
-			vcfFile.getVcfHeader().addLine("##INFO=<ID=" + VCF_INFO_PREFIX + key + ",Number=A,Type=String,Description=\"" + fieldsToAdd.get(key) + "\">");
+		for (String fieldName : fieldsToAdd.keySet()) {
+			// Get type
+			String type = fieldsType.get(fieldName);
+			if (type == null) {
+				System.err.println("WARNIGN: Cannot find type for field '" + fieldName + "', using 'String'.");
+				type = VcfInfoType.String.toString();
+			}
+
+			vcfFile.getVcfHeader().addLine("##INFO=<ID=" + VCF_INFO_PREFIX + fieldName + ",Number=A,Type=" + type + ",Description=\"" + fieldsToAdd.get(fieldName) + "\">");
 		}
 	}
 
@@ -260,8 +268,6 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 		fieldsDescription.put("1000Gp1_AMR_AF", "Alternative allele frequency in the 1000Gp1 American descendent samples.");
 		fieldsDescription.put("1000Gp1_ASN_AC", "Alternative allele counts in the 1000Gp1 Asian descendent samples.");
 		fieldsDescription.put("1000Gp1_ASN_AF", "Alternative allele frequency in the 1000Gp1 Asian descendent samples.");
-		//		fieldsDescription.put("ESP5400_AA_AF", "Alternative allele frequency in the Afrian American samples of the NHLBI GO Exome Sequencing Project (ESP5400 data set).");
-		//		fieldsDescription.put("ESP5400_EA_AF", "Alternative allele frequency in the European American samples of the NHLBI GO Exome Sequencing Project (ESP5400 data set).");
 		fieldsDescription.put("ESP6500_AA_AF", "Alternative allele frequency in the Afrian American samples of the NHLBI GO Exome Sequencing Project (ESP6500 data set).");
 		fieldsDescription.put("ESP6500_EA_AF", "Alternative allele frequency in the European American samples of the NHLBI GO Exome Sequencing Project (ESP6500 data set).");
 		fieldsDescription.put("MutationAssessor_score", "MutationAssessor functional impact combined score");
@@ -269,6 +275,59 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 		fieldsDescription.put("FATHMM_score", "FATHMM default score (weighted for human inherited-disease mutations with Disease Ontology); If a score is smaller than -1.5 the corresponding NS is predicted as D(AMAGING); otherwise it is predicted as T(OLERATED). If there's more than one scores associated with the same NS due to isoforms, the smallest score (most damaging) was used.");
 
 		// Field type
+		fieldsType = new HashMap<String, String>();
+		fieldsType.put("chr", "String");
+		fieldsType.put("pos(1-coor)", "Integer");
+		fieldsType.put("ref", "String");
+		fieldsType.put("alt", "String");
+		fieldsType.put("aaref", "String");
+		fieldsType.put("aaalt", "String");
+		fieldsType.put("hg18_pos(1-coor)", "Integer");
+		fieldsType.put("genename", "String");
+		fieldsType.put("Uniprot_acc", "String");
+		fieldsType.put("Uniprot_id", "String");
+		fieldsType.put("Uniprot_aapos", "String");
+		fieldsType.put("Interpro_domain", "String");
+		fieldsType.put("cds_strand", "String");
+		fieldsType.put("refcodon", "String");
+		fieldsType.put("SLR_test_statistic", "String");
+		fieldsType.put("codonpos", "Integer");
+		fieldsType.put("fold-degenerate", "Integer");
+		fieldsType.put("Ancestral_allele", "String");
+		fieldsType.put("Ensembl_geneid", "String");
+		fieldsType.put("Ensembl_transcriptid", "String");
+		fieldsType.put("aapos", "Integer");
+		fieldsType.put("SIFT_score", "Float");
+		fieldsType.put("Polyphen2_HDIV_score", "Float");
+		fieldsType.put("Polyphen2_HDIV_pred", "String");
+		fieldsType.put("Polyphen2_HVAR_score", "Float");
+		fieldsType.put("Polyphen2_HVAR_pred", "String");
+		fieldsType.put("LRT_score", "Float");
+		fieldsType.put("LRT_pred", "String");
+		fieldsType.put("MutationTaster_score", "Float");
+		fieldsType.put("MutationTaster_pred", "String");
+		fieldsType.put("GERP++_NR", "Float");
+		fieldsType.put("GERP++_RS", "Float");
+		fieldsType.put("phyloP", "Float");
+		fieldsType.put("29way_pi", "String");
+		fieldsType.put("29way_logOdds", "Float");
+		fieldsType.put("LRT_Omega", "Float");
+		fieldsType.put("UniSNP_ids", "String");
+		fieldsType.put("1000Gp1_AC", "Integer");
+		fieldsType.put("1000Gp1_AF", "Float");
+		fieldsType.put("1000Gp1_AFR_AC", "Integer");
+		fieldsType.put("1000Gp1_AFR_AF", "Float");
+		fieldsType.put("1000Gp1_EUR_AC", "Integer");
+		fieldsType.put("1000Gp1_EUR_AF", "Float");
+		fieldsType.put("1000Gp1_AMR_AC", "Integer");
+		fieldsType.put("1000Gp1_AMR_AF", "Float");
+		fieldsType.put("1000Gp1_ASN_AC", "Integer");
+		fieldsType.put("1000Gp1_ASN_AF", "Float");
+		fieldsType.put("ESP6500_AA_AF", "Float");
+		fieldsType.put("ESP6500_EA_AF", "Float");
+		fieldsType.put("MutationAssessor_score", "Float");
+		fieldsType.put("MutationAssessor_pred", "String");
+		fieldsType.put("FATHMM_score", "Float");
 	}
 
 	/**
