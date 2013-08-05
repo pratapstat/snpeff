@@ -138,7 +138,7 @@ public class SnpSiftCmdIntersect extends SnpSift {
 			// Load file
 			if (verbose) Timer.showStdErr("Loading file '" + fileName + "'");
 			Markers markers = Markers.readMarkers(fileName);
-			if (verbose) Timer.showStdErr("Done. Marers in file : " + markers.size());
+			if (verbose) Timer.showStdErr("Done. Markers in file : " + markers.size());
 
 			// Create forest
 			IntervalForest ifor = new IntervalForest();
@@ -160,7 +160,7 @@ public class SnpSiftCmdIntersect extends SnpSift {
 			// Load file
 			if (verbose) Timer.showStdErr("Loading 'NOT' file '" + fileName + "'");
 			Markers markers = Markers.readMarkers(fileName);
-			if (verbose) Timer.showStdErr("Done. Marers in file : " + markers.size());
+			if (verbose) Timer.showStdErr("Done. Markers in file : " + markers.size());
 
 			// Create forest
 			IntervalForest ifor = new IntervalForest();
