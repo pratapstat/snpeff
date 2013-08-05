@@ -104,16 +104,16 @@ public class SnpSiftCmdPhastCons extends SnpSift {
 		SeqChange scPrev = new SeqChange(seqChange.getParent(), start, end, seqChange.getId());
 		SeqChange sc = scPrev;
 		float score = score(sc);
-		if (score <= minScore) return null;
+		if (score < minScore) return null;
 
 		// Try to get a larger interval
-		while (score > minScore) {
+		while (score >= minScore) {
 			scPrev = sc;
 			prevEnd = end;
 
+			// Prepare for next iteration
 			end++;
 			sc = new SeqChange(seqChange.getParent(), start, end, seqChange.getId());
-
 			score = score(sc);
 		}
 
@@ -157,7 +157,7 @@ public class SnpSiftCmdPhastCons extends SnpSift {
 		score = null;
 
 		// Find a file that matches a phastCons name
-		String wigFile = findPhastConsFile(phastConsDir, ".*/chr" + chromo + ".phastCons.\\d+way.wigFix.*");
+		String wigFile = findPhastConsFile(phastConsDir, ".*/chr" + chromo + ".*wigFix.*");
 		if ((wigFile == null) || !Gpr.exists(wigFile)) {
 			if (wigFile != null) Timer.showStdErr("Cannot open PhastCons file '" + wigFile + "' for chromosome '" + chromo + "'\n\tEntry:\t" + marker);
 			return false;
@@ -278,7 +278,6 @@ public class SnpSiftCmdPhastCons extends SnpSift {
 		);
 
 		if (score > minScore) System.out.print(String.format("\t%.3f", score));
-
 		System.out.println("");
 	}
 
@@ -311,6 +310,9 @@ public class SnpSiftCmdPhastCons extends SnpSift {
 		return runVcf(createList);
 	}
 
+	/**
+	 * Run on intervals (BED file)
+	 */
 	void runBed() {
 		BedFileIterator bedFile = new BedFileIterator(vcfFile);
 		String chrPrev = "";
