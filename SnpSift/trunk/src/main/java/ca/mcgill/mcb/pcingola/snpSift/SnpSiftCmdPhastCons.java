@@ -136,6 +136,8 @@ public class SnpSiftCmdPhastCons extends SnpSift {
 		} catch (IOException e) {
 			// Do nothing
 		}
+
+		Timer.showStdErr("Cannot find any file in directory '" + dirName + "' matching regular expression '" + regex + "'");
 		return null;
 	}
 
@@ -157,7 +159,7 @@ public class SnpSiftCmdPhastCons extends SnpSift {
 		// Find a file that matches a phastCons name
 		String wigFile = findPhastConsFile(phastConsDir, ".*/chr" + chromo + ".phastCons.\\d+way.wigFix.*");
 		if ((wigFile == null) || !Gpr.exists(wigFile)) {
-			Timer.showStdErr("Cannot open PhastCons file '" + wigFile + "' for chromosome '" + chromo + "'\n\tEntry:\t" + marker);
+			if (wigFile != null) Timer.showStdErr("Cannot open PhastCons file '" + wigFile + "' for chromosome '" + chromo + "'\n\tEntry:\t" + marker);
 			return false;
 		}
 
