@@ -21,7 +21,7 @@ import ca.mcgill.mcb.pcingola.vcf.VcfGenotype;
  */
 public class SnpSiftCmdCaseControl extends SnpSift {
 
-	public static final int SHOW_EVERY = 1000;
+	public static final int SHOW_EVERY = 100;
 
 	public static final String VCF_INFO_CASE = "Cases";
 	public static final String VCF_INFO_CONTROL = "Controls";
@@ -120,6 +120,7 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 	@Override
 	protected void handleVcfHeader(VcfFileIterator vcf) {
 		if (!vcf.isHeadeSection()) return;
+
 		super.handleVcfHeader(vcf); // Add lines and print header
 
 		// Parse pedigree from TFAM?
@@ -288,7 +289,13 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 	 * @return
 	 */
 	String pValueStr(VcfEntry vcfEntry, double p) {
-		if (verbose && (p > 0) && (p < 1.0) && (p <= pValueMin)) Timer.showStdErr("Minimum p-value so far: " + pValueMin + "\tchr: " + vcfEntry.getChromosomeName() + "\tpos: " + (vcfEntry.getStart() + 1) + "\tid: " + vcfEntry.getId());
+		if (verbose && (p > 0) && (p < 1.0) && (p <= pValueMin)) //
+			Timer.showStdErr("Minimum p-value so far: " //
+					+ pValueMin //
+					+ "\tchr: " + vcfEntry.getChromosomeName() //
+					+ "\tpos: " + (vcfEntry.getStart() + 1) //
+					+ (!vcfEntry.getId().isEmpty() ? "\tid: " + vcfEntry.getId() : "") //
+			);
 
 		if ((p > 0) && (p < pValueMin)) {
 			pValueMin = p;
@@ -323,6 +330,7 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		// Read all vcfEntries
 		VcfFileIterator vcf = new VcfFileIterator(fileName);
 
+		int i = 1;
 		for (VcfEntry vcfEntry : vcf) {
 			handleVcfHeader(vcf); // Handle header stuff
 			annotate(vcfEntry); // Annotate
@@ -330,6 +338,8 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 			// Show
 			if (createList) list.add(vcfEntry);
 			else System.out.println(vcfEntry);
+
+			if (verbose) Gpr.showMark(i++, SHOW_EVERY);
 		}
 
 		if (verbose) {
