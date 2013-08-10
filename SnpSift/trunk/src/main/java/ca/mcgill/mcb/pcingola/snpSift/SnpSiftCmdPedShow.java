@@ -110,6 +110,9 @@ public class SnpSiftCmdPedShow extends SnpSift {
 		PedigreeDraw pedigree = null;
 		VcfFileIterator vcfFile = new VcfFileIterator(vcfFileName);
 
+		// Create directory if it doesn't exist
+		new File(outputDir).mkdir();
+
 		//---
 		// Read VCF file 
 		//---
