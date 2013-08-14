@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 
 #-------------------------------------------------------------------------------
 # Requirements:
@@ -31,6 +31,8 @@
 #	ii) We assume this is caused by a high impact mutation in gene.
 #
 #-------------------------------------------------------------------------------
+
+echo "Begin: " `date`
 
 #---
 # Download and install SnpEff and sample data
@@ -118,7 +120,7 @@ java -Xmx1g -jar SnpSift.jar \
 #
 #	iii) Finally, we expect this to ba a high impact mutation. Since we know that
 #	there are several effect per variant, we ask for ANY effect (EFF[*]) to have an
-#	impact 'HIGH'. So the filter expression is
+#	impact 'HIGH' or 'MODERATE'. So the filter expression is
 #
 #		(EFF[*].IMPACT = 'HIGH')
 #
@@ -127,8 +129,8 @@ java -Xmx1g -jar SnpSift.jar \
 echo "Filtering variants"
 cat protocols/ex1.eff.cc.vcf \
   | java -jar SnpSift.jar filter \
-    "(Cases[0] = 3) & (Controls[0] = 0) & (EFF[*].IMPACT = 'HIGH')" \
-  > protocols/ex1.filtered.hom.high.vcf
+    "(Cases[0] = 3) & (Controls[0] = 0) & ((EFF[*].IMPACT = 'HIGH') | (EFF[*].IMPACT = 'MODERATE'))" \
+  > protocols/ex1.filtered.vcf
 
 echo "Show variants in a simple format"
 cat protocols/ex1.filtered.hom.high.vcf \
@@ -145,6 +147,23 @@ java -jar SnpSift.jar pedShow \
 	protocols/chart
 
 # Open protocols/chart/7_117227832/index.html in your browser
+
+#---
+# Step 4: Annotate using ClinVar database
+#--- 
+java -Xmx1g -jar SnpSift.jar \
+	annotate \
+	-v \
+	protocols/db/clinvar_00-latest.vcf \
+	protocols/ex1.eff.cc.vcf \
+	> protocols/ex1.eff.cc.clinvar.vcf
+
+# Filter to get Cystic Fibrosis variant
+cat protocols/ex1.eff.cc.clinvar.vcf \
+	| java -jar SnpSift.jar filter \
+	"(exists CLNDBN) & (EFF[*].EFFECT = 'STOP_GAINED') & (EFF[*].GENE = 'CFTR')" 
+
+echo "End: " `date`
 
 #---
 # Optional step: Annotating for GATK pipelines
@@ -194,3 +213,4 @@ java -Xmx4g -jar $gatk \
     -L protocols/ex1.vcf \
     -o protocols/ex1.gatk.vcf
 
+echo "End (optional part): " `date`

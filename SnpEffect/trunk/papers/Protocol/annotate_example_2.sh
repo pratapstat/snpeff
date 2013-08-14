@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 
 #-------------------------------------------------------------------------------
 # Requirements:
@@ -9,6 +9,8 @@
 #	- Hard drive space: 1GB
 #-------------------------------------------------------------------------------
 
+echo "Begin: " `date`
+
 #---
 # Step 1 : Annotate sample data
 # Approximate time: 3 minutes
@@ -18,6 +20,7 @@
 # Notice that we use the '-motif' command line option to add TBFS information
 
 java -Xmx4g -jar snpEff.jar \
+	-v \
 	-motif \
 	-interval protocols/ex2_regulatory.bed \
 	GRCh37.71 \
@@ -39,8 +42,9 @@ java -Xmx1g -jar SnpSift.jar \
 # Step 3: Filter variants
 #---
 
-cat protocols/ex2.eff.cons.closest.vcf \
+cat protocols/ex2.eff.cons.vcf \
   | java -jar SnpSift.jar filter \
     "(EFF[*].EFFECT = 'CUSTOM[ex2_regulatory]') & (exists PhastCons) & (PhastCons > 0.9)" \
   > protocols/ex2.filtered.vcf
 
+echo "End: " `date`
