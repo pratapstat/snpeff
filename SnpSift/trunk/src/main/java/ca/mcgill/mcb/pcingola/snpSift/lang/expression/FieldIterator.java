@@ -181,7 +181,7 @@ public class FieldIterator {
 		if (type == Field.TYPE_ALL) typeStr = "ALL ";
 		else if (type == Field.TYPE_ANY) typeStr = "ANY ";
 
-		return typeStr + "[ " + var.current + " | " + effect.current + " | " + gentype.current + " | " + gentypeVar.current + " ]";
+		return typeStr + "[ var:" + var.current + " | eff:" + effect.current + " | gt:" + gentype.current + " | gtVar:" + gentypeVar.current + " ]";
 	}
 }
 

@@ -352,6 +352,7 @@ public class LangFactory {
 	int parseIndexField(String text, IteratorType starType) {
 		if (text.equals("*")) return -1;
 		if (text.equals("ANY")) return -1;
+		if (text.equals("?")) return -2;
 		if (text.equals("ALL")) return -2;
 		return Gpr.parseIntSafe(text);
 	}
