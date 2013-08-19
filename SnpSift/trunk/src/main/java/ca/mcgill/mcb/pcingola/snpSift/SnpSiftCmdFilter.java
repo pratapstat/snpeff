@@ -62,8 +62,6 @@ import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
  */
 public class SnpSiftCmdFilter extends SnpSift {
 
-	public static final String VERSION = SnpSiftCmdFilter.class.getSimpleName() + " v0.2";
-
 	boolean usePassField; // Use Filter field
 	boolean inverse; // Inverse filter (i.e. do NOT show lines that match the filter)
 	String inputFile; // Input file
@@ -185,14 +183,27 @@ public class SnpSiftCmdFilter extends SnpSift {
 		fieldIterator.reset();
 
 		boolean all = true, any = false;
+
+		if (debug) System.err.println("VCF entry:" + vcfEntry.toStringNoGt());
+
 		do {
 			boolean eval = condition.eval(vcfEntry);
+			if (debug) System.err.println("\tEval: " + eval + "\tFieldIterator: " + fieldIterator);
 
 			all &= eval;
 			any |= eval;
 
-			if ((fieldIterator.getType() == Field.TYPE_ALL) && !all) return inverse ^ all;
-			if ((fieldIterator.getType() == Field.TYPE_ANY) && any) return inverse ^ any;
+			if ((fieldIterator.getType() == Field.TYPE_ALL) && !all) {
+				boolean ret = inverse ^ all;
+				if (debug) System.err.println("\tResult [ALL]: " + ret);
+				return ret;
+			}
+
+			if ((fieldIterator.getType() == Field.TYPE_ANY) && any) {
+				boolean ret = inverse ^ any;
+				if (debug) System.err.println("\tResult [ANY]: " + ret);
+				return ret;
+			}
 
 			if (fieldIterator.hasNext()) fieldIterator.next(); // End of iteration?
 			else break;
@@ -200,11 +211,18 @@ public class SnpSiftCmdFilter extends SnpSift {
 
 		// Iteration type (ALL or ANY)?
 		boolean ret = false;
-		if (fieldIterator.getType() == Field.TYPE_ALL) ret = all;
-		ret = any;
+
+		if (fieldIterator.getType() == Field.TYPE_ALL) {
+			ret = all;
+			if (debug) System.err.println("\tResult [ALL]: " + ret);
+		} else {
+			ret = any;
+			if (debug) System.err.println("\tResult [ANY]: " + ret);
+		}
 
 		// Inverse result
 		ret = inverse ^ ret;
+		if (debug && inverse) System.err.println("\tResult [INV]: " + ret);
 
 		return ret;
 	}
