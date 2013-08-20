@@ -14,7 +14,7 @@ import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 public class Match extends OpBinary {
 
 	public Match(Expression left, Expression right) {
-		super(right, left, "~=");
+		super(left, right, "~=");
 	}
 
 	@Override
