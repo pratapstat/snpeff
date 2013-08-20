@@ -20,8 +20,8 @@ public class Match extends OpBinary {
 	@Override
 	public boolean eval(VcfEntry vcfEntry) {
 
-		String value = right.get(vcfEntry).toString();
-		String regexp = left.get(vcfEntry).toString();
+		String value = left.get(vcfEntry).toString();
+		String regexp = right.get(vcfEntry).toString();
 
 		Pattern pattern = Pattern.compile(regexp);
 		Matcher matcher = pattern.matcher(value);
