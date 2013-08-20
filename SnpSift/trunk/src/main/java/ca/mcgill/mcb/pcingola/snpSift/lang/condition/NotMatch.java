@@ -2,7 +2,6 @@ package ca.mcgill.mcb.pcingola.snpSift.lang.condition;
 
 import ca.mcgill.mcb.pcingola.snpSift.lang.expression.Expression;
 
-
 /**
  * Match a regular expression (string)
  * 
@@ -11,7 +10,7 @@ import ca.mcgill.mcb.pcingola.snpSift.lang.expression.Expression;
 public class NotMatch extends Match {
 
 	public NotMatch(Expression left, Expression right) {
-		super(right, left);
+		super(left, right);
 		operator = "~!";
 		negated = true;
 	}

@@ -19,13 +19,21 @@ public class Match extends OpBinary {
 
 	@Override
 	public boolean eval(VcfEntry vcfEntry) {
-
 		String value = left.get(vcfEntry).toString();
-		String regexp = right.get(vcfEntry).toString();
 
-		Pattern pattern = Pattern.compile(regexp);
-		Matcher matcher = pattern.matcher(value);
-		boolean retVal = matcher.find();
+		boolean retVal = false;
+
+		if (value.isEmpty()) {
+			// Empty doesn't match anything
+			retVal = false;
+		} else {
+			String regexp = right.get(vcfEntry).toString();
+
+			Pattern pattern = Pattern.compile(regexp);
+			Matcher matcher = pattern.matcher(value);
+			retVal = matcher.find();
+			// Gpr.debug("MATCH ( '" + value + "' , '" + regexp + "' ) : " + retVal);
+		}
 
 		return negated ? !retVal : retVal;
 	}
