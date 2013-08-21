@@ -14,18 +14,26 @@ import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 public class Match extends OpBinary {
 
 	public Match(Expression left, Expression right) {
-		super(right, left, "~=");
+		super(left, right, "~=");
 	}
 
 	@Override
 	public boolean eval(VcfEntry vcfEntry) {
+		String value = left.get(vcfEntry).toString();
 
-		String value = right.get(vcfEntry).toString();
-		String regexp = left.get(vcfEntry).toString();
+		boolean retVal = false;
 
-		Pattern pattern = Pattern.compile(regexp);
-		Matcher matcher = pattern.matcher(value);
-		boolean retVal = matcher.find();
+		if (value.isEmpty()) {
+			// Empty doesn't match anything
+			retVal = false;
+		} else {
+			String regexp = right.get(vcfEntry).toString();
+
+			Pattern pattern = Pattern.compile(regexp);
+			Matcher matcher = pattern.matcher(value);
+			retVal = matcher.find();
+			// Gpr.debug("MATCH ( '" + value + "' , '" + regexp + "' ) : " + retVal);
+		}
 
 		return negated ? !retVal : retVal;
 	}

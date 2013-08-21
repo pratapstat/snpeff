@@ -23,7 +23,7 @@ import ca.mcgill.mcb.pcingola.vcf.VcfEffect.FormatVersion;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 
 /**
- * Generic VFC filter
+ * Generic SnpSift filter
  * 
  * Filter out data based on VCF attributes:
  * 		- Chromosome, Position, etc.
@@ -168,7 +168,7 @@ public class SnpSiftCmdFilter extends SnpSift {
 
 		// Changed? Set new value
 		if (removed) {
-			Gpr.debug("REMOVE:" + filter + "\t" + filterStr + "\t=>\t" + sbFilter);
+			if (debug) Gpr.debug("REMOVE:" + filter + "\t" + filterStr + "\t=>\t" + sbFilter);
 			vcfEntry.setFilterPass(sbFilter.toString());
 		}
 	}
@@ -184,24 +184,24 @@ public class SnpSiftCmdFilter extends SnpSift {
 
 		boolean all = true, any = false;
 
-		if (debug) System.err.println("VCF entry:" + vcfEntry.toStringNoGt());
+		if (debug) Gpr.debug("VCF entry:" + vcfEntry.toStringNoGt());
 
 		do {
 			boolean eval = condition.eval(vcfEntry);
-			if (debug) System.err.println("\tEval: " + eval + "\tFieldIterator: " + fieldIterator);
+			if (debug) Gpr.debug("\tEval: " + eval + "\tFieldIterator: " + fieldIterator);
 
 			all &= eval;
 			any |= eval;
 
 			if ((fieldIterator.getType() == Field.TYPE_ALL) && !all) {
 				boolean ret = inverse ^ all;
-				if (debug) System.err.println("\tResult [ALL]: " + ret);
+				if (debug) Gpr.debug("\tResult [ALL]: " + ret);
 				return ret;
 			}
 
 			if ((fieldIterator.getType() == Field.TYPE_ANY) && any) {
 				boolean ret = inverse ^ any;
-				if (debug) System.err.println("\tResult [ANY]: " + ret);
+				if (debug) Gpr.debug("\tResult [ANY]: " + ret);
 				return ret;
 			}
 
@@ -214,15 +214,15 @@ public class SnpSiftCmdFilter extends SnpSift {
 
 		if (fieldIterator.getType() == Field.TYPE_ALL) {
 			ret = all;
-			if (debug) System.err.println("\tResult [ALL]: " + ret);
+			if (debug) Gpr.debug("\tResult [ALL]: " + ret);
 		} else {
 			ret = any;
-			if (debug) System.err.println("\tResult [ANY]: " + ret);
+			if (debug) Gpr.debug("\tResult [ANY]: " + ret);
 		}
 
 		// Inverse result
 		ret = inverse ^ ret;
-		if (debug && inverse) System.err.println("\tResult [INV]: " + ret);
+		if (debug && inverse) Gpr.debug("\tResult [INV]: " + ret);
 
 		return ret;
 	}
