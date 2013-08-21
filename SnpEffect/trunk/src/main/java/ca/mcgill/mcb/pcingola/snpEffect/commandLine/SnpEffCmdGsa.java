@@ -49,7 +49,8 @@ public class SnpEffCmdGsa extends SnpEff {
 		NONE
 	}
 
-	public static int READ_INPUT_SHOW_EVERY = 1000;;
+	public static int READ_INPUT_SHOW_EVERY = 1000;
+	public static int MAX_WARNS = 20;
 
 	InputFormat inputFormat = InputFormat.VCF;
 	boolean useClosestGene = false; // Map to 'any' closest gene?
@@ -68,7 +69,10 @@ public class SnpEffCmdGsa extends SnpEff {
 	String infoName = "";
 	String msigdb = "";
 	String geneScoreFile = "";
+	String geneScoreFileOut = null;
+	String commandsFile = null;
 	String geneInterestingFile = "";
+	String saveFile = null;
 	ScoreSummary scoreSummary = ScoreSummary.MIN;
 	CorrectionMethod correctionMethod = CorrectionMethod.NONE;
 	SnpEffectPredictor snpEffectPredictor;
@@ -82,6 +86,29 @@ public class SnpEffCmdGsa extends SnpEff {
 
 	public SnpEffCmdGsa() {
 		super();
+	}
+
+	/**
+	 * Read config file, load & build database 
+	 */
+	protected void config() {
+		readConfig();
+
+		// Read database (if gene level scores are provided, we don't need to map p_values to genes (we can skip this step)
+		if (geneScoreFile.isEmpty() && geneInterestingFile.isEmpty()) {
+			if (verbose) Timer.showStdErr("Reading database for genome version '" + genomeVer + "' from file '" + config.getFileSnpEffectPredictor() + "' (this might take a while)");
+			config.loadSnpEffectPredictor();
+			if (verbose) Timer.showStdErr("done");
+
+			// Set upstream-downstream interval length
+			SnpEffectPredictor snpEffectPredictor = config.getSnpEffectPredictor();
+			snpEffectPredictor.setUpDownStreamLength(upDownStreamLength);
+
+			// Build tree
+			if (verbose) Timer.showStdErr("Building interval forest");
+			snpEffectPredictor.buildForest();
+			if (verbose) Timer.showStdErr("done.");
+		}
 	}
 
 	/**
@@ -229,34 +256,20 @@ public class SnpEffCmdGsa extends SnpEff {
 
 		// Run algorithm
 		algorithm.select();
+
 	}
 
 	/**
 	 * Initialize: read config, database, etc.
 	 */
 	void initialize() {
-		readConfig(); // Read config file
-
-		if (verbose) Timer.showStdErr("done");
+		// Read config file
+		if (config == null) config();
 
 		// Read database (if gene level scores are provided, we don't neet to map p_values to genes (we can skip this step)
 		if (geneScoreFile.isEmpty() && geneInterestingFile.isEmpty()) {
-			if (verbose) Timer.showStdErr("Reading database for genome version '" + genomeVer + "' from file '" + config.getFileSnpEffectPredictor() + "' (this might take a while)");
-			config.loadSnpEffectPredictor();
 			snpEffectPredictor = config.getSnpEffectPredictor();
 			genome = config.getGenome();
-			if (verbose) Timer.showStdErr("done");
-
-			// Set upstream-downstream interval length
-			snpEffectPredictor.setUpDownStreamLength(upDownStreamLength);
-
-			// Build tree
-			if (verbose) Timer.showStdErr("Building interval forest");
-			snpEffectPredictor.buildForest();
-			if (verbose) Timer.showStdErr("done.");
-
-			// Show some genome stats. Chromosome names are shown, a lot of people has problems with the correct chromosome names.
-			if (verbose) Timer.showStdErr("Genome stats :\n" + config.getGenome());
 		}
 
 		// Read gene set database
@@ -385,9 +398,21 @@ public class SnpEffCmdGsa extends SnpEff {
 						enrichmentAlgorithmType = EnrichmentAlgorithmType.valueOf(algo);
 					} else usage("Missing value in command line option '-algo'");
 				} else if (arg.equals("-geneScoreFile")) {
-					// Algorithm to use
+					// Read gene scores from file
 					if ((i + 1) < args.length) geneScoreFile = args[++i];
 					else usage("Missing value in command line option '-geneScoreFile'");
+				} else if (arg.equals("-saveGeneScoreFile")) {
+					// Save gene scores to file
+					if ((i + 1) < args.length) geneScoreFileOut = args[++i];
+					else usage("Missing value in command line option '-saveGeneScoreFile'");
+				} else if (arg.equals("-commands")) {
+					// Load multiple commands from file
+					if ((i + 1) < args.length) commandsFile = args[++i];
+					else usage("Missing value in command line option '-commands'");
+				} else if (arg.equals("-save")) {
+					// Save results to file
+					if ((i + 1) < args.length) saveFile = args[++i];
+					else usage("Missing value in command line option '-save'");
 				} else if (arg.equals("-geneInterestingFile")) {
 					// Algorithm to use
 					if ((i + 1) < args.length) geneInterestingFile = args[++i];
@@ -411,23 +436,28 @@ public class SnpEffCmdGsa extends SnpEff {
 		//---
 		// Sanity checks
 		//---
-		if ((inputFormat == InputFormat.VCF) && infoName.isEmpty() && geneScoreFile.isEmpty() && geneInterestingFile.isEmpty()) usage("Missing '-info' comamnd line option.");
-
-		// Check input file
-		if (inputFile.isEmpty()) inputFile = "-"; // Default is STDIN
-		if (!Gpr.canRead(inputFile)) fatalError("Cannot read input file '" + inputFile + "'");
-
-		if (msigdb.isEmpty()) fatalError("Missing Gene-Sets file");
-		if (!Gpr.canRead(msigdb)) fatalError("Cannot read Gene-Sets file '" + msigdb + "'");
-
 		if (genomeVer.isEmpty() && geneScoreFile.isEmpty() && geneInterestingFile.isEmpty()) usage("Missing genome version.");
 
-		if (maxGeneSetSize <= 0) usage("MaxSetSize must be a positive number.");
-		if (minGeneSetSize >= maxGeneSetSize) usage("MaxSetSize (" + maxGeneSetSize + ") must larger than MinSetSize (" + minGeneSetSize + ").");
+		if (commandsFile == null) {
+			// All these check are only performed when "commands" is not set
+			if ((inputFormat == InputFormat.VCF) && infoName.isEmpty() && geneScoreFile.isEmpty() && geneInterestingFile.isEmpty()) usage("Missing '-info' comamnd line option.");
 
-		if ((interestingPerc < 0) || (interestingPerc > 1)) usage("Interesting percentile must be in the [0 , 1.0] range.");
+			if (inputFile.isEmpty()) inputFile = "-"; // Default is STDIN
+			if (!Gpr.canRead(inputFile)) fatalError("Cannot read input file '" + inputFile + "'");
 
-		if (!geneInterestingFile.isEmpty() && !enrichmentAlgorithmType.isBinary()) usage("Cannot specify '-geneInterestingFile' using algorithm '" + enrichmentAlgorithmType + "'");
+			if (msigdb.isEmpty()) fatalError("Missing Gene-Sets file");
+			if (!Gpr.canRead(msigdb)) fatalError("Cannot read Gene-Sets file '" + msigdb + "'");
+
+			if (maxGeneSetSize <= 0) usage("MaxSetSize must be a positive number.");
+			if (minGeneSetSize >= maxGeneSetSize) usage("MaxSetSize (" + maxGeneSetSize + ") must larger than MinSetSize (" + minGeneSetSize + ").");
+
+			if ((interestingPerc < 0) || (interestingPerc > 1)) usage("Interesting percentile must be in the [0 , 1.0] range.");
+
+			if (!geneInterestingFile.isEmpty() && !enrichmentAlgorithmType.isBinary()) usage("Cannot specify '-geneInterestingFile' using algorithm '" + enrichmentAlgorithmType + "'");
+		} else {
+			if (!Gpr.canRead(commandsFile)) fatalError("Cannot read commands file '" + commandsFile + "'");
+		}
+
 	}
 
 	/**
@@ -581,14 +611,18 @@ public class SnpEffCmdGsa extends SnpEff {
 	ChrPosScoreList readInputVcf() {
 		ChrPosScoreList cppList = new ChrPosScoreList();
 
-		int num = 1;
+		int num = 1, warns = 0;
 		VcfFileIterator vcf = new VcfFileIterator(inputFile);
 		for (VcfEntry ve : vcf) {
 			double score = ve.getInfoFloat(infoName);
 
 			if (Double.isNaN(score)) {
 				// Error
-				System.err.println("Warning: Cannot find INFO field '" + infoName + "'.\n\tIgnoring VCF entry." + vcf.getLineNum() + "\n\t" + ve);
+				if (warns <= MAX_WARNS) {
+					System.err.println("Warning: Cannot find INFO field '" + infoName + "'. Ignoring VCF entry " + vcf.getLineNum() + "\t" + ve);
+					if (warns == MAX_WARNS) System.err.println("Too many warnings! No more warnings shown.");
+				}
+				warns++;
 			} else {
 				// Add to list
 				cppList.add(ve.getChromosome(), ve.getStart(), ve.getEnd(), score);
@@ -601,10 +635,20 @@ public class SnpEffCmdGsa extends SnpEff {
 	}
 
 	/**
-	* Run command
-	*/
+	 * Run command
+	 */
 	@Override
 	public boolean run() {
+		// Normal usage: Just run analysis
+		if (commandsFile == null) return runAnalisis();
+
+		return runCommands();
+	}
+
+	/**
+	 * Run command
+	 */
+	protected boolean runAnalisis() {
 		initialize();
 
 		if (geneScoreFile.isEmpty() && geneInterestingFile.isEmpty()) {
@@ -614,7 +658,7 @@ public class SnpEffCmdGsa extends SnpEff {
 			scoreGenes(); // Get one score (Score) per gene
 			correctScores(); // Correct gene scores
 		} else if (!geneScoreFile.isEmpty()) {
-			// Sscores already mapped to genes, provided in a file
+			// Scores already mapped to genes, provided in a file
 			readGeneScores(geneScoreFile);
 		} else if (!geneInterestingFile.isEmpty()) {
 			// Interesting genes from file (not calculated)
@@ -622,7 +666,7 @@ public class SnpEffCmdGsa extends SnpEff {
 		}
 
 		enrichmentAnalysis(); // Perform enrichment analysis
-		if (randIterations > 0) runRand(); // Perform random iterations
+		if (randIterations > 0) runAnalisisRand(); // Perform random iterations
 
 		if (verbose) Timer.showStdErr("Done.");
 		return true;
@@ -631,7 +675,7 @@ public class SnpEffCmdGsa extends SnpEff {
 	/**
 	* Run enrichment analysis using random scores
 	*/
-	public boolean runRand() {
+	protected boolean runAnalisisRand() {
 		HashMap<String, Double> geneScoreOri = geneScore; // Save original scores
 
 		for (int iter = 1; iter <= randIterations; iter++) {
@@ -652,25 +696,73 @@ public class SnpEffCmdGsa extends SnpEff {
 	}
 
 	/**
+	 * Read "command" lines from file. 
+	 * Loads database only once to save time
+	 * @return
+	 */
+	protected boolean runCommands() {
+		boolean ok = true;
+
+		// Read config file, load & build database 
+		config();
+
+		// Parse commands from file
+		for (String commnadLine : Gpr.readFile(commandsFile).split("\n")) {
+			if (verbose) {
+				Timer.showStdErr("COMMAND: " + commnadLine);
+				System.out.println("COMMAND: " + commnadLine);
+			}
+
+			// Parse command line (tab-separated)
+			String args[] = commnadLine.split("\t");
+
+			// Create new 'SnpEffCmdGsa' and set database
+			SnpEffCmdGsa snpEffCmdGsa = new SnpEffCmdGsa();
+
+			// Set config (and database)
+			snpEffCmdGsa.setConfig(config);
+
+			// Run
+			StringBuilder err = new StringBuilder();
+			ok &= run(snpEffCmdGsa, args, err);
+		}
+
+		if (verbose) Timer.showStdErr("Done!");
+		return ok;
+	}
+
+	/**
 	 * Get one score (Score) per gene
 	 */
 	void scoreGenes() {
 		if (verbose) Timer.showStdErr("Aggregating scores by gene (scoring genes)");
 
+		StringBuilder saveScores = null;
+		if (geneScoreFileOut != null) saveScores = new StringBuilder();
+
 		// Create one Score per gene
+		double scoreMin = Double.MAX_VALUE, scoreMax = Double.MIN_VALUE;
+
 		geneScore = new HashMap<String, Double>();
-		if (debug) System.err.println("\tscore\tgeneId");
+		if (geneScoreFileOut != null) saveScores.append("score\tgeneId\tcount_pvalues\tpvalues\n");
 		for (String geneId : geneScores.keySet()) {
 			// Calculate aggregated score
 			ScoreList gpl = geneScores.get(geneId);
 			double score = gpl.score(scoreSummary);
 
+			scoreMax = Math.max(score, scoreMax);
+			scoreMin = Math.min(score, scoreMin);
+
 			// Add to map
 			geneScore.put(geneId, score);
-			if (debug) System.err.println(String.format("\t%.2e\t%s", score, geneId));
+			if (geneScoreFileOut != null) saveScores.append(String.format("%.2e\t%s\n", score, gpl));
 		}
 
-		if (verbose) Timer.showStdErr("Done.");
+		if (geneScoreFileOut != null) {
+			if (verbose) Timer.showStdErr("Saving gene scores to file: '" + geneScoreFileOut + "'");
+			Gpr.toFile(geneScoreFileOut, saveScores);
+		}
+		if (verbose) Timer.showStdErr("Done. Score range: [ " + scoreMin + " , " + scoreMax + " ]");
 	}
 
 	/**
@@ -682,15 +774,18 @@ public class SnpEffCmdGsa extends SnpEff {
 		System.err.println("snpEff version " + SnpEff.VERSION);
 		System.err.println("Usage: snpEff gsa [options] genome_version geneSets.gmt input_file");
 		System.err.println("\n\tInput data options:");
+		System.err.println("\t-commands <file>              : Read commands from file (allows multiple analysis loading the database only once).");
 		System.err.println("\t-geneId                       : Use geneID instead of gene names. Default: " + useGeneId);
 		System.err.println("\t-i <format>                   : Input format {vcf, bed, txt}. Default: " + inputFormat);
 		System.err.println("\t-info <name>                  : INFO tag used for scores (in VCF input format).");
 		System.err.println("\t-desc                         : Sort scores in descending order (high score are better then low scores. Default " + orderDescending);
+		System.err.println("\t-save <file>                  : Save results to file.");
 		System.err.println("\t-score                        : Treat input data as scores instead of p-values.");
 		System.err.println("\n\tAlgorithm options:");
 		System.err.println("\t-algo <name>                  : Gene set enrichment algorithm {FISHER_GREEDY, RANKSUM_GREEDY, FISHER, RANKSUM, LEADING_EDGE_FRACTION}. Default: " + enrichmentAlgorithmType);
 		System.err.println("\t-geneScore                    : Method to summarize gene scores {MIN, MAX, AVG, AVG_MIN_10, AVG_MAX_10, FISHER_CHI_SQUARE, Z_SCORES, SIMES}. Default: " + scoreSummary);
 		System.err.println("\t-geneScoreFile <file>         : Read gene score from file instead of calculating them.");
+		System.err.println("\t-saveGeneScoreFile <file>     : Save gene scores to file.");
 		System.err.println("\t-mapClosestGene               : Map to closest gene. Default: " + useClosestGene);
 		System.err.println("\t-rand <num>                   : Perform 'num' iterations using random scores. Default: " + randIterations);
 		System.err.println("\n\tAlgorithm specific options: FISHER and FISHER_GREEDY");
