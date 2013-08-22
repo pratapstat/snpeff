@@ -27,29 +27,32 @@ public class TestCasesAnnotateMem extends TestCase {
 		String args[] = { dbFileName, fileName };
 
 		// Iterate over VCF entries
-		SnpSiftCmdAnnotateMem vcfAnnotate = new SnpSiftCmdAnnotateMem(args);
-		vcfAnnotate.setSuppressOutput(true);
-		vcfAnnotate.initAnnotate();
-
-		VcfFileIterator vcfFile = new VcfFileIterator(fileName);
-		for (VcfEntry vcf : vcfFile) {
-			vcfAnnotate.annotate(vcf);
-
-			// We expect the same annotation twice 
-			String idstr = vcf.getId();
-
-			// Get expected IDs
-			String expectedIds = vcf.getInfo("EXP_IDS");
-			if (expectedIds != null) {
-				expectedIds = expectedIds.replace('|', ';');
-				if (expectedIds.equals(".")) expectedIds = "";
-
-				// Compare
-				Assert.assertEquals(expectedIds, idstr);
-			} else fail("EXP_IDS (expected ids) INFO field missing in " + fileName + ", entry:\n" + vcf);
+		try {
+			SnpSiftCmdAnnotateMem vcfAnnotate = new SnpSiftCmdAnnotateMem(args);
+			vcfAnnotate.setSuppressOutput(true);
+			vcfAnnotate.initAnnotate();
+	
+			VcfFileIterator vcfFile = new VcfFileIterator(fileName);
+			for (VcfEntry vcf : vcfFile) {
+				vcfAnnotate.annotate(vcf);
+	
+				// We expect the same annotation twice 
+				String idstr = vcf.getId();
+	
+				// Get expected IDs
+				String expectedIds = vcf.getInfo("EXP_IDS");
+				if (expectedIds != null) {
+					expectedIds = expectedIds.replace('|', ';');
+					if (expectedIds.equals(".")) expectedIds = "";
+	
+					// Compare
+					Assert.assertEquals(expectedIds, idstr);
+				} else fail("EXP_IDS (expected ids) INFO field missing in " + fileName + ", entry:\n" + vcf);
+			}
+			vcfAnnotate.endAnnotate();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
-
-		vcfAnnotate.endAnnotate();
 	}
 
 	public void test_01() {
