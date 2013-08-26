@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
+import ca.mcgill.mcb.pcingola.interval.SeqChange;
 import ca.mcgill.mcb.pcingola.util.Timer;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 
@@ -17,6 +18,8 @@ public class SnpSiftCmdVarType extends SnpSift {
 	public static final int SHOW = 10000;
 	public static final int SHOW_LINES = 100 * SHOW;
 
+	public static final String VARTYPE = "VARTYPE";
+
 	String vcfFile;
 	HashMap<String, String> db = new HashMap<String, String>();
 
@@ -27,6 +30,7 @@ public class SnpSiftCmdVarType extends SnpSift {
 	@Override
 	protected List<String> addHeader() {
 		List<String> newHeaders = super.addHeader();
+		newHeaders.add("##INFO=<ID=" + VARTYPE + ",Number=A,Type=Flag,Description=\"Variant types {SNP,MNP,INS,DEL,Mixed}\">");
 		//
 		newHeaders.add("##INFO=<ID=SNP,Number=0,Type=Flag,Description=\"Variant is a SNP\">");
 		newHeaders.add("##INFO=<ID=MNP,Number=0,Type=Flag,Description=\"Variant is an MNP\">");
@@ -50,6 +54,14 @@ public class SnpSiftCmdVarType extends SnpSift {
 		// Heterozygous?
 		Boolean isHet = vcfEntry.calcHetero();
 		if (isHet != null) vcfEntry.addInfo(isHet ? "HET" : "HOM");
+
+		// Add vartype according to alleles
+		StringBuilder sb = new StringBuilder();
+		for (SeqChange sq : vcfEntry.seqChanges()) {
+			if (sb.length() > 0) sb.append(",");
+			sb.append(sq.getChangeType());
+		}
+		vcfEntry.addInfo(VARTYPE, sb.toString());
 	}
 
 	/**

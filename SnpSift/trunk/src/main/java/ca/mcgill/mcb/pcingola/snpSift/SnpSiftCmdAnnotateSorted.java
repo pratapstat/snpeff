@@ -259,10 +259,17 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 	 * Initialize annotation process
 	 * @throws IOException
 	 */
-	public void initAnnotate() throws IOException {
+	protected void initInputVcf() throws IOException {
 		// Index and open VCF files
 		vcfFile = new VcfFileIterator(vcfFileName);
+	}
 
+	/**
+	 * Initialize annotation process
+	 * @throws IOException
+	 */
+	public void initAnnotate() throws IOException {
+		initInputVcf();
 		// Open and index database
 		indexDb = index(vcfDbFileName);
 		vcfDbFile = new VcfFileIterator(new SeekableBufferedReader(vcfDbFileName));

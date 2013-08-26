@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 #
-# P-values correction for gene set analysis (SnpEff gsa)
+# Bayes-factor correction for gene set analysis (SnpEff gsa)
 #
 #
 #															Pablo Cingolani 2013
@@ -11,10 +11,8 @@
 # Main
 #-------------------------------------------------------------------------------
 
-show = FALSE	# Used for production
-show = TRUE		# Used for debugging
-
-pvalCoefThreshold = 10^-12	# Adjust only if linearmodel p-value is less than this
+show = FALSE
+ show = TRUE		# Used for debugging
 
 #---
 # Parse command line arguments
@@ -34,12 +32,12 @@ d = read.table(fileName, sep="\t", header=TRUE)
 p = d$score			# p-values or scores
 c = d$scoreCount	# number of variants 
 
-# Filter out p-values of zero OR counts of zero (because of log)
-#keep = (p > 0) & (c > 0) 
-keep = (p > 0) & (c > 0) & (c > minScoreCount)	
+keep = (c > 0)
 
 p = p[keep]
-lp = qnorm(p)				# Convert to z-scores using an inverse normal distribution
+mu = mean(p)
+sigma = sd(p)
+lp = as.vector(scale(p[keep]))		# Scale to mean=0 and var=1 => Convert to z-scores using an inverse normal distribution
 
 c = c[keep]
 lc = log10(c)
@@ -52,35 +50,41 @@ sumLmfit =  summary(lmfit)
 pvalCoef = sumLmfit$coefficients[2,4]
 
 res = lmfit$residuals		# Residuals
-padj = p						# Keep some un-adjusted values
-padj[keep] = pnorm(res)			# Adjusted p-values
+padj = sigma * res + mu	# Adjusted bayesian factor
+
+# Don't adjust under 'minScoreCount'
+padj[ c <= minScoreCount ] = p[ c <= minScoreCount ]
 
 if( show ) {
 	print(sumLmfit)
 	cat('Slope:\t', sumLmfit$coefficients[2], '\tp-value:\t', pvalCoef, 'File:\t', fileName, '\n');
 
 	par(mfrow=c(2,2))
-	smoothScatter( lc, lp, main="Z-Scores", xlab="Number of scores", ylab="Z-Score" )
-	lines(lowess(lc, lp ), col='orange')
+	smoothScatter( lc, p, main="Z-Scores", xlab="Number of scores", ylab="Z-Score" )
+	lines(lowess(lc, p ), col='orange')
 
-	smoothScatter( lc, res, main="Adjusted Z-Scores", xlab="Number of scores", ylab="Z-Score" )
-	lines(lowess(lc, res ), col='orange')
+	smoothScatter( lc, padj, main="Adjusted Z-Scores", xlab="Number of scores", ylab="Z-Score" )
+	lines(lowess(lc, padj ), col='orange')
 
-	plot( density(lp) , main="Z-Scores distribution", xlab="red:Adjusted black:Unadjusted")
-	lines( density(res) , col='red')
+	plot( density(p) , main="Bayes-Factors distribution", xlab="red:Adjusted black:Unadjusted")
+	lines( density(padj) , col='red')
 
 	plot( density(lc) , main="log10(Number of scores)", xlab="")
 }
 
 #---
-# Decide whether to use corrected scores or not.
-# Not very significant? Use original scores
+# Decide whether to use corrected scores or not
 #---
-if( pvalCoef > pvalCoefThreshold ) { padj = d$score	}
+if( pvalCoef < 10^-12 ) { 
+	so = padj		# Significant? Then use correction
+	so[ c <= minScoreCount ] = p[ c <= minScoreCount ]
+} else {
+	so = d$score	# Not very significant? Use original scores
+}
 
 #---
 # Create output file
 #---
-dout = data.frame( geneId = d$geneId, score = padj )
+dout = data.frame( geneId = d$geneId[keep], score = so )
 write.table( dout, file=outFileName, quote=FALSE, row.names = FALSE, col.names = FALSE, sep="\t")
 

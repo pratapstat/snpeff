@@ -77,7 +77,8 @@ public class SnpSiftCmdAnnotateMem extends SnpSiftCmdAnnotateSorted {
 	 * @throws IOException
 	 */
 	@Override
-	public void initAnnotate() {
+	public void initAnnotate() throws IOException {
+		initInputVcf();
 		readDb();
 	}
 
