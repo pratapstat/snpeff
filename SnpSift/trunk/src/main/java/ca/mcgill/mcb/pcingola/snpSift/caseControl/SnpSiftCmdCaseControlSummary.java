@@ -19,7 +19,6 @@ import ca.mcgill.mcb.pcingola.snpEffect.ChangeEffect;
 import ca.mcgill.mcb.pcingola.snpSift.SnpSift;
 import ca.mcgill.mcb.pcingola.snpSift.SnpSiftCmdAnnotateSortedDbNsfp;
 import ca.mcgill.mcb.pcingola.stats.CountByType;
-import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.util.Timer;
 import ca.mcgill.mcb.pcingola.vcf.VcfEffect;
 import ca.mcgill.mcb.pcingola.vcf.VcfEffect.FormatVersion;
@@ -322,8 +321,7 @@ public class SnpSiftCmdCaseControlSummary extends SnpSift {
 				sampleIds = parseSampleIds(vcf);
 			}
 
-			if (ve.getAlts().length > 1) Gpr.debug("Ignoring entry with more than one ALT:\t" + ve);
-			else parseVcfEntry(ve);
+			parseVcfEntry(ve);
 		}
 
 		// Show summaries by interval
