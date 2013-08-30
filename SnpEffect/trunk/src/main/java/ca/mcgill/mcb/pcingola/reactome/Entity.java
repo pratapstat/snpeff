@@ -13,17 +13,24 @@ import ca.mcgill.mcb.pcingola.util.Gpr;
  */
 public class Entity {
 
+	public static boolean debug = false;
+
 	protected int id; // Entity ID
 	protected String name; // Entity Name
 	protected Compartment compartment; // In which cell's compartment is this entity located?
-	protected double output = Double.NaN; // Entity output value
-	protected double weight = Double.NaN; // Weight applied to this entity (NaN means not available)
-	protected int countWeights = 0;
+	protected double output; // Entity output value
+	protected double weight; // Weight applied to this entity (NaN means not available)
+	protected double fixedOutput; // Fixed output value (external information)
+	protected int countWeights;
 	protected HashSet<String> geneIds; // All gene IDs related to this entity
+
+	public static final double MAX_OUTPUT = 10;
+	public static final double MIN_OUTPUT = -10;
 
 	public Entity(int id, String name) {
 		this.id = id;
 		this.name = name;
+		reset();
 	}
 
 	/**
@@ -50,13 +57,29 @@ public class Entity {
 	 * @return
 	 */
 	public double calc(HashSet<Entity> doneEntities) {
-		if (doneEntities.contains(this)) return output; // Make sure we don't calculate twice
-		if (hasOutput()) return output; // TODO: Remove this!
 
-		doneEntities.add(this); // Keep 'entities' set up to date
-		output = getWeight(); // Calculate output
+		if (!Double.isNaN(fixedOutput)) {
+			output = fixedOutput;
+		} else {
+			if (doneEntities.contains(this)) return output; // Make sure we don't calculate twice
+			doneEntities.add(this); // Keep 'entities' set up to date
 
+			output = cap(getWeight()); // Calculate output
+		}
+
+		if (debug) System.out.println(output + "\tfixed:" + isFixed() + "\tid:" + id + "\ttype:" + getClass().getSimpleName() + "\tname:" + name);
 		return output;
+	}
+
+	/**
+	 * Cap a value 
+	 * @param out
+	 * @return
+	 */
+	protected double cap(double out) {
+		if (out < MIN_OUTPUT) return MIN_OUTPUT;
+		if (out > MAX_OUTPUT) return MAX_OUTPUT;
+		return out;
 	}
 
 	public Compartment getCompartment() {
@@ -80,10 +103,7 @@ public class Entity {
 	}
 
 	public double getWeight() {
-		if (countWeights > 1) {
-			weight = weight / countWeights;
-			countWeights = 1;
-		}
+		if (countWeights > 1) return weight / Math.sqrt(countWeights);
 		return weight;
 	}
 
@@ -91,12 +111,34 @@ public class Entity {
 		return !Double.isNaN(output);
 	}
 
-	public boolean isEvent() {
+	public boolean isFixed() {
+		return !Double.isNaN(fixedOutput);
+	}
+
+	public boolean isReaction() {
 		return false;
+	}
+
+	public void reset() {
+		output = Double.NaN; // Entity output value
+		weight = Double.NaN; // Weight applied to this entity (NaN means not available)
+		fixedOutput = Double.NaN; // Fixed output value (external information)
+		countWeights = 0;
+
+		output = weight = 0;
+	}
+
+	public void resetWeight() {
+		weight = Double.NaN;
+		countWeights = 0;
 	}
 
 	public void setCompartment(Compartment compartment) {
 		this.compartment = compartment;
+	}
+
+	public void setFixedOutput(double fixedOutput) {
+		this.fixedOutput = fixedOutput;
 	}
 
 	public void setWeight(double weight) {
@@ -106,10 +148,11 @@ public class Entity {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[" + id + "]: " + name;
+		return toString(0, new HashSet<Entity>());
 	}
 
 	public String toString(int tabs, HashSet<Entity> done) {
+		done.add(this);
 		return Gpr.tabs(tabs) + getClass().getSimpleName() + "[" + id + "]: " + name;
 	}
 
