@@ -5,7 +5,7 @@
   <artifactId>snpSift</artifactId>
   <packaging>jar</packaging>
   <name>Snp Sift</name>
-  <version>3.3</version>
+  <version>3.4</version>
   <description>SnpSift is a collection of tools to manipulate VCF (variant call format) files.</description>
   <url>http://snpeff.sourceforge.net/</url>
   <licenses>
@@ -68,7 +68,7 @@
     <dependency>
     	<groupId>net.sf.samtools</groupId>
     	<artifactId>Sam</artifactId>
-    	<version>1.94</version>
+    	<version>1.97</version>
     </dependency>
      
   </dependencies>
