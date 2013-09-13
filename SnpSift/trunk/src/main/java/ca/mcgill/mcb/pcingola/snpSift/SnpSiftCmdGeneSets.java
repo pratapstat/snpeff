@@ -82,8 +82,10 @@ public class SnpSiftCmdGeneSets extends SnpSift {
 
 			// Create INFO string
 			StringBuilder setssb = new StringBuilder();
-			for (String s : setsSorted)
-				setssb.append((setssb.length() > 0 ? "," : "") + s);
+			for (String s : setsSorted) {
+				String setName = VcfEntry.vcfInfoSafe(s);
+				setssb.append((setssb.length() > 0 ? "," : "") + setName);
+			}
 
 			// Add INFO field
 			vcfEntry.addInfo(INFO_GENE_SETS, setssb.toString());
