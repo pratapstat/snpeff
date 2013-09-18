@@ -54,7 +54,7 @@ public class PedigreeEnrty {
 	 * @return
 	 */
 	public boolean isDerived() {
-		return mother == null;
+		return (mother == null) && (father != null);
 	}
 
 	/**
