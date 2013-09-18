@@ -1920,10 +1920,55 @@ CHROMOSOME1	10469	C	G	SNP	Hom	365.78	0		ENSG00000223972	DDX11L1	transcribed_unpr
 				<i class="icon-hand-right"></i> In order to activate cancer analysis, you must use <code>-cancer</code> command line option.
 				<br>
 				<br>
+				<h3>Defining cancer samples</h3>
 				As we already mentioned, cancer data is represented in a VCF file using multiple ALTs (REF field always is reference genome).
-				In order to specify which samples are somatic, we use the PEDIGREE meta information (header).
+				In order to specify which samples are somatic and which ones are germline, there are two options:
 				<br>
-				E.g.:
+				<br>
+				<ul>
+					<li> Use a TXT file using <code>-canceSample</code> command line option.
+					<li> Use the PEDIGREE meta information in your VCF file's header. This is the default, but some people might find hard to edit / change information in VCF file's headers.
+				</ul>
+				<br>
+				<i class="icon-warning-sign"></i> If you do not provide either <code>PEDIGREE</code> meta information or a TXT samples file, SnpEff will not know which somatic samples derive from which germline samples. 
+				Thus it will be unable to perform cancer effect analysis.
+				<br>
+				<br>
+				<b> TXT file </b>
+				<br>
+				This is quite easy. 
+				All you have to do is to create a tab-separated TXT file having two columns: the first column has the germline sample names and the second column has the somatic sample names.
+				Make sure that sample names match exactly the ones in the VCF file.
+				<br>
+				<br>
+				E.g.: Create a TXT file named 'samples_cancer.txt'
+<pre>
+Patient_01_Germline	Patient_01_Somatic
+Patient_02_Germline	Patient_02_Somatic
+Patient_03_Germline	Patient_03_Somatic
+Patient_04_Germline	Patient_04_Somatic
+</pre>
+
+				Then you have to specify this TXT file when invoking SnpEff, using the <code>-canceSample</code> command line option.
+				<br>
+				<br>
+				E.g. In our example, the file name is 'samples_cancer.txt', so the command line would look like this:
+<pre>
+java -Xmx4g -jar snpEff.jar eff -v -cancer -canceSample samples_cancer.txt GRCh37.70 cancer.vcf > cancer.snpeff.vcf 
+</pre>
+				<br>
+				<br>
+				<b> VCF header </b>
+				<br>
+				This is the default method and the main advantage is that you don't have to carry information on a separate TXT file (all the information is within your VCF file).
+				You have to add the <code>PEDIGREE</code> header with the appropriate information to your VCF file.
+				Obviously this requires you to edit you VCF file's header.
+				<br>
+				<br>
+				<i class="icon-warning-sign"></i> How to edit VCF  headers is beyond the scope of this manual (we recommend using <code>vcf-annotate</code> from <a href="http://vcftools.sourceforge.net/docs.html#annotate">VCFtools</a>). But if you find adding PEDIGREE information to your VCF file difficult, just use the TXT file method described in the previous sub-section.
+				<br>
+				<br>
+				E.g.: Pedigree information in a VCF file would look like this
 <pre>
 ##PEDIGREE=&lt;Derived=Patient_01_Somatic,Original=Patient_01_Germline>
 #CHROM  POS ID  REF ALT QUAL    FILTER  INFO        FORMAT  Patient_01_Germline Patient_01_Somatic
@@ -1936,8 +1981,6 @@ CHROMOSOME1	10469	C	G	SNP	Hom	365.78	0		ENSG00000223972	DDX11L1	transcribed_unpr
 
 				<br>
 				<br>
-				<i class="icon-warning-sign"></i> If you do not provide <code>PEDIGREE</code> meta information, SnpEff will not know which somatic samples derive from which germline samples. 
-				Thus it will be unable to perform cancer effect analysis.
 
 				<h3>Running in cancer analysis mode</h3>
 				We added '-cancer'  command line option for somatic vs germline comparisons. 
