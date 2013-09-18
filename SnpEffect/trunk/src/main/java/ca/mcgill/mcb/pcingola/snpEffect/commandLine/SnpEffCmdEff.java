@@ -885,12 +885,18 @@ public class SnpEffCmdEff extends SnpEff {
 		if (cancerSamples != null) {
 			// Read from TXT file
 			if (verbose) Timer.show("Reading cancer samples pedigree from file '" + cancerSamples + "'.");
+
+			List<String> sampleNames = vcfFile.getVcfHeader().getSampleNames();
 			pedigree = new ArrayList<PedigreeEnrty>();
+
 			for (String line : Gpr.readFile(cancerSamples).split("\n")) {
 				String recs[] = line.split("\\s", -1);
 				String original = recs[0];
 				String derived = recs[1];
+
 				PedigreeEnrty pe = new PedigreeEnrty(original, derived);
+				pe.sampleNumbers(sampleNames);
+
 				pedigree.add(pe);
 			}
 		} else {

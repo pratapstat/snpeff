@@ -16,6 +16,7 @@ import java.util.List;
  *
  */
 public class PedigreeEnrty {
+
 	public String father;
 	public String mother;
 	public String child;
