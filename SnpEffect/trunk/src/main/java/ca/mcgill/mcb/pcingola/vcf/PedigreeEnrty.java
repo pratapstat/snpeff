@@ -16,6 +16,7 @@ import java.util.List;
  *
  */
 public class PedigreeEnrty {
+
 	public String father;
 	public String mother;
 	public String child;
@@ -54,7 +55,7 @@ public class PedigreeEnrty {
 	 * @return
 	 */
 	public boolean isDerived() {
-		return mother == null;
+		return (mother == null) && (father != null);
 	}
 
 	/**

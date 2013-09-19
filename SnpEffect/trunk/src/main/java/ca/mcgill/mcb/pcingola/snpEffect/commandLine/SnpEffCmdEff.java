@@ -107,6 +107,7 @@ public class SnpEffCmdEff extends SnpEff {
 	String summaryFile; // Summary output file
 	String summaryGenesFile; // Gene table file
 	String onlyTranscriptsFile = null; // Only use the transcripts in this file (Format: One transcript ID per line)
+	String cancerSamples = null;
 	SeqChangeFilter seqChangeFilter; // Filter seqChanges (before prediction)
 	InputFormat inputFormat = InputFormat.VCF; // Format use in input files
 	OutputFormat outputFormat = OutputFormat.VCF; // Output format
@@ -288,7 +289,7 @@ public class SnpEffCmdEff extends SnpEff {
 				// Find if there is a pedigree and if it has any 'derived' entry
 				if (vcfFile.isHeadeSection()) {
 					if (cancer) {
-						pedigree = vcfFile.getVcfHeader().getPedigree();
+						pedigree = readPedigree(vcfFile);
 
 						// Any 'derived' entry in this pedigree?
 						if (pedigree != null) {
@@ -579,7 +580,10 @@ public class SnpEffCmdEff extends SnpEff {
 						else treatAllAsProteinCoding = Gpr.parseBoolSafe(args[i]);
 					}
 				} else if (arg.equalsIgnoreCase("-cancer")) cancer = true; // Perform cancer comparissons
-				else if (arg.equalsIgnoreCase("-canon")) canonical = true; // Use canonical transcripts
+				else if (arg.equalsIgnoreCase("-cancerSamples")) {
+					if ((i + 1) < args.length) cancerSamples = args[++i]; // Read cancer samples from TXT files
+					else usage("Missing -cancerSamples argument");
+				} else if (arg.equalsIgnoreCase("-canon")) canonical = true; // Use canonical transcripts
 				else if (arg.equalsIgnoreCase("-lof")) lossOfFunction = true; // Add LOF tag
 				else if (arg.equalsIgnoreCase("-hgvs")) useHgvs = true; // Use HGVS notation
 				else if (arg.equalsIgnoreCase("-geneId")) useGeneId = true; // Use gene ID instead of gene name
@@ -867,6 +871,42 @@ public class SnpEffCmdEff extends SnpEff {
 
 		// Note: We might end up with more markers than we loaded (just because they map to multiple exons (although it would be highly unusual)
 		if (verbose) Timer.showStdErr("NextProt database: " + nextProtsToAdd.size() + " markers added.");
+	}
+
+	/**
+	 * Read pedigree either from VCF header or from cancerSample file
+	 * 
+	 * @param vcfFile
+	 * @return
+	 */
+	List<PedigreeEnrty> readPedigree(VcfFileIterator vcfFile) {
+		List<PedigreeEnrty> pedigree = null;
+
+		if (cancerSamples != null) {
+			// Read from TXT file
+			if (verbose) Timer.show("Reading cancer samples pedigree from file '" + cancerSamples + "'.");
+
+			List<String> sampleNames = vcfFile.getVcfHeader().getSampleNames();
+			pedigree = new ArrayList<PedigreeEnrty>();
+
+			for (String line : Gpr.readFile(cancerSamples).split("\n")) {
+				String recs[] = line.split("\\s", -1);
+				String original = recs[0];
+				String derived = recs[1];
+
+				PedigreeEnrty pe = new PedigreeEnrty(original, derived);
+				pe.sampleNumbers(sampleNames);
+
+				pedigree.add(pe);
+			}
+		} else {
+			// Read from VCF header
+			if (verbose) Timer.show("Reading cancer samples pedigree from VCF header.");
+			pedigree = vcfFile.getVcfHeader().getPedigree();
+		}
+
+		if (verbose && ((pedigree == null) || pedigree.isEmpty())) Timer.show("Warngin: No cancer sample pedigree found.");
+		return pedigree;
 	}
 
 	/**
@@ -1264,6 +1304,7 @@ public class SnpEffCmdEff extends SnpEff {
 		System.err.println("\t-no-utr                         : Do not show 5_PRIME_UTR or 3_PRIME_UTR changes");
 		System.err.println("\nAnnotations options:");
 		System.err.println("\t-cancer                         : Perform 'cancer' comparissons (Somatic vs Germline). Default: " + cancer);
+		System.err.println("\t-cancerSamples <file>           : Two column TXT file defining 'oringinal \\t derived' samples.");
 		System.err.println("\t-canon                          : Only use canonical transcripts.");
 		System.err.println("\t-geneId                         : Use gene ID instead of gene name (VCF output). Default: " + useGeneId);
 		System.err.println("\t-hgvs                           : Use HGVS annotations for amino acid sub-field. Default: " + useHgvs);

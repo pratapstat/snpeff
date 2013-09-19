@@ -28,9 +28,12 @@ public class TestCasesCancer extends TestCase {
 	 * Calculate snp effect for a list of snps
 	 * @param snpEffFile
 	 */
-	public void snpEffect(String vcfFile, String aaHgsv, String genotype) {
+	public void snpEffect(String vcfFile, String txtFile, String aaHgsv, String genotype) {
 		// Create command
-		String args[] = { "-cancer", "-hgvs", "testHg3766Chr1", vcfFile };
+		String argsVcf[] = { "-cancer", "-hgvs", "testHg3766Chr1", vcfFile };
+		String argsTxt[] = { "-cancer", "-cancerSamples", txtFile, "-hgvs", "testHg3766Chr1", vcfFile };
+		String args[] = (txtFile == null ? argsVcf : argsTxt);
+
 		SnpEffCmdEff snpeff = new SnpEffCmdEff();
 		snpeff.setVerbose(verbose);
 		snpeff.parseArgs(args);
@@ -59,7 +62,16 @@ public class TestCasesCancer extends TestCase {
 	 */
 	public void test_01() {
 		String file = "tests/test.cancer.snp.01.vcf";
-		snpEffect(file, "p.Leu1?/c.1A>G", "2-1");
+		snpEffect(file, null, "p.Leu1?/c.1A>G", "2-1");
+	}
+
+	/**
+	 * Test Somatic vs Germline (using TXT file)
+	 */
+	public void test_02() {
+		String fileVcf = "tests/test.cancer_no_ped.vcf";
+		String fileTxt = "tests/test.cancer_no_ped.txt";
+		snpEffect(fileVcf, fileTxt, "p.Leu1?/c.1A>G", "2-1");
 	}
 
 }
