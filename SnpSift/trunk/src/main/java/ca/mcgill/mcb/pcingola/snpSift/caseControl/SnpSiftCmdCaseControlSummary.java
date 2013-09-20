@@ -37,7 +37,6 @@ public class SnpSiftCmdCaseControlSummary extends SnpSift {
 	public static FormatVersion formatVersion = null;
 
 	public static Boolean CaseControl[] = { true, false };
-	public static String VariantsAf[] = { "COMMON", "RARE" };
 
 	PedPedigree pedPedigree;
 	boolean headerSummary = true;
@@ -216,6 +215,8 @@ public class SnpSiftCmdCaseControlSummary extends SnpSift {
 		VcfEffect effMax = null;
 		StringBuilder effAll = new StringBuilder();
 		StringBuilder otherInfo = new StringBuilder();
+
+		// Find highest impact effect
 		for (VcfEffect eff : ve.parseEffects(formatVersion)) {
 			if ((eff.getFunClass() != null) && (funcClass.ordinal() < eff.getFunClass().ordinal())) {
 				funcClass = eff.getFunClass();
@@ -226,12 +227,10 @@ public class SnpSiftCmdCaseControlSummary extends SnpSift {
 
 		// Ignore 'NONE' functional class
 		if (funcClass != ChangeEffect.FunctionalClass.NONE) {
-			// Get minor allele frequency
-			double maf = maf(ve);
+			maf(ve);
 
 			// Variant type (based on allele frequency)
-			String variantAf = "COMMON";
-			if (maf < 0.05) variantAf = "RARE";
+			String variantAf = ve.alleleFrequencyType().toString();
 
 			// Summary per line
 			Summary summary = new Summary();

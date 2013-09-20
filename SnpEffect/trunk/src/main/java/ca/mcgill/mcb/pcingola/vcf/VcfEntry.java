@@ -24,7 +24,10 @@ import ca.mcgill.mcb.pcingola.vcf.VcfEffect.FormatVersion;
  */
 public class VcfEntry extends Marker implements Iterable<VcfGenotype> {
 
-	public enum VariantByFrequency {
+	public static final double ALLELE_FEQUENCY_COMMON = 0.05;
+	public static final double ALLELE_FEQUENCY_LOW = 0.01;
+
+	public enum AlleleFrequencyType {
 		Common, LowFrequency, Rare
 	}
 
@@ -160,6 +163,17 @@ public class VcfEntry extends Marker implements Iterable<VcfGenotype> {
 		String addInfoStr = name + (value != null ? "=" + value : "");
 		if (info != null) info.put(name, value); // Add to info hash (if available)
 		addInfo(addInfoStr, false);
+	}
+
+	/**
+	 * Categorization by allele frequency
+	 * @return
+	 */
+	public AlleleFrequencyType alleleFrequencyType() {
+		double maf = maf();
+		if (maf <= ALLELE_FEQUENCY_LOW) return AlleleFrequencyType.Rare;
+		if (maf <= ALLELE_FEQUENCY_COMMON) return AlleleFrequencyType.LowFrequency;
+		return AlleleFrequencyType.Common;
 	}
 
 	/**
@@ -1081,13 +1095,6 @@ public class VcfEntry extends Marker implements Iterable<VcfGenotype> {
 		}
 
 		return this;
-	}
-
-	public VariantByFrequency variantByFrequency() {
-		double maf = maf();
-		if (maf <= 0.01) return VariantByFrequency.Rare;
-		if (maf <= 0.05) return VariantByFrequency.LowFrequency;
-		return VariantByFrequency.Common;
 	}
 
 }

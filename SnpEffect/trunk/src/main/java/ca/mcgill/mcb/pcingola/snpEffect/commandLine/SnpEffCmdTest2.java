@@ -76,7 +76,7 @@ public class SnpEffCmdTest2 extends SnpEff {
 
 		// Add this info after all keys
 		String keyPost = "";
-		if (keyMafCategory) keyPost += "\t" + ve.variantByFrequency().toString();
+		if (keyMafCategory) keyPost += "\t" + ve.alleleFrequencyType().toString();
 		if (keyPrivate) keyPost += "\t" + (ve.getInfoFlag(VcfEntry.VCF_INFO_PRIVATE) ? VcfEntry.VCF_INFO_PRIVATE : "");
 		if (keyId) keyPost += "\t" + ((ve.getId() == null) || ve.getId().isEmpty() ? "" : "ID");
 
