@@ -19,7 +19,6 @@ public class NeedlemanWunsch {
 	boolean useSpace; // Use spaces when calculating alignment
 
 	public NeedlemanWunsch(String a, String b) {
-		score = new int[a.length() + 1][b.length() + 1];
 		this.a = a.toCharArray();
 		this.b = b.toCharArray();
 		useSpace = true;
@@ -136,6 +135,8 @@ public class NeedlemanWunsch {
 	 * Calculate score matrix
 	 */
 	void scoreMatrix() {
+		score = new int[a.length + 1][b.length + 1];
+
 		// Initialize
 		for (int i = 0; i <= a.length; i++)
 			setScore(i, 0, deletion * i);
@@ -190,6 +191,9 @@ public class NeedlemanWunsch {
 
 	@Override
 	public String toString() {
+		// Alignment not performed
+		if (score == null) return "";
+
 		char matching[] = new char[alignmentA.length];
 
 		for (int i = 0; i < alignmentA.length; i++) {

@@ -113,6 +113,8 @@ public class SmithWaterman extends NeedlemanWunsch {
 	 */
 	@Override
 	void scoreMatrix() {
+		score = new int[a.length + 1][b.length + 1];
+
 		// Initialize
 		for (int i = 0; i <= a.length; i++)
 			setScore(i, 0, 0);

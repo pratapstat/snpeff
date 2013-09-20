@@ -202,15 +202,16 @@ public class SnpEffCmdProtein extends SnpEff {
 						proteinReference = proteinFormat(proteinReference);
 
 						SmithWaterman sw = new SmithWaterman(protein, proteinReference);
-						sw.align();
-						int score = sw.getAligmentScore();
+						if (Math.max(protein.length(), proteinReference.length()) < SnpEffCmdCds.MAX_ALIGN_LENGTH) sw.align();
+
 						int maxScore = Math.min(protein.length(), proteinReference.length());
+						int score = sw.getAligmentScore();
 						System.err.println("\nERROR: Proteins do not match for transcript " + tr.getId() //
 								+ "\tStrand:" + tr.getStrand() //
 								+ "\tExons: " + tr.numChilds() //
 								+ "\n" //
 								+ String.format("\tSnpEff protein     (%6d) : '%s'\n", protein.length(), protein) //
-								+ String.format("\tReference protein  (%6d) : '%s'\n", proteinReference.length(), proteinReference.toLowerCase()) //
+								+ String.format("\tReference protein  (%6d) : '%s'\n", proteinReference.length(), proteinReference) //
 								+ "\tAlignment (Snpeff protein vs Reference protein)." //
 								+ "\tScore: " + score //
 								+ "\tMax. possible score: " + maxScore //

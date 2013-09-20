@@ -24,6 +24,7 @@ public class SnpEffCmdCds extends SnpEff {
 
 	public static boolean onlyOneError = false; // This is used in some test-cases
 	public static double maxErrorPercentage = 0.01; // Maximum allowed error is 1% (otherwise test fails)
+	public static int MAX_ALIGN_LENGTH = 10000;
 
 	int totalErrors = 0;
 	int totalOk = 0;
@@ -124,9 +125,10 @@ public class SnpEffCmdCds extends SnpEff {
 					if (debug || onlyOneError) {
 						// Create a string indicating differences
 						SmithWaterman sw = new SmithWaterman(cds, cdsReference);
-						sw.align();
-						int score = sw.getAligmentScore();
+						if (Math.max(cds.length(), cdsReference.length()) < MAX_ALIGN_LENGTH) sw.align();
+
 						int maxScore = Math.min(cds.length(), cdsReference.length());
+						int score = sw.getAligmentScore();
 						System.err.println("\nERROR: CDSs do not match for transcript " + tr.getId() //
 								+ "\tStrand:" + tr.getStrand() //
 								+ "\tExons: " + tr.numChilds() //
