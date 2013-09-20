@@ -5,6 +5,7 @@ import java.util.HashMap;
 import ca.mcgill.mcb.pcingola.codons.CodonTable;
 import ca.mcgill.mcb.pcingola.codons.CodonTables;
 import ca.mcgill.mcb.pcingola.fileIterator.FastaFileIterator;
+import ca.mcgill.mcb.pcingola.fileIterator.SmithWaterman;
 import ca.mcgill.mcb.pcingola.interval.Gene;
 import ca.mcgill.mcb.pcingola.interval.Transcript;
 import ca.mcgill.mcb.pcingola.snpEffect.Config;
@@ -62,19 +63,19 @@ public class SnpEffCmdCds extends SnpEff {
 
 		// Compare all genes
 		for (Gene gint : config.getGenome().getGenes())
-			for (Transcript tint : gint) {
-				String cds = tint.cds().toUpperCase();
-				String mRna = tint.mRna().toUpperCase();
-				String cdsReference = cdsByTrId.get(tint.getId());
+			for (Transcript tr : gint) {
+				String cds = tr.cds().toUpperCase();
+				String mRna = tr.mRna().toUpperCase();
+				String cdsReference = cdsByTrId.get(tr.getId());
 
 				if (cdsReference != null) cdsReference = cdsReference.toUpperCase();
 
 				if (cdsReference == null) {
-					if (debug) System.err.println("\nWARNING:Cannot find reference CDS for transcript '" + tint.getId() + "'");
+					if (debug) System.err.println("\nWARNING:Cannot find reference CDS for transcript '" + tr.getId() + "'");
 					else if (verbose) System.out.print('.');
 					totalNotFound++;
 				} else if (cds.isEmpty()) {
-					if (debug) System.err.println("\nWARNING:Empty CDS for transcript '" + tint.getId() + "'");
+					if (debug) System.err.println("\nWARNING:Empty CDS for transcript '" + tr.getId() + "'");
 					else if (verbose) System.out.print('.');
 					totalNotFound++;
 				} else if (cds.equals(cdsReference)) {
@@ -83,19 +84,19 @@ public class SnpEffCmdCds extends SnpEff {
 
 					// Sanity check: Start and stop codons
 					if ((cds != null) && (cds.length() >= 3)) {
-						CodonTable ctable = CodonTables.getInstance().getTable(config.getGenome(), tint.getChromosomeName());
+						CodonTable ctable = CodonTables.getInstance().getTable(config.getGenome(), tr.getChromosomeName());
 
 						// Check start codon
 						String startCodon = cds.substring(0, 3);
 						if (!ctable.isStart(startCodon)) {
-							if (debug) System.err.println("\nWARNING: CDS for transcript '" + tint.getId() + "' does not start with a start codon:\t" + startCodon + "\t" + cds);
+							if (debug) System.err.println("\nWARNING: CDS for transcript '" + tr.getId() + "' does not start with a start codon:\t" + startCodon + "\t" + cds);
 							totalWarnings++;
 						}
 
 						// Check stop codon
 						String stopCodon = cds.substring(cds.length() - 3, cds.length());
 						if (!ctable.isStop(stopCodon)) {
-							if (debug) System.err.println("\nWARNING: CDS for transcript '" + tint.getId() + "' does not end with a stop codon:\t" + stopCodon + "\t" + cds);
+							if (debug) System.err.println("\nWARNING: CDS for transcript '" + tr.getId() + "' does not end with a stop codon:\t" + stopCodon + "\t" + cds);
 							totalWarnings++;
 						}
 					}
@@ -116,31 +117,33 @@ public class SnpEffCmdCds extends SnpEff {
 					// OK, it was a mRNA +  polyA
 					totalOk++;
 					if (verbose) System.out.print('+');
+				} else if (cdsReference.indexOf(cds) >= 0) { // CDS fully included in reference?
+					totalOk++;
+					if (verbose) System.out.print('+');
 				} else {
 					if (debug || onlyOneError) {
 						// Create a string indicating differences
-						String diffMrna = SnpEffCmdProtein.diffStr(mRna, cdsReference);
-						int diffMrnaCount = SnpEffCmdProtein.diffCount(mRna, cdsReference);
-
-						String diffCds = SnpEffCmdProtein.diffStr(cds, cdsReference);
-						int diffCdsCount = SnpEffCmdProtein.diffCount(cds, cdsReference);
-
-						System.err.println("\nERROR:CDS do not match for transcript " + tint.getId() + "\tStrand:" + tint.getStrand() + "\tExons: " + tint.numChilds());
-
-						if (diffMrnaCount < diffCdsCount) {
-							System.err.println(String.format("\tsnpEff mRNA (%6d) : '%s'", mRna.length(), mRna.toLowerCase()));
-							System.err.println(String.format("\tdiff        (%6d) : '%s'", diffMrnaCount, diffMrna));
-						} else {
-							System.err.println(String.format("\tsnpEff CDS  (%6d) : '%s'", cds.length(), cds.toLowerCase()));
-							System.err.println(String.format("\tdiff        (%6d) : '%s'", diffCdsCount, diffCds));
-						}
-
-						System.err.println(String.format("\tReference   (%6d) : '%s'", cdsReference.length(), cdsReference.toLowerCase()));
-						System.err.println("Transcript details:\n" + tint);
+						SmithWaterman sw = new SmithWaterman(cds, cdsReference);
+						sw.align();
+						int score = sw.getAligmentScore();
+						int maxScore = Math.min(cds.length(), cdsReference.length());
+						System.err.println("\nERROR: CDSs do not match for transcript " + tr.getId() //
+								+ "\tStrand:" + tr.getStrand() //
+								+ "\tExons: " + tr.numChilds() //
+								+ "\n" //
+								+ String.format("\tSnpEff CDS  (%6d) : '%s'\n", cds.length(), cds.toLowerCase()) //
+								+ String.format("\tReference   (%6d) : '%s'\n", cdsReference.length(), cdsReference.toLowerCase()) //
+								+ "\tAlignment (Snpeff CDS vs Reference CDS)." //
+								+ "\tScore: " + score //
+								+ "\tMax. possible score: " + maxScore //
+								+ "\tDiff: " + (maxScore - score) //
+								+ "\n" + sw //
+						);
+						System.err.println("Transcript details:\n" + tr);
 
 						if (onlyOneError) {
-							System.err.println("Transcript details:\n" + tint);
-							throw new RuntimeException("DIE");
+							System.err.println("Transcript details:\n" + tr);
+							throw new RuntimeException("Showing only one error!");
 						}
 
 					} else if (verbose) System.out.print('*');
