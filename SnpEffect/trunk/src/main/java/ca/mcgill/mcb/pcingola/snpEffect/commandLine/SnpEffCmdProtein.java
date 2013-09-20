@@ -3,6 +3,7 @@ package ca.mcgill.mcb.pcingola.snpEffect.commandLine;
 import java.util.HashMap;
 
 import ca.mcgill.mcb.pcingola.fileIterator.FastaFileIterator;
+import ca.mcgill.mcb.pcingola.fileIterator.SmithWaterman;
 import ca.mcgill.mcb.pcingola.genBank.Feature;
 import ca.mcgill.mcb.pcingola.genBank.Feature.Type;
 import ca.mcgill.mcb.pcingola.genBank.Features;
@@ -200,20 +201,25 @@ public class SnpEffCmdProtein extends SnpEff {
 						protein = proteinFormat(protein);
 						proteinReference = proteinFormat(proteinReference);
 
-						// Create a string indicating differences
-						String diffStr = diffStr(protein, proteinReference);
-						int countDiff = diffCount(protein, proteinReference);
+						SmithWaterman sw = new SmithWaterman(protein, proteinReference);
+						if (Math.max(protein.length(), proteinReference.length()) < SnpEffCmdCds.MAX_ALIGN_LENGTH) sw.align();
 
-						System.err.println("\nERROR:Protein sequence does not match:" //
-								+ "\n\tTranscript " + tr.getId() //
-								+ "\t, Gene: " + ((Gene) tr.getParent()).getGeneName() //
-								+ "\t, Strand:" + tr.getStrand() //
-								+ "\t, Exons: " + tr.numChilds() //
-								+ "\n\tsnpEff    (" + protein.length() + "):\t" + (protein).toLowerCase() //
-								+ "\n\tReference (" + proteinReference.length() + "):\t" + proteinFormat(proteinReference).toLowerCase() //
-								+ "\n\tdiff      (" + countDiff + "):\t" + diffStr //
-								+ "\n\tTranscript details:\t" + tr //
+						int maxScore = Math.min(protein.length(), proteinReference.length());
+						int score = sw.getAligmentScore();
+						System.err.println("\nERROR: Proteins do not match for transcript " + tr.getId() //
+								+ "\tStrand:" + tr.getStrand() //
+								+ "\tExons: " + tr.numChilds() //
+								+ "\n" //
+								+ String.format("\tSnpEff protein     (%6d) : '%s'\n", protein.length(), protein) //
+								+ String.format("\tReference protein  (%6d) : '%s'\n", proteinReference.length(), proteinReference) //
+								+ "\tAlignment (Snpeff protein vs Reference protein)." //
+								+ "\tScore: " + score //
+								+ "\tMax. possible score: " + maxScore //
+								+ "\tDiff: " + (maxScore - score) //
+								+ "\n" + sw //
 						);
+						System.err.println("Transcript details:\n" + tr);
+
 					} else if (verbose) System.out.print('*');
 
 					totalErrors++;
