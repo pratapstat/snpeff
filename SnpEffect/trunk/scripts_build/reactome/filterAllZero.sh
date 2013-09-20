@@ -1,5 +1,6 @@
-#!/bin/sh
+#!/bin/sh -e
 
+file=zzz.100.txt.gz
 file=zzz.1660.txt.gz
 
 zcat $file | ./filterAllZero.pl > z.txt

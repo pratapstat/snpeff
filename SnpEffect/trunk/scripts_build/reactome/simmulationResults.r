@@ -6,9 +6,9 @@
 #-------------------------------------------------------------------------------
 
 savePdf <- FALSE
-savePdf <- TRUE
+#savePdf <- TRUE
 
-maxPval <- 10E-30
+maxPval <- 10E-3
 minNameCount <- 3
 
 if( ! exists('d') ) {
@@ -16,8 +16,8 @@ if( ! exists('d') ) {
 	d <- read.table('zz.txt', sep='\t', header=TRUE)
 
 	# Experiment names
-	names <- read.table('expNames.txt', sep='\t', header=TRUE)
 	names <- read.table('expNames_full.txt', sep='\t', header=TRUE)
+	names <- read.table('expNames.txt', sep='\t', header=TRUE)
 }
 
 # Experiment indexes
@@ -48,9 +48,9 @@ if( savePdf ) { pdf(width=20, height=20); }
 for( i in 1:length(rnames) ) {
 	#if( length( grep("insulin", rnames[i], fixed=TRUE) ) > 0 ) {
 	if( FALSE
-		|| (d$enityId[i] == 74695) 
-		# || (d$enityId[i] == 165690) 
-		# || (d$enityId[i] == 373676)
+		#|| (d$enityId[i] == 74695) 
+		#|| (d$enityId[i] == 165690) 
+		|| (d$enityId[i] == 373676)
 		# || ( length( grep("insulin", rnames[i], fixed=TRUE) ) > 0 )
 		) {
 		x <- as.numeric(d[i,minExp:maxExp])
@@ -76,6 +76,8 @@ for( i in 1:length(rnames) ) {
 			dens <- density(x)
 			plot( dens, xlim=c(-1,1), main=rnames[i], sub=pvalStr )
 
+			if( FALSE ) {
+
 			# Plot chrts for each tissue
 			par( mfrow=c(3,3) ) 
 			col <- minColor
@@ -96,6 +98,8 @@ for( i in 1:length(rnames) ) {
 
 					col <- col + 1
 				}
+			}
+
 			}
 		} else {
 			cat('NO\t', i,'\tp-value:', pval, '\tNode:', i, d$enityId[i], d$entityName[i],as.character(rnames[i]), '\n');
