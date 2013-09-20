@@ -4,6 +4,7 @@ import java.util.List;
 
 import ca.mcgill.mcb.pcingola.snpEffect.ChangeEffect;
 import ca.mcgill.mcb.pcingola.stats.CountByType;
+import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 
 /**
  * Summarize a VCF annotated file
@@ -26,7 +27,7 @@ public class Summary {
 			for (Boolean caseControl : SnpSiftCmdCaseControlSummary.CaseControl) {
 				for (ChangeEffect.FunctionalClass functClass : ChangeEffect.FunctionalClass.values()) {
 					if (functClass != ChangeEffect.FunctionalClass.NONE) {
-						for (String variantAf : SnpSiftCmdCaseControlSummary.VariantsAf) {
+						for (VcfEntry.AlleleFrequencyType variantAf : VcfEntry.AlleleFrequencyType.values()) {
 							// Get count 
 							String key = group + "\t" + caseControl + "\t" + functClass + "\t" + variantAf;
 							long count = countByType.get(key);
@@ -49,7 +50,7 @@ public class Summary {
 			for (Boolean caseControl : SnpSiftCmdCaseControlSummary.CaseControl) {
 				for (ChangeEffect.FunctionalClass functClass : ChangeEffect.FunctionalClass.values()) {
 					if (functClass != ChangeEffect.FunctionalClass.NONE) {
-						for (String variantAf : SnpSiftCmdCaseControlSummary.VariantsAf) {
+						for (VcfEntry.AlleleFrequencyType variantAf : VcfEntry.AlleleFrequencyType.values()) {
 							String key = group + "," + (caseControl ? "case" : "control") + "," + functClass + "," + variantAf;
 							sb.append(key + "\t");
 						}
