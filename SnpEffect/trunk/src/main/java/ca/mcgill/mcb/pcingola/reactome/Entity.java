@@ -19,7 +19,7 @@ public class Entity implements Comparable<Entity> {
 
 	public static boolean debug = false;
 	public static TransferFunction TRANSFER_FUNCTION = TransferFunction.SIGM_PLUS_MINUS;
-	public static double BETA = 2.0;
+	public static double BETA = 3.0;
 
 	protected int id; // Entity ID
 	protected String name; // Entity Name
