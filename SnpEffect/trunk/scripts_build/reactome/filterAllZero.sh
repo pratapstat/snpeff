@@ -1,21 +1,21 @@
 #!/bin/sh -e
 
-file=zzz.100.txt.gz
-file=zzz.1660.txt.gz
+#file=zzz.1660.txt.gz
+file=$1
 
-zcat $file | ./filterAllZero.pl > z.txt
-cut -f 1,2 z.txt | tr -d "-" | tr -s "_" > ids.txt
-cut -f 3- z.txt > nums.txt
+cat $file | ./filterAllZero.pl > circuits.non_zero.raw.txt
+cut -f 1,2 circuits.non_zero.raw.txt | tr -d "-" | tr -s "_" > ids.txt
+cut -f 3- circuits.non_zero.raw.txt > nums.txt
 
-wc -l nums.txt ids.txt z.txt
+wc -l nums.txt ids.txt circuits.non_zero.raw.txt
 
 # Create file
-zcat $file | head -n 1 |  tr -d "-" | tr -s "_" > zz.txt
-paste ids.txt nums.txt >> zz.txt
+cat $file | head -n 1 |  tr -d "-" | tr -s "_" > circuits.non_zero.txt
+paste ids.txt nums.txt >> circuits.non_zero.txt
 
-head -n 1 zz.txt | tr "\t" "\n" > expNames.long.txt
-head -n 1 zz.txt | tr "\t" "\n" | cut -f 1 -d "_" > expNames.short.txt
+head -n 1 circuits.non_zero.txt | tr "\t" "\n" > expNames.long.txt
+head -n 1 circuits.non_zero.txt | tr "\t" "\n" | cut -f 1 -d "_" > expNames.short.txt
 ( echo -e "nameLong\tnameShort" ; paste expNames.long.txt expNames.short.txt ) > expNames.txt
 
-rm -vf z.txt expNames.long.txt expNames.short.txt  ids.txt nums.txt
+rm -vf circuits.non_zero.raw.txt expNames.long.txt expNames.short.txt  ids.txt nums.txt
 

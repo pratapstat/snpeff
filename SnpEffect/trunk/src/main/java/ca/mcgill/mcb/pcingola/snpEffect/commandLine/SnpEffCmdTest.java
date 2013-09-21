@@ -59,13 +59,16 @@ public class SnpEffCmdTest extends SnpEff {
 		gtex.getClass();
 
 		//---
-		// Simulate...!?
+		// Simulate
 		//---
 		for (GtexExperiment gtexExperiment : gtex) {
 			if ((gtexExperiment.size() > 0) // Do we have data for this experiment?
 					&& ((nameMatch == null) || gtexExperiment.getTissueTypeDetail().toLowerCase().indexOf(nameMatch.toLowerCase()) >= 0) // Does the name match (if any)
-			) reactome.zzz(gtexExperiment);
+			) reactome.run(gtexExperiment);
 		}
+
+		// Results to STDOUT
+		System.out.println(reactome.getMonitor().toString());
 
 		return true;
 	}

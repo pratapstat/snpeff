@@ -5,15 +5,15 @@
 #																Pablo Cingolani
 #-------------------------------------------------------------------------------
 
-savePdf <- FALSE
-#savePdf <- TRUE
+#savePdf <- FALSE
+savePdf <- TRUE
 
 maxPval <- 10E-3
 minNameCount <- 3
 
 if( ! exists('d') ) {
 	# Simaltion data
-	d <- read.table('zz.txt', sep='\t', header=TRUE)
+	d <- read.table('circuits.non_zero.txt', sep='\t', header=TRUE)
 
 	# Experiment names
 	names <- read.table('expNames_full.txt', sep='\t', header=TRUE)
@@ -47,12 +47,7 @@ if( savePdf ) { pdf(width=20, height=20); }
 # Plot values
 for( i in 1:length(rnames) ) {
 	#if( length( grep("insulin", rnames[i], fixed=TRUE) ) > 0 ) {
-	if( FALSE
-		#|| (d$enityId[i] == 74695) 
-		#|| (d$enityId[i] == 165690) 
-		|| (d$enityId[i] == 373676)
-		# || ( length( grep("insulin", rnames[i], fixed=TRUE) ) > 0 )
-		) {
+	if( (d$enityId[i] == 74695) || (d$enityId[i] == 165690) || (d$enityId[i] == 373676) ) {
 		x <- as.numeric(d[i,minExp:maxExp])
 
 		# Kruskal-Wallis test
@@ -76,7 +71,7 @@ for( i in 1:length(rnames) ) {
 			dens <- density(x)
 			plot( dens, xlim=c(-1,1), main=rnames[i], sub=pvalStr )
 
-			if( FALSE ) {
+			if( TRUE ) {
 
 			# Plot chrts for each tissue
 			par( mfrow=c(3,3) ) 

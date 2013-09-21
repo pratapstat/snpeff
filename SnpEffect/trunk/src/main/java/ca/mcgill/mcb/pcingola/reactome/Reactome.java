@@ -90,13 +90,20 @@ public class Reactome implements Iterable<Entity> {
 		gtex.getClass();
 
 		//---
-		// Simulate...!?
+		// Simulate
 		//---
 		for (GtexExperiment gtexExperiment : gtex) {
 			if (gtexExperiment.size() > 0) {
-				reactome.zzz(gtexExperiment);
+				reactome.run(gtexExperiment);
 			}
 		}
+
+		//---
+		// Save results
+		//---
+		String file = Gpr.HOME + "/circuit.txt";
+		Timer.showStdErr("Saving results to '" + file + "'");
+		reactome.monitor.save(file);
 	}
 
 	public Reactome(String dirName) {
@@ -127,7 +134,7 @@ public class Reactome implements Iterable<Entity> {
 	boolean calc(GtexExperiment gtexExperiment) {
 		boolean changed = true;
 		int iteration;
-		System.out.print(gtexExperiment.getTissueTypeDetail() + "\t");
+		System.err.print(gtexExperiment.getTissueTypeDetail() + "\t");
 		for (iteration = 0; changed && iteration < MAX_ITERATIONS; iteration++) {
 			changed = false;
 			HashSet<Entity> done = new HashSet<Entity>();
@@ -139,9 +146,9 @@ public class Reactome implements Iterable<Entity> {
 				// Output changed?
 				if (Math.abs(outPrev - out) > MAX_CONVERGENCE_DIFFERENCE) changed = true;
 			}
-			System.out.print(".");
+			System.err.print(".");
 		}
-		System.out.println(" " + iteration);
+		System.err.println(" " + iteration);
 
 		return changed;
 	}
@@ -211,6 +218,14 @@ public class Reactome implements Iterable<Entity> {
 		entityById.put(id, e);
 
 		return e;
+	}
+
+	public Monitor getMonitor() {
+		return monitor;
+	}
+
+	public Monitor getMonitorTrace() {
+		return monitorTrace;
 	}
 
 	@Override
@@ -584,8 +599,6 @@ public class Reactome implements Iterable<Entity> {
 			if (reaction == null) continue; // Reaction not found? Skip
 
 			Entity e = getEntity(outputId);
-			if (reaction.getId() == 74711) //
-				Gpr.debug(reaction.getName() + "\t--->\t" + e.toStringSimple());
 			reaction.addOutput(e);
 
 			Gpr.showMark(i++, SHOW_EVERY);
@@ -640,6 +653,30 @@ public class Reactome implements Iterable<Entity> {
 	}
 
 	/**
+	 * Run some simulations
+	 * @param gtex
+	 * @param gtexExperiment
+	 */
+	public boolean run(GtexExperiment gtexExperiment) {
+		// Initialize 
+		if (monitor == null) monitor = createMonitor(); // Create monitor if needed
+		if (monitorTrace == null) monitorTrace = createMonitor("74695"); // Create monitor if needed
+		reset(); // Reset previous values
+		setInputsFromGtex(gtexExperiment); // Set input nodes (fixed outputs from GTEx values)
+		scaleWeights(); // Scale weights
+
+		// Calculate circuit
+		calc(gtexExperiment);
+
+		// Add results to monitors
+		String experimentLabel = gtexExperiment.getTissueTypeDetail();
+		monitor.addResults(experimentLabel);
+		monitorTrace.addResults(experimentLabel);
+
+		return true;
+	}
+
+	/**
 	 * Scale weights
 	 */
 	void scaleWeights() {
@@ -667,6 +704,10 @@ public class Reactome implements Iterable<Entity> {
 		}
 	}
 
+	public void setMonitorTrace(Monitor monitorTrace) {
+		this.monitorTrace = monitorTrace;
+	}
+
 	@Override
 	public String toString() {
 		CountByType countByType = new CountByType();
@@ -688,34 +729,5 @@ public class Reactome implements Iterable<Entity> {
 			sb.append(e + "\n");
 
 		return sb.toString();
-	}
-
-	/**
-	 * Run some simulations
-	 * @param gtex
-	 * @param gtexExperiment
-	 */
-	public boolean zzz(GtexExperiment gtexExperiment) {
-		// Initialize 
-		if (monitor == null) monitor = createMonitor(); // Create monitor if needed
-		if (monitorTrace == null) monitorTrace = createMonitor("74695"); // Create monitor if needed
-		reset(); // Reset previous values
-		setInputsFromGtex(gtexExperiment); // Set input nodes (fixed outputs from GTEx values)
-		scaleWeights(); // Scale weights
-
-		// Calculate circuit
-		calc(gtexExperiment);
-
-		// Add results to monitors
-		String experimentLabel = gtexExperiment.getTissueTypeDetail();
-		monitor.addResults(experimentLabel);
-		monitorTrace.addResults(experimentLabel);
-
-		// Save results
-		String file = Gpr.HOME + "/zzz." + monitorTrace.sizeResults() + ".txt";
-		Timer.showStdErr("Saving results to '" + file + "'");
-		monitor.save(file);
-
-		return true;
 	}
 }

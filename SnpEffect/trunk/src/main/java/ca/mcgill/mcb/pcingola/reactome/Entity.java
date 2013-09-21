@@ -147,11 +147,11 @@ public class Entity implements Comparable<Entity> {
 	protected double transferFunction(double x) {
 		switch (TRANSFER_FUNCTION) {
 		case SIGM_PLUS_MINUS:
-			return 2.0 / (1.0 + Math.exp(-x)) - 1;
+			return 2.0 / (1.0 + Math.exp(-BETA * x)) - 1;
 		case LINEAR:
 			return x;
 		case SIGM:
-			return 1.0 / (1.0 + Math.exp(-x));
+			return 1.0 / (1.0 + Math.exp(-BETA * x));
 		case TANH:
 			return Math.tanh(BETA * x);
 		default:
