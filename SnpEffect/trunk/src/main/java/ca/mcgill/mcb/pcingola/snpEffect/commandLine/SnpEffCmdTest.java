@@ -46,6 +46,8 @@ public class SnpEffCmdTest extends SnpEff {
 	 */
 	@Override
 	public boolean run() {
+		verbose = true;
+
 		// Load reactome data
 		Reactome reactome = new Reactome();
 		reactome.setVerbose(verbose);
@@ -63,6 +65,7 @@ public class SnpEffCmdTest extends SnpEff {
 		// Results to STDOUT
 		System.out.println(reactome.getMonitor().toString());
 
+		if (verbose) Timer.showStdErr("Done!");
 		return true;
 	}
 

@@ -46,7 +46,7 @@ public class Reactome implements Iterable<Entity> {
 	AutoHashMap<String, ArrayList<Entity>> entitiesByGeneId;
 	HashSet<String> entitiesGeneId = new HashSet<String>();
 	Monitor monitor; // Monitor all nodes in the circuit
-	Monitor monitorTrace; // Monitor a specific set of nodes (usually one node and all it's predecesors)
+	Monitor monitorTrace; // Monitor a specific set of nodes (usually one node and all it's predecessors)
 
 	/**
 	 * Find and return first Regexp occurrence (null if nothing is found)
@@ -74,7 +74,7 @@ public class Reactome implements Iterable<Entity> {
 		String geneIdsFile = Gpr.HOME + "/snpEff/db/reactome/gene_ids/biomart_query_uniq.txt";
 		String gtexDir = Gpr.HOME + "/snpEff/db/GTEx";
 		String gtexSamples = gtexDir + "/GTEx_Analysis_Annotations_Sample_DS__Pilot_2013_01_31.txt";
-		String gtexData = gtexDir + "/gtex_norm.zzz.txt";
+		String gtexData = gtexDir + "/gtex_norm.10.txt";
 
 		// Load reactome data
 		Timer.showStdErr("Loading reactome data");
@@ -88,6 +88,8 @@ public class Reactome implements Iterable<Entity> {
 		gtex.setVerbose(true);
 		gtex.load(gtexSamples, gtexData);
 
+		reactome.simplifyEntities();
+
 		// Simulate
 		Timer.showStdErr("Running");
 		reactome.run(gtex, null);
@@ -95,8 +97,8 @@ public class Reactome implements Iterable<Entity> {
 		// Save results
 		String file = Gpr.HOME + "/circuit.txt";
 		Timer.showStdErr("Saving results to '" + file + "'");
-		reactome.monitor.save(file);
-		reactome.monitorTrace.save(file);
+		if (reactome.monitor != null) reactome.monitor.save(file);
+		if (reactome.monitorTrace != null) reactome.monitorTrace.save(file);
 	}
 
 	public Reactome() {
@@ -177,12 +179,24 @@ public class Reactome implements Iterable<Entity> {
 		return monitor;
 	}
 
+	Entity getEntity(int id) {
+		return entityById.get(Integer.toString(id));
+	}
+
+	public Monitor getMonitor() {
+		return monitor;
+	}
+
+	public Monitor getMonitorTrace() {
+		return monitorTrace;
+	}
+
 	/**
 	 * Get or create a new entity
 	 * @param id
 	 * @return
 	 */
-	Entity getEntity(String id) {
+	Entity getOrCreateEntity(String id) {
 		// Get from hash
 		Entity e = entityById.get(id);
 		if (e != null) return e;
@@ -208,14 +222,6 @@ public class Reactome implements Iterable<Entity> {
 		entityById.put(id, e);
 
 		return e;
-	}
-
-	public Monitor getMonitor() {
-		return monitor;
-	}
-
-	public Monitor getMonitorTrace() {
-		return monitorTrace;
 	}
 
 	@Override
@@ -268,7 +274,7 @@ public class Reactome implements Iterable<Entity> {
 			CatalystActivity reaction = (CatalystActivity) entityById.get(id);
 			if (reaction == null) continue; // Reaction not found? Skip
 
-			Entity e = getEntity(entityId);
+			Entity e = getOrCreateEntity(entityId);
 			reaction.addInput(e);
 
 			if (verbose) Gpr.showMark(i++, SHOW_EVERY);
@@ -299,8 +305,8 @@ public class Reactome implements Iterable<Entity> {
 			if (idNum == 0) continue; // Skip title
 
 			// Get complex and add entity
-			Complex c = (Complex) getEntity(id);
-			c.add(getEntity(componentId));
+			Complex c = (Complex) getOrCreateEntity(id);
+			c.add(getOrCreateEntity(componentId));
 
 			if (verbose) Gpr.showMark(i++, SHOW_EVERY);
 		}
@@ -452,8 +458,8 @@ public class Reactome implements Iterable<Entity> {
 			if (id.equals("DB_ID")) continue; // Skip title
 
 			// Add event to pathway
-			Pathway pathway = (Pathway) getEntity(id);
-			Event event = (Event) getEntity(eventId);
+			Pathway pathway = (Pathway) getOrCreateEntity(id);
+			Event event = (Event) getOrCreateEntity(eventId);
 			pathway.add(event);
 
 			if (verbose) Gpr.showMark(i++, SHOW_EVERY);
@@ -484,8 +490,8 @@ public class Reactome implements Iterable<Entity> {
 			if (id.equals("DB_ID")) continue; // Skip title
 
 			// Get entity & compartment
-			Entity e = getEntity(id);
-			Compartment compartment = (Compartment) getEntity(compartmentId);
+			Entity e = getOrCreateEntity(id);
+			Compartment compartment = (Compartment) getOrCreateEntity(compartmentId);
 
 			// Assign compartment (if not already assigned)
 			if (e.getCompartment() != null) throw new RuntimeException("Compartment already assigned for entity: " + e);
@@ -522,7 +528,7 @@ public class Reactome implements Iterable<Entity> {
 			Reaction reaction = (Reaction) entityById.get(id);
 			if (reaction == null) continue; // Reaction not found? Skip
 
-			Entity e = getEntity(catalystId);
+			Entity e = getOrCreateEntity(catalystId);
 			reaction.addCatalyst(e);
 
 			if (verbose) Gpr.showMark(i++, SHOW_EVERY);
@@ -556,7 +562,7 @@ public class Reactome implements Iterable<Entity> {
 			Reaction reaction = (Reaction) entityById.get(id);
 			if (reaction == null) continue; // Reaction not found? Skip
 
-			Entity e = getEntity(inputId);
+			Entity e = getOrCreateEntity(inputId);
 			reaction.addInput(e);
 
 			if (verbose) Gpr.showMark(i++, SHOW_EVERY);
@@ -590,7 +596,7 @@ public class Reactome implements Iterable<Entity> {
 			Reaction reaction = (Reaction) entityById.get(id);
 			if (reaction == null) continue; // Reaction not found? Skip
 
-			Entity e = getEntity(outputId);
+			Entity e = getOrCreateEntity(outputId);
 			reaction.addOutput(e);
 
 			if (verbose) Gpr.showMark(i++, SHOW_EVERY);
@@ -626,7 +632,7 @@ public class Reactome implements Iterable<Entity> {
 			Reaction reaction = (Reaction) entityById.get(regulatedEntityId);
 			if (reaction == null) continue; // Reaction not found? Skip
 
-			Entity e = getEntity(regulatorId);
+			Entity e = getOrCreateEntity(regulatorId);
 			reaction.addRegulator(e, objectType.get(id));
 
 			if (verbose) Gpr.showMark(i++, SHOW_EVERY);
@@ -670,7 +676,7 @@ public class Reactome implements Iterable<Entity> {
 		// Initialize 
 		if (monitor == null) monitor = createMonitor(); // Create monitor if needed
 		reset(); // Reset previous values
-		setInputsFromGtex(gtexExperiment); // Set input nodes (fixed outputs from GTEx values)
+		setInputs(gtexExperiment); // Set input nodes (fixed outputs from GTEx values)
 		scaleWeights(); // Scale weights
 
 		// Calculate circuit
@@ -696,7 +702,7 @@ public class Reactome implements Iterable<Entity> {
 	 * Set input nodes (fixed outputs from GTEx values)
 	 * @param gtex
 	 */
-	void setInputsFromGtex(GtexExperiment gtexExperiment) {
+	void setInputs(GtexExperiment gtexExperiment) {
 		Gtex gtex = gtexExperiment.getGtex();
 
 		for (String gid : gtex.getGeneIds()) {
@@ -718,6 +724,61 @@ public class Reactome implements Iterable<Entity> {
 
 	public void setVerbose(boolean verbose) {
 		this.verbose = verbose;
+	}
+
+	/**
+	 * Simplify: Removes entities that are not reachable from any 'gene' entity
+	 */
+	void simplifyEntities() {
+		if (verbose) Timer.showStdErr("Simplify: Removing unnecesary nodes.");
+
+		//---
+		// Select entities to keep or delete
+		//---
+
+		// Entities to keep (all other entities will be deleted)
+		HashSet<Entity> keep = new HashSet<Entity>();
+
+		// Create a set of all genes
+		HashSet<Entity> genes = new HashSet<Entity>();
+		for (List<Entity> entities : entitiesByGeneId.values())
+			genes.addAll(entities);
+
+		// Analyze each entity
+		for (Entity e : entityById.values()) {
+			// Calculate
+			HashSet<Entity> done = new HashSet<Entity>();
+			e.calc(done);
+
+			// Is any of the calculated entities a gene?
+			boolean ok = genes.contains(e);
+			for (Entity ee : done)
+				ok |= genes.contains(ee);
+
+			// OK? Keep all these entities
+			if (ok) keep.addAll(done);
+		}
+
+		// Entities to delete
+		HashSet<Entity> toDelete = new HashSet<Entity>();
+		for (Entity e : entityById.values())
+			if (!keep.contains(e)) toDelete.add(e);
+
+		//---
+		// Delete entities
+		//---
+		int deleted = 0;
+		for (Entity e : toDelete) {
+			String id = "" + e.getId();
+			if (entityById.remove(id) != null) deleted++;
+		}
+
+		// Done
+		if (verbose) Timer.showStdErr("Simplify: done." //
+				+ "\n\tGenes              : " + genes.size() //
+				+ "\n\tEntities deleted   : " + deleted //
+				+ "\n\tEntities remaining : " + entityById.size() //
+		);
 	}
 
 	@Override

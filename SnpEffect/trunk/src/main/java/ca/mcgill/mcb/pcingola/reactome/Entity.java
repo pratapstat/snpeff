@@ -56,15 +56,12 @@ public class Entity implements Comparable<Entity> {
 	 * @return
 	 */
 	public double calc(HashSet<Entity> doneEntities) {
+		// Make sure we don't calculate twice
+		if (doneEntities.contains(this)) return output;
+		doneEntities.add(this); // Keep 'entities' set up to date
 
-		if (!Double.isNaN(fixedOutput)) {
-			output = fixedOutput;
-		} else {
-			if (doneEntities.contains(this)) return output; // Make sure we don't calculate twice
-			doneEntities.add(this); // Keep 'entities' set up to date
-
-			output = getWeight(); // Calculate output
-		}
+		if (!Double.isNaN(fixedOutput)) output = fixedOutput;
+		else output = getWeight(); // Calculate output
 
 		if (debug) System.out.println(output + "\tfixed:" + isFixed() + "\tid:" + id + "\ttype:" + getClass().getSimpleName() + "\tname:" + name);
 		return output;
