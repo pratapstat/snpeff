@@ -5,11 +5,11 @@
 #																Pablo Cingolani
 #-------------------------------------------------------------------------------
 
-#savePdf <- FALSE
+savePdf <- FALSE
 savePdf <- TRUE
 
 maxPval <- 10E-3
-minNameCount <- 3
+minNameCount <- 10
 
 if( ! exists('d') ) {
 	# Simaltion data
@@ -69,7 +69,7 @@ for( i in 1:length(rnames) ) {
 			cat('  \t', i,'\tp-value:', pval, '\tNode:', i, '\tId:', d$enityId[i], '\tName:', name, '\n');
 			pvalStr <- paste('p-value(ANNOVA):', pval, '  p-value(Kruskal):', pval.kw)
 			dens <- density(x)
-			plot( dens, xlim=c(-1,1), main=rnames[i], sub=pvalStr )
+			plot( dens, xlim=c(-1,1), main=rnames[i], sub=pvalStr, xlab="All" )
 
 			if( TRUE ) {
 
@@ -84,12 +84,10 @@ for( i in 1:length(rnames) ) {
 
 				# At least 'minNameCount' samples?
 				if( length(xns) > minNameCount ) {
-					# Avoid black color
-					if( col %% 9 == 0 ) { col <- col + 1; }
-
 					# Plot this density and overall density
-					plot( density(xns), xlim=c(-1,1), main=ns, xlab=rnames[i], sub=col, col=col )
-					lines( dens )
+					main <- paste(ns, '(#samples:',length(xns), ')')
+					plot( density(xns), xlim=c(-1,1), main=main, xlab=rnames[i], sub=col, col=col )
+					lines( dens, lty=2, col='gray' )
 
 					col <- col + 1
 				}

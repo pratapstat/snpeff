@@ -19,7 +19,7 @@ public class Entity implements Comparable<Entity> {
 
 	public static boolean debug = false;
 	public static TransferFunction TRANSFER_FUNCTION = TransferFunction.SIGM_PLUS_MINUS;
-	public static double BETA = 3.0;
+	public static double BETA = 3.0; // Note: Betas of less than 2.2 will make output shrink to zero, because iterated functions tend to zero f(f(f(....f(x)...))) -> 0
 
 	protected int id; // Entity ID
 	protected String name; // Entity Name
@@ -42,6 +42,10 @@ public class Entity implements Comparable<Entity> {
 	public void addGeneId(String geneId) {
 		if (geneIds == null) geneIds = new HashSet<String>();
 		geneIds.add(geneId);
+	}
+
+	public double calc() {
+		return calc(new HashSet<Entity>());
 	}
 
 	/**

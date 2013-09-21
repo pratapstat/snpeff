@@ -38,6 +38,7 @@ public class Reactome implements Iterable<Entity> {
 	public static final double MAX_CONVERGENCE_DIFFERENCE = 1E-3;
 	public static final int MAX_ITERATIONS = 1000;
 
+	boolean verbose = false;
 	String dirName;
 	HashMap<String, Entity> entityById;
 	HashMap<String, String> objectType;
@@ -69,45 +70,36 @@ public class Reactome implements Iterable<Entity> {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-
-		//---
-		// Load reactome data
-		//---
 		String reactomeDir = Gpr.HOME + "/snpEff/db/reactome/txt/";
 		String geneIdsFile = Gpr.HOME + "/snpEff/db/reactome/gene_ids/biomart_query_uniq.txt";
-		Reactome reactome = new Reactome(reactomeDir);
-		reactome.load();
-		reactome.loadGeneIds(geneIdsFile); // Load Gene IDs data
-
-		//---
-		// Load GTEX data
-		//---
-		Timer.showStdErr("Loading GTEx data");
 		String gtexDir = Gpr.HOME + "/snpEff/db/GTEx";
 		String gtexSamples = gtexDir + "/GTEx_Analysis_Annotations_Sample_DS__Pilot_2013_01_31.txt";
 		String gtexData = gtexDir + "/gtex_norm.zzz.txt";
-		Gtex gtex = new Gtex(gtexSamples, gtexData);
-		gtex.getClass();
 
-		//---
+		// Load reactome data
+		Timer.showStdErr("Loading reactome data");
+		Reactome reactome = new Reactome();
+		reactome.setVerbose(true);
+		reactome.load(reactomeDir, geneIdsFile);
+
+		// Load GTEX data
+		Timer.showStdErr("Loading GTEx data");
+		Gtex gtex = new Gtex();
+		gtex.setVerbose(true);
+		gtex.load(gtexSamples, gtexData);
+
 		// Simulate
-		//---
-		for (GtexExperiment gtexExperiment : gtex) {
-			if (gtexExperiment.size() > 0) {
-				reactome.run(gtexExperiment);
-			}
-		}
+		Timer.showStdErr("Running");
+		reactome.run(gtex, null);
 
-		//---
 		// Save results
-		//---
 		String file = Gpr.HOME + "/circuit.txt";
 		Timer.showStdErr("Saving results to '" + file + "'");
 		reactome.monitor.save(file);
+		reactome.monitorTrace.save(file);
 	}
 
-	public Reactome(String dirName) {
-		this.dirName = dirName;
+	public Reactome() {
 		entityById = new HashMap<String, Entity>();
 		entitiesByGeneId = new AutoHashMap<String, ArrayList<Entity>>(new ArrayList<Entity>());
 	}
@@ -134,7 +126,8 @@ public class Reactome implements Iterable<Entity> {
 	boolean calc(GtexExperiment gtexExperiment) {
 		boolean changed = true;
 		int iteration;
-		System.err.print(gtexExperiment.getTissueTypeDetail() + "\t");
+
+		if (verbose) System.err.print(gtexExperiment.getTissueTypeDetail() + "\t");
 		for (iteration = 0; changed && iteration < MAX_ITERATIONS; iteration++) {
 			changed = false;
 			HashSet<Entity> done = new HashSet<Entity>();
@@ -146,9 +139,9 @@ public class Reactome implements Iterable<Entity> {
 				// Output changed?
 				if (Math.abs(outPrev - out) > MAX_CONVERGENCE_DIFFERENCE) changed = true;
 			}
-			System.err.print(".");
+			if (verbose) System.err.print(".");
 		}
-		System.err.println(" " + iteration);
+		if (verbose) System.err.println(" " + iteration);
 
 		return changed;
 	}
@@ -163,8 +156,6 @@ public class Reactome implements Iterable<Entity> {
 		}
 
 		monitor.sort();
-		Gpr.debug("Monitor size: " + monitor.size());
-
 		return monitor;
 	}
 
@@ -182,7 +173,6 @@ public class Reactome implements Iterable<Entity> {
 		for (Entity e : done)
 			monitor.add(e);
 		monitor.sort();
-		Gpr.debug("Monitor size: " + monitor.size());
 
 		return monitor;
 	}
@@ -233,26 +223,28 @@ public class Reactome implements Iterable<Entity> {
 		return entityById.values().iterator();
 	}
 
-	public void load() {
-		Timer.showStdErr("Loading Reactome data from directory '" + dirName + "'");
+	public void load(String dirName, String geneIdsFile) {
+		this.dirName = dirName;
+		if (verbose) Timer.showStdErr("Loading Reactome data from directory '" + dirName + "'");
 
 		loadDatabaseObjects(); // Load a map of all object names and types
 		loadComplex2HasComponent(); // Load Complex_2_hasComponent
 		loadPhysicalEntity2Compartment(); // Load compartment information
 		loadPathway2HasEvent(); // Load pathway data
-
 		loadReactionlikeEvent2Input(); // Load reaction inputs
 		loadReactionlikeEvent2Output(); // Load reaction outputs
 		loadReactionlikeEvent2CatalystActivity(); // Load reaction catalysts
 		loadRegulation(); // Load reaction regulators
-
 		loadCatalystActivity(); // Load catalyst
 
 		// Remove cached data, we don't need it any more
 		objectType = null;
 		objectName = null;
 
-		Timer.showStdErr("Loading finished");
+		// Load Gene IDs data
+		loadGeneIds(geneIdsFile);
+
+		if (verbose) Timer.showStdErr("Loading finished");
 	}
 
 	/**
@@ -261,7 +253,7 @@ public class Reactome implements Iterable<Entity> {
 	protected void loadCatalystActivity() {
 		String name = "CatalystActivity";
 		String fileName = dirName + name + ".txt";
-		Timer.showStdErr("Loading " + name + " from '" + fileName + "'");
+		if (verbose) Timer.showStdErr("Loading " + name + " from '" + fileName + "'");
 
 		int i = 1;
 		for (String line : Gpr.readFile(fileName).split("\n")) {
@@ -279,11 +271,11 @@ public class Reactome implements Iterable<Entity> {
 			Entity e = getEntity(entityId);
 			reaction.addInput(e);
 
-			Gpr.showMark(i++, SHOW_EVERY);
+			if (verbose) Gpr.showMark(i++, SHOW_EVERY);
 		}
 
-		System.err.println("");
-		Timer.showStdErr("Total catalyst entities assigned: " + (i - 1));
+		if (verbose) System.err.println("");
+		if (verbose) Timer.showStdErr("Total catalyst entities assigned: " + (i - 1));
 	}
 
 	/**
@@ -294,7 +286,7 @@ public class Reactome implements Iterable<Entity> {
 	 */
 	protected void loadComplex2HasComponent() {
 		String fileName = dirName + "Complex_2_hasComponent.txt";
-		Timer.showStdErr("Loading Complex_2_hasComponent from '" + fileName + "'");
+		if (verbose) Timer.showStdErr("Loading Complex_2_hasComponent from '" + fileName + "'");
 
 		int i = 1;
 		for (String line : Gpr.readFile(fileName).split("\n")) {
@@ -310,11 +302,11 @@ public class Reactome implements Iterable<Entity> {
 			Complex c = (Complex) getEntity(id);
 			c.add(getEntity(componentId));
 
-			Gpr.showMark(i++, SHOW_EVERY);
+			if (verbose) Gpr.showMark(i++, SHOW_EVERY);
 		}
 
-		System.err.println("");
-		Timer.showStdErr("Total entities added: " + entityById.size());
+		if (verbose) System.err.println("");
+		if (verbose) Timer.showStdErr("Total entities added: " + entityById.size());
 	}
 
 	/**
@@ -322,11 +314,11 @@ public class Reactome implements Iterable<Entity> {
 	 */
 	protected void loadDatabaseObjects() {
 		String fileName = dirName + "DatabaseObject.txt";
-		Timer.showStdErr("Loading objects from '" + fileName + "'");
+		if (verbose) Timer.showStdErr("Loading objects from '" + fileName + "'");
 
 		// Ensure capacity
 		int numObjects = Gpr.countLines(fileName);
-		Timer.showStdErr("Counting lines from '" + fileName + "'. Total lines: " + numObjects);
+		if (verbose) Timer.showStdErr("Counting lines from '" + fileName + "'. Total lines: " + numObjects);
 		objectType = new HashMap<String, String>(numObjects);
 		objectName = new HashMap<String, String>(numObjects);
 
@@ -345,11 +337,11 @@ public class Reactome implements Iterable<Entity> {
 			objectType.put(id, objType);
 			objectName.put(id, objName);
 
-			Gpr.showMark(i++, SHOW_EVERY);
+			if (verbose) Gpr.showMark(i++, SHOW_EVERY);
 		}
 
-		System.err.println("");
-		Timer.showStdErr("Total objects loaded: " + objectName.size());
+		if (verbose) System.err.println("");
+		if (verbose) Timer.showStdErr("Total objects loaded: " + objectName.size());
 	}
 
 	/**
@@ -361,7 +353,7 @@ public class Reactome implements Iterable<Entity> {
 		//---
 		// Load Gene IDs data
 		//---
-		Timer.showStdErr("Loading Gene IDs from " + geneIdsFile);
+		if (verbose) Timer.showStdErr("Loading Gene IDs from " + geneIdsFile);
 		GeneIds geneIds = new GeneIds(geneIdsFile);
 
 		// Assign to geneIDs
@@ -414,7 +406,7 @@ public class Reactome implements Iterable<Entity> {
 
 		}
 
-		Timer.showStdErr("Done. Entities matched to geneIDs:" + countMatched + " / " + countUnMatched);
+		if (verbose) Timer.showStdErr("Done. Entities matched to geneIDs:" + countMatched + " / " + countUnMatched);
 	}
 
 	/**
@@ -424,7 +416,7 @@ public class Reactome implements Iterable<Entity> {
 	 * @param map
 	 */
 	protected void loadMap(String name, String fileName, HashMap<String, String> map) {
-		Timer.showStdErr("Loading " + name + " from '" + fileName + "'");
+		if (verbose) Timer.showStdErr("Loading " + name + " from '" + fileName + "'");
 
 		int i = 1;
 		for (String line : Gpr.readFile(fileName).split("\n")) {
@@ -432,11 +424,11 @@ public class Reactome implements Iterable<Entity> {
 			String id = rec[0];
 			String componentId = rec[1];
 			map.put(id, componentId);
-			Gpr.showMark(i++, SHOW_EVERY);
+			if (verbose) Gpr.showMark(i++, SHOW_EVERY);
 		}
 
-		System.err.println("");
-		Timer.showStdErr("Total objects loaded: " + map.size());
+		if (verbose) System.err.println("");
+		if (verbose) Timer.showStdErr("Total objects loaded: " + map.size());
 	}
 
 	/**
@@ -448,7 +440,7 @@ public class Reactome implements Iterable<Entity> {
 	protected void loadPathway2HasEvent() {
 		String name = "Pathway_2_hasEvent";
 		String fileName = dirName + name + ".txt";
-		Timer.showStdErr("Loading " + name + " from '" + fileName + "'");
+		if (verbose) Timer.showStdErr("Loading " + name + " from '" + fileName + "'");
 
 		int i = 1;
 		for (String line : Gpr.readFile(fileName).split("\n")) {
@@ -464,11 +456,11 @@ public class Reactome implements Iterable<Entity> {
 			Event event = (Event) getEntity(eventId);
 			pathway.add(event);
 
-			Gpr.showMark(i++, SHOW_EVERY);
+			if (verbose) Gpr.showMark(i++, SHOW_EVERY);
 		}
 
-		System.err.println("");
-		Timer.showStdErr("Total events assigned: " + (i - 1));
+		if (verbose) System.err.println("");
+		if (verbose) Timer.showStdErr("Total events assigned: " + (i - 1));
 	}
 
 	/**
@@ -480,7 +472,7 @@ public class Reactome implements Iterable<Entity> {
 	protected void loadPhysicalEntity2Compartment() {
 		String name = "PhysicalEntity_2_compartment";
 		String fileName = dirName + name + ".txt";
-		Timer.showStdErr("Loading " + name + " from '" + fileName + "'");
+		if (verbose) Timer.showStdErr("Loading " + name + " from '" + fileName + "'");
 
 		int i = 1;
 		for (String line : Gpr.readFile(fileName).split("\n")) {
@@ -499,11 +491,11 @@ public class Reactome implements Iterable<Entity> {
 			if (e.getCompartment() != null) throw new RuntimeException("Compartment already assigned for entity: " + e);
 			e.setCompartment(compartment);
 
-			Gpr.showMark(i++, SHOW_EVERY);
+			if (verbose) Gpr.showMark(i++, SHOW_EVERY);
 		}
 
-		System.err.println("");
-		Timer.showStdErr("Total compartments assigned: " + (i - 1));
+		if (verbose) System.err.println("");
+		if (verbose) Timer.showStdErr("Total compartments assigned: " + (i - 1));
 	}
 
 	/**
@@ -515,7 +507,7 @@ public class Reactome implements Iterable<Entity> {
 	protected void loadReactionlikeEvent2CatalystActivity() {
 		String name = "ReactionlikeEvent_2_catalystActivity";
 		String fileName = dirName + name + ".txt";
-		Timer.showStdErr("Loading " + name + " from '" + fileName + "'");
+		if (verbose) Timer.showStdErr("Loading " + name + " from '" + fileName + "'");
 
 		int i = 1;
 		for (String line : Gpr.readFile(fileName).split("\n")) {
@@ -533,11 +525,11 @@ public class Reactome implements Iterable<Entity> {
 			Entity e = getEntity(catalystId);
 			reaction.addCatalyst(e);
 
-			Gpr.showMark(i++, SHOW_EVERY);
+			if (verbose) Gpr.showMark(i++, SHOW_EVERY);
 		}
 
-		System.err.println("");
-		Timer.showStdErr("Total outputs assigned: " + (i - 1));
+		if (verbose) System.err.println("");
+		if (verbose) Timer.showStdErr("Total outputs assigned: " + (i - 1));
 	}
 
 	/**
@@ -549,7 +541,7 @@ public class Reactome implements Iterable<Entity> {
 	protected void loadReactionlikeEvent2Input() {
 		String name = "ReactionlikeEvent_2_input";
 		String fileName = dirName + name + ".txt";
-		Timer.showStdErr("Loading " + name + " from '" + fileName + "'");
+		if (verbose) Timer.showStdErr("Loading " + name + " from '" + fileName + "'");
 
 		int i = 1;
 		for (String line : Gpr.readFile(fileName).split("\n")) {
@@ -567,11 +559,11 @@ public class Reactome implements Iterable<Entity> {
 			Entity e = getEntity(inputId);
 			reaction.addInput(e);
 
-			Gpr.showMark(i++, SHOW_EVERY);
+			if (verbose) Gpr.showMark(i++, SHOW_EVERY);
 		}
 
-		System.err.println("");
-		Timer.showStdErr("Total inputs assigned: " + (i - 1));
+		if (verbose) System.err.println("");
+		if (verbose) Timer.showStdErr("Total inputs assigned: " + (i - 1));
 	}
 
 	/**
@@ -583,7 +575,7 @@ public class Reactome implements Iterable<Entity> {
 	protected void loadReactionlikeEvent2Output() {
 		String name = "ReactionlikeEvent_2_output";
 		String fileName = dirName + name + ".txt";
-		Timer.showStdErr("Loading " + name + " from '" + fileName + "'");
+		if (verbose) Timer.showStdErr("Loading " + name + " from '" + fileName + "'");
 
 		int i = 1;
 		for (String line : Gpr.readFile(fileName).split("\n")) {
@@ -601,11 +593,11 @@ public class Reactome implements Iterable<Entity> {
 			Entity e = getEntity(outputId);
 			reaction.addOutput(e);
 
-			Gpr.showMark(i++, SHOW_EVERY);
+			if (verbose) Gpr.showMark(i++, SHOW_EVERY);
 		}
 
-		System.err.println("");
-		Timer.showStdErr("Total outputs assigned: " + (i - 1));
+		if (verbose) System.err.println("");
+		if (verbose) Timer.showStdErr("Total outputs assigned: " + (i - 1));
 	}
 
 	/**
@@ -617,7 +609,7 @@ public class Reactome implements Iterable<Entity> {
 	protected void loadRegulation() {
 		String name = "Regulation";
 		String fileName = dirName + name + ".txt";
-		Timer.showStdErr("Loading " + name + " from '" + fileName + "'");
+		if (verbose) Timer.showStdErr("Loading " + name + " from '" + fileName + "'");
 
 		int i = 1;
 		for (String line : Gpr.readFile(fileName).split("\n")) {
@@ -637,11 +629,11 @@ public class Reactome implements Iterable<Entity> {
 			Entity e = getEntity(regulatorId);
 			reaction.addRegulator(e, objectType.get(id));
 
-			Gpr.showMark(i++, SHOW_EVERY);
+			if (verbose) Gpr.showMark(i++, SHOW_EVERY);
 		}
 
-		System.err.println("");
-		Timer.showStdErr("Total regulations assigned: " + (i - 1));
+		if (verbose) System.err.println("");
+		if (verbose) Timer.showStdErr("Total regulations assigned: " + (i - 1));
 	}
 
 	/**
@@ -653,6 +645,23 @@ public class Reactome implements Iterable<Entity> {
 	}
 
 	/**
+	 * Run all experiments on gtex
+	 * @param gtex
+	 * @return
+	 */
+	public boolean run(Gtex gtex, String nameMatch) {
+		boolean ok = true;
+
+		for (GtexExperiment gtexExperiment : gtex) {
+			if ((gtexExperiment.size() > 0) // Do we have data for this experiment?
+					&& ((nameMatch == null) || gtexExperiment.getTissueTypeDetail().toLowerCase().indexOf(nameMatch.toLowerCase()) >= 0) // Does the name match (if any)
+			) run(gtexExperiment);
+		}
+
+		return ok;
+	}
+
+	/**
 	 * Run some simulations
 	 * @param gtex
 	 * @param gtexExperiment
@@ -660,7 +669,6 @@ public class Reactome implements Iterable<Entity> {
 	public boolean run(GtexExperiment gtexExperiment) {
 		// Initialize 
 		if (monitor == null) monitor = createMonitor(); // Create monitor if needed
-		if (monitorTrace == null) monitorTrace = createMonitor("74695"); // Create monitor if needed
 		reset(); // Reset previous values
 		setInputsFromGtex(gtexExperiment); // Set input nodes (fixed outputs from GTEx values)
 		scaleWeights(); // Scale weights
@@ -670,8 +678,8 @@ public class Reactome implements Iterable<Entity> {
 
 		// Add results to monitors
 		String experimentLabel = gtexExperiment.getTissueTypeDetail();
-		monitor.addResults(experimentLabel);
-		monitorTrace.addResults(experimentLabel);
+		if (monitor != null) monitor.addResults(experimentLabel);
+		if (monitorTrace != null) monitorTrace.addResults(experimentLabel);
 
 		return true;
 	}
@@ -706,6 +714,10 @@ public class Reactome implements Iterable<Entity> {
 
 	public void setMonitorTrace(Monitor monitorTrace) {
 		this.monitorTrace = monitorTrace;
+	}
+
+	public void setVerbose(boolean verbose) {
+		this.verbose = verbose;
 	}
 
 	@Override

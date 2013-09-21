@@ -1,7 +1,6 @@
 package ca.mcgill.mcb.pcingola.snpEffect.commandLine;
 
 import ca.mcgill.mcb.pcingola.gtex.Gtex;
-import ca.mcgill.mcb.pcingola.gtex.GtexExperiment;
 import ca.mcgill.mcb.pcingola.reactome.Reactome;
 import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.util.Timer;
@@ -47,25 +46,19 @@ public class SnpEffCmdTest extends SnpEff {
 	 */
 	@Override
 	public boolean run() {
-		Reactome reactome = new Reactome(reactomeDir);
-		reactome.load();
-		reactome.loadGeneIds(geneIdsFile); // Load Gene IDs data
+		// Load reactome data
+		Reactome reactome = new Reactome();
+		reactome.setVerbose(verbose);
+		reactome.load(reactomeDir, geneIdsFile);
 
-		//---
 		// Load GTEX data
-		//---
-		Timer.showStdErr("Loading GTEx data");
-		Gtex gtex = new Gtex(gtexSamples, gtexData);
-		gtex.getClass();
+		if (verbose) Timer.showStdErr("Loading GTEx data");
+		Gtex gtex = new Gtex();
+		gtex.setVerbose(verbose);
+		gtex.load(gtexSamples, gtexData);
 
-		//---
 		// Simulate
-		//---
-		for (GtexExperiment gtexExperiment : gtex) {
-			if ((gtexExperiment.size() > 0) // Do we have data for this experiment?
-					&& ((nameMatch == null) || gtexExperiment.getTissueTypeDetail().toLowerCase().indexOf(nameMatch.toLowerCase()) >= 0) // Does the name match (if any)
-			) reactome.run(gtexExperiment);
-		}
+		reactome.run(gtex, nameMatch);
 
 		// Results to STDOUT
 		System.out.println(reactome.getMonitor().toString());

@@ -19,14 +19,14 @@ public class Gtex implements Iterable<GtexExperiment> {
 
 	public static final String NA_VALUE = "NA";
 
-	boolean verbose = true;
+	boolean verbose = false;
 	HashMap<String, GtexExperiment> experiments;
 	HashMap<String, Integer> geneId2Index;
 	String geneIds[];
 
-	public Gtex(String samples, String data) {
-		loadSamples(samples); // Sample definition file
-		loadData(data); // Data file
+	public Gtex() {
+		experiments = new HashMap<String, GtexExperiment>();
+		geneId2Index = new HashMap<String, Integer>();
 	}
 
 	public Collection<String> getGeneIds() {
@@ -37,8 +37,14 @@ public class Gtex implements Iterable<GtexExperiment> {
 		return geneId2Index.get(geneId);
 	}
 
+	@Override
 	public Iterator<GtexExperiment> iterator() {
 		return experiments.values().iterator();
+	}
+
+	public void load(String samples, String data) {
+		loadSamples(samples); // Sample definition file
+		loadData(data); // Data file
 	}
 
 	/**
@@ -117,6 +123,10 @@ public class Gtex implements Iterable<GtexExperiment> {
 		}
 
 		if (verbose) Timer.showStdErr("Done. Loaded " + experiments.size() + " experiments.");
+	}
+
+	public void setVerbose(boolean verbose) {
+		this.verbose = verbose;
 	}
 
 	@Override
