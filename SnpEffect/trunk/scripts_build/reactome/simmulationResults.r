@@ -8,8 +8,8 @@
 savePdf <- FALSE
 savePdf <- TRUE
 
-maxPval <- 10E-3
-minNameCount <- 10
+maxPval <- 1E-3
+minNameCount <- 5
 
 if( ! exists('d') ) {
 	# Simaltion data
@@ -71,7 +71,7 @@ for( i in 1:length(rnames) ) {
 			dens <- density(x)
 			plot( dens, xlim=c(-1,1), main=rnames[i], sub=pvalStr, xlab="All" )
 
-			if( TRUE ) {
+			if( F ) {
 
 			# Plot chrts for each tissue
 			par( mfrow=c(3,3) ) 
