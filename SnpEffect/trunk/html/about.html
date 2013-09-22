@@ -135,27 +135,33 @@
 				<p class="lead">
 				Please send any bug reports to:
 				<address>
-				  <strong>Pablo Cingolani.</strong><br>
+				  <strong><a class="body" href="http://www.linkedin.com/in/pablocingolani">Pablo Cingolani</a>.</strong><br>
 				  pcingola@users.sourceforge.net
 				</address>
 				</p>
-
-				<p> <b>Important:</b> Try SnpEff's latest version. SnpEff is updated often, may be the bug has already been corrected (e.g you are using version 3.1A, but I've already fixed it in version 3.1B). 
-					<p>
+				<br>
+				<p>
+				<b>Important:</b> A bug report should include the following information (in order to try to reproduce and fix the bug)
+				<table class="table table-striped">
+					<tr> <th> Item </th><th> Explanation </th><th> Example </th> </tr>
+					<tr> <td>What?</td><td> A clear explanation of the bug condition </td><td> "a RuntimeException occurss when trying to annotate..." </td> </tr>
+					<tr> <td>How?</td><td> A minimal bug-demonstrating test case </td><td> "when running the following command/s...".<br> Make sure you send the exact command lines you are using. </td> </tr>
+					<tr> <td>Which?</td><td> Which organism and genome version you are using (if applicable) </td><td> "we use GRCh37.72" </td> </tr>
+					<tr> <td>Version:</td><td> Which SnpEFf version and sub-version you are using </td><td> "we are using SnpEFf 3.3H").<br> Hint: Running <code>java -jar snpEff.jar</code> shows version information. </td> </tr>
+					<tr> <td>Data:</td><td> Sample data enough to reproduce the conditions </td><td> "find attached a sample of the VCF file..." </td> </tr>
+					<tr> <td>Results:</td><td> What you expect to obtain (if applicable)</td><td> "we expected result X, but we obtained Y instead..." </td> </tr>
+				</table>
+				</p>
+				<br>
+				<br>
+				<p> <b>Note:</b> Try SnpEff's latest version. SnpEff is updated often, may be the bug has already been corrected (e.g you are using version 3.1A, but I've already fixed it in version 3.1B). 
+					<br>
 					I know this is obvious, but I get many emails saying:
 					<p>
-							<blockquote><i>"...I read someone was using version 2.0.5 many years ago, so I'm using that version, and I noticed the features implemented in version 3.X don't work..." </i></blockquote>
-							<p>
-
-				<p>
-				<b>Note:</b> A bug report should include at least
-				<ul>
-					<li> An explanation of the bug condition
-					<li> A minimal bug-demonstrating test case (i.e. include SNP file used to run the test case)
-					<li> The conditions for the bug to occur (e.g. genome version)
-					<li> SnpEff version and sub-version numbers you are using (e.g. "I'm using SnpEff version 3.1 revision K")
-				</ul>
+					<blockquote><i>"...I read someone was using version 2.0.5 many years ago, so I'm using that version, and I noticed the features implemented in version 3.X don't work..." </i></blockquote>
+					</p>
 				</p>
+
         </section>
 
         <!-- help
@@ -169,39 +175,39 @@
 				Apologies in advanced.<br>
 				Contact information:
 				<address>
-				  <strong>Pablo Cingolani.</strong><br>
+				  <strong><a class="body" href="http://www.linkedin.com/in/pablocingolani">Pablo Cingolani</a>.</strong><br>
 				  pcingola@users.sourceforge.net
 				</address>
 				</p>
-
+				<br>
 				<p>
-				<b>Important:</b> A request for help, should include at least
-				<ul>
-					<li> A clear explanation of what you are trying to achieve (e.g. "I want to annotate variants... and then filter them to obtain...").
-					<li> Which organism and genome version you are using (e.g. "we are analyzing human samples using GRCh37.72 reference genome")
-					<li> A minimal demonstration of how you are trying to do it (e.g. "we run the following command...")
-					<li> Sample data enough to reproduce the conditions (e.g. "find attached a sample of the VCF file...")
-					<li> What you expect to obtain (e.g. "we wanted to get information on variants that affect splcie regions...")
-				</ul>
+				<b>Important:</b> A request for help, should include at least the following items:
+				<table class="table table-striped">
+					<tr> <th> Item </th><th> Explanation </th><th> Example </th> </tr>
+					<tr> <td>What?</td><td> A clear explanation of what you are trying to achieve </td><td> "I want to annotate variants... and then filter them to obtain..." </td> </tr>
+					<tr> <td>How?</td><td> A minimal demonstration of how you are trying to do it </td><td> "we run the following command...".<br> Make sure you send the exact command lines you are using. </td> </tr>
+					<tr> <td>Which?</td><td> Which organism and genome version you are using </td><td> "we are analyzing human samples using GRCh37.72 reference genome" </td> </tr>
+					<tr> <td>Version:</td><td> Which SnpEFf version and sub-version you are using </td><td> "we are using SnpEFf 3.3H").<br> Hint: Running <code>java -jar snpEff.jar</code> shows version information. </td> </tr>
+					<tr> <td>Data:</td><td> Sample data enough to reproduce the conditions </td><td> "find attached a sample of the VCF file..." </td> </tr>
+					<tr> <td>Results:</td><td> What you expect to obtain </td><td> "we wanted to get information on variants that affect splcie regions..." </td> </tr>
+				</table>
 				</p>
-
-				A few guidelines when asking for help:
+				<br>
+				<br>
 				<p>
+				<b>Note:</b> A few guidelines when asking for help...
 				<ul>
 					<li> <b>Read the documentation first.</b> Please make sure you've read the documentation before asking fo help. I know this is obvious, but a lot of people ask for questions in that are shown as examples in the documentation.
 							<p>
+							</p>
 					<li> <b>Use the latest version.</b> This may sound obvious, but there are a lot of requests that boil down to
 							<p>
-							<blockquote><i> "I'm using an obsolete verision and for some reason your latest feature is not there, this is obviously a bug, Fix it!" </i></blockquote>
-							or sometimes
-							<p>
-					<li> <b>Be polite.</b> Again, it may be obvious, but you cannot imagine the number of emails I get saying something like 
-							<p>
-							<blockquote><i> "I'm doing XYZ (which is totaly incorrect) and it doesn't work, so it' your fault because your program must have a bug!" </i></blockquote>
-							or sometimes
-							<p>
-							<blockquote><i>"You must drop everything you are doing and do my job for me right now!" </i></blockquote>
+							<blockquote><i> "I'm using an obsolete verision and for some reason your latest feature is not there..." </i></blockquote>
 							</p>
+					<li> <b>Be polite.</b> Again, it may be obvious, but you cannot imagine the number of emails I get saying something like 
+							<blockquote><i> "I'm doing [something very wrong] and it doesn't work, so it' your fault because your program must have a bug!" </i></blockquote>
+							or sometimes
+							<blockquote><i>"You must drop everything you are doing and do my job for me right now!" </i></blockquote>
 					<li> <b>If I don't get back to you...</b> Do remind me if I don't get back to you within a few days. Sometimes I'm swamped with work or just out of town, a polite reminder helps.
 				</ul>
 				</p>
@@ -218,7 +224,7 @@
 				So don't hesitate to send me your ideas.<br>
 				Contact information:
 				<address>
-				  <strong>Pablo Cingolani.</strong><br>
+				  <strong><a class="body" href="http://www.linkedin.com/in/pablocingolani">Pablo Cingolani</a>.</strong><br>
 				  pcingola@users.sourceforge.net
 				</address>
 				</p>
@@ -243,7 +249,7 @@
     <!-- Footer
     ================================================== -->
       <footer>
-        <p class="text-center">&copy; Pablo Cingolani 2013</p>
+        <p class="text-center">&copy; <a class="body" href="http://www.linkedin.com/in/pablocingolani">Pablo Cingolani 2013</a></p>
       </footer>
 
 
