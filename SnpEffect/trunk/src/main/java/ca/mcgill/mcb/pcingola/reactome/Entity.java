@@ -19,7 +19,7 @@ public class Entity implements Comparable<Entity> {
 
 	public static boolean debug = false;
 	public static TransferFunction TRANSFER_FUNCTION = TransferFunction.SIGM_PLUS_MINUS;
-	public static double BETA = 2.0;
+	public static double BETA = 3.0; // Note: Betas of less than 2.2 will make output shrink to zero, because iterated functions tend to zero f(f(f(....f(x)...))) -> 0
 
 	protected int id; // Entity ID
 	protected String name; // Entity Name
@@ -44,6 +44,10 @@ public class Entity implements Comparable<Entity> {
 		geneIds.add(geneId);
 	}
 
+	public double calc() {
+		return calc(new HashSet<Entity>());
+	}
+
 	/**
 	 * Calculate entities.
 	 * Make sure we don't calculate twice (keep 'doneEntities' set up to date)
@@ -52,15 +56,12 @@ public class Entity implements Comparable<Entity> {
 	 * @return
 	 */
 	public double calc(HashSet<Entity> doneEntities) {
+		// Make sure we don't calculate twice
+		if (doneEntities.contains(this)) return output;
+		doneEntities.add(this); // Keep 'entities' set up to date
 
-		if (!Double.isNaN(fixedOutput)) {
-			output = fixedOutput;
-		} else {
-			if (doneEntities.contains(this)) return output; // Make sure we don't calculate twice
-			doneEntities.add(this); // Keep 'entities' set up to date
-
-			output = getWeight(); // Calculate output
-		}
+		if (!Double.isNaN(fixedOutput)) output = fixedOutput;
+		else output = getWeight(); // Calculate output
 
 		if (debug) System.out.println(output + "\tfixed:" + isFixed() + "\tid:" + id + "\ttype:" + getClass().getSimpleName() + "\tname:" + name);
 		return output;
@@ -68,7 +69,9 @@ public class Entity implements Comparable<Entity> {
 
 	@Override
 	public int compareTo(Entity e) {
-		return getName().compareTo(e.getName());
+		int cmp = getName().compareTo(e.getName());
+		if (cmp != 0) return cmp;
+		return getId() - e.getId();
 	}
 
 	public Compartment getCompartment() {
@@ -147,11 +150,11 @@ public class Entity implements Comparable<Entity> {
 	protected double transferFunction(double x) {
 		switch (TRANSFER_FUNCTION) {
 		case SIGM_PLUS_MINUS:
-			return 2.0 / (1.0 + Math.exp(-x)) - 1;
+			return 2.0 / (1.0 + Math.exp(-BETA * x)) - 1;
 		case LINEAR:
 			return x;
 		case SIGM:
-			return 1.0 / (1.0 + Math.exp(-x));
+			return 1.0 / (1.0 + Math.exp(-BETA * x));
 		case TANH:
 			return Math.tanh(BETA * x);
 		default:

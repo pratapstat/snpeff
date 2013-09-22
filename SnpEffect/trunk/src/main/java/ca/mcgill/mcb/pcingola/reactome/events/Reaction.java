@@ -80,6 +80,10 @@ public class Reaction extends Event {
 			if (doneEntities.contains(this)) return output; // Make sure we don't calculate twice
 			doneEntities.add(this); // Keep 'entities' set up to date
 
+			//---
+			// Calculate required nodes
+			//---
+
 			// Calculate inputs
 			for (Entity ein : getInputs())
 				ein.calc(doneEntities);
@@ -92,86 +96,66 @@ public class Reaction extends Event {
 			for (Entity ereg : regulator.keySet())
 				ereg.calc(doneEntities);
 
-			// Calculate aggregated input
+			//---
+			// Add inputs
+			//---
+
+			// Aggregated input
 			double in = 0;
-			switch (TRANSFER_FUNCTION) {
-			case LINEAR:
-				// Min of all inputs
-				in = Double.POSITIVE_INFINITY;
-				for (Entity ein : getInputs())
-					if (ein.hasOutput()) in = Math.min(in, ein.getOutput());
-				break;
+			for (Entity ein : getInputs())
+				if (ein.hasOutput()) in += ein.getOutput() * inputs.get(ein);
 
-			default:
-				// Weighted input
-				in = 0;
-				for (Entity ein : getInputs())
-					if (ein.hasOutput()) in += ein.getOutput() * inputs.get(ein);
-				break;
-			}
+			// Aggregated catalysts
+			double inCat = 0.0; // Neutral by default
+			for (Entity ecat : catalyst)
+				if (ecat.hasOutput()) inCat += ecat.getOutput();
 
-			// Apply 'catalyst'
-			double cat = 1.0; // Neutral by default
-			for (Entity ecat : catalyst) {
-				if (ecat.hasOutput()) {
-					double dcat = ecat.getOutput();
-					double sigm = 2.0 / (1.0 + Math.exp(-dcat));
-					cat *= sigm;
-				}
-			}
-
-			// Apply 'regulation'
-			double reg = 1.0; // Neutral by default
+			// Aggregated regulation
+			double inRegPos = 0, inRegNeg = 0, inRegReq = 0; // Neutral by default
+			int countPos = 0, countNeg = 0, countReq = 0;
 			for (Entity ereg : regulator.keySet()) {
 				if (ereg.hasOutput()) {
-					double dcat = ereg.getOutput();
-					double sigm = 1.0;
-
+					double inReg = ereg.getOutput();
 					RegulationType regType = regulator.get(ereg);
 
 					switch (regType) {
 
 					case PositiveRegulation:
-						sigm = 1 + 1.0 / (1.0 + Math.exp(-dcat));
+						inRegPos += inReg;
+						countPos++;
 						break;
 
 					case NegativeRegulation:
-						sigm = 1 - 1.0 / (1.0 + Math.exp(-dcat));
+						inRegNeg += inReg;
+						countNeg++;
 						break;
 
 					case Requirement:
-						sigm = 1.0 / (1.0 + Math.exp(-dcat));
+						inRegReq += inReg;
+						countReq++;
 						break;
 					}
-
-					reg *= sigm; // Summarize weight
 				}
 			}
 
-			// Nothing in input? => Cannot calculate output
-			if (Double.isInfinite(in)) output = Double.NaN;
-			else output = transferFunction(in, cat, reg);
+			// Transfer function
+			if (Double.isInfinite(in) || Double.isNaN(in)) output = Double.NaN; // Nothing in input? => Cannot calculate output
+			else {
+				double z = sigm(in);
+				double cat = 2.0 * sigm(inCat);
+
+				// Only active if there are inputs
+				double regPos = 1.0, regNeg = 1.0, regReq = 1.0;
+				if (countPos > 0) regPos = 1 + sigm(inRegPos);
+				if (countNeg > 0) regNeg = 1 - sigm(inRegNeg);
+				if (countReq > 0) regReq = sigm(inRegReq);
+
+				output = 2.0 * (z * cat * regPos * regNeg * regReq) - 1.0;
+			}
 		}
 
 		if (debug) System.out.println(output + "\tfixed:" + isFixed() + "\tid:" + id + "\ttype:" + getClass().getSimpleName() + "\tname:" + name);
 		return output;
-	}
-
-	/**
-	 * Transfer function
-	 * @param x
-	 * @return
-	 */
-	protected double transferFunction(double x, double cat, double reg) {
-		switch (TRANSFER_FUNCTION) {
-		case SIGM_PLUS_MINUS:
-			return 2.0 * (cat * reg) / (1.0 + Math.exp(-x)) - 1.0;
-		case SIGM:
-			return (cat * reg) / (1.0 + Math.exp(-x));
-		case LINEAR:
-		default:
-			throw new RuntimeException("Unimplemented transfer function: " + TRANSFER_FUNCTION);
-		}
 	}
 
 	public HashSet<Entity> getCatalyst() {
@@ -195,6 +179,9 @@ public class Reaction extends Event {
 		return true;
 	}
 
+	/**
+	 * Scale weights so that they add to 1
+	 */
 	public void scaleWeights() {
 		// One input? Nothing to do
 		if (inputs.size() <= 1) return;
@@ -217,6 +204,10 @@ public class Reaction extends Event {
 		// Replace hash
 		inputs = newInputs;
 
+	}
+
+	double sigm(double x) {
+		return 1.0 / (1.0 + Math.exp(-Entity.BETA * x));
 	}
 
 	@Override
@@ -276,6 +267,22 @@ public class Reaction extends Event {
 		}
 
 		return sb.toString();
+	}
+
+	/**
+	 * Transfer function
+	 * @param h
+	 * @return
+	 */
+	protected double transferFunction(double h, double inCat, double inRegPos, double inRegNeg, double inRegReq) {
+		// Non-linear functions
+		double z = 1.0 / (1.0 + Math.exp(-Entity.BETA * h));
+		double cat = 2.0 / (1.0 + Math.exp(-Entity.BETA * inCat));
+		double regPos = 1 + 1.0 / (1.0 + Math.exp(-Entity.BETA * inRegPos));
+		double regNeg = 1 - 1.0 / (1.0 + Math.exp(-Entity.BETA * inRegNeg));
+		double regReq = 1.0 / (1.0 + Math.exp(-Entity.BETA * inRegReq));
+
+		return 2.0 * (z * cat * regPos * regNeg * regReq) - 1.0;
 	}
 
 }

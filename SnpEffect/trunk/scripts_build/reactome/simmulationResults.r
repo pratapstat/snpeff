@@ -8,16 +8,16 @@
 savePdf <- FALSE
 savePdf <- TRUE
 
-maxPval <- 10E-30
-minNameCount <- 3
+maxPval <- 1E-3
+minNameCount <- 5
 
 if( ! exists('d') ) {
 	# Simaltion data
-	d <- read.table('zz.txt', sep='\t', header=TRUE)
+	d <- read.table('circuits.non_zero.txt', sep='\t', header=TRUE)
 
 	# Experiment names
-	names <- read.table('expNames.txt', sep='\t', header=TRUE)
 	names <- read.table('expNames_full.txt', sep='\t', header=TRUE)
+	names <- read.table('expNames.txt', sep='\t', header=TRUE)
 }
 
 # Experiment indexes
@@ -47,12 +47,7 @@ if( savePdf ) { pdf(width=20, height=20); }
 # Plot values
 for( i in 1:length(rnames) ) {
 	#if( length( grep("insulin", rnames[i], fixed=TRUE) ) > 0 ) {
-	if( FALSE
-		|| (d$enityId[i] == 74695) 
-		# || (d$enityId[i] == 165690) 
-		# || (d$enityId[i] == 373676)
-		# || ( length( grep("insulin", rnames[i], fixed=TRUE) ) > 0 )
-		) {
+	if( (d$enityId[i] == 74695) || (d$enityId[i] == 165690) || (d$enityId[i] == 373676) ) {
 		x <- as.numeric(d[i,minExp:maxExp])
 
 		# Kruskal-Wallis test
@@ -74,7 +69,9 @@ for( i in 1:length(rnames) ) {
 			cat('  \t', i,'\tp-value:', pval, '\tNode:', i, '\tId:', d$enityId[i], '\tName:', name, '\n');
 			pvalStr <- paste('p-value(ANNOVA):', pval, '  p-value(Kruskal):', pval.kw)
 			dens <- density(x)
-			plot( dens, xlim=c(-1,1), main=rnames[i], sub=pvalStr )
+			plot( dens, xlim=c(-1,1), main=rnames[i], sub=pvalStr, xlab="All" )
+
+			if( F ) {
 
 			# Plot chrts for each tissue
 			par( mfrow=c(3,3) ) 
@@ -87,15 +84,15 @@ for( i in 1:length(rnames) ) {
 
 				# At least 'minNameCount' samples?
 				if( length(xns) > minNameCount ) {
-					# Avoid black color
-					if( col %% 9 == 0 ) { col <- col + 1; }
-
 					# Plot this density and overall density
-					plot( density(xns), xlim=c(-1,1), main=ns, xlab=rnames[i], sub=col, col=col )
-					lines( dens )
+					main <- paste(ns, '(#samples:',length(xns), ')')
+					plot( density(xns), xlim=c(-1,1), main=main, xlab=rnames[i], sub=col, col=col )
+					lines( dens, lty=2, col='gray' )
 
 					col <- col + 1
 				}
+			}
+
 			}
 		} else {
 			cat('NO\t', i,'\tp-value:', pval, '\tNode:', i, d$enityId[i], d$entityName[i],as.character(rnames[i]), '\n');
