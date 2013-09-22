@@ -69,7 +69,9 @@ public class Entity implements Comparable<Entity> {
 
 	@Override
 	public int compareTo(Entity e) {
-		return getName().compareTo(e.getName());
+		int cmp = getName().compareTo(e.getName());
+		if (cmp != 0) return cmp;
+		return getId() - e.getId();
 	}
 
 	public Compartment getCompartment() {
