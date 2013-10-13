@@ -26,6 +26,11 @@ public class TestCasesTranscriptError extends TestCase {
 		transcriptError(args, WarningType.WARNING_TRANSCRIPT_INCOMPLETE);
 	}
 
+	public void test_02() {
+		String args[] = { "testHg3763Chr20", "./tests/incorrect_ref.vcf" };
+		transcriptError(args, WarningType.WARNING_REF_DOES_NOT_MATCH_GENOME);
+	}
+
 	/**
 	 * Run a predictor and check if the expected warnings appear
 	 * @param args
@@ -44,7 +49,7 @@ public class TestCasesTranscriptError extends TestCase {
 				EffectImpact imp = veff.getImpact();
 				System.out.println("\t" + imp + "\t" + veff);
 
-				// Chek if the warning type we expect is there
+				// Check if the warning type we expect is there
 				if (veff.getErrorsOrWarning() != null) hasWarning |= veff.getErrorsOrWarning().indexOf(warningType.toString()) >= 0;
 			}
 		}

@@ -107,5 +107,4 @@ public class TestCasesRefSeq extends TestCase {
 		}
 
 	}
-
 }
