@@ -279,7 +279,8 @@ public class GeneSet implements Comparable<GeneSet>, Iterable<String>, Serializa
 	}
 
 	public void setName(String geneSetName) {
-		name = geneSetName.toUpperCase();
+		//		name = geneSetName.toUpperCase();
+		name = geneSetName;
 	}
 
 	public int size() {

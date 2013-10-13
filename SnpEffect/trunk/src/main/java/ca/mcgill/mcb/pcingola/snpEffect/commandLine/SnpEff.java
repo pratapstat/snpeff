@@ -48,8 +48,8 @@ public class SnpEff implements CommandLine {
 
 	// Version info
 	public static final String SOFTWARE_NAME = "SnpEff";
-	public static final String REVISION = "z";
-	public static final String BUILD = "2013-09-18";
+	public static final String REVISION = "i";
+	public static final String BUILD = "2013-10-13";
 	public static final String VERSION_MAJOR = "3.3";
 	public static final String VERSION_SHORT = VERSION_MAJOR + REVISION;
 	public static final String VERSION_NO_NAME = VERSION_SHORT + " (build " + BUILD + "), by " + Pcingola.BY;
