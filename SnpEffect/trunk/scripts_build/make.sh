@@ -43,20 +43,6 @@ mvn install:install-file \
 cd - 
 
 #---
-# Build SnpSql
+# Update galaxy databases
 #---
-# cd $HOME/workspace/SnpSql/
-# 
-# mvn assembly:assembly
-# cp target/snpSql-$VERSION_SNPSQL-jar-with-dependencies.jar $HOME/snpEff/SnpSql.jar
-# 
-# # Install JAR file in local Maven repo
-# mvn install:install-file \
-# 	-Dfile=target/snpSql-$VERSION_SNPSQL.jar \
-# 	-DgroupId=ca.mcgill.mcb.pcingola \
-# 	-DartifactId=snpSql \
-# 	-Dversion=$VERSION_SNPSQL \
-# 	-Dpackaging=jar \
-# 	-DgeneratePom=true
-# 
-# cd - 
+./scripts_build/galaxy.sh
