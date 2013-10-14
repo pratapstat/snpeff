@@ -31,6 +31,7 @@ public class CodonChangeSnp extends CodonChange {
 		codonsNew = codonsNew();
 		changeEffect.set(exon, EffectType.CODON_CHANGE, "");
 		changeEffect.setCodons(codonsOld, codonsNew, codonNum, codonIndex);
+
 		return true;
 	}
 

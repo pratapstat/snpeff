@@ -152,6 +152,9 @@ public class CodonChange {
 				if (hasChanged) {
 					codonsAround(seqChange, changeEffectNew, codonNum); // Show codons around change (if required)
 					changes.add(changeEffectNew);
+
+					// Check that reference bases (in seqChange) match reference genome
+					if (exon != null) exon.check(seqChange, changeEffectNew);
 				}
 
 				// Can we return immediately?
