@@ -1,4 +1,4 @@
-<tool id="snpSift_filter" name="SnpSift Filter" version="3.1">
+<tool id="snpSift_filter" name="SnpSift Filter" version="latest">
 	<options sanitize="False" />
 	<description>Filter variants using arbitrary expressions</description>
 	<!-- 
@@ -7,7 +7,7 @@
 	java -Xmx6G -jar $JAVA_JAR_PATH/SnpSift.jar filter -f $input -e $exprFile > $output
 	-->
 	<requirements>
-                <requirement type="package" version="3.1">snpEff</requirement>
+                <requirement type="package" version="latest">snpEff</requirement>
 	</requirements>
 	<command interpreter="perl">snpSiftWrapper.pl filter filter -f $input -e $exprFile > $output </command>
 	<inputs>

@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -17,8 +18,9 @@ import ca.mcgill.mcb.pcingola.interval.Chromosome;
 import ca.mcgill.mcb.pcingola.interval.Genome;
 import ca.mcgill.mcb.pcingola.util.Gpr;
 
-@SuppressWarnings("serial")
 public class Config implements Serializable, Iterable<String> {
+
+	private static final long serialVersionUID = 877453207407217465L;
 
 	public static final String DEFAULT_CONFIG_FILE = "snpEff.config";
 	public static final String DEFAULT_DATA_DIR = "./data";
@@ -78,7 +80,7 @@ public class Config implements Serializable, Iterable<String> {
 		errorOnMissingChromo = true;
 		errorChromoHit = true;
 
-		read(genomeVersion, DEFAULT_CONFIG_FILE); // Read config file and get a genome
+		readConfig(genomeVersion, DEFAULT_CONFIG_FILE); // Read config file and get a genome
 		genome = genomeByVersion.get(genomeVersion); // Set a genome
 		if (genome == null) throw new RuntimeException("No such genome '" + genomeVersion + "'");
 		configInstance = this;
@@ -95,7 +97,7 @@ public class Config implements Serializable, Iterable<String> {
 		errorOnMissingChromo = true;
 		errorChromoHit = true;
 
-		read(genomeVersion, configFileName); // Read config file and get a genome
+		readConfig(genomeVersion, configFileName); // Read config file and get a genome
 		genome = genomeByVersion.get(genomeVersion); // Set a genome
 		if (!genomeVersion.isEmpty() && (genome == null)) throw new RuntimeException("No such genome '" + genomeVersion + "'");
 		configInstance = this;
@@ -304,6 +306,20 @@ public class Config implements Serializable, Iterable<String> {
 		return referenceByVersion.get(genomeVersion);
 	}
 
+	/**
+	 * Get the relative path to a config file
+	 * @return
+	 */
+	String getRelativeConfigPath() {
+		URL url = Config.class.getProtectionDomain().getCodeSource().getLocation();
+		try {
+			File path = new File(url.toURI());
+			return path.getParent();
+		} catch (Exception e) {
+			throw new RuntimeException("Cannot get path '" + url + "'", e);
+		}
+	}
+
 	public SnpEffectPredictor getSnpEffectPredictor() {
 		return snpEffectPredictor;
 	}
@@ -356,33 +372,21 @@ public class Config implements Serializable, Iterable<String> {
 	 * Read configuration file and create all 'genomes' 
 	 * @return
 	 */
-	private void read(String genomeVersion, String configFileName) {
+	private void readConfig(String genomeVersion, String configFileName) {
 		//---
 		// Read properties file
 		//---
+		configFileName = readProperties(configFileName);
 
-		properties = new Properties();
-		try {
-			File confFile = new File(configFileName);
-			if (!Gpr.canRead(configFileName)) throw new RuntimeException("Cannot read config file!"//
-					+ "\n\tConfig file name : '" + configFileName + "'" //
-					+ "\n\tFull path        : '" + confFile.getCanonicalPath() + "'" //
-					+ "\n" //
-			);
-
-			properties.load(new FileReader(confFile));
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException("Cannot find config file '" + configFileName + "'");
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-
-		// Config directory
+		// Get config file directory
 		String cfgDir = "";
 		try {
 			File configDir = new File(configFileName).getAbsoluteFile().getParentFile();
 			cfgDir = configDir.getCanonicalPath();
-		} catch (IOException e1) {
+		} catch (Exception e) {
+			// Nothing done
+			cfgDir = "";
+			e.printStackTrace();
 		}
 
 		//---
@@ -461,6 +465,45 @@ public class Config implements Serializable, Iterable<String> {
 
 		Genome genome = new Genome(genVer, properties);
 		genomeByVersion.put(genVer, genome);
+	}
+
+	/**
+	 * Reads a properties file
+	 * @param configFileName
+	 * @return The path where config file is located
+	 */
+	String readProperties(String configFileName) {
+		properties = new Properties();
+		try {
+			// Try to read properties file
+			File confFile = new File(configFileName);
+			if (Gpr.canRead(configFileName)) {
+				properties.load(new FileReader(confFile));
+				return configFileName;
+			}
+
+			// Build error message
+			StringBuilder errMsg = new StringBuilder();
+			errMsg.append("\tConfig file name : '" + configFileName + "'" + "\n\tFull path        : '" + confFile.getCanonicalPath() + "'" + "\n");
+
+			// Absolute path? Nothing else to do...
+			if (confFile.isAbsolute()) throw new RuntimeException("Cannot read config file!\n" + errMsg);
+
+			// Try reading from relative dir
+			configFileName = getRelativeConfigPath() + "/" + configFileName;
+			confFile = new File(configFileName);
+			if (Gpr.canRead(configFileName)) {
+				properties.load(new FileReader(confFile));
+				return configFileName;
+			}
+			errMsg.append("\n\tConfig file name : '" + configFileName + "'" + "\n\tFull path        : '" + confFile.getCanonicalPath() + "'" + "\n");
+
+			throw new RuntimeException("Cannot read config file!\n" + errMsg);
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException("Cannot find config file '" + configFileName + "'");
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public void setErrorChromoHit(boolean errorChromoHit) {

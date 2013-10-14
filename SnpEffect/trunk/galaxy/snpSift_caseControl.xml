@@ -1,11 +1,11 @@
-<tool id="snpSift_caseControl" name="SnpSift CaseControl" version="3.1">
+<tool id="snpSift_caseControl" name="SnpSift CaseControl" version="latest">
 	<description>Count samples are in 'case' and 'control' groups.</description>
 	<!-- 
 	    You will need to change the path to wherever your installation is.
 		You can change the amount of memory used, just change the -Xmx parameter (e.g. use -Xmx2G for 2Gb of memory)
 	-->
 	<requirements>
-                <requirement type="package" version="3.1">snpEff</requirement>
+                <requirement type="package" version="latest">snpEff</requirement>
 	</requirements>
 	<command interpreter="perl">snpSiftWrapper.pl caseControl -q -tfam $tfam $input > $output </command>
 	<inputs>

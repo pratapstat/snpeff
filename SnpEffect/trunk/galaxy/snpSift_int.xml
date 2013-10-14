@@ -1,11 +1,11 @@
-<tool id="snpSift_int" name="SnpSift Intervals" version="3.1">
+<tool id="snpSift_int" name="SnpSift Intervals" version="latest">
 	<description>Filter variants using intervals </description>
 	<!-- 
 	    You will need to change the path to wherever your installation is.
 		You can change the amount of memory used, just change the -Xmx parameter (e.g. use -Xmx2G for 2Gb of memory)
 	-->
 	<requirements>
-                <requirement type="package" version="3.1">snpEff</requirement>
+                <requirement type="package" version="latest">snpEff</requirement>
 	</requirements>
 	<command>
 		cat $input | java -Xmx2G -jar \$JAVA_JAR_PATH/SnpSift.jar int $bedFile > $output
