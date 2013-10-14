@@ -341,7 +341,7 @@ public class SnpEff implements CommandLine {
 			else snpEff.parseArgs(args);
 			ok = snpEff.run();
 		} catch (Throwable t) {
-			err.append(t.getMessage());
+			if (err != null) err.append(t.getMessage());
 			t.printStackTrace();
 		}
 		return ok;
