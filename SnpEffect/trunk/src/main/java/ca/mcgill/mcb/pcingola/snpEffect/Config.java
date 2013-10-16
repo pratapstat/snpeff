@@ -47,7 +47,7 @@ public class Config implements Serializable, Iterable<String> {
 	double lofIgnoreProteinCodingBefore;
 	double lofDeleteProteinCodingBases;
 
-	String dataDir; // Ditectory containing all databases and genomes
+	String dataDir; // Directory containing all databases and genomes
 	Properties properties;
 	Genome genome;
 	HashMap<String, Genome> genomeByVersion;
@@ -75,15 +75,7 @@ public class Config implements Serializable, Iterable<String> {
 	 * @param genomeVersion
 	 */
 	public Config(String genomeVersion) {
-		treatAllAsProteinCoding = false;
-		onlyRegulation = false;
-		errorOnMissingChromo = true;
-		errorChromoHit = true;
-
-		readConfig(genomeVersion, DEFAULT_CONFIG_FILE); // Read config file and get a genome
-		genome = genomeByVersion.get(genomeVersion); // Set a genome
-		if (genome == null) throw new RuntimeException("No such genome '" + genomeVersion + "'");
-		configInstance = this;
+		init(genomeVersion, DEFAULT_CONFIG_FILE, null);
 	}
 
 	/**
@@ -92,15 +84,16 @@ public class Config implements Serializable, Iterable<String> {
 	 * @param configFileName
 	 */
 	public Config(String genomeVersion, String configFileName) {
-		treatAllAsProteinCoding = false;
-		onlyRegulation = false;
-		errorOnMissingChromo = true;
-		errorChromoHit = true;
+		init(genomeVersion, configFileName, null);
+	}
 
-		readConfig(genomeVersion, configFileName); // Read config file and get a genome
-		genome = genomeByVersion.get(genomeVersion); // Set a genome
-		if (!genomeVersion.isEmpty() && (genome == null)) throw new RuntimeException("No such genome '" + genomeVersion + "'");
-		configInstance = this;
+	/**
+	 * Create a configuration from 'configFileName'
+	 * @param genomeVersion
+	 * @param configFileName
+	 */
+	public Config(String genomeVersion, String configFileName, String dataDir) {
+		init(genomeVersion, configFileName, dataDir);
 	}
 
 	/**
@@ -337,6 +330,24 @@ public class Config implements Serializable, Iterable<String> {
 		return versionsUrl;
 	}
 
+	/**
+	 * Create a configuration from 'configFileName'
+	 * @param genomeVersion
+	 * @param configFileName
+	 */
+	void init(String genomeVersion, String configFileName, String dataDir) {
+		treatAllAsProteinCoding = false;
+		onlyRegulation = false;
+		errorOnMissingChromo = true;
+		errorChromoHit = true;
+		this.dataDir = dataDir;
+
+		readConfig(genomeVersion, configFileName); // Read config file and get a genome
+		genome = genomeByVersion.get(genomeVersion); // Set a genome
+		if (!genomeVersion.isEmpty() && (genome == null)) throw new RuntimeException("No such genome '" + genomeVersion + "'");
+		configInstance = this;
+	}
+
 	public boolean isErrorChromoHit() {
 		return errorChromoHit;
 	}
@@ -392,7 +403,12 @@ public class Config implements Serializable, Iterable<String> {
 		//---
 		// Set attributes
 		//---
-		dataDir = properties.getProperty("data_dir", DEFAULT_DATA_DIR);
+
+		// Set data_dir if not overriden by constructor
+		if (dataDir == null) dataDir = properties.getProperty("data_dir", DEFAULT_DATA_DIR);
+		else Gpr.debug("INFO: data_dir already set to '" + dataDir + "', ignoring config file entry.");
+
+		// Parse data dir
 		if (dataDir.startsWith("~")) dataDir = Gpr.HOME + "/" + dataDir.substring(1); // Relative to 'home' dir?
 		else if (!dataDir.startsWith("/")) dataDir = cfgDir + "/" + dataDir; // Not an absolute path?
 

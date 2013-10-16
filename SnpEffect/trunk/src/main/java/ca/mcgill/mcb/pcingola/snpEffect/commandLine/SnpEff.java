@@ -10,7 +10,6 @@ import ca.mcgill.mcb.pcingola.interval.Markers;
 import ca.mcgill.mcb.pcingola.interval.SeqChange;
 import ca.mcgill.mcb.pcingola.logStatsServer.LogStats;
 import ca.mcgill.mcb.pcingola.logStatsServer.VersionCheck;
-import ca.mcgill.mcb.pcingola.nextProt.SnpEffCmdBuildNextProt;
 import ca.mcgill.mcb.pcingola.snpEffect.Config;
 import ca.mcgill.mcb.pcingola.spliceSites.SnpEffCmdSpliceAnalysis;
 import ca.mcgill.mcb.pcingola.util.Gpr;
@@ -69,6 +68,7 @@ public class SnpEff implements CommandLine {
 	protected int outOffset = 1;
 	protected String configFile; // Config file
 	protected String genomeVer; // Genome version
+	protected String dataDir; // Override data_dir in config file
 	protected Config config; // Configuration
 
 	/**
@@ -221,7 +221,10 @@ public class SnpEff implements CommandLine {
 				quiet = true;
 				verbose = false;
 			} else if (args[i].equals("-d") || args[i].equalsIgnoreCase("-debug")) debug = verbose = true;
-			else if ((args[i].equals("-c") || args[i].equalsIgnoreCase("-config"))) {
+			else if (args[i].equalsIgnoreCase("-dataDir")) {
+				if ((i + 1) < args.length) dataDir = args[++i];
+				else usage("Option '-dataDir' without data_dir argument");
+			} else if ((args[i].equals("-c") || args[i].equalsIgnoreCase("-config"))) {
 				if ((i + 1) < args.length) configFile = args[++i];
 				else usage("Option '-c' without config file argument");
 			} else argsList.add(args[i]);
@@ -239,7 +242,7 @@ public class SnpEff implements CommandLine {
 			Timer.showStdErr("Reading configuration file '" + configFile + "'" //
 					+ ((genomeVer != null) && (!genomeVer.isEmpty()) ? ". Genome: '" + genomeVer + "'" : "") //
 			);
-		config = new Config(genomeVer, configFile); // Read configuration
+		config = new Config(genomeVer, configFile, dataDir); // Read configuration
 		if (verbose) Timer.showStdErr("done");
 	}
 
@@ -336,6 +339,7 @@ public class SnpEff implements CommandLine {
 			snpEff.debug = debug;
 			snpEff.quiet = quiet;
 			snpEff.configFile = configFile;
+			snpEff.dataDir = dataDir;
 
 			if (help) snpEff.usage(null); // Show help message and exit
 			else snpEff.parseArgs(args);
