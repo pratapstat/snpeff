@@ -48,7 +48,7 @@ public class SnpEff implements CommandLine {
 	// Version info
 	public static final String SOFTWARE_NAME = "SnpEff";
 	public static final String REVISION = "i";
-	public static final String BUILD = "2013-10-13";
+	public static final String BUILD = "2013-10-16";
 	public static final String VERSION_MAJOR = "3.3";
 	public static final String VERSION_SHORT = VERSION_MAJOR + REVISION;
 	public static final String VERSION_NO_NAME = VERSION_SHORT + " (build " + BUILD + "), by " + Pcingola.BY;
@@ -387,6 +387,14 @@ public class SnpEff implements CommandLine {
 		System.err.println("   protein         : Compare protein sequences calculated form a SnpEff database to the one in a FASTA file. Used for checking databases correctness.");
 		System.err.println("   spliceAnalysis  : Perform an analysis of splice sites. Experimental feature.");
 		System.err.println("\nRun 'java -jar snpEff.jar command' for help on each specific command");
+		System.err.println("\nGeneric options:");
+		System.err.println("\t-c , -config     : Specify config file");
+		System.err.println("\t-d , -debug      : Debug mode (very verbose).");
+		System.err.println("\t-dataDir <path>  : Override data_dir parameter from config file.");
+		System.err.println("\t-h , -help       : Show this help and exit");
+		System.err.println("\t-noLog           : Do not report usage statistics to server");
+		System.err.println("\t-q , -quiet      : Quiet mode (do not show any messages or errors)");
+		System.err.println("\t-v , -verbose    : Verbose mode");
 		System.exit(-1);
 	}
 }

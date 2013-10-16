@@ -1339,6 +1339,8 @@ public class SnpEffCmdEff extends SnpEff {
 		System.err.println("\t-0                      : File positions are zero-based (same as '-inOffset 0 -outOffset 0')");
 		System.err.println("\t-1                      : File positions are one-based (same as '-inOffset 1 -outOffset 1')");
 		System.err.println("\t-c , -config            : Specify config file");
+		System.err.println("\t-d , -debug             : Debug mode (very verbose).");
+		System.err.println("\t-dataDir <path>         : Override data_dir parameter from config file.");
 		System.err.println("\t-h , -help              : Show this help and exit");
 		System.err.println("\t-if, -inOffset          : Offset input by a number of bases. E.g. '-inOffset 1' for one-based input files");
 		System.err.println("\t-of, -outOffset         : Offset output by a number of bases. E.g. '-outOffset 1' for one-based output files");
