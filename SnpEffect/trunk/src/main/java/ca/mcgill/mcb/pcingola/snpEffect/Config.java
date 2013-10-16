@@ -406,7 +406,6 @@ public class Config implements Serializable, Iterable<String> {
 
 		// Set data_dir if not overriden by constructor
 		if (dataDir == null) dataDir = properties.getProperty("data_dir", DEFAULT_DATA_DIR);
-		else Gpr.debug("INFO: data_dir already set to '" + dataDir + "', ignoring config file entry.");
 
 		// Parse data dir
 		if (dataDir.startsWith("~")) dataDir = Gpr.HOME + "/" + dataDir.substring(1); // Relative to 'home' dir?
