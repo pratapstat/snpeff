@@ -30,7 +30,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 
 	boolean isMulti;
 	int minAlleleCount;
-	double pvalueThreshold = 1e-3;
+	double pvalueThreshold = 1e-5;
 	List<String> sampleIds;
 	ArrayList<byte[]> genotypes;
 	ArrayList<String> entryId;
@@ -355,7 +355,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	 */
 	public String runCoEvolution(int i) {
 		int numEntries = genotypes.size();
-		long count = 0;
+		int count = 0;
 		StringBuilder sb = new StringBuilder();
 
 		for (int j = 0; j < numEntries; j++) {
@@ -364,17 +364,15 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 				count++;
 
 				if (pvalue <= pvalueThreshold) {
-					pvalueThreshold = pvalue;
-
-					String out = String.format("\n%d\t%s\t%s\t%.4e\t%d\t%d", count, entryId.get(i), entryId.get(j), pvalue, mac(genotypes.get(i)), mac(genotypes.get(j)));
+					String out = String.format("\n[%d, %d]\t%s\t%s\t%.4e\t%d\t%d", i, j, entryId.get(i), entryId.get(j), pvalue, mac(genotypes.get(i)), mac(genotypes.get(j)));
 					if (!isMulti) System.out.println(out);
 					else sb.append(out + "\n");
 
-				} else if (!isMulti) Gpr.showMark((int) count, SHOW_EVERY);
+				} else if (!isMulti) Gpr.showMark(count, SHOW_EVERY);
 			}
 		}
 
-		if (verbose && !isMulti) Timer.showStdErr(count + "\t" + entryId.get(i) + "\t" + i + "/" + numEntries);
+		if (verbose && !isMulti) Timer.showStdErr(entryId.get(i) + "\t" + i + "/" + numEntries);
 
 		return sb.toString();
 	}
