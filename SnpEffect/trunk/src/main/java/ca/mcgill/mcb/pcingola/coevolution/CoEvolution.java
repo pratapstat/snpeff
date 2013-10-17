@@ -19,7 +19,8 @@ import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
  */
 public class CoEvolution {
 
-	public static final int MIN_MAC = 5;
+	public static final int MIN_MAC = 100;
+	public static final int SHOW_EVERY = 1000;
 
 	boolean debug = false;
 	boolean verbose = true;
@@ -29,10 +30,11 @@ public class CoEvolution {
 	List<String> sampleIds;
 	Boolean caseControl[];
 	ArrayList<byte[]> genotypes;
+	ArrayList<String> entryId;
 
 	public static void main(String[] args) {
-		// String vcfInput = Gpr.HOME + "/t2d1/eff/hm1.vcf";
-		String vcfInput = Gpr.HOME + "/t2d1/eff/z.gt.vcf";
+		String vcfInput = Gpr.HOME + "/t2d1/eff/hm1.gt.vcf";
+		// String vcfInput = Gpr.HOME + "/t2d1/eff/z.gt.vcf";
 		String tfam = Gpr.HOME + "/t2d1/pheno/pheno.tfam";
 
 		CoEvolution coEvolution = new CoEvolution(vcfInput, tfam);
@@ -42,6 +44,88 @@ public class CoEvolution {
 	public CoEvolution(String vcf, String tfam) {
 		vcfFileName = vcf;
 		tfamFileName = tfam;
+	}
+
+	/**
+	 * Codes conversion table
+	 * 
+	 * 		code 1:    0/0      0/1      1/1
+	 *                   0        1        2
+	 *     code 2   +------------------------+
+	 *     0/0   0  |    0        1        2 |
+	 *     0/1   1  |    0        0        1 |
+	 *     1/1   2  |    0        0        0 |
+	 *              +------------------------+
+	 *     
+	 * @param code1
+	 * @param code2
+	 * @return
+	 */
+	int code(int code1, int code2) {
+		return Math.max(code1 - code2, 0);
+	}
+
+	/**
+	 * Load TFAM file
+	 */
+	void loadTfam() {
+		// Load TFAM
+		if (verbose) Timer.showStdErr("Reading TFAM file '" + tfamFileName + "'");
+		pedigree = new PedPedigree();
+		pedigree.loadTfam(tfamFileName);
+	}
+
+	/**
+	 * Load VCF file
+	 */
+	void loadVcf() {
+		// Initialize
+		genotypes = new ArrayList<byte[]>();
+		entryId = new ArrayList<String>();
+		double minp = 1.0;
+
+		// Read file
+		if (verbose) Timer.showStdErr("Reading input file '" + vcfFileName + "'");
+		VcfFileIterator vcf = new VcfFileIterator(vcfFileName);
+		for (VcfEntry ve : vcf) {
+			if (vcf.isHeadeSection()) {
+				parseVcfHeader(vcf);
+			}
+
+			// Use if at least 'MIN_MAC' minor allele counts
+			if (ve.isVariant() && (ve.mac() >= MIN_MAC)) {
+				byte genoScores[] = ve.getGenotypesScores();
+				genotypes.add(genoScores);
+				entryId.add(ve.getChromosomeName() + ":" + (ve.getStart() + 1));
+
+				// Show line
+				if (debug) {
+					// Calculate p-values
+					double pvalue = pValue(genoScores);
+					double logp = -Math.log10(pvalue);
+					minp = Math.min(pvalue, minp);
+
+					System.out.print(String.format("%s:%d\t%d\t%.2f\t%.4e\t%.4e\t", ve.getChromosomeName(), ve.getStart(), ve.mac(), logp, pvalue, minp));
+					for (int i = 0; i < genoScores.length; i++)
+						System.out.print(genoScores[i]);
+					System.out.println("");
+				}
+			}
+		}
+
+		if (verbose) Timer.showStdErr("Done.\n\tLoaded: " + genotypes.size() + " lines." + (minp < 1 ? "\n\tMin p-value: " + minp : ""));
+	}
+
+	/**
+	 * Minor allele count
+	 * @param scores
+	 * @return
+	 */
+	int mac(byte scores[]) {
+		int count = 0;
+		for (int i = 0; i < scores.length; i++)
+			if (scores[i] > 0) count += scores[i];
+		return count;
 	}
 
 	/**
@@ -153,43 +237,91 @@ public class CoEvolution {
 	}
 
 	/**
-	 * Run 
+	 * Compare p-values between two genotypes
 	 */
-	public void run() {
-		if (verbose) Timer.showStdErr("Reading TFAM file '" + tfamFileName + "'");
-		pedigree = new PedPedigree();
-		pedigree.loadTfam(tfamFileName);
+	double pValue(byte scores1[], byte scores2[]) {
+		int casesHom = 0, casesHet = 0, cases = 0;
+		int ctrlHom = 0, ctrlHet = 0, ctrl = 0;
+		int nCase[] = new int[3];
+		int nControl[] = new int[3];
 
-		genotypes = new ArrayList<byte[]>();
+		// Count genotypes
+		for (int idx = 0; idx < scores1.length; idx++) {
+			if ((caseControl[idx] != null)) {
+				int code1 = scores1[idx];
+				int code2 = scores2[idx];
 
-		if (verbose) Timer.showStdErr("Reading input file '" + vcfFileName + "'");
-		double minp = 1.0;
-		VcfFileIterator vcf = new VcfFileIterator(vcfFileName);
-		for (VcfEntry ve : vcf) {
-			if (vcf.isHeadeSection()) {
-				parseVcfHeader(vcf);
-			}
+				if ((code1 >= 0) && (code2 >= 0)) {
+					// Summarize two codes into one
+					int code = code(code1, code2);
+					int codeMissing = Math.max(0, code);
 
-			// Use if at least 'MIN_MAC' minor allele counts
-			if (ve.isVariant() && (ve.mac() >= MIN_MAC)) {
-				byte genoScores[] = ve.getGenotypesScores();
-				genotypes.add(genoScores);
-				double pvalue = pValue(genoScores);
-				double logp = -Math.log10(pvalue);
-				minp = Math.min(pvalue, minp);
+					// Count a/a, a/A and A/A
+					if (caseControl[idx]) nCase[code]++;
+					else nControl[code]++;
 
-				// Show line
+					if (caseControl[idx]) {
+						// Case sample
+						if (code < 0) ; // Missing? => Do not count
+						else if (code == 2) casesHom++;
+						else casesHet++;
 
-				if (debug) {
-					System.out.print(String.format("%s:%d\t%d\t%.2f\t%.4e\t%.4e\t", ve.getChromosomeName(), ve.getStart(), ve.mac(), logp, pvalue, minp));
-					for (int i = 0; i < genoScores.length; i++)
-						System.out.print(genoScores[i]);
-					System.out.println("");
+						cases += codeMissing;
+					} else {
+						//Control sample
+						if (code < 0) ; // Missing? => Do not count
+						else if (code == 2) ctrlHom++;
+						else ctrlHet++;
+
+						ctrl += codeMissing;
+					}
 				}
 			}
 		}
 
-		if (verbose) Timer.showStdErr("Done.\n\tLoaded: " + genotypes.size() + " lines.\n\tMin p-value: " + minp);
+		// Add info fields
+		if (debug) Gpr.debug("\n\tCases: " + casesHom + "," + casesHet + "," + cases + "\n\tControls: " + ctrlHom + "," + ctrlHet + "," + ctrl);
+
+		// pValue
+		return pDominant(nControl, nCase);
+	}
+
+	/**
+	 * Run 
+	 */
+	public void run() {
+		loadTfam();
+		loadVcf();
+		runCoEvolution();
+	}
+
+	/**
+	 * Run co-evolutionary algorithm
+	 */
+	void runCoEvolution() {
+		//---
+		// Run main analysis
+		//---
+		double minp = 1;
+		int numEntries = genotypes.size();
+		long count = 0;
+		for (int i = 0; i < numEntries; i++) {
+			for (int j = 0; j < numEntries; j++) {
+				if (i != j) {
+					double pvalue = pValue(genotypes.get(i), genotypes.get(j));
+
+					count++;
+					if (minp > pvalue) {
+						minp = pvalue;
+						System.out.println(String.format("\n%d\t%s\t%s\t%.4e\t%d\t%d", count, entryId.get(i), entryId.get(j), pvalue, mac(genotypes.get(i)), mac(genotypes.get(j))));
+					} else Gpr.showMark((int) count, SHOW_EVERY);
+				}
+			}
+
+			if (verbose) Timer.showStdErr(count + "\t" + entryId.get(i) + "\t" + i + "/" + numEntries);
+		}
+
+		if (verbose) Timer.showStdErr("Done. Number of combinations:\t" + count);
 	}
 
 }
