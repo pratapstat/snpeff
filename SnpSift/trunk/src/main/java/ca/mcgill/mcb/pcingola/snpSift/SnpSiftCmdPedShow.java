@@ -99,7 +99,7 @@ public class SnpSiftCmdPedShow extends SnpSift {
 
 	/**
 	 * Run: Main method
-	 * @param tfamFileName
+	 * @param tfamFile
 	 * @param vcfFileName
 	 * @param outputDir
 	 * @param chrPos
