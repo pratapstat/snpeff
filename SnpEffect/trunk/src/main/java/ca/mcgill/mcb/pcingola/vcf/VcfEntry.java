@@ -24,12 +24,13 @@ import ca.mcgill.mcb.pcingola.vcf.VcfEffect.FormatVersion;
  */
 public class VcfEntry extends Marker implements Iterable<VcfGenotype> {
 
-	public static final double ALLELE_FEQUENCY_COMMON = 0.05;
-	public static final double ALLELE_FEQUENCY_LOW = 0.01;
-
 	public enum AlleleFrequencyType {
 		Common, LowFrequency, Rare
 	}
+
+	public static final double ALLELE_FEQUENCY_COMMON = 0.05;
+
+	public static final double ALLELE_FEQUENCY_LOW = 0.01;
 
 	public static final String VCF_INFO_HOMS = "HO";
 	public static final String VCF_INFO_HETS = "HE";
@@ -507,7 +508,7 @@ public class VcfEntry extends Marker implements Iterable<VcfGenotype> {
 	}
 
 	public boolean hasGenotypes() {
-		return (vcfGenotypes != null) || (genotypeFieldsStr != null);
+		return ((vcfGenotypes != null) && (vcfGenotypes.size() > 0)) || (genotypeFieldsStr != null);
 	}
 
 	public boolean hasInfo(String infoFieldName) {
@@ -531,7 +532,7 @@ public class VcfEntry extends Marker implements Iterable<VcfGenotype> {
 	 * @return
 	 */
 	public boolean isCompressedGenotypes() {
-		return !hasGenotypes();
+		return !hasGenotypes() && (hasInfo(VCF_INFO_HOMS) || hasInfo(VCF_INFO_HETS) || hasInfo(VCF_INFO_NAS));
 	}
 
 	public boolean isDel() {
@@ -621,6 +622,35 @@ public class VcfEntry extends Marker implements Iterable<VcfGenotype> {
 	public Iterator<VcfGenotype> iterator() {
 		if (vcfGenotypes == null) parseGenotypes();
 		return vcfGenotypes.iterator();
+	}
+
+	/**
+	 * Calculate Minor allele count
+	 * @param ve
+	 * @return
+	 */
+	public int mac() {
+		long mac = -1;
+		if (vcfGenotypes == null) parseGenotypes();
+
+		// Do we have it annotated as AF or MAF?
+		if (hasField("AC")) mac = getInfoInt("AC");
+		else if (hasField("MAC")) mac = getInfoInt("MAC");
+		else {
+			// No annotations, we have to calculate
+			int ac = 0;
+			for (VcfGenotype gen : this) {
+				int genCode = gen.getGenotypeCode();
+				if (genCode > 0) ac += genCode;
+			}
+			mac = ac;
+		}
+
+		// Always use the Minor Allele Count
+		int count2 = vcfGenotypes.size() / 2;
+		if ((count2 > 1) && (mac > count2)) mac = vcfGenotypes.size() - mac;
+
+		return (int) mac;
 	}
 
 	/**
