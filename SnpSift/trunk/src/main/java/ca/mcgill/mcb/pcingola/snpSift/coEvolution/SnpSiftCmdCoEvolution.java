@@ -30,7 +30,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 
 	boolean isMulti;
 	int minAlleleCount;
-	double pvalueThreshold = 1e-5;
+	double pvalueThreshold = 1e-4;
 	List<String> sampleIds;
 	ArrayList<byte[]> genotypes;
 	ArrayList<String> entryId;
