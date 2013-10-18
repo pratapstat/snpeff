@@ -311,6 +311,7 @@ public class SnpSift {
 				+ "\n\tannMem        : Annotate 'ID' from a database (e.g. dbSnp). Loads db in memory. Does not assume sorted entries." //
 				+ "\n\tcaseControl   : Compare how many variants are in 'case' and in 'control' groups; calculate p-values." //
 				+ "\n\tccs           : Case control summary. Case and control summaries by region, allele frequency and variant's functional effect." //
+				+ "\n\tcoevolution   : Co-evoution case control model (this feature is alpha)." //
 				+ "\n\tconcordance   : Concordance metrics between two VCF files." //
 				+ "\n\tcovMat        : Create an covariance matrix output (allele matrix as input)." //
 				+ "\n\tdbnsfp        : Annotate with multiple entries from dbNSFP. <EXPERIMENTAL>" //
