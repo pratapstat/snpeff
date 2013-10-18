@@ -479,7 +479,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 				count++;
 
 				if (pvalue <= pvalueThreshold) {
-					String out = String.format("\n%.4e\t[%d, %d]\t%s\t%s\t%d\t%d", pvalue, i, j, entryId.get(i), entryId.get(j), mac(genotypes.get(i)), mac(genotypes.get(j)));
+					String out = String.format("Result\t%.4e\t[%d, %d]\t%s\t%s\t%d\t%d", pvalue, i, j, entryId.get(i), entryId.get(j), mac(genotypes.get(i)), mac(genotypes.get(j)));
 					if (!isMulti) System.out.println(out);
 					else sb.append((sb.length() > 0 ? "\n" : "") + out);
 
