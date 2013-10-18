@@ -1,6 +1,7 @@
 package ca.mcgill.mcb.pcingola.snpSift.coEvolution;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import akka.actor.Actor;
@@ -17,6 +18,7 @@ import ca.mcgill.mcb.pcingola.snpSift.coEvolution.akka.WorkQueueCoEvolution;
 import ca.mcgill.mcb.pcingola.stats.CountByType;
 import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.util.Timer;
+import ca.mcgill.mcb.pcingola.vcf.VcfEffect;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 
 /**
@@ -26,11 +28,16 @@ import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
  */
 public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 
+	public enum Model {
+		ABS, MAX
+	};
+
 	public static final int SHOW_EVERY = 1000;
 
 	boolean isMulti;
 	int minAlleleCount;
 	double pvalueThreshold = 1e-4;
+	Model model = Model.ABS;
 	List<String> sampleIds;
 	ArrayList<byte[]> genotypes;
 	ArrayList<String> entryId;
@@ -50,23 +57,93 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		command = "coevolution";
 	}
 
+	int coEvolutionCode(int code1, int code2) {
+		switch (model) {
+		case ABS:
+			/**
+			 * Codes conversion table
+			 * 
+			 * 		code 1:    0/0      0/1      1/1
+			 *                   0        1        2
+			 *     code 2   +------------------------+
+			 *     0/0   0  |    0        1        2 |
+			 *     0/1   1  |    1        0        1 |
+			 *     1/1   2  |    2        1        0 |
+			 *              +------------------------+
+			 */
+			return Math.abs(code1 - code2);
+
+		case MAX:
+			/**
+			 * Codes conversion table
+			 * 
+			 * 		code 1:    0/0      0/1      1/1
+			 *                   0        1        2
+			 *     code 2   +------------------------+
+			 *     0/0   0  |    0        1        2 |
+			 *     0/1   1  |    0        0        1 |
+			 *     1/1   2  |    0        0        0 |
+			 *              +------------------------+
+			 */
+			Math.max(code1 - code2, 0);
+
+		default:
+			throw new RuntimeException("Unimplemented model '" + model + "'");
+		}
+	}
+
 	/**
-	 * Codes conversion table
-	 * 
-	 * 		code 1:    0/0      0/1      1/1
-	 *                   0        1        2
-	 *     code 2   +------------------------+
-	 *     0/0   0  |    0        1        2 |
-	 *     0/1   1  |    0        0        1 |
-	 *     1/1   2  |    0        0        0 |
-	 *              +------------------------+
-	 *     
-	 * @param code1
-	 * @param code2
+	 * Create an ID for this VCF entry
+	 * @param ve
 	 * @return
 	 */
-	int coEvolutionCode(int code1, int code2) {
-		return Math.max(code1 - code2, 0);
+	String entryId(VcfEntry ve) {
+		// Try to get gene names
+		HashSet<String> done = new HashSet<String>();
+		StringBuilder sb = new StringBuilder();
+		for (VcfEffect veff : ve.parseEffects()) {
+			String gene = veff.getGene();
+			if ((gene != null) && !done.contains(gene)) {
+				sb.append((sb.length() > 0 ? "," : "") + gene);
+				done.add(gene);
+			}
+		}
+
+		// ID
+		return ve.getChromosomeName() //
+				+ ":" + (ve.getStart() + 1) //
+				+ "_" + ve.getRef() //
+				+ "/" + ve.getAltsStr() //
+				+ (sb.length() > 0 ? " " + sb.toString() : "") //
+		;
+	}
+
+	/**
+	 * Obtain genotype scores
+	 * @param ve
+	 * @return
+	 */
+	byte[] genotypesScores(VcfEntry ve) {
+		byte gs[] = ve.getGenotypesScores();
+
+		// Do we need to swap alleles (REF <-> ALT)
+		// Note: We swap alleles in order to have 'ALT' always being the minor allele
+		int count = 0, alleles = 0;
+		for (int i = 0; i < gs.length; i++) {
+			if (gs[i] >= 0) {
+				count += 2;
+				alleles += gs[i];
+			}
+		}
+
+		// ALT is more common than REF? Swap alleles 
+		if (alleles > count / 2) {
+			if (debug) Gpr.debug("Swapping alleles for entry: " + ve.toStr());
+			for (int i = 0; i < gs.length; i++)
+				if (gs[i] > 0) gs[i] = (byte) (2 - gs[i]);
+		}
+
+		return gs;
 	}
 
 	public ArrayList<String> getEntryId() {
@@ -112,9 +189,10 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 			// Use if at least 'MIN_MAC' minor allele counts
 			int mac = ve.mac();
 			if (ve.isVariant() && (mac >= minAlleleCount)) {
-				byte genoScores[] = ve.getGenotypesScores();
+				byte genoScores[] = genotypesScores(ve);
+
 				genotypes.add(genoScores);
-				entryId.add(ve.getChromosomeName() + ":" + (ve.getStart() + 1));
+				entryId.add(entryId(ve));
 
 				// Show line
 				if (debug) {
@@ -358,7 +436,13 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		int count = 0;
 		StringBuilder sb = new StringBuilder();
 
-		for (int j = 0; j < numEntries; j++) {
+		// Iteration start
+		// Note: 'Abs' model yields the same result for [i, j] than [j, i] whereas 'max' model doesn't
+		int minj = 0;
+		if (model == Model.ABS) minj = i + 1;
+
+		// Iterate on all entries
+		for (int j = minj; j < numEntries; j++) {
 			if (i != j) {
 				double pvalue = pValue(genotypes.get(i), genotypes.get(j));
 				count++;
@@ -366,7 +450,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 				if (pvalue <= pvalueThreshold) {
 					String out = String.format("\n[%d, %d]\t%s\t%s\t%.4e\t%d\t%d", i, j, entryId.get(i), entryId.get(j), pvalue, mac(genotypes.get(i)), mac(genotypes.get(j)));
 					if (!isMulti) System.out.println(out);
-					else sb.append(out + "\n");
+					else sb.append((sb.length() > 0 ? "\n" : "") + out);
 
 				} else if (!isMulti) Gpr.showMark(count, SHOW_EVERY);
 			}
