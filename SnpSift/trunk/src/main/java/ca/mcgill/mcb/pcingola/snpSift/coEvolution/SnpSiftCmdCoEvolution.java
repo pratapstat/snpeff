@@ -36,11 +36,12 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 
 	boolean isMulti;
 	int minAlleleCount;
-	double pvalueThreshold = 1e-4;
-	Model model = Model.ABS;
+	double pvalueThreshold;
+	Model model;
 	List<String> sampleIds;
 	ArrayList<byte[]> genotypes;
 	ArrayList<String> entryId;
+	HashSet<String> genes;
 
 	public static void main(String[] args) {
 		String vcfInput = Gpr.HOME + "/t2d1/eff/hm1.gt.vcf";
@@ -85,7 +86,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 			 *     1/1   2  |    0        0        0 |
 			 *              +------------------------+
 			 */
-			Math.max(code1 - code2, 0);
+			return Math.max(code1 - code2, 0);
 
 		default:
 			throw new RuntimeException("Unimplemented model '" + model + "'");
@@ -157,6 +158,8 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	@Override
 	public void init() {
 		minAlleleCount = 10;
+		pvalueThreshold = 1e-4;
+		model = Model.ABS;
 	}
 
 	/**
@@ -221,6 +224,22 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		return count;
 	}
 
+	boolean matchGenes(int i) {
+		// Do we have a preferred list of genes to focus on?
+		if (genes == null) return true; // No 'genes' set? Everything matches
+
+		// Get genes from entryId
+		String eid[] = entryId.get(i).split(" ");
+		if (eid.length < 2) return false; // There is no genes information in this variant
+
+		// Any match?
+		String genesStr = eid[1];
+		for (String g : genesStr.split(","))
+			if (genes.contains(g)) return true;
+
+		return false;
+	}
+
 	double min(double d1, double d2, double d3, double d4) {
 		return Math.min(Math.min(d1, d2), Math.min(d3, d4));
 	}
@@ -235,6 +254,14 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 			if (isOpt(arg)) {
 				// Command line options
 				if (arg.equalsIgnoreCase("-minAc")) minAlleleCount = Gpr.parseIntSafe(args[++argc]);
+				else if (arg.equalsIgnoreCase("-maxP")) pvalueThreshold = Gpr.parseDoubleSafe(args[++argc]);
+				else if (arg.equalsIgnoreCase("-model")) model = Model.valueOf(args[++argc].toUpperCase());
+				else if (arg.equalsIgnoreCase("-genes")) {
+					String genesStr = args[++argc];
+					genes = new HashSet<String>();
+					for (String g : genesStr.split(","))
+						genes.add(g);
+				}
 			} else if (tfamFile == null) tfamFile = arg;
 			else if (vcfFileName == null) vcfFileName = arg;
 			else usage("Unkown parameter '" + arg + "'");
@@ -432,6 +459,10 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	 * @return
 	 */
 	public String runCoEvolution(int i) {
+
+		// Does this entry match 'genes'?
+		if (!matchGenes(i)) return "";
+
 		int numEntries = genotypes.size();
 		int count = 0;
 		StringBuilder sb = new StringBuilder();
@@ -448,7 +479,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 				count++;
 
 				if (pvalue <= pvalueThreshold) {
-					String out = String.format("\n[%d, %d]\t%s\t%s\t%.4e\t%d\t%d", i, j, entryId.get(i), entryId.get(j), pvalue, mac(genotypes.get(i)), mac(genotypes.get(j)));
+					String out = String.format("\n%.4e\t[%d, %d]\t%s\t%s\t%d\t%d", pvalue, i, j, entryId.get(i), entryId.get(j), mac(genotypes.get(i)), mac(genotypes.get(j)));
 					if (!isMulti) System.out.println(out);
 					else sb.append((sb.length() > 0 ? "\n" : "") + out);
 
@@ -515,7 +546,10 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 
 		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar coevolution file.tfam file.vcf");
 		System.err.println("Where:");
+		System.err.println("\t-genes <list>   : Comma separated list of genes to analyze. Default: None");
+		System.err.println("\t-maxP  <num>    : Maximum p-value to report. Default: " + pvalueThreshold);
 		System.err.println("\t-minAc <num>    : Filter using minimum number of alleles. Default: " + minAlleleCount);
+		System.err.println("\t-model <model>  : Model to use {ABS, MAX}. Default: " + model);
 		System.err.println("\tfile.tfam       : A TFAM file having case/control informations (phenotype colmun)");
 		System.err.println("\tfile.vcf        : A VCF file (variants and genotype data)");
 		System.exit(1);
