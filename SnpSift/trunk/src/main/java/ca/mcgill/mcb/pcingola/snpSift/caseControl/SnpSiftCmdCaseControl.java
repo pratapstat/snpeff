@@ -30,11 +30,11 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 	public static final String VCF_INFO_CC_DOM = "CC_DOM";
 	public static final String VCF_INFO_CC_REC = "CC_REC";
 
-	Boolean caseControl[];
-	String tfamFile;
-	String groups;
-	String fileName;
-	PedPedigree pedigree;
+	protected Boolean caseControl[];
+	protected String tfamFile;
+	protected String groups;
+	protected String vcfFileName;
+	protected PedPedigree pedigree;
 	String name;
 	String posMin = "";
 	double pValueMin = 1.0;
@@ -205,12 +205,12 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 			if (args[argc].equals("-tfam")) tfamFile = args[++argc];
 			else if (args[argc].equals("-name")) name = args[++argc];
 			else if ((groups == null) && (tfamFile == null) && isGroupString(args[argc])) groups = args[argc];
-			else if (fileName == null) fileName = args[argc];
+			else if (vcfFileName == null) vcfFileName = args[argc];
 			else usage("Unkown parameter '" + args[argc] + "'");
 		}
 
 		// Sanity check
-		if (fileName == null) usage("Missing paramter 'file.vcf'");
+		if (vcfFileName == null) usage("Missing paramter 'file.vcf'");
 		if ((groups == null) && (tfamFile == null)) usage("You must provide either a 'group' string or a TFAM file");
 
 		if (name == null) name = "";
@@ -322,13 +322,13 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 	public List<VcfEntry> run(boolean createList) {
 		showHeader = !createList;
 		ArrayList<VcfEntry> list = new ArrayList<VcfEntry>();
-		if (verbose) Timer.showStdErr("Annotating number of cases and controls : '" + fileName + "'");
+		if (verbose) Timer.showStdErr("Annotating number of cases and controls : '" + vcfFileName + "'");
 
 		if (tfamFile != null) parseCaseControlTfam();
 		else parseCaseControlString();
 
 		// Read all vcfEntries
-		VcfFileIterator vcf = new VcfFileIterator(fileName);
+		VcfFileIterator vcf = new VcfFileIterator(vcfFileName);
 
 		int i = 1;
 		for (VcfEntry vcfEntry : vcf) {
@@ -353,7 +353,7 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 	 * @param nControl
 	 * @param nCase
 	 */
-	void swapMinorAllele(int nControl[], int nCase[]) {
+	protected void swapMinorAllele(int nControl[], int nCase[]) {
 		int refCount = 2 * nControl[0] + nControl[1] + 2 * nCase[0] + nCase[1];
 		int altCount = 2 * nControl[2] + nControl[1] + 2 * nCase[2] + nCase[1];
 

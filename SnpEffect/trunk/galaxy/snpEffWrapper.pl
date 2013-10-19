@@ -15,7 +15,7 @@ $dir =~ tr/\r\n//d;
 
 # Basic SnpEff command
 $command = $ARGV[0];	# Which snpEff's command do we want to execute?
-@snpEffCmd = ("java", "-Xmx4g", "-jar", "$dir/snpEff.jar", "$command", "-c", "$dir/snpEff.config");
+@snpEffCmd = ("java", "-Xmx4g", "-jar", "$dir/snpEff.jar", "$command" );
 
 # Add all command line options
 for( $i=1 ; $i <= $#ARGV ; $i++ ) {

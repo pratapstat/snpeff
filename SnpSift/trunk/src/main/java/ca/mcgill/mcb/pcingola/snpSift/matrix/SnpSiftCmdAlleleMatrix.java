@@ -89,11 +89,8 @@ public class SnpSiftCmdAlleleMatrix extends SnpSift {
 
 			System.out.println(ve.getChromosomeName() //
 					+ "\t" + (ve.getStart() + 1) //
-					//	+ "\t" + ve.getId() //
 					+ "\t" + ve.getRef() //
 					+ "\t" + ve.getAltsStr() //
-					//	+ "\t" + ve.getQuality() //
-					//	+ "\t" + ve.getInfoStr() //
 					+ "\t" + sbcodes.toString() //
 			);
 			if (verbose) Gpr.showMark(i++, SHOW_EVERY);

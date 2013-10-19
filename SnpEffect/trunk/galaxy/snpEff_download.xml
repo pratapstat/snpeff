@@ -1,7 +1,7 @@
-<tool id="snpEff_download" name="SnpEff Download" version="3.1">
+<tool id="snpEff_download" name="SnpEff Download" version="latest">
 	<description>Download a new database</description>
 	<requirements>
-		<requirement type="package" version="3.1">snpEff</requirement>
+		<requirement type="package" version="latest">snpEff</requirement>
 	</requirements>
 	<command interpreter="perl">snpEffWrapper.pl download -v $genomeVersion > $logfile </command>
 	<inputs>

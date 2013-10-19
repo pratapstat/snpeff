@@ -10,7 +10,6 @@ import ca.mcgill.mcb.pcingola.interval.Markers;
 import ca.mcgill.mcb.pcingola.interval.SeqChange;
 import ca.mcgill.mcb.pcingola.logStatsServer.LogStats;
 import ca.mcgill.mcb.pcingola.logStatsServer.VersionCheck;
-import ca.mcgill.mcb.pcingola.nextProt.SnpEffCmdBuildNextProt;
 import ca.mcgill.mcb.pcingola.snpEffect.Config;
 import ca.mcgill.mcb.pcingola.spliceSites.SnpEffCmdSpliceAnalysis;
 import ca.mcgill.mcb.pcingola.util.Gpr;
@@ -49,7 +48,7 @@ public class SnpEff implements CommandLine {
 	// Version info
 	public static final String SOFTWARE_NAME = "SnpEff";
 	public static final String REVISION = "i";
-	public static final String BUILD = "2013-10-13";
+	public static final String BUILD = "2013-10-16";
 	public static final String VERSION_MAJOR = "3.3";
 	public static final String VERSION_SHORT = VERSION_MAJOR + REVISION;
 	public static final String VERSION_NO_NAME = VERSION_SHORT + " (build " + BUILD + "), by " + Pcingola.BY;
@@ -69,6 +68,7 @@ public class SnpEff implements CommandLine {
 	protected int outOffset = 1;
 	protected String configFile; // Config file
 	protected String genomeVer; // Genome version
+	protected String dataDir; // Override data_dir in config file
 	protected Config config; // Configuration
 
 	/**
@@ -221,7 +221,10 @@ public class SnpEff implements CommandLine {
 				quiet = true;
 				verbose = false;
 			} else if (args[i].equals("-d") || args[i].equalsIgnoreCase("-debug")) debug = verbose = true;
-			else if ((args[i].equals("-c") || args[i].equalsIgnoreCase("-config"))) {
+			else if (args[i].equalsIgnoreCase("-dataDir")) {
+				if ((i + 1) < args.length) dataDir = args[++i];
+				else usage("Option '-dataDir' without data_dir argument");
+			} else if ((args[i].equals("-c") || args[i].equalsIgnoreCase("-config"))) {
 				if ((i + 1) < args.length) configFile = args[++i];
 				else usage("Option '-c' without config file argument");
 			} else argsList.add(args[i]);
@@ -239,7 +242,7 @@ public class SnpEff implements CommandLine {
 			Timer.showStdErr("Reading configuration file '" + configFile + "'" //
 					+ ((genomeVer != null) && (!genomeVer.isEmpty()) ? ". Genome: '" + genomeVer + "'" : "") //
 			);
-		config = new Config(genomeVer, configFile); // Read configuration
+		config = new Config(genomeVer, configFile, dataDir); // Read configuration
 		if (verbose) Timer.showStdErr("done");
 	}
 
@@ -336,12 +339,13 @@ public class SnpEff implements CommandLine {
 			snpEff.debug = debug;
 			snpEff.quiet = quiet;
 			snpEff.configFile = configFile;
+			snpEff.dataDir = dataDir;
 
 			if (help) snpEff.usage(null); // Show help message and exit
 			else snpEff.parseArgs(args);
 			ok = snpEff.run();
 		} catch (Throwable t) {
-			err.append(t.getMessage());
+			if (err != null) err.append(t.getMessage());
 			t.printStackTrace();
 		}
 		return ok;
@@ -383,6 +387,14 @@ public class SnpEff implements CommandLine {
 		System.err.println("   protein         : Compare protein sequences calculated form a SnpEff database to the one in a FASTA file. Used for checking databases correctness.");
 		System.err.println("   spliceAnalysis  : Perform an analysis of splice sites. Experimental feature.");
 		System.err.println("\nRun 'java -jar snpEff.jar command' for help on each specific command");
+		System.err.println("\nGeneric options:");
+		System.err.println("\t-c , -config     : Specify config file");
+		System.err.println("\t-d , -debug      : Debug mode (very verbose).");
+		System.err.println("\t-dataDir <path>  : Override data_dir parameter from config file.");
+		System.err.println("\t-h , -help       : Show this help and exit");
+		System.err.println("\t-noLog           : Do not report usage statistics to server");
+		System.err.println("\t-q , -quiet      : Quiet mode (do not show any messages or errors)");
+		System.err.println("\t-v , -verbose    : Verbose mode");
 		System.exit(-1);
 	}
 }

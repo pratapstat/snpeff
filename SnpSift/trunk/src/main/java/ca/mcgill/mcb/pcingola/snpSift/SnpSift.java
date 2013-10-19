@@ -9,6 +9,7 @@ import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
 import ca.mcgill.mcb.pcingola.snpEffect.commandLine.SnpEff;
 import ca.mcgill.mcb.pcingola.snpSift.caseControl.SnpSiftCmdCaseControl;
 import ca.mcgill.mcb.pcingola.snpSift.caseControl.SnpSiftCmdCaseControlSummary;
+import ca.mcgill.mcb.pcingola.snpSift.coEvolution.SnpSiftCmdCoEvolution;
 import ca.mcgill.mcb.pcingola.snpSift.hwe.SnpSiftCmdHwe;
 import ca.mcgill.mcb.pcingola.snpSift.matrix.SnpSiftCmdAlleleMatrix;
 import ca.mcgill.mcb.pcingola.snpSift.matrix.SnpSiftCmdCovarianceMatrix;
@@ -159,7 +160,10 @@ public class SnpSift {
 			else if (args[i].equals("-v") || args[i].equalsIgnoreCase("-verbose")) verbose = true;
 			else if (args[i].equals("-q") || args[i].equalsIgnoreCase("-quiet")) quiet = true;
 			else if (args[i].equals("-d") || args[i].equalsIgnoreCase("-debug")) debug = true;
-			else argsList.add(args[i]);
+			else if (args[i].equals("-cpus")) {
+				numWorkers = Gpr.parseIntSafe(args[++i]);
+				if (numWorkers <= 0) usage("Error: Number of cpus must be positive");
+			} else argsList.add(args[i]);
 		}
 
 		this.args = argsList.toArray(new String[0]);;
@@ -209,6 +213,7 @@ public class SnpSift {
 		else if (command.startsWith("GT")) cmd = new SnpSiftCmdGt(args);
 		else if (command.startsWith("SIMPLIFYINDELS")) cmd = new SnpSiftCmdSimplifyIndels(args);
 		else if (command.startsWith("PEDSHOW")) cmd = new SnpSiftCmdPedShow(args);
+		else if (command.startsWith("COEVOLUTION")) cmd = new SnpSiftCmdCoEvolution(args);
 		else usage("Unknown command '" + command + "'");
 
 		// Help? Show help and exit
@@ -222,6 +227,7 @@ public class SnpSift {
 		cmd.quiet = quiet;
 		cmd.debug = debug;
 		cmd.help = help;
+		cmd.numWorkers = numWorkers;
 
 		// Execute command
 		cmd.run();
@@ -305,6 +311,7 @@ public class SnpSift {
 				+ "\n\tannMem        : Annotate 'ID' from a database (e.g. dbSnp). Loads db in memory. Does not assume sorted entries." //
 				+ "\n\tcaseControl   : Compare how many variants are in 'case' and in 'control' groups; calculate p-values." //
 				+ "\n\tccs           : Case control summary. Case and control summaries by region, allele frequency and variant's functional effect." //
+				+ "\n\tcoevolution   : Co-evoution case control model (this feature is alpha)." //
 				+ "\n\tconcordance   : Concordance metrics between two VCF files." //
 				+ "\n\tcovMat        : Create an covariance matrix output (allele matrix as input)." //
 				+ "\n\tdbnsfp        : Annotate with multiple entries from dbNSFP. <EXPERIMENTAL>" //

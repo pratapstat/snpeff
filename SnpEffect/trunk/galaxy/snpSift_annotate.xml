@@ -1,11 +1,11 @@
-<tool id="snpSift_annotate" name="SnpSift Annotate" version="3.1">
+<tool id="snpSift_annotate" name="SnpSift Annotate" version="latest">
 	<description>Annotate SNPs from dbSnp</description>
 	<!-- 
 	    You will need to change the path to wherever your installation is.
 		You can change the amount of memory used, just change the -Xmx parameter (e.g. use -Xmx2G for 2Gb of memory)
 	-->
 	<requirements>
-                <requirement type="package" version="3.1">snpEff</requirement>
+                <requirement type="package" version="latest">snpEff</requirement>
 	</requirements>
 	<command interpreter="perl">snpSiftWrapper.pl annotate -q $dbSnp $input > $output </command>
 	<inputs>

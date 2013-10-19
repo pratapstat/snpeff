@@ -85,6 +85,7 @@ public class SnpEffCmdEff extends SnpEff {
 	boolean canonical = false; // Use only canonical transcripts
 	boolean supressOutput = false; // Only used for debugging purposes 
 	boolean createSummary = true; // Do not create summary output file 
+	boolean download = false; // Download genome, if not available 
 	boolean useHgvs = false; // Use Hgvs notation
 	boolean useLocalTemplate = false; // Use template from 'local' file instead of 'jar' (this is only used for development and debugging)
 	boolean useSequenceOntolgy = false; // Use Sequence Ontolgy terms
@@ -584,6 +585,7 @@ public class SnpEffCmdEff extends SnpEff {
 					if ((i + 1) < args.length) cancerSamples = args[++i]; // Read cancer samples from TXT files
 					else usage("Missing -cancerSamples argument");
 				} else if (arg.equalsIgnoreCase("-canon")) canonical = true; // Use canonical transcripts
+				else if (arg.equalsIgnoreCase("-download")) download = true; // Download genome if not availble
 				else if (arg.equalsIgnoreCase("-lof")) lossOfFunction = true; // Add LOF tag
 				else if (arg.equalsIgnoreCase("-hgvs")) useHgvs = true; // Use HGVS notation
 				else if (arg.equalsIgnoreCase("-geneId")) useGeneId = true; // Use gene ID instead of gene name
@@ -975,7 +977,8 @@ public class SnpEffCmdEff extends SnpEff {
 
 		filterIntervals = null;
 
-		readConfig(); // Read config file
+		// Read config file
+		readConfig();
 
 		// Read database (or create a new one)
 		if (onlyRegulation) {
@@ -987,6 +990,19 @@ public class SnpEffCmdEff extends SnpEff {
 		} else {
 			// Read
 			if (verbose) Timer.showStdErr("Reading database for genome version '" + genomeVer + "' from file '" + config.getFileSnpEffectPredictor() + "' (this might take a while)");
+
+			// Try to download database if it doesn't exists?
+			if (download && !Gpr.canRead(config.getFileSnpEffectPredictor())) {
+				if (verbose) Timer.showStdErr("Database not installed\n\tAttempting to download and install database '" + genomeVer + "'");
+
+				// Run download command
+				String downloadArgs[] = { genomeVer };
+				SnpEffCmdDownload snpEffCmdDownload = new SnpEffCmdDownload();
+				boolean ok = run(snpEffCmdDownload, downloadArgs, null);
+				if (!ok) throw new RuntimeException("Genome download failed!");
+				else if (verbose) Timer.showStdErr("Database installed.");
+			}
+
 			config.loadSnpEffectPredictor(); // Read snpEffect predictor
 			if (verbose) Timer.showStdErr("done");
 		}
@@ -1276,6 +1292,7 @@ public class SnpEffCmdEff extends SnpEff {
 		System.err.println("\nOptions:");
 		System.err.println("\t-a , -around            : Show N codons and amino acids around change (only in coding regions). Default is " + CodonChange.SHOW_CODONS_AROUND_CHANGE + " codons.");
 		System.err.println("\t-chr <string>           : Prepend 'string' to chromosome name (e.g. 'chr1' instead of '1'). Only on TXT output.");
+		System.err.println("\t-download               : Download reference genome if not available. Default: " + download);
 		System.err.println("\t-i <format>             : Input format [ vcf, txt, pileup, bed ]. Default: VCF.");
 		System.err.println("\t-fileList               : Input actually contains a list of files to process.");
 		System.err.println("\t-interval               : Use a custom interval BED file (you may use this option many times)");
@@ -1322,6 +1339,8 @@ public class SnpEffCmdEff extends SnpEff {
 		System.err.println("\t-0                      : File positions are zero-based (same as '-inOffset 0 -outOffset 0')");
 		System.err.println("\t-1                      : File positions are one-based (same as '-inOffset 1 -outOffset 1')");
 		System.err.println("\t-c , -config            : Specify config file");
+		System.err.println("\t-d , -debug             : Debug mode (very verbose).");
+		System.err.println("\t-dataDir <path>         : Override data_dir parameter from config file.");
 		System.err.println("\t-h , -help              : Show this help and exit");
 		System.err.println("\t-if, -inOffset          : Offset input by a number of bases. E.g. '-inOffset 1' for one-based input files");
 		System.err.println("\t-of, -outOffset         : Offset output by a number of bases. E.g. '-outOffset 1' for one-based output files");

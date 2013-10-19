@@ -104,7 +104,7 @@ public class SnpEffCmdDownload extends SnpEff {
 	boolean download(URL url, String localFile) {
 		boolean res = false;
 		try {
-			if (verbose) Timer.show("Connecting to " + url);
+			if (verbose) Timer.showStdErr("Connecting to " + url);
 			URLConnection connection = url.openConnection();
 
 			for (boolean followRedirect = true; followRedirect;) {
@@ -115,7 +115,7 @@ public class SnpEffCmdDownload extends SnpEff {
 					followRedirect = false; // We are done
 				} else if (code == 302) {
 					String newUrl = connection.getHeaderField("Location");
-					if (verbose) Timer.show("Following redirect: " + newUrl);
+					if (verbose) Timer.showStdErr("Following redirect: " + newUrl);
 					url = new URL(newUrl);
 					connection = url.openConnection();
 				} else if (code == 404) {
@@ -128,10 +128,10 @@ public class SnpEffCmdDownload extends SnpEff {
 
 			// Print info about resource
 			Date date = new Date(connection.getLastModified());
-			if (verbose) Timer.show("Copying file (type: " + connection.getContentType() + ", modified on: " + date + ")");
+			if (verbose) Timer.showStdErr("Copying file (type: " + connection.getContentType() + ", modified on: " + date + ")");
 
 			// Open local file 
-			if (verbose) Timer.show("Local file name: '" + localFile + "'");
+			if (verbose) Timer.showStdErr("Local file name: '" + localFile + "'");
 			FileOutputStream os = null;
 			os = new FileOutputStream(localFile);
 
@@ -144,7 +144,7 @@ public class SnpEffCmdDownload extends SnpEff {
 
 				// Show every MB
 				if ((total - lastShown) > (1024 * 1024)) {
-					if (verbose) Timer.show("Downloaded " + total + " bytes");
+					if (verbose) Timer.showStdErr("Downloaded " + total + " bytes");
 					lastShown = total;
 				}
 			}
@@ -152,7 +152,7 @@ public class SnpEffCmdDownload extends SnpEff {
 			// Close streams
 			is.close();
 			os.close();
-			if (verbose) Timer.show("Donwload finished. Total " + total + " bytes.");
+			if (verbose) Timer.showStdErr("Donwload finished. Total " + total + " bytes.");
 
 			res = true;
 		} catch (Exception e) {
@@ -197,7 +197,7 @@ public class SnpEffCmdDownload extends SnpEff {
 			String entryPath[] = entryName.split("/"); // Entry name should be something like 'data/genomeVer/file';
 			String dataName = entryPath[entryPath.length - 2] + "/" + entryPath[entryPath.length - 1]; // remove the 'data/' part
 			entryName = config.getDirData() + "/" + dataName; // Ad local 'data' dir
-			if (verbose) Timer.show("Local file name: '" + entryName + "'");
+			if (verbose) Timer.showStdErr("Local file name: '" + entryName + "'");
 		}
 
 		return entryName;
@@ -225,17 +225,17 @@ public class SnpEffCmdDownload extends SnpEff {
 	boolean runDownloadGenome() {
 		readConfig(); // Read config file
 
-		if (verbose) Timer.show("Downloading database for '" + genomeVer + "'");
+		if (verbose) Timer.showStdErr("Downloading database for '" + genomeVer + "'");
 
 		URL url = buildUrl();
 		String localFile = baseName(url.toString());
 
 		// Download and unzip
 		if (download(url, localFile)) {
-			if (unzip(localFile) && verbose) Timer.show("Unzip: OK");
+			if (unzip(localFile) && verbose) Timer.showStdErr("Unzip: OK");
 		}
 
-		if (verbose) Timer.show("Done");
+		if (verbose) Timer.showStdErr("Done");
 		return true;
 	}
 
@@ -264,7 +264,7 @@ public class SnpEffCmdDownload extends SnpEff {
 		}
 
 		// OK, download
-		if (verbose) Timer.show("Downloading SnpEff");
+		if (verbose) Timer.showStdErr("Downloading SnpEff");
 
 		URL url;
 		try {
@@ -276,10 +276,10 @@ public class SnpEffCmdDownload extends SnpEff {
 
 		// Download and unzip
 		if (download(url, localFile)) {
-			if (unzip(localFile) && verbose) Timer.show("Unzip: OK");
+			if (unzip(localFile) && verbose) Timer.showStdErr("Unzip: OK");
 		}
 
-		if (verbose) Timer.show("Done");
+		if (verbose) Timer.showStdErr("Done");
 		return true;
 	}
 
@@ -319,7 +319,7 @@ public class SnpEffCmdDownload extends SnpEff {
 					String dirName = Gpr.dirName(localEntryName);
 					File dir = new File(dirName);
 					if (!dir.exists()) {
-						if (verbose) Timer.show("Creating local directory: '" + dir + "'");
+						if (verbose) Timer.showStdErr("Creating local directory: '" + dir + "'");
 						dir.mkdirs(); // Create local dir
 					}
 
@@ -338,7 +338,7 @@ public class SnpEffCmdDownload extends SnpEff {
 					dest.close();
 				} else if (entry.isDirectory()) {
 					String dir = parseEntryPath(entry.getName());
-					if (verbose) Timer.show("Creating local directory: '" + dir + "'");
+					if (verbose) Timer.showStdErr("Creating local directory: '" + dir + "'");
 					new File(dir).mkdirs(); // Create local dir
 				}
 			}

@@ -1,4 +1,4 @@
-package ca.mcgill.mcb.pcingola.nextProt;
+package ca.mcgill.mcb.pcingola.snpEffect.commandLine;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -25,7 +25,6 @@ import ca.mcgill.mcb.pcingola.interval.NextProt;
 import ca.mcgill.mcb.pcingola.interval.Transcript;
 import ca.mcgill.mcb.pcingola.serializer.MarkerSerializer;
 import ca.mcgill.mcb.pcingola.snpEffect.SnpEffectPredictor;
-import ca.mcgill.mcb.pcingola.snpEffect.commandLine.SnpEff;
 import ca.mcgill.mcb.pcingola.stats.CountByType;
 import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.util.GprSeq;
