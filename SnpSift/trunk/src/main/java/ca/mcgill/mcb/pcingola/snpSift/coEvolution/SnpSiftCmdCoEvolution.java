@@ -470,6 +470,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	public void run() {
 		loadTfam();
 		loadVcf();
+		initMatchGenes();
 		runCoEvolution();
 	}
 
