@@ -42,6 +42,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	ArrayList<byte[]> genotypes;
 	ArrayList<String> entryId;
 	HashSet<String> genes;
+	boolean genesMatch[];
 
 	public static void main(String[] args) {
 		String vcfInput = Gpr.HOME + "/t2d1/eff/hm1.gt.vcf";
@@ -163,6 +164,15 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	}
 
 	/**
+	 * Initialize genesMatch
+	 */
+	void initMatchGenes() {
+		genesMatch = new boolean[genotypes.size()];
+		for (int i = 0; i < genesMatch.length; i++)
+			genesMatch[i] = matchGenes(i);
+	}
+
+	/**
 	 * Load TFAM file
 	 */
 	void loadTfam() {
@@ -224,6 +234,11 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		return count;
 	}
 
+	/**
+	 * Does this entry matches "genes" command line option?
+	 * @param i
+	 * @return
+	 */
 	boolean matchGenes(int i) {
 		// Do we have a preferred list of genes to focus on?
 		if (genes == null) return true; // No 'genes' set? Everything matches
@@ -238,6 +253,16 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 			if (genes.contains(g)) return true;
 
 		return false;
+	}
+
+	/**
+	 * Do either entries match 'genes' from command line?
+	 * @param i
+	 * @param j
+	 * @return
+	 */
+	boolean matchGenes(int i, int j) {
+		return genesMatch[i] || genesMatch[j];
 	}
 
 	double min(double d1, double d2, double d3, double d4) {
@@ -460,9 +485,6 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	 */
 	public String runCoEvolution(int i) {
 
-		// Does this entry match 'genes'?
-		if (!matchGenes(i)) return "";
-
 		int numEntries = genotypes.size();
 		int count = 0;
 		StringBuilder sb = new StringBuilder();
@@ -475,15 +497,19 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		// Iterate on all entries
 		for (int j = minj; j < numEntries; j++) {
 			if (i != j) {
-				double pvalue = pValue(genotypes.get(i), genotypes.get(j));
-				count++;
+				// Does this entry match 'genes'?
+				if (matchGenes(i, j)) {
 
-				if (pvalue <= pvalueThreshold) {
-					String out = String.format("Result\t%.4e\t[%d, %d]\t%s\t%s\t%d\t%d", pvalue, i, j, entryId.get(i), entryId.get(j), mac(genotypes.get(i)), mac(genotypes.get(j)));
-					if (!isMulti) System.out.println(out);
-					else sb.append((sb.length() > 0 ? "\n" : "") + out);
+					double pvalue = pValue(genotypes.get(i), genotypes.get(j));
+					count++;
 
-				} else if (!isMulti) Gpr.showMark(count, SHOW_EVERY);
+					if (pvalue <= pvalueThreshold) {
+						String out = String.format("Result\t%.4e\t[%d, %d]\t%s\t%s\t%d\t%d", pvalue, i, j, entryId.get(i), entryId.get(j), mac(genotypes.get(i)), mac(genotypes.get(j)));
+						if (!isMulti) System.out.println(out);
+						else sb.append((sb.length() > 0 ? "\n" : "") + out);
+
+					} else if (!isMulti) Gpr.showMark(count, SHOW_EVERY);
+				}
 			}
 		}
 
