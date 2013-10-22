@@ -116,7 +116,8 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 				+ ":" + (ve.getStart() + 1) //
 				+ "_" + ve.getRef() //
 				+ "/" + ve.getAltsStr() //
-				+ (sb.length() > 0 ? " " + sb.toString() : "") //
+				+ " " + sb.toString() //
+				+ " " + ve.getId() //
 		;
 	}
 
