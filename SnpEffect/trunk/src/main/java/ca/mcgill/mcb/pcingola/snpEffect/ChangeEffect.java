@@ -156,12 +156,13 @@ public class ChangeEffect implements Cloneable, Comparable<ChangeEffect> {
 				return "regulatory_region_variant";
 			case RARE_AMINO_ACID:
 				return "non_conservative_missense_variant";
+			case CDS:
+				return "CDS";
 
 			case START_GAINED:
 			case MICRO_RNA:
 			case NONE:
 			case GENE:
-			case CDS:
 			case GENOME:
 			case CUSTOM:
 				return this.toString().toLowerCase(); // Just a wild guess ... this should probably throw an Exception
