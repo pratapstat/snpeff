@@ -268,6 +268,8 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 
 	/**
 	 * Find the minimum non-zero pvalue
+	 * Note: If a p-value is exactly zero, there is something probably wrong with the statistic.
+	 * 
 	 * @param d1
 	 * @param d2
 	 * @param d3
