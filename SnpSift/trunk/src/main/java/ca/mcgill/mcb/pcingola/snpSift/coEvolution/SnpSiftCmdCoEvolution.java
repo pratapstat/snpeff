@@ -266,7 +266,20 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		return genesMatch[i] || genesMatch[j];
 	}
 
-	double min(double d1, double d2, double d3, double d4) {
+	/**
+	 * Find the minimum non-zero pvalue
+	 * @param d1
+	 * @param d2
+	 * @param d3
+	 * @param d4
+	 * @return
+	 */
+	double minPvalue(double d1, double d2, double d3, double d4) {
+		if (d1 <= 0.0) d1 = 1.0;
+		if (d2 <= 0.0) d2 = 1.0;
+		if (d3 <= 0.0) d3 = 1.0;
+		if (d4 <= 0.0) d4 = 1.0;
+
 		return Math.min(Math.min(d1, d2), Math.min(d3, d4));
 	}
 
@@ -410,13 +423,16 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		double pDominant = pDominant(nControl, nCase);
 		double pRecessive = pRecessive(nControl, nCase);
 
-		return min(pCodominant, pAllelic, pDominant, pRecessive);
+		return minPvalue(pCodominant, pAllelic, pDominant, pRecessive);
 	}
 
 	/**
 	 * Compare p-values between two genotypes
 	 */
-	public double pValue(byte scores1[], byte scores2[]) {
+	//public double pValue(byte scores1[], byte scores2[]) {
+	public double pValue(int i1, int i2) {
+		byte scores1[] = genotypes.get(i1);
+		byte scores2[] = genotypes.get(i2);
 		int casesHom = 0, casesHet = 0, cases = 0;
 		int ctrlHom = 0, ctrlHet = 0, ctrl = 0;
 		int nCase[] = new int[3];
@@ -456,9 +472,6 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 			}
 		}
 
-		// Add info fields
-		if (debug) Gpr.debug("\n\tCases: " + casesHom + "," + casesHet + "," + cases + "\n\tControls: " + ctrlHom + "," + ctrlHet + "," + ctrl);
-
 		// pValues
 		double pCodominant = pCodominant(nControl, nCase);
 		// swapMinorAllele(nControl, nCase); // Swap if minor allele is reference
@@ -466,7 +479,21 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		double pDominant = pDominant(nControl, nCase);
 		double pRecessive = pRecessive(nControl, nCase);
 
-		return min(pCodominant, pAllelic, pDominant, pRecessive);
+		double pvalue = minPvalue(pCodominant, pAllelic, pDominant, pRecessive);
+
+		// Add info fields
+		if (pvalue == 0.0) Gpr.debug("p-value is zero!" //
+				+ "\n\t" + entryId.get(i1) + "\t" + entryId.get(i2) //
+				+ "\n\tCases: " + casesHom + "," + casesHet + "," + cases //
+				+ "\n\tControls: " + ctrlHom + "," + ctrlHet + "," + ctrl //
+				+ "\n\tpCodominant = " + pCodominant //
+				+ "\n\tpAllelic    = " + pAllelic //
+				+ "\n\tpDominant   = " + pDominant //
+				+ "\n\tpRecessive  = " + pRecessive //
+		);
+		if (debug) Gpr.debug(entryId.get(i1) + "\t" + entryId.get(i2) + "\n\tCases: " + casesHom + "," + casesHet + "," + cases + "\n\tControls: " + ctrlHom + "," + ctrlHet + "," + ctrl);
+
+		return pvalue;
 	}
 
 	/**
@@ -507,7 +534,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 				// Does this entry match 'genes'?
 				if (matchGenes(i, j)) {
 
-					double pvalue = pValue(genotypes.get(i), genotypes.get(j));
+					double pvalue = pValue(i, j);
 					count++;
 
 					if (pvalue <= pvalueThreshold) {
