@@ -459,8 +459,14 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		// Add info fields
 		if (debug) Gpr.debug("\n\tCases: " + casesHom + "," + casesHet + "," + cases + "\n\tControls: " + ctrlHom + "," + ctrlHet + "," + ctrl);
 
-		// pValue
-		return pDominant(nControl, nCase);
+		// pValues
+		double pCodominant = pCodominant(nControl, nCase);
+		// swapMinorAllele(nControl, nCase); // Swap if minor allele is reference
+		double pAllelic = pAllelic(nControl, nCase);
+		double pDominant = pDominant(nControl, nCase);
+		double pRecessive = pRecessive(nControl, nCase);
+
+		return min(pCodominant, pAllelic, pDominant, pRecessive);
 	}
 
 	/**
@@ -486,7 +492,6 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	 * @return
 	 */
 	public String runCoEvolution(int i) {
-
 		int numEntries = genotypes.size();
 		int count = 0;
 		StringBuilder sb = new StringBuilder();
