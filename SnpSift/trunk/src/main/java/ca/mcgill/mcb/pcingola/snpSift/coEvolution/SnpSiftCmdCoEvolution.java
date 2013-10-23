@@ -18,6 +18,7 @@ import ca.mcgill.mcb.pcingola.snpSift.coEvolution.akka.WorkQueueCoEvolution;
 import ca.mcgill.mcb.pcingola.stats.CountByType;
 import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.util.Timer;
+import ca.mcgill.mcb.pcingola.util.Tuple;
 import ca.mcgill.mcb.pcingola.vcf.VcfEffect;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 
@@ -28,8 +29,12 @@ import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
  */
 public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 
-	public enum Model {
+	public enum ModelCoevolution {
 		ABS, MAX
+	};
+
+	public enum ModelPvalue {
+		Allelic, Dominant, Recessive, Codominant
 	};
 
 	public static final int SHOW_EVERY = 1000;
@@ -37,22 +42,12 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	boolean isMulti;
 	int minAlleleCount;
 	double pvalueThreshold;
-	Model model;
+	ModelCoevolution model;
 	List<String> sampleIds;
 	ArrayList<byte[]> genotypes;
 	ArrayList<String> entryId;
 	HashSet<String> genes;
 	boolean genesMatch[];
-
-	public static void main(String[] args) {
-		String vcfInput = Gpr.HOME + "/t2d1/eff/hm1.gt.vcf";
-		// String vcfInput = Gpr.HOME + "/t2d1/eff/z.gt.vcf";
-		String tfam = Gpr.HOME + "/t2d1/pheno/pheno.tfam";
-
-		String argsCmd[] = { tfam, vcfInput };
-		SnpSiftCmdCoEvolution coEvolution = new SnpSiftCmdCoEvolution(argsCmd);
-		coEvolution.run();
-	}
 
 	public SnpSiftCmdCoEvolution(String args[]) {
 		super(args);
@@ -161,7 +156,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	public void init() {
 		minAlleleCount = 10;
 		pvalueThreshold = 1e-4;
-		model = Model.ABS;
+		model = ModelCoevolution.ABS;
 	}
 
 	/**
@@ -296,7 +291,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 				// Command line options
 				if (arg.equalsIgnoreCase("-minAc")) minAlleleCount = Gpr.parseIntSafe(args[++argc]);
 				else if (arg.equalsIgnoreCase("-maxP")) pvalueThreshold = Gpr.parseDoubleSafe(args[++argc]);
-				else if (arg.equalsIgnoreCase("-model")) model = Model.valueOf(args[++argc].toUpperCase());
+				else if (arg.equalsIgnoreCase("-model")) model = ModelCoevolution.valueOf(args[++argc].toUpperCase());
 				else if (arg.equalsIgnoreCase("-genes")) {
 					String genesStr = args[++argc];
 					genes = new HashSet<String>();
@@ -431,8 +426,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	/**
 	 * Compare p-values between two genotypes
 	 */
-	//public double pValue(byte scores1[], byte scores2[]) {
-	public double pValue(int i1, int i2) {
+	public Tuple<Double, ModelPvalue> pValue(int i1, int i2) {
 		byte scores1[] = genotypes.get(i1);
 		byte scores2[] = genotypes.get(i2);
 		int casesHom = 0, casesHet = 0, cases = 0;
@@ -481,7 +475,16 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		double pDominant = pDominant(nControl, nCase);
 		double pRecessive = pRecessive(nControl, nCase);
 
-		double pvalue = minPvalue(pCodominant, pAllelic, pDominant, pRecessive);
+		double pvalues[] = { pAllelic, pDominant, pRecessive, pCodominant };
+		double pvalue = 1.0;
+		int minp = 0;
+		for (int i = 0; i < pvalues.length; i++) {
+			double p = pvalues[i] <= 0 ? 1.0 : pvalues[i];
+			if (p < pvalue) {
+				minp = i;
+				pvalue = p;
+			}
+		}
 
 		// Add info fields
 		if (pvalue == 0.0) Gpr.debug("p-value is zero!" //
@@ -495,7 +498,9 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		);
 		if (debug) Gpr.debug(entryId.get(i1) + "\t" + entryId.get(i2) + "\n\tCases: " + casesHom + "," + casesHet + "," + cases + "\n\tControls: " + ctrlHom + "," + ctrlHet + "," + ctrl);
 
-		return pvalue;
+		// Return a tuple
+		if (pvalue > pvalueThreshold) return null; // Over threshold? Don't even bother....
+		return new Tuple<Double, ModelPvalue>(pvalue, ModelPvalue.values()[minp]);
 	}
 
 	/**
@@ -528,7 +533,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		// Iteration start
 		// Note: 'Abs' model yields the same result for [i, j] than [j, i] whereas 'max' model doesn't
 		int minj = 0;
-		if (model == Model.ABS) minj = i + 1;
+		if (model == ModelCoevolution.ABS) minj = i + 1;
 
 		// Iterate on all entries
 		for (int j = minj; j < numEntries; j++) {
@@ -536,11 +541,13 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 				// Does this entry match 'genes'?
 				if (matchGenes(i, j)) {
 
-					double pvalue = pValue(i, j);
+					Tuple<Double, ModelPvalue> tuple = pValue(i, j);
 					count++;
 
-					if (pvalue <= pvalueThreshold) {
-						String out = String.format("Result\t%.4e\t[%d, %d]\t%s\t%s\t%d\t%d", pvalue, i, j, entryId.get(i), entryId.get(j), mac(genotypes.get(i)), mac(genotypes.get(j)));
+					if (tuple != null) {
+						double pvalue = tuple.first;
+						ModelPvalue modelPvalue = tuple.second;
+						String out = String.format("Result\t%.4e\t%s\t[%d, %d]\t%s\t%s\t%d\t%d", pvalue, modelPvalue.toString(), i, j, entryId.get(i), entryId.get(j), mac(genotypes.get(i)), mac(genotypes.get(j)));
 						if (!isMulti) System.out.println(out);
 						else sb.append((sb.length() > 0 ? "\n" : "") + out);
 
