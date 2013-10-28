@@ -369,6 +369,56 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	}
 
 	/**
+	 * Power calculation
+	 */
+	void powerCalculation() {
+		Timer.showStdErr("Power calculation.");
+		int nCase[] = new int[3];
+		int nControl[] = new int[3];
+		int cases = 0, controls = 0;
+
+		// Count cases & controls
+		for (int idx = 0; idx < caseControl.length; idx++) {
+			if ((caseControl[idx] != null)) {
+				// Count a/a, a/A and A/A
+				if (caseControl[idx]) cases++;
+				else controls++;
+			}
+		}
+
+		Timer.showStdErr("Cases & Controls:" //
+				+ "\n\tCases    : " + cases //
+				+ "\n\tControls : " + controls //
+		);
+
+		int numEntries = genotypes.size();
+		double pvalueSignificant = 0.05 / (numEntries * numEntries);
+
+		// Calculate pvalues (best case scenario)
+		String powerStr = "";
+		for (int numCases = cases; numCases > 0; numCases--) {
+			nCase[0] = 2 * (cases - numCases);
+			nCase[1] = 0;
+			nCase[2] = 2 * numCases;
+
+			nControl[0] = 2 * controls;
+			nControl[1] = 0;
+			nControl[2] = 0;
+
+			Tuple<Double, ModelPvalue> tuple = minPvalue(nCase, nControl);
+			double pvalue = tuple.first;
+			//if (pvalue <= pvalueThreshold) System.out.println("NumCases : " + numCases + "\tp-value: " + pvalue);
+			if (pvalue <= pvalueSignificant) powerStr = String.format("" //
+					+ "\n\tSignificance threshold : %e" //
+					+ "\n\tNumber of cases        : %d" //
+					+ "\n\tp-value                : %e (%s)" //
+			, pvalueSignificant, numCases, pvalue, tuple.second.toString());
+		}
+
+		Timer.showStdErr("Done:" + powerStr);
+	}
+
+	/**
 	 * Calculate pValue
 	 * @param genoScores
 	 * @return
@@ -424,6 +474,36 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	}
 
 	/**
+	 * Calculate the best p-value
+	 * 
+	 * @param nCase
+	 * @param nControl
+	 * @return
+	 */
+	Tuple<Double, ModelPvalue> minPvalue(int nCase[], int nControl[]) {
+		// pValues
+		double pCodominant = pCodominant(nControl, nCase);
+		//	swapMinorAllele(nControl, nCase); // Swap if minor allele is reference
+		double pAllelic = pAllelic(nControl, nCase);
+		double pDominant = pDominant(nControl, nCase);
+		double pRecessive = pRecessive(nControl, nCase);
+
+		double pvalues[] = { pAllelic, pDominant, pRecessive, pCodominant };
+		double pvalue = 1.0;
+		int minp = 0;
+		for (int i = 0; i < pvalues.length; i++) {
+			double p = pvalues[i] <= 0 ? 1.0 : pvalues[i];
+			if (p < pvalue) {
+				minp = i;
+				pvalue = p;
+			}
+		}
+
+		// Return a tuple
+		return new Tuple<Double, ModelPvalue>(pvalue, ModelPvalue.values()[minp]);
+	}
+
+	/**
 	 * Compare p-values between two genotypes
 	 */
 	public Tuple<Double, ModelPvalue> pValue(int i1, int i2) {
@@ -468,39 +548,17 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 			}
 		}
 
-		// pValues
-		double pCodominant = pCodominant(nControl, nCase);
-		// swapMinorAllele(nControl, nCase); // Swap if minor allele is reference
-		double pAllelic = pAllelic(nControl, nCase);
-		double pDominant = pDominant(nControl, nCase);
-		double pRecessive = pRecessive(nControl, nCase);
+		// Calculate pValues
+		Tuple<Double, ModelPvalue> tuple = minPvalue(nCase, nControl);
+		double pvalue = tuple.first;
 
-		double pvalues[] = { pAllelic, pDominant, pRecessive, pCodominant };
-		double pvalue = 1.0;
-		int minp = 0;
-		for (int i = 0; i < pvalues.length; i++) {
-			double p = pvalues[i] <= 0 ? 1.0 : pvalues[i];
-			if (p < pvalue) {
-				minp = i;
-				pvalue = p;
-			}
-		}
-
-		// Add info fields
-		if (pvalue == 0.0) Gpr.debug("p-value is zero!" //
-				+ "\n\t" + entryId.get(i1) + "\t" + entryId.get(i2) //
-				+ "\n\tCases: " + casesHom + "," + casesHet + "," + cases //
-				+ "\n\tControls: " + ctrlHom + "," + ctrlHet + "," + ctrl //
-				+ "\n\tpCodominant = " + pCodominant //
-				+ "\n\tpAllelic    = " + pAllelic //
-				+ "\n\tpDominant   = " + pDominant //
-				+ "\n\tpRecessive  = " + pRecessive //
-		);
+		// Sanity check
+		if (pvalue == 0.0) Gpr.debug("p-value is zero!" + "\n\t" + entryId.get(i1) + "\t" + entryId.get(i2) + "\n\tCases: " + casesHom + "," + casesHet + "," + cases + "\n\tControls: " + ctrlHom + "," + ctrlHet + "," + ctrl);
 		if (debug) Gpr.debug(entryId.get(i1) + "\t" + entryId.get(i2) + "\n\tCases: " + casesHom + "," + casesHet + "," + cases + "\n\tControls: " + ctrlHom + "," + ctrlHet + "," + ctrl);
 
 		// Return a tuple
 		if (pvalue > pvalueThreshold) return null; // Over threshold? Don't even bother....
-		return new Tuple<Double, ModelPvalue>(pvalue, ModelPvalue.values()[minp]);
+		return tuple;
 	}
 
 	/**
@@ -511,6 +569,8 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		loadTfam();
 		loadVcf();
 		initMatchGenes();
+
+		if (verbose) powerCalculation();
 		runCoEvolution();
 	}
 
