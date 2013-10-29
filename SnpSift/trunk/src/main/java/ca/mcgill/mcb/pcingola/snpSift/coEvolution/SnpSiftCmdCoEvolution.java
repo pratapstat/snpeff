@@ -1,5 +1,8 @@
 package ca.mcgill.mcb.pcingola.snpSift.coEvolution;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -40,14 +43,16 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	public static final int SHOW_EVERY = 1000;
 
 	boolean isMulti;
+	boolean genesMatch[];
 	int minAlleleCount;
 	double pvalueThreshold;
+	String rFileName = Gpr.HOME + "/coEvolution.txt";
 	ModelCoevolution model;
 	List<String> sampleIds;
 	ArrayList<byte[]> genotypes;
 	ArrayList<String> entryId;
 	HashSet<String> genes;
-	boolean genesMatch[];
+	BufferedWriter rFile;
 
 	public SnpSiftCmdCoEvolution(String args[]) {
 		super(args);
@@ -280,6 +285,36 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		return Math.min(Math.min(d1, d2), Math.min(d3, d4));
 	}
 
+	/**
+	 * Calculate the best p-value
+	 * 
+	 * @param nCase
+	 * @param nControl
+	 * @return
+	 */
+	Tuple<Double, ModelPvalue> minPvalue(int nCase[], int nControl[]) {
+		// pValues
+		double pCodominant = pCodominant(nControl, nCase);
+		//	swapMinorAllele(nControl, nCase); // Swap if minor allele is reference
+		double pAllelic = pAllelic(nControl, nCase);
+		double pDominant = pDominant(nControl, nCase);
+		double pRecessive = pRecessive(nControl, nCase);
+
+		double pvalues[] = { pAllelic, pDominant, pRecessive, pCodominant };
+		double pvalue = 1.0;
+		int minp = 0;
+		for (int i = 0; i < pvalues.length; i++) {
+			double p = pvalues[i] <= 0 ? 1.0 : pvalues[i];
+			if (p < pvalue) {
+				minp = i;
+				pvalue = p;
+			}
+		}
+
+		// Return a tuple
+		return new Tuple<Double, ModelPvalue>(pvalue, ModelPvalue.values()[minp]);
+	}
+
 	@Override
 	public void parse(String[] args) {
 		if (args.length <= 0) usage(null);
@@ -372,7 +407,6 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	 * Power calculation
 	 */
 	void powerCalculation() {
-		Timer.showStdErr("Power calculation.");
 		int nCase[] = new int[3];
 		int nControl[] = new int[3];
 		int cases = 0, controls = 0;
@@ -386,7 +420,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 			}
 		}
 
-		Timer.showStdErr("Cases & Controls:" //
+		Timer.showStdErr("Power calculation:" //
 				+ "\n\tCases    : " + cases //
 				+ "\n\tControls : " + controls //
 		);
@@ -398,8 +432,8 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		String powerStr = "";
 		for (int numCases = cases; numCases > 0; numCases--) {
 			nCase[0] = 2 * (cases - numCases);
-			nCase[1] = 0;
-			nCase[2] = 2 * numCases;
+			nCase[1] = numCases;
+			nCase[2] = 0;
 
 			nControl[0] = 2 * controls;
 			nControl[1] = 0;
@@ -407,7 +441,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 
 			Tuple<Double, ModelPvalue> tuple = minPvalue(nCase, nControl);
 			double pvalue = tuple.first;
-			//if (pvalue <= pvalueThreshold) System.out.println("NumCases : " + numCases + "\tp-value: " + pvalue);
+			if (debug && pvalue <= pvalueThreshold) System.out.println("NumCases : " + numCases + "\tp-value: " + pvalue);
 			if (pvalue <= pvalueSignificant) powerStr = String.format("" //
 					+ "\n\tSignificance threshold : %e" //
 					+ "\n\tNumber of cases        : %d" //
@@ -474,41 +508,12 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	}
 
 	/**
-	 * Calculate the best p-value
-	 * 
-	 * @param nCase
-	 * @param nControl
-	 * @return
-	 */
-	Tuple<Double, ModelPvalue> minPvalue(int nCase[], int nControl[]) {
-		// pValues
-		double pCodominant = pCodominant(nControl, nCase);
-		//	swapMinorAllele(nControl, nCase); // Swap if minor allele is reference
-		double pAllelic = pAllelic(nControl, nCase);
-		double pDominant = pDominant(nControl, nCase);
-		double pRecessive = pRecessive(nControl, nCase);
-
-		double pvalues[] = { pAllelic, pDominant, pRecessive, pCodominant };
-		double pvalue = 1.0;
-		int minp = 0;
-		for (int i = 0; i < pvalues.length; i++) {
-			double p = pvalues[i] <= 0 ? 1.0 : pvalues[i];
-			if (p < pvalue) {
-				minp = i;
-				pvalue = p;
-			}
-		}
-
-		// Return a tuple
-		return new Tuple<Double, ModelPvalue>(pvalue, ModelPvalue.values()[minp]);
-	}
-
-	/**
 	 * Compare p-values between two genotypes
 	 */
 	public Tuple<Double, ModelPvalue> pValue(int i1, int i2) {
 		byte scores1[] = genotypes.get(i1);
 		byte scores2[] = genotypes.get(i2);
+		byte codes[] = new byte[scores1.length];
 		int casesHom = 0, casesHet = 0, cases = 0;
 		int ctrlHom = 0, ctrlHet = 0, ctrl = 0;
 		int nCase[] = new int[3];
@@ -516,6 +521,8 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 
 		// Count genotypes
 		for (int idx = 0; idx < scores1.length; idx++) {
+			codes[idx] = -1;
+
 			if ((caseControl[idx] != null)) {
 				int code1 = scores1[idx];
 				int code2 = scores2[idx];
@@ -523,7 +530,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 				if ((code1 >= 0) && (code2 >= 0)) {
 					// Summarize two codes into one
 					int code = coEvolutionCode(code1, code2);
-					int codeMissing = Math.max(0, code);
+					codes[idx] = (byte) code;
 
 					// Count a/a, a/A and A/A
 					if (caseControl[idx]) nCase[code]++;
@@ -535,14 +542,14 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 						else if (code == 2) casesHom++;
 						else casesHet++;
 
-						cases += codeMissing;
+						cases += code;
 					} else {
 						//Control sample
 						if (code < 0) ; // Missing? => Do not count
 						else if (code == 2) ctrlHom++;
 						else ctrlHet++;
 
-						ctrl += codeMissing;
+						ctrl += code;
 					}
 				}
 			}
@@ -558,6 +565,8 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 
 		// Return a tuple
 		if (pvalue > pvalueThreshold) return null; // Over threshold? Don't even bother....
+
+		writeR(i1, i2, codes);
 		return tuple;
 	}
 
@@ -566,12 +575,26 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	 */
 	@Override
 	public void run() {
-		loadTfam();
-		loadVcf();
-		initMatchGenes();
+		try {
+			// Load data
+			loadTfam();
+			loadVcf();
+			initMatchGenes();
 
-		if (verbose) powerCalculation();
-		runCoEvolution();
+			// Open 'R' file
+			if (verbose) Timer.showStdErr("Writing results to file " + rFileName + "'");
+			rFile = new BufferedWriter(new FileWriter(rFileName));
+			writeRTitle();
+
+			// Run
+			if (debug) powerCalculation();
+			runCoEvolution();
+
+			rFile.close();
+			if (verbose) Timer.showStdErr("Results written to file '" + rFileName + "'");
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	void runCoEvolution() {
@@ -682,6 +705,56 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		System.err.println("\tfile.tfam       : A TFAM file having case/control informations (phenotype colmun)");
 		System.err.println("\tfile.vcf        : A VCF file (variants and genotype data)");
 		System.exit(1);
+	}
+
+	/**
+	 * Show in a way that R can read (logistic regression)
+	 * @param i1
+	 * @param i2
+	 * @param codes
+	 */
+	void writeR(int i1, int i2, byte codes[]) {
+		StringBuilder sb = new StringBuilder();
+
+		// Preapre string
+		sb.append(entryId.get(i1).replace(' ', '\t'));
+		sb.append('\t');
+		sb.append(entryId.get(i2).replace(' ', '\t'));
+		for (int i = 0; i < codes.length; i++)
+			sb.append("\t" + codes[i]);
+		sb.append('\n');
+
+		// Write it to file
+		writeR(sb.toString());
+	}
+
+	/**
+	 * Make sure only one process is writing at the same time
+	 * @param str
+	 */
+	synchronized void writeR(String str) {
+		try {
+			rFile.write(str);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * Show title in R file
+	 */
+	void writeRTitle() {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("pos1\tgene1\tid1\tpos2\tgene2\tid2");
+		for (int i = 0; i < caseControl.length; i++) {
+			int num = -1;
+			if (caseControl[i] != null) num = caseControl[i] ? 1 : 0;
+			sb.append("\t" + num);
+		}
+		sb.append('\n');
+
+		writeR(sb.toString());
 	}
 
 }
