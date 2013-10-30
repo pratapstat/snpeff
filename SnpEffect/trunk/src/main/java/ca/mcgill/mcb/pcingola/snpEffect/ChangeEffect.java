@@ -14,6 +14,7 @@ import ca.mcgill.mcb.pcingola.interval.NextProt;
 import ca.mcgill.mcb.pcingola.interval.Regulation;
 import ca.mcgill.mcb.pcingola.interval.SeqChange;
 import ca.mcgill.mcb.pcingola.interval.Transcript;
+import ca.mcgill.mcb.pcingola.util.GprSeq;
 import ca.mcgill.mcb.pcingola.vcf.VcfEffect;
 
 /**
@@ -662,7 +663,10 @@ public class ChangeEffect implements Cloneable, Comparable<ChangeEffect> {
 		if (codonNum < 0) return "";
 
 		int seqPos = codonNum * 3 + codonIndex + 1;
-		return "c." + seqPos + seqChange.getReference() + ">" + seqChange.getChange();
+
+		Transcript tr = getTranscript();
+		if ((tr == null) || tr.isStrandPlus()) return "c." + seqPos + seqChange.getReference() + ">" + seqChange.getChange();
+		return "c." + seqPos + GprSeq.wc(seqChange.getReference()) + ">" + GprSeq.wc(seqChange.getChange());
 	}
 
 	/**
