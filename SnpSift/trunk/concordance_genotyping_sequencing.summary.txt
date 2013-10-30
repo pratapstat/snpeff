@@ -1,5 +1,0 @@
-Number of samples:
-	929	File /home/pcingola/snpEff/conc/genotyping.vcf
-	583	File /home/pcingola/snpEff/conc/sequencing.vcf
-	3	File /home/pcingola/snpEff/conc/samples.txt
-	1	Both files
