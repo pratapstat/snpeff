@@ -566,7 +566,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		// Return a tuple
 		if (pvalue > pvalueThreshold) return null; // Over threshold? Don't even bother....
 
-		writeR(i1, i2, codes);
+		writeR(i1, i2, pvalue, codes);
 		return tuple;
 	}
 
@@ -713,13 +713,15 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	 * @param i2
 	 * @param codes
 	 */
-	void writeR(int i1, int i2, byte codes[]) {
+	void writeR(int i1, int i2, double pvalue, byte codes[]) {
 		StringBuilder sb = new StringBuilder();
 
 		// Preapre string
 		sb.append(entryId.get(i1).replace(' ', '\t'));
 		sb.append('\t');
 		sb.append(entryId.get(i2).replace(' ', '\t'));
+		sb.append("\t" + pvalue);
+
 		for (int i = 0; i < codes.length; i++)
 			sb.append("\t" + codes[i]);
 		sb.append('\n');
@@ -746,7 +748,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	void writeRTitle() {
 		StringBuilder sb = new StringBuilder();
 
-		sb.append("pos1\tgene1\tid1\tpos2\tgene2\tid2");
+		sb.append("pos1\tgene1\tid1\tpos2\tgene2\tid2\tpvalue");
 		for (int i = 0; i < caseControl.length; i++) {
 			int num = -1;
 			if (caseControl[i] != null) num = caseControl[i] ? 1 : 0;
