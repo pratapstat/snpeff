@@ -88,7 +88,7 @@ public class TestSuiteAll {
 		suite.addTestSuite(TestCasesCancer.class);
 
 		// HGSV notation
-		suite.addTestSuite(TestCasesHgsv.class);
+		suite.addTestSuite(TestCasesHgvs.class);
 
 		// Nextprot
 		suite.addTestSuite(TestCasesNextProt.class);

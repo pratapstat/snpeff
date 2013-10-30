@@ -15,8 +15,11 @@ import ca.mcgill.mcb.pcingola.interval.Transcript;
 import ca.mcgill.mcb.pcingola.snpEffect.ChangeEffect;
 import ca.mcgill.mcb.pcingola.snpEffect.Config;
 import ca.mcgill.mcb.pcingola.snpEffect.SnpEffectPredictor;
+import ca.mcgill.mcb.pcingola.snpEffect.commandLine.SnpEffCmdEff;
 import ca.mcgill.mcb.pcingola.snpEffect.factory.SnpEffPredictorFactoryRand;
+import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.util.GprSeq;
+import ca.mcgill.mcb.pcingola.vcf.VcfEffect;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 
 /**
@@ -24,9 +27,11 @@ import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
  * 
  * @author pcingola
  */
-public class TestCasesHgsv extends TestCase {
+public class TestCasesHgvs extends TestCase {
 
 	boolean debug = false;
+	boolean verbose = true;
+
 	Random rand;
 	Config config;
 	Genome genome;
@@ -37,7 +42,7 @@ public class TestCasesHgsv extends TestCase {
 	String chromoSequence = "";
 	char chromoBases[];
 
-	public TestCasesHgsv() {
+	public TestCasesHgvs() {
 		super();
 		init();
 	}
@@ -51,6 +56,9 @@ public class TestCasesHgsv extends TestCase {
 		rand = new Random(20130708);
 	}
 
+	/**
+	 * Create a predictor
+	 */
 	void initSnpEffPredictor() {
 		// Create a config and force out snpPredictor for hg37 chromosome Y
 		config = new Config("testCase", Config.DEFAULT_CONFIG_FILE);
@@ -80,6 +88,39 @@ public class TestCasesHgsv extends TestCase {
 		genome = config.getGenome();
 		gene = genome.getGenes().iterator().next();
 		transcript = gene.iterator().next();
+	}
+
+	/**
+	 * Run SnpEff on VCF file
+	 * @param vcfFile
+	 */
+	public void snpEffect(String vcfFile) {
+		// Create command
+		String args[] = { "-hgvs", "testHg3766Chr1", vcfFile };
+
+		SnpEffCmdEff snpeff = new SnpEffCmdEff();
+		snpeff.setVerbose(verbose);
+		snpeff.parseArgs(args);
+
+		// Run command
+		List<VcfEntry> list = snpeff.run(true);
+
+		// Find HGVS in any 'EFF' field
+		boolean found = false;
+		for (VcfEntry vcfEntry : list) {
+			String hgvs = vcfEntry.getInfo("HGVS");
+
+			for (VcfEffect eff : vcfEntry.parseEffects()) {
+				if (debug) Gpr.debug("AA: " + eff.getAa() + "\t" + eff.getGenotype() + "\t" + eff);
+				if (hgvs.equals(eff.getAa())) {
+					if (debug) Gpr.debug("FOUND!");
+					found = true;
+				}
+			}
+
+			// Not found? Error
+			if (!found) throw new RuntimeException("HGVS not found in variant\n" + vcfEntry);
+		}
 	}
 
 	public void test_01() {
@@ -183,5 +224,9 @@ public class TestCasesHgsv extends TestCase {
 				}
 			}
 		}
+	}
+
+	public void test_02() {
+		snpEffect("tests/hgvs_1.vcf");
 	}
 }
