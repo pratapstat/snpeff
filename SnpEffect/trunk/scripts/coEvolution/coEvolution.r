@@ -9,6 +9,7 @@ if( ! exists('d') ) {
 
 minCol <- 8
 maxCol <- length(d[1,])
+minRox <- 12
 maxRow <- length(d[,1])
 
 phenoCol <- minCol:maxCol

@@ -1,5 +1,13 @@
 #!/usr/bin/env python
 
+#------------------------------------------------------------------------------
+#
+# Add PC values to coEvolution.txt file
+# Those values are used as covariates in a logistic regression model
+# See coEvolution.r
+#
+#------------------------------------------------------------------------------
+
 import sys
 
 debug = False
