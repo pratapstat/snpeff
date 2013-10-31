@@ -1,13 +1,10 @@
 
 if( ! exists('d') ) {
-	fileName <- "coEvolution.txt"
+	fileName <- "coEvolution.pc.txt"
 
 	# Read data
 	cat('Reading data', fileName, '\n')
 	d <- read.table(fileName, sep="\t", header=TRUE)
-
-	# Read principal components
-	pca <- read.table('t2d.mds', sep='\t', header=TRUE)
 }
 
 minCol <- 8
