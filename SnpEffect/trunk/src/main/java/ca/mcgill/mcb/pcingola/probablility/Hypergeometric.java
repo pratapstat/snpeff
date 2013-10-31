@@ -165,6 +165,7 @@ public class Hypergeometric {
 		// A probability can't be negative
 		if (hypergeometric < 0) throw new RuntimeException("Negative cumulativeHG = " + hypergeometric + "\n\t\t\t\t\tcalculating hypergeometric(" + k + ", " + N + ", " + D + ", " + n + ")");
 
+		if ((hypergeometricLog < 0.0) && (hypergeometric == 0.0)) return Double.MIN_VALUE;
 		return hypergeometric;
 	}
 

@@ -1,0 +1,100 @@
+#!/usr/bin/env bds
+
+#-------------------------------------------------------------------------------
+#
+# Create databases
+#
+#-------------------------------------------------------------------------------
+
+#---
+# Commands to run
+#---
+string snpeffDir="$HOME/snpEff"
+string snpeffData="$snpeffDir/data"
+string snpeff="java -Xmx10G -jar snpEff.jar "
+string snpeffBuild="$snpeff build -v"
+
+# Variables
+string{} built
+
+#-------------------------------------------------------------------------------
+# Add a build command
+#-------------------------------------------------------------------------------
+bool addBuild(string type, string genome) {
+	string dir = "$snpeffData/$genome"
+	string db = "$dir/snpEffectPredictor.bin"
+	string[] geneFiles = dir.dir("genes.*") 
+
+	# No 'genes' file? Error
+	if( geneFiles.isEmpty() ) {
+		print("Error: No genes file for $genome\n")
+		return( false );
+	}
+
+	string geneFile = geneFiles.head()
+	if( built.hasKey(genome) ) {
+		print("INFO: Genome $genome already built\n")
+	} else if( db <- geneFile ) {
+		print("BUILD:\t$type\t$genome\n")
+		task $snpeffBuild -$type $genome 2>&1 | tee build.$genome.out
+	}
+
+	# Mark as built
+	built{genome} = genome
+}
+
+#-------------------------------------------------------------------------------
+# Main
+#-------------------------------------------------------------------------------
+
+# Special cases
+addBuild("refseq", "hg19")
+addBuild("gff2", "amel2")
+
+# Look into all directories
+for(string genome : snpeffData.dir() ) {
+
+	# Get genome name and genes file
+	genome = genome.baseName()
+	string dir = "$snpeffData/$genome"
+	string[] geneFiles = dir.dir("genes.*")
+
+	if( ! geneFiles.isEmpty() ) {
+		# Find genes' file type
+		string geneFile = geneFiles.head()
+		geneFile = geneFile.baseName(".gz")
+
+		# Get type from gene's file extention
+		string type = geneFile.extName()
+
+		# Convert type names
+		if( type == "gtf" )			{ type = "gtf22" }
+		else if( type == "gff" )	{ type = "gff3" }
+		else if( type == "gb" )		{ type = "genbank" }
+
+		# Build
+		addBuild(type, genome)
+	}
+}
+
+wait
+
+# #---
+# # Build genomes
+# #---
+# ./scripts/queue.pl 24 24 1 queue_build.txt
+# 
+# #---
+# # Special builds: Human
+# #---
+# $snpeff buildNextProt -v GRCh37.$ENSEMBL_RELEASE db/nextProt/
+# 
+# #---
+# # Create build reports
+# #---
+# echo "Creating build report : cds_check.txt"
+# grep "CDS check" *.stdout | cut -f 3- -d : | grep -v "^$" | sort | tee cds_check.txt
+# 
+# echo "Creating build report : protein_check.txt"
+# grep "Protein check" *.stdout | cut -f 3- -d : | grep -v "^$" | sort | tee protein_check.txt
+# 
