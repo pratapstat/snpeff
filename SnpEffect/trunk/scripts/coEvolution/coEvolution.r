@@ -1,4 +1,16 @@
 
+#--------------------------------------------------------------------------------
+#
+# Logistic regression of coEvolutionary model
+#
+#															Pablo Cingolani 2013
+#--------------------------------------------------------------------------------
+
+library(epicalc)
+
+#---
+# Load data
+#---
 if( ! exists('d') ) {
 	fileName <- "coEvolution.pc.txt"
 
@@ -7,46 +19,87 @@ if( ! exists('d') ) {
 	d <- read.table(fileName, sep="\t", header=TRUE)
 }
 
-minCol <- 8
+#---
+# Parse the data file
+#---
+minCol <- 8						# Columns 1-7 are [chr1, pos1, gene1, chr2, pos2, gene2, p_value]
+minRow <- 12					# Rows 1-11 are: [PC_1 ... PC_10, phenotypes ]
 maxCol <- length(d[1,])
-minRox <- 12
 maxRow <- length(d[,1])
 
+# Extract phenotypes
+phenoRow <- minRow - 1			# Phenotypes are in the last row before genotypes start
 phenoCol <- minCol:maxCol
-rows <- 2:maxRow
+pheno <- as.numeric( d[phenoRow,phenoCol] )
 
-pheno <- as.vector( d[1,phenoCol] )
-genotypes <- as.matrix( d[rows,phenoCol] )
-pvalues <- as.numeric(as.character(d[,7]))
+cat('Phenotypes:\n')
+cat('    Cases    :', sum(pheno == 1), '\n' )
+cat('    Controls :', sum(pheno == 0), '\n' )
+cat('    Missing  :', sum(pheno == -1), '\n' )
+cat('    Max      :', max(pheno), '\n' )
+cat('    Min      :', min(pheno), '\n' )
 
+# Extract principal components (used as covariates)
+pcRows <- 1:(phenoRow-1)
+pcCols <- minCol:maxCol
+pcs <-  data.matrix( d[pcRows,pcCols] )
 
-keep <- ( pheno >= 0 )
+# Extract genotypes
+genoCols <- minCol:maxCol
+genoRows <- minRow:maxRow
+genotypes <- data.matrix( d[genoRows, genoCols] )
 
-for( idx in 2:maxRow ) {
+# Extract p_values
+pvalueCol <- minCol-1 			# Last column before genotypes has p_values
+pvalues <- as.numeric(as.character(d[genoRows, pvalueCol]))
+cat('\np-values:\n')
+cat('    Min :', min(pvalues), '\n' )
+cat('    Max :', max(pvalues), '\n' )
+
+#---
+# Analyze each row (calcualte logistic regression)
+#---
+
+cat('\nLogistic regression:\n')
+keep <- ( pheno >= 0 )	# No pheotype? Don't use the sample
+
+rowsToAnalyze <- minRow:(minRow+1)
+rowsToAnalyze <- 1:(dim(genotypes)[1])
+for( idx in rowsToAnalyze ) {
 
 	# Prepare data
-	gt <- as.vector( genotypes[idx,] )
-	keep <- ( pheno >= 0 ) & (gt >= 0)
+	gt <- as.numeric( genotypes[idx,] )
+	keep <- ( pheno >= 0 ) & (gt >= 0)	# No pheotype? No genotype? Don't use the sample
 	ph <- pheno[keep]
-	gt <- factor( gt[keep] )
+	#gt <- factor( gt[keep] )
+	gt <- gt[keep]
+	pc <- pcs[,keep]
 
+	#---
 	# Logistic regression
-	logReg <- glm( ph ~ gt, family=binomial)
-	anovaLr <- anova(logReg, test="Chisq")
-	pvalue <- anovaLr$"Pr(>Chi)"[2]
+	#---
+	#lr0 <- glm( ph ~ gt + pc[1,] + pc[2,] + pc[3,] + pc[4,] + pc[5,] + pc[6,] + pc[7,] + pc[8,] + pc[9,] + pc[10,] , family=binomial)
+	lr0 <- glm( ph ~ gt + pc[1,] + pc[2,] + pc[3,], family=binomial)	# Full model, takes into account genotypes and PCs
+	lr1 <- glm( ph ~ pc[1,] + pc[2,] + pc[3,], family=binomial)			# Reduced model: only PCs, no genotypes
+	lrt <- lrtest(lr0, lr1)												# Likeliehood ratio test
+	pvalue <- lrt$p.value												# p-value from likelihood ration test
 
 	# Show results
 	pvalueOri <- pvalues[idx]
-	id1 <- paste( d[idx,1] )
-	id2 <- paste( d[idx,4] )
-	gene1 <- paste( d[idx,2] )
-	gene2 <- paste( d[idx,5] )
+
+	didx <- idx + minRow - 1
+	pos1 <- paste( d[didx,1] )
+	gene1 <- paste( d[didx,2] )
+	id1 <- paste( d[didx,3] )
+	pos2 <- paste( d[didx,4] )
+	gene2 <- paste( d[didx,5] )
+	id2 <- paste( d[didx,6] )
 	ratio <- pvalue / pvalueOri
 
 	if( pvalue < pvalueOri ) {
-		cat( paste("=>", idx, pvalue, pvalueOri, ratio, id1, gene1, id2, gene2, sep="\t") , '\n')
+		cat( paste("=>", idx, pvalue, pvalueOri, ratio, pos1, gene1, id1, pos2, gene2, id2, sep="\t") , '\n')
 	} else {
-		cat( paste("  ", idx, pvalue, pvalueOri, ratio, id1, gene1, id2, gene2, sep="\t") , '\n')
+		cat( paste("  ", idx, pvalue, pvalueOri, ratio, pos1, gene1, id1, pos2, gene2, id2, sep="\t") , '\n')
 	}
 }
 

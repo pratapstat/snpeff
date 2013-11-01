@@ -56,14 +56,16 @@ with open(coEvFile) as f:
 			for pcnum in range(maxPc):
 				# Show 'PC' label
 				outLine = ""
-				for i in range(headerCol):
-					outLine += "PC{}".format(pcnum+1)
-					if i < (headerCol-1) : outLine += "\t"
+				for i in range(headerCol-1):
+					outLine += "PC{}\t".format(pcnum+1)
+
+				# pvalue column
+				outLine += "1.0"
 
 				# Show PC values
 				for i in range(headerCol, len(header)):
 					id = header[i]
-					pc = id
+					pc = 0
 					pcs = pcas.get(id,[])
 					if pcs : pc = pcs[pcnum]
 					outLine += "\t{}".format(pc)
