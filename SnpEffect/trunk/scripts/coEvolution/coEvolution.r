@@ -1,10 +1,15 @@
 
 if( ! exists('d') ) {
-	d <- read.table("coEvolution.txt", sep="\t")
+	fileName <- "coEvolution.pc.txt"
+
+	# Read data
+	cat('Reading data', fileName, '\n')
+	d <- read.table(fileName, sep="\t", header=TRUE)
 }
 
 minCol <- 8
 maxCol <- length(d[1,])
+minRox <- 12
 maxRow <- length(d[,1])
 
 phenoCol <- minCol:maxCol

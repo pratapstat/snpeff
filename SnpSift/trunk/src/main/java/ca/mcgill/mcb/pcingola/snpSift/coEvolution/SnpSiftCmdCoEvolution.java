@@ -748,7 +748,14 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	void writeRTitle() {
 		StringBuilder sb = new StringBuilder();
 
+		// Write title
 		sb.append("pos1\tgene1\tid1\tpos2\tgene2\tid2\tpvalue");
+		for (String sid : sampleIds)
+			sb.append("\t" + sid);
+		sb.append('\n');
+
+		// Write phenotypes
+		sb.append("pheno\tpheno\tpheno\tpheno\tpheno\tpheno\t1.0");
 		for (int i = 0; i < caseControl.length; i++) {
 			int num = -1;
 			if (caseControl[i] != null) num = caseControl[i] ? 1 : 0;

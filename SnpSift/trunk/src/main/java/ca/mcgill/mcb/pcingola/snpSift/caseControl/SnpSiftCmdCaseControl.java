@@ -134,6 +134,7 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 				if (tfam == null) {
 					System.err.println("WARNING: Sample ID '" + sid + "' has no entry in pedigree form TFAM file '" + tfamFile + "'");
 					errors++;
+					caseControl[idx] = null;
 				} else {
 					// Assign case, control or missing
 					if (tfam.isMissing()) caseControl[idx] = null;
