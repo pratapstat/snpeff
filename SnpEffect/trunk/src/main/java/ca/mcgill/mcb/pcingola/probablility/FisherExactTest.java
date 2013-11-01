@@ -1,6 +1,5 @@
 package ca.mcgill.mcb.pcingola.probablility;
 
-
 /**
  * 
  * Calculate Fisher's exact test (based on hypergeometric distribution)
@@ -15,7 +14,7 @@ public class FisherExactTest {
 	Hypergeometric hd;
 
 	public static FisherExactTest get() {
-		if( fisherExactTest == null ) fisherExactTest = new FisherExactTest();
+		if (fisherExactTest == null) fisherExactTest = new FisherExactTest();
 		return fisherExactTest;
 	}
 
@@ -61,7 +60,7 @@ public class FisherExactTest {
 		double E22 = (N2d * Nd2) / Ndd;
 
 		// Is every expected frecuency more than 10?
-		if( (E11 < 10) || (E12 < 10) || (E21 < 10) || (E22 < 10) ) return false;
+		if ((E11 < 10) || (E12 < 10) || (E21 < 10) || (E22 < 10)) return false;
 
 		// Ok
 		return true;
@@ -95,7 +94,7 @@ public class FisherExactTest {
 		double Nd1 = n11 + n21;
 		double Nd2 = n12 + n22;
 		double Ndd = N;
-		if( (N1d != D) || (Nd1 != n) || (Nd2 != (N - n)) || (N2d != (N - D)) ) throw new RuntimeException("ERROR: This should never happen!");
+		if ((N1d != D) || (Nd1 != n) || (Nd2 != (N - n)) || (N2d != (N - D))) throw new RuntimeException("ERROR: This should never happen!");
 		double chiSquare = (Ndd * Math.pow((Math.abs(n11 * n22 - n12 * n21)), 2)) / (N1d * N2d * Nd1 * Nd2);
 
 		// Estimation is: 1 - chisquare_cdf( ChiSquare, 1)
@@ -130,7 +129,7 @@ public class FisherExactTest {
 		double Nd1 = n11 + n21;
 		double Nd2 = n12 + n22;
 		double Ndd = N;
-		if( (N1d != D) || (Nd1 != n) || (Nd2 != (N - n)) || (N2d != (N - D)) ) throw new RuntimeException("ERROR: This should never happen!");
+		if ((N1d != D) || (Nd1 != n) || (Nd2 != (N - n)) || (N2d != (N - D))) throw new RuntimeException("ERROR: This should never happen!");
 		double chiSquare = (Ndd * Math.pow((Math.abs(n11 * n22 - n12 * n21) - (Ndd / 2)), 2)) / (N1d * N2d * Nd1 * Nd2);
 
 		// Estimation is: 1 - chisquare_cdf( ChiSquare, 1)
@@ -146,9 +145,15 @@ public class FisherExactTest {
 	 * @return
 	 */
 	public double fisherExactTestDown(int k, int N, int D, int n) {
+		// Zero marbles drawn? => Nothing to calculate
+		if (n == 0) {
+			if (k == 0) return 1.0;
+			return 0.0;
+		}
+
 		double cumulativeHG = 0;
 		int minTest = Math.max(n + D - N, 0);
-		for( int i = minTest; i <= k; i++ )
+		for (int i = minTest; i <= k; i++)
 			cumulativeHG += hd.hypergeometric(i, N, D, n);
 		return cumulativeHG;
 	}
@@ -167,30 +172,30 @@ public class FisherExactTest {
 	 */
 	public double fisherExactTestDownThreshold(int k, int N, int D, int n, double threshold) {
 		// Trivial case
-		if( (k == 1) && (n == 0) ) return 1;
-		if( (k == 1) && (D == 0) ) return 1;
-		if( k == 0 ) return 0;
+		if ((k == 1) && (n == 0)) return 1;
+		if ((k == 1) && (D == 0)) return 1;
+		if (k == 0) return 0;
 
 		k--; // Lower tail does not include 'k'
 
 		// If 'k' is less then the mean, then it's the p-value will be more then the threshold (if thresdold is above 1/2)
 		double mean = mean(k, N, D, n);
-		if( (k > mean) && (threshold < 0.5) ) return 1;
+		if ((k > mean) && (threshold < 0.5)) return 1;
 
 		double cumulativeHG = 0;
 		int maxTest = Math.min(n, D);
 
-		if( k >= maxTest ) return 1;
+		if (k >= maxTest) return 1;
 
 		// Calculate extreme values
 		double hypergeom = hd.hypergeometric(k, N, D, n);
-		if( hypergeom <= 0 ) return Double.MIN_NORMAL; // Underflow? (report minimum double)
+		if (hypergeom <= 0) return Double.MIN_NORMAL; // Underflow? (report minimum double)
 
 		// Calculate cumulative hypergeometric
 		cumulativeHG += hypergeom;
-		for( int i = k - 1; i >= 0; i-- ) {
+		for (int i = k - 1; i >= 0; i--) {
 
-			if( hypergeom <= 0 ) {
+			if (hypergeom <= 0) {
 				return cumulativeHG; // Zero? => Underflow (report current sum)
 			} else {
 				// We can use the previous value to speed up this calculation
@@ -205,7 +210,7 @@ public class FisherExactTest {
 			cumulativeHG += hypergeom;
 
 			// Above threshold? => just return 1.0
-			if( cumulativeHG >= threshold ) return 1.0;
+			if (cumulativeHG >= threshold) return 1.0;
 		}
 
 		return Math.min(cumulativeHG, 1.0);
@@ -220,11 +225,12 @@ public class FisherExactTest {
 	 * @return
 	 */
 	public double fisherExactTestUp(int k, int N, int D, int n) {
-		if( k == 0 ) return 1; // This line speeds up a lot of cases
+		if (k == 0) return 1.0; // This line speeds up a lot of cases
+		if (n == 0) return 0.0; // Zero marbles drawn? => Nothing to calculate
 
 		double cumulativeHG = 0;
 		int maxTest = Math.min(n, D);
-		for( int i = k; i <= maxTest; i++ )
+		for (int i = k; i <= maxTest; i++)
 			cumulativeHG += hd.hypergeometric(i, N, D, n);
 
 		return Math.min(cumulativeHG, 1.0);
@@ -243,24 +249,24 @@ public class FisherExactTest {
 	 * @return Cumulative probability or 1.0 (if cumulative is over the threshold)
 	 */
 	public double fisherExactTestUpThreshold(int k, int N, int D, int n, double threshold) {
-		if( k == 0 ) return 1; // This line speeds up a lot of cases
+		if (k == 0) return 1; // This line speeds up a lot of cases
 
 		// If 'k' is less then the mean, then it's the p-value will be more then the threshold (if threshold is above 1/2)
 		double mean = mean(k, N, D, n);
-		if( (k < mean) && (threshold < 0.5) ) return 1;
+		if ((k < mean) && (threshold < 0.5)) return 1;
 
 		double cumulativeHG = 0;
 		int maxTest = Math.min(n, D);
 
 		// Calculate extreme values
 		double hypergeom = hd.hypergeometric(k, N, D, n);
-		if( hypergeom <= 0 ) return Double.MIN_NORMAL; // Underflow? (report minimum double)
+		if (hypergeom <= 0) return Double.MIN_NORMAL; // Underflow? (report minimum double)
 
 		// Calculate cumulative hypergeometric
 		cumulativeHG += hypergeom;
-		for( int i = k + 1; i <= maxTest; i++ ) {
+		for (int i = k + 1; i <= maxTest; i++) {
 
-			if( hypergeom <= 0 ) {
+			if (hypergeom <= 0) {
 				return cumulativeHG; // Zero? => Underflow (report current sum)
 			} else {
 				// We can use the previous value to speed up this calculation
@@ -275,7 +281,7 @@ public class FisherExactTest {
 			cumulativeHG += hypergeom;
 
 			// Above threshold? => just return 1.0
-			if( cumulativeHG >= threshold ) return 1.0;
+			if (cumulativeHG >= threshold) return 1.0;
 		}
 
 		return Math.min(cumulativeHG, 1.0);
@@ -295,26 +301,26 @@ public class FisherExactTest {
 	 * @return Cumulative probability or 1.0 (if cumulative is over the threshold)
 	 */
 	public double fisherExactTestUpThresholdAndFold(int k, int N, int D, int n, double threshold, double fold) {
-		if( k == 0 ) return 1; // This line speeds up a lot of cases
+		if (k == 0) return 1; // This line speeds up a lot of cases
 
 		double cumulativeHG = 0;
 		double hg = 0, hgBefore = 0;
 		boolean descending = false;
 
 		int maxTest = Math.min(n, D);
-		for( int i = k; i <= maxTest; i++ ) {
+		for (int i = k; i <= maxTest; i++) {
 			hg = hd.hypergeometric(i, N, D, n);
 			cumulativeHG += hg;
-			if( cumulativeHG >= threshold ) return 1.0;
+			if (cumulativeHG >= threshold) return 1.0;
 
-			if( descending ) {
+			if (descending) {
 				// We can approximate the upper bound (of what's left to calculate)
 				double toGo = maxTest - k; // How many hypergeometrics do we still need to calculate?
 				double upperBound = hg * toGo; // This is the upper bound
 				// Is the upper bound 'fold' times bigger than what we've already calculated? => stop calculating (we are close enough to the result)
-				if( cumulativeHG > (upperBound / fold) ) return cumulativeHG;
+				if (cumulativeHG > (upperBound / fold)) return cumulativeHG;
 			} else {
-				if( hgBefore > hg ) descending = true;
+				if (hgBefore > hg) descending = true;
 				hgBefore = hg;
 			}
 		}
