@@ -241,6 +241,9 @@ public class VcfEntry extends Marker implements Iterable<VcfGenotype> {
 		if (hets.length() > 0) addInfo(VCF_INFO_HETS, hets.toString());
 		if (nas.length() > 0) addInfo(VCF_INFO_NAS, nas.toString());
 
+		// Nothing added? Add 'NAS' (as an indicator that it was compressed
+		if ((homs.length() == 0) && (hets.length() == 0) && (nas.length() == 0)) addInfo(VCF_INFO_NAS);
+
 		return true;
 	}
 
@@ -915,7 +918,7 @@ public class VcfEntry extends Marker implements Iterable<VcfGenotype> {
 	 * @param value
 	 */
 	void parseSparseGt(String str, byte gt[], int valueInt) {
-		if (str == null) return;
+		if ((str == null) || (str.isEmpty()) || (str.equals("true"))) return;
 
 		// Split comma separated indeces
 		String idxs[] = str.split(",");
