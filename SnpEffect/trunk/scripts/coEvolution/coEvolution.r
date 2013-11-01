@@ -22,7 +22,7 @@ if( ! exists('d') ) {
 #---
 # Parse the data file
 #---
-minCol <- 8						# Columns 1-7 are [chr1, pos1, gene1, chr2, pos2, gene2, p_value]
+minCol <- 11					# Columns 1-10 are [chr1, pos1, gene1, chr2, pos2, gene2, pllelic, pDominant, pRecessive, pCodominant]
 minRow <- 12					# Rows 1-11 are: [PC_1 ... PC_10, phenotypes ]
 maxCol <- length(d[1,])
 maxRow <- length(d[,1])
@@ -50,8 +50,9 @@ genoRows <- minRow:maxRow
 genotypes <- data.matrix( d[genoRows, genoCols] )
 
 # Extract p_values
-pvalueCol <- minCol-1 			# Last column before genotypes has p_values
-pvalues <- as.numeric(as.character(d[genoRows, pvalueCol]))
+pvalueCol <- (minCol-4):(minCol-1) 			# Last columns before genotypes has p_values
+pvaluesMat <- data.matrix( d[genoRows, pvalueCol] )
+pvalues <- apply(pvaluesMat, 1, min)		# Min pvalue in each row
 cat('\np-values:\n')
 cat('    Min :', min(pvalues), '\n' )
 cat('    Max :', max(pvalues), '\n' )
