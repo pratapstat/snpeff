@@ -9,6 +9,7 @@ import ca.mcgill.mcb.pcingola.ped.TfamEntry;
 import ca.mcgill.mcb.pcingola.probablility.CochranArmitageTest;
 import ca.mcgill.mcb.pcingola.probablility.FisherExactTest;
 import ca.mcgill.mcb.pcingola.snpSift.SnpSift;
+import ca.mcgill.mcb.pcingola.snpSift.coEvolution.SnpSiftCmdCoEvolution.ModelCoevolution;
 import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.util.Timer;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
@@ -35,9 +36,14 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 	protected String groups;
 	protected String vcfFileName;
 	protected PedPedigree pedigree;
+	protected double pvalueThreshold;
 	String name;
 	String posMin = "";
 	double pValueMin = 1.0;
+
+	public void init() {
+		pvalueThreshold = 1.0;
+	}
 
 	public SnpSiftCmdCaseControl(String args[]) {
 		super(args, "casecontrol");
@@ -192,8 +198,10 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		int D = 2 * (nCase[0] + nCase[1] + nCase[2]); // All cases
 		int n = 2 * nControl[2] + nControl[1] + 2 * nCase[2] + nCase[1]; // A/A + A/a
 
-		double pdown = FisherExactTest.get().fisherExactTestDown(k, N, D, n);
-		double pup = FisherExactTest.get().fisherExactTestUp(k, N, D, n);
+//		double pdown = FisherExactTest.get().fisherExactTestDown(k, N, D, n, pvalueThreshold);
+//		double pup = FisherExactTest.get().fisherExactTestUp(k, N, D, n, pvalueThreshold);
+		double pdown = FisherExactTest.get().pValueDown(k, N, D, n, pvalueThreshold);
+		double pup = FisherExactTest.get().pValueUp(k, N, D, n, pvalueThreshold);
 
 		return Math.min(pup, pdown);
 	}
@@ -259,8 +267,8 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		int D = nCase[0] + nCase[1] + nCase[2]; // All cases
 		int n = nControl[2] + nControl[1] + nCase[2] + nCase[1]; // a/a + A/a
 
-		double pdown = FisherExactTest.get().fisherExactTestDown(k, N, D, n);
-		double pup = FisherExactTest.get().fisherExactTestUp(k, N, D, n);
+		double pdown = FisherExactTest.get().pValueDown(k, N, D, n, pvalueThreshold);
+		double pup = FisherExactTest.get().pValueUp(k, N, D, n, pvalueThreshold);
 
 		return Math.min(pup, pdown);
 	}
@@ -277,8 +285,8 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		int D = nCase[0] + nCase[1] + nCase[2]; // All cases
 		int n = nControl[2] + nCase[2]; // a/a
 
-		double pdown = FisherExactTest.get().fisherExactTestDown(k, N, D, n);
-		double pup = FisherExactTest.get().fisherExactTestUp(k, N, D, n);
+		double pdown = FisherExactTest.get().pValueDown(k, N, D, n, pvalueThreshold);
+		double pup = FisherExactTest.get().pValueUp(k, N, D, n, pvalueThreshold);
 
 		return Math.min(pup, pdown);
 	}

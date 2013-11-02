@@ -104,4 +104,8 @@ public class TestCasesCaseControl extends TestCase {
 		checkCaseControlTfam("test/test.private.08.vcf", "test/test.private.05.tfam", "0,2,2", "0,1,1");
 	}
 
+	public void test_09() {
+		throw new RuntimeException("Compare to PLINK's values");
+	}
+
 }

@@ -44,7 +44,6 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	boolean isMulti;
 	boolean genesMatch[];
 	int minAlleleCount;
-	double pvalueThreshold;
 	String rFileName = Gpr.HOME + "/coEvolution.txt";
 	ModelCoevolution model;
 	List<String> sampleIds;

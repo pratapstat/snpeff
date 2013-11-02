@@ -15,6 +15,8 @@ import ca.mcgill.mcb.pcingola.util.Gpr;
  */
 public class TestCasesHypergeometric extends TestCase {
 
+	public static double MAX_DIFF = 0.00000000001;
+	
 	boolean verbose = true;
 	double threshold = 0.01;
 	int numTests = 100;
@@ -35,17 +37,23 @@ public class TestCasesHypergeometric extends TestCase {
 	 * @param result
 	 */
 	void compareFisherDown(int k, int N, int D, int n, double result) {
-		double p = FisherExactTest.get().pValueDown(k, N, D, n, threshold);
+		double p = FisherExactTest.get().fisherExactTestDown(k, N, D, n, threshold);
+		compareFisher(k, N, D, n, result, p);
 
+		p = FisherExactTest.get().fisherExactTestDown(k, N, D, n);
+		compareFisher(k, N, D, n, result, p);
+	}
+	
+	void compareFisher(int k, int N, int D, int n, double result, double p) {
 		double abs = Math.abs(p - result);
 		double diff = abs / Math.min(p, result);
 
-		if ((abs > 1E-300) && (diff > 0.00000000001)) {
-			String err = "Difference:" + diff //
-					+ "\n\t\tpValue:\t" + p //
+		if ((abs > 1E-300) && (diff > MAX_DIFF)) {
+			String err = "\tDifference:" + diff //
+					+ "\n\tpValue:\t" + p //
 					+ "\n\tExpected:\t" + result //
 					+ "\n\tR: " + FisherExactTest.get().toR(k, N, D, n, true);
-			Gpr.debug(err);
+			Gpr.debug("Error\n"+err);
 			throw new RuntimeException(err);
 		}
 	}
@@ -60,19 +68,20 @@ public class TestCasesHypergeometric extends TestCase {
 	 */
 	void compareFisherUp(int k, int N, int D, int n, double result) {
 		double p = FisherExactTest.get().pValueUp(k, N, D, n, threshold);
-
-		double abs = Math.abs(p - result);
-		double diff = abs / Math.min(p, result);
-		if ((abs > 1E-300) && (diff > 0.00000000001)) {
-			String err = "Difference:" + diff //
-					+ "\n\t\tpValue:\t" + p //
-					+ "\n\tExpected:\t" + result //
-					+ "\n\tR: " + FisherExactTest.get().toR(k, N, D, n, false);
-			Gpr.debug(err);
-			throw new RuntimeException(err);
-		}
+		compareFisher(k, N, D, n, result, p);
+		
+		p = FisherExactTest.get().fisherExactTestUp(k, N, D, n);
+		compareFisher(k, N, D, n, result, p);
 	}
 
+	/**
+	 * Compare hypergeometric results
+	 * @param k
+	 * @param N
+	 * @param D
+	 * @param n
+	 * @param result
+	 */
 	void compareHypergeometric(int k, int N, int D, int n, double result) {
 		double p = Hypergeometric.get().hypergeometric(k, N, D, n);
 
@@ -82,7 +91,7 @@ public class TestCasesHypergeometric extends TestCase {
 	}
 
 	/**
-	 * 
+	 * Create commands in R to run and get test results
 	 */
 	public void generate_test() {
 		boolean lowerTail = true;

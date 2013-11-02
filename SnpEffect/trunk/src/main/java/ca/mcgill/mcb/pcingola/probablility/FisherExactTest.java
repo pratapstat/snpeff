@@ -22,119 +22,119 @@ public class FisherExactTest {
 		hd = Hypergeometric.get();
 	}
 
-	/**
-	 * Can ChiSquare approximation be used? A rule of the thumb says it can be 
-	 * used if every expected frecuency is more than 10
-	 * 
-	 * @param k : white marbles drawn
-	 * @param N : Total marbles
-	 * @param D : White marbles => N-D : Black marbles
-	 * @param n : marbles drawn => N-n : not drawn
-	 * @return Chi-Square approximation
-	 */
-	public boolean canUseChiSquareApproximation(int k, int N, int D, int n) {
-		/*
-		 * Use different names for contingency table: 
-		 * See 'Global functional profiling of gene expression', Draghici et. al, table 2 (page 103)
-		 * 
-		 * 					drawn		not drawn		|	total
-		 *	defective 		n11			n12				|	N1d
-		 *	nondefective	n21			n22				|	N2d
-		 *					----------------------------+----------
-		 *	total 			Nd1			Nd2				|	Ndd
-		 */
-		double n11 = k;
-		double n12 = D - k;
-		double n21 = n - k;
-		double n22 = N + k - n - D;
-		double N1d = n11 + n12; // 'd' stands for 'dot'
-		double N2d = n21 + n22;
-		double Nd1 = n11 + n21;
-		double Nd2 = n12 + n22;
-		double Ndd = N;
+//	/**
+//	 * Can ChiSquare approximation be used? A rule of the thumb says it can be 
+//	 * used if every expected frequency is more than 10
+//	 * 
+//	 * @param k : white marbles drawn
+//	 * @param N : Total marbles
+//	 * @param D : White marbles => N-D : Black marbles
+//	 * @param n : marbles drawn => N-n : not drawn
+//	 * @return Chi-Square approximation
+//	 */
+//	public boolean canUseChiSquareApproximation(int k, int N, int D, int n) {
+//		/*
+//		 * Use different names for contingency table: 
+//		 * See 'Global functional profiling of gene expression', Draghici et. al, table 2 (page 103)
+//		 * 
+//		 * 					drawn		not drawn		|	total
+//		 *	defective 		n11			n12				|	N1d
+//		 *	nondefective	n21			n22				|	N2d
+//		 *					----------------------------+----------
+//		 *	total 			Nd1			Nd2				|	Ndd
+//		 */
+//		double n11 = k;
+//		double n12 = D - k;
+//		double n21 = n - k;
+//		double n22 = N + k - n - D;
+//		double N1d = n11 + n12; // 'd' stands for 'dot'
+//		double N2d = n21 + n22;
+//		double Nd1 = n11 + n21;
+//		double Nd2 = n12 + n22;
+//		double Ndd = N;
+//
+//		// Expected frecuencies
+//		double E11 = (N1d * Nd1) / Ndd;
+//		double E12 = (N1d * Nd2) / Ndd;
+//		double E21 = (N2d * Nd1) / Ndd;
+//		double E22 = (N2d * Nd2) / Ndd;
+//
+//		// Is every expected frecuency more than 10?
+//		if ((E11 < 10) || (E12 < 10) || (E21 < 10) || (E22 < 10)) return false;
+//
+//		// Ok
+//		return true;
+//	}
 
-		// Expected frecuencies
-		double E11 = (N1d * Nd1) / Ndd;
-		double E12 = (N1d * Nd2) / Ndd;
-		double E21 = (N2d * Nd1) / Ndd;
-		double E22 = (N2d * Nd2) / Ndd;
+//	/**
+//	 * Chi-Square approximation for Fisher's exact test
+//	 * @param k : white marbles drawn
+//	 * @param N : Total marbles
+//	 * @param D : White marbles => N-D : Black marbles
+//	 * @param n : marbles drawn => N-n : not drawn
+//	 * @return Chi-Square approximation
+//	 */
+//	public double chiSquareApproximation(int k, int N, int D, int n) {
+//		/*
+//		 * Use different names for contingency table: 
+//		 * See 'Global functional profiling of gene expression', Draghici et. al, table 2 (page 103)
+//		 * 
+//		 * 					drawn		not drawn		|	total
+//		 *	defective 		n11			n12				|	N1d
+//		 *	nondefective	n21			n22				|	N2d
+//		 *					----------------------------+----------
+//		 *	total 			Nd1			Nd2				|	Ndd
+//		 */
+//		double n11 = k;
+//		double n12 = D - k;
+//		double n21 = n - k;
+//		double n22 = N + k - n - D;
+//		double N1d = n11 + n12; // 'd' stands for 'dot'
+//		double N2d = n21 + n22;
+//		double Nd1 = n11 + n21;
+//		double Nd2 = n12 + n22;
+//		double Ndd = N;
+//		if ((N1d != D) || (Nd1 != n) || (Nd2 != (N - n)) || (N2d != (N - D))) throw new RuntimeException("ERROR: This should never happen!");
+//		double chiSquare = (Ndd * Math.pow((Math.abs(n11 * n22 - n12 * n21)), 2)) / (N1d * N2d * Nd1 * Nd2);
+//
+//		// Estimation is: 1 - chisquare_cdf( ChiSquare, 1)
+//		return 1 - flanagan.analysis.Stat.chiSquareCDF(chiSquare, 1);
+//	}
 
-		// Is every expected frecuency more than 10?
-		if ((E11 < 10) || (E12 < 10) || (E21 < 10) || (E22 < 10)) return false;
-
-		// Ok
-		return true;
-	}
-
-	/**
-	 * Chi-Square approximation for Fisher's exact test
-	 * @param k : white marbles drawn
-	 * @param N : Total marbles
-	 * @param D : White marbles => N-D : Black marbles
-	 * @param n : marbles drawn => N-n : not drawn
-	 * @return Chi-Square approximation
-	 */
-	public double chiSquareApproximation(int k, int N, int D, int n) {
-		/*
-		 * Use different names for contingency table: 
-		 * See 'Global functional profiling of gene expression', Draghici et. al, table 2 (page 103)
-		 * 
-		 * 					drawn		not drawn		|	total
-		 *	defective 		n11			n12				|	N1d
-		 *	nondefective	n21			n22				|	N2d
-		 *					----------------------------+----------
-		 *	total 			Nd1			Nd2				|	Ndd
-		 */
-		double n11 = k;
-		double n12 = D - k;
-		double n21 = n - k;
-		double n22 = N + k - n - D;
-		double N1d = n11 + n12; // 'd' stands for 'dot'
-		double N2d = n21 + n22;
-		double Nd1 = n11 + n21;
-		double Nd2 = n12 + n22;
-		double Ndd = N;
-		if ((N1d != D) || (Nd1 != n) || (Nd2 != (N - n)) || (N2d != (N - D))) throw new RuntimeException("ERROR: This should never happen!");
-		double chiSquare = (Ndd * Math.pow((Math.abs(n11 * n22 - n12 * n21)), 2)) / (N1d * N2d * Nd1 * Nd2);
-
-		// Estimation is: 1 - chisquare_cdf( ChiSquare, 1)
-		return 1 - flanagan.analysis.Stat.chiSquareCDF(chiSquare, 1);
-	}
-
-	/**
-	 * Chi-Square approximation for Fisher's exact test
-	 * @param k : white marbles drawn
-	 * @param N : Total marbles
-	 * @param D : White marbles => N-D : Black marbles
-	 * @param n : marbles drawn => N-n : not drawn
-	 * @return Chi-Square approximation
-	 */
-	public double chiSquareYatesApproximation(int k, int N, int D, int n) {
-		/*
-		 * Use different names for contingency table: 
-		 * See 'Global functional profiling of gene expression', Draghici et. al, table 2 (page 103)
-		 * 
-		 * 					drawn		not drawn		|	total
-		 *	defective 		n11			n12				|	N1d
-		 *	nondefective	n21			n22				|	N2d
-		 *					----------------------------+----------
-		 *	total 			Nd1			Nd2				|	Ndd
-		 */
-		double n11 = k;
-		double n12 = D - k;
-		double n21 = n - k;
-		double n22 = N + k - n - D;
-		double N1d = n11 + n12; // 'd' stands for 'dot'
-		double N2d = n21 + n22;
-		double Nd1 = n11 + n21;
-		double Nd2 = n12 + n22;
-		double Ndd = N;
-		if ((N1d != D) || (Nd1 != n) || (Nd2 != (N - n)) || (N2d != (N - D))) throw new RuntimeException("ERROR: This should never happen!");
-		double chiSquare = (Ndd * Math.pow((Math.abs(n11 * n22 - n12 * n21) - (Ndd / 2)), 2)) / (N1d * N2d * Nd1 * Nd2);
-
-		// Estimation is: 1 - chisquare_cdf( ChiSquare, 1)
-		return 1 - flanagan.analysis.Stat.chiSquareCDF(chiSquare, 1);
-	}
+//	/**
+//	 * Chi-Square approximation for Fisher's exact test
+//	 * @param k : white marbles drawn
+//	 * @param N : Total marbles
+//	 * @param D : White marbles => N-D : Black marbles
+//	 * @param n : marbles drawn => N-n : not drawn
+//	 * @return Chi-Square approximation
+//	 */
+//	public double chiSquareYatesApproximation(int k, int N, int D, int n) {
+//		/*
+//		 * Use different names for contingency table: 
+//		 * See 'Global functional profiling of gene expression', Draghici et. al, table 2 (page 103)
+//		 * 
+//		 * 					drawn		not drawn		|	total
+//		 *	defective 		n11			n12				|	N1d
+//		 *	nondefective	n21			n22				|	N2d
+//		 *					----------------------------+----------
+//		 *	total 			Nd1			Nd2				|	Ndd
+//		 */
+//		double n11 = k;
+//		double n12 = D - k;
+//		double n21 = n - k;
+//		double n22 = N + k - n - D;
+//		double N1d = n11 + n12; // 'd' stands for 'dot'
+//		double N2d = n21 + n22;
+//		double Nd1 = n11 + n21;
+//		double Nd2 = n12 + n22;
+//		double Ndd = N;
+//		if ((N1d != D) || (Nd1 != n) || (Nd2 != (N - n)) || (N2d != (N - D))) throw new RuntimeException("ERROR: This should never happen!");
+//		double chiSquare = (Ndd * Math.pow((Math.abs(n11 * n22 - n12 * n21) - (Ndd / 2)), 2)) / (N1d * N2d * Nd1 * Nd2);
+//
+//		// Estimation is: 1 - chisquare_cdf( ChiSquare, 1)
+//		return 1 - flanagan.analysis.Stat.chiSquareCDF(chiSquare, 1);
+//	}
 
 	/**
 	 * Fisher's exact test for 'k' or less (lower tail)
@@ -146,20 +146,20 @@ public class FisherExactTest {
 	 */
 	public double fisherExactTestDown(int k, int N, int D, int n) {
 		// Zero marbles drawn? => Nothing to calculate
-		if (n == 0) {
-			if (k == 0) return 1.0;
+		if (n == 0)  {
+			if (k == 1) return 1;
 			return 0.0;
 		}
 
 		double cumulativeHG = 0;
 		int minTest = Math.max(n + D - N, 0);
-		for (int i = minTest; i <= k; i++)
+		for (int i = minTest; i < k; i++)
 			cumulativeHG += hd.hypergeometric(i, N, D, n);
 		return cumulativeHG;
 	}
 
 	/**
-	 * Fisher's exact test for 'k' or less
+	 * Fisher's exact test for less than 'k' (lower tail)
 	 * It also compares to a 'threshold' value to speedup the process. Whenever 
 	 * cumulative probability is over the threshold, 1.0 is returned
 	 * 
@@ -170,7 +170,7 @@ public class FisherExactTest {
 	 * @param theshold  Threshold value
 	 * @return Cumulative probability or 1.0 (if cumulative is over the threshold)
 	 */
-	public double fisherExactTestDownThreshold(int k, int N, int D, int n, double threshold) {
+	public double fisherExactTestDown(int k, int N, int D, int n, double threshold) {
 		// Trivial case
 		if ((k == 1) && (n == 0)) return 1;
 		if ((k == 1) && (D == 0)) return 1;
@@ -178,9 +178,10 @@ public class FisherExactTest {
 
 		k--; // Lower tail does not include 'k'
 
-		// If 'k' is less then the mean, then it's the p-value will be more then the threshold (if thresdold is above 1/2)
+		// If 'k' is less then the mean, then it's the p-value will be more than 0.5
+		// So we can just return '1.0' if the threshold is lower than 0.5
 		double mean = mean(k, N, D, n);
-		if ((k > mean) && (threshold < 0.5)) return 1;
+		if ((k > mean) && (threshold <= 0.5)) return 1;
 
 		double cumulativeHG = 0;
 		int maxTest = Math.min(n, D);
@@ -248,7 +249,7 @@ public class FisherExactTest {
 	 * @param theshold  Threshold value
 	 * @return Cumulative probability or 1.0 (if cumulative is over the threshold)
 	 */
-	public double fisherExactTestUpThreshold(int k, int N, int D, int n, double threshold) {
+	public double fisherExactTestUp(int k, int N, int D, int n, double threshold) {
 		if (k == 0) return 1; // This line speeds up a lot of cases
 
 		// If 'k' is less then the mean, then it's the p-value will be more then the threshold (if threshold is above 1/2)
@@ -287,46 +288,46 @@ public class FisherExactTest {
 		return Math.min(cumulativeHG, 1.0);
 	}
 
-	/**
-	 * Fisher's exact test for 'k' or more
-	 * It also compares to a 'threshold' value to speedup the process. Whenever 
-	 * cumulative probability is over the threshold, 1.0 is returned
-	 * This is useful when we are interested on very small p-values
-	 * 
-	 * @param k : white marbles drawn
-	 * @param N : Total marbles
-	 * @param D : White marbles => N-D : Black marbles
-	 * @param n : marbles drawn => N-n : not drawn
-	 * @param theshold  Threshold value
-	 * @return Cumulative probability or 1.0 (if cumulative is over the threshold)
-	 */
-	public double fisherExactTestUpThresholdAndFold(int k, int N, int D, int n, double threshold, double fold) {
-		if (k == 0) return 1; // This line speeds up a lot of cases
-
-		double cumulativeHG = 0;
-		double hg = 0, hgBefore = 0;
-		boolean descending = false;
-
-		int maxTest = Math.min(n, D);
-		for (int i = k; i <= maxTest; i++) {
-			hg = hd.hypergeometric(i, N, D, n);
-			cumulativeHG += hg;
-			if (cumulativeHG >= threshold) return 1.0;
-
-			if (descending) {
-				// We can approximate the upper bound (of what's left to calculate)
-				double toGo = maxTest - k; // How many hypergeometrics do we still need to calculate?
-				double upperBound = hg * toGo; // This is the upper bound
-				// Is the upper bound 'fold' times bigger than what we've already calculated? => stop calculating (we are close enough to the result)
-				if (cumulativeHG > (upperBound / fold)) return cumulativeHG;
-			} else {
-				if (hgBefore > hg) descending = true;
-				hgBefore = hg;
-			}
-		}
-
-		return Math.min(cumulativeHG, 1.0);
-	}
+//	/**
+//	 * Fisher's exact test for 'k' or more
+//	 * It also compares to a 'threshold' value to speedup the process. Whenever 
+//	 * cumulative probability is over the threshold, 1.0 is returned
+//	 * This is useful when we are interested on very small p-values
+//	 * 
+//	 * @param k : white marbles drawn
+//	 * @param N : Total marbles
+//	 * @param D : White marbles => N-D : Black marbles
+//	 * @param n : marbles drawn => N-n : not drawn
+//	 * @param theshold  Threshold value
+//	 * @return Cumulative probability or 1.0 (if cumulative is over the threshold)
+//	 */
+//	public double fisherExactTestUpThresholdAndFold(int k, int N, int D, int n, double threshold, double fold) {
+//		if (k == 0) return 1; // This line speeds up a lot of cases
+//
+//		double cumulativeHG = 0;
+//		double hg = 0, hgBefore = 0;
+//		boolean descending = false;
+//
+//		int maxTest = Math.min(n, D);
+//		for (int i = k; i <= maxTest; i++) {
+//			hg = hd.hypergeometric(i, N, D, n);
+//			cumulativeHG += hg;
+//			if (cumulativeHG >= threshold) return 1.0;
+//
+//			if (descending) {
+//				// We can approximate the upper bound (of what's left to calculate)
+//				double toGo = maxTest - k; // How many hypergeometrics do we still need to calculate?
+//				double upperBound = hg * toGo; // This is the upper bound
+//				// Is the upper bound 'fold' times bigger than what we've already calculated? => stop calculating (we are close enough to the result)
+//				if (cumulativeHG > (upperBound / fold)) return cumulativeHG;
+//			} else {
+//				if (hgBefore > hg) descending = true;
+//				hgBefore = hg;
+//			}
+//		}
+//
+//		return Math.min(cumulativeHG, 1.0);
+//	}
 
 	/**
 	 * Calculate the mean
@@ -336,14 +337,33 @@ public class FisherExactTest {
 		return ((double) n) * ((double) D) / (N);
 	}
 
+	/**
+	 * Pvalue for 'k' or less
+	 * Note: Includes 'k'
+	 * 
+	 * It also compares to a 'threshold' value to speedup the process. 
+	 * Whenever cumulative probability is over the threshold, 1.0 is returned
+	 * This is useful when we are interested on very small p-values
+	 * 
+	 * @param k : white marbles drawn
+	 * @param N : Total marbles
+	 * @param D : White marbles => N-D : Black marbles
+	 * @param n : marbles drawn => N-n : not drawn
+	 * @param theshold  Threshold value
+	 * @return Cumulative probability or 1.0 (if cumulative is over the threshold)
+	 */
 	public double pValueDown(int k, int N, int D, int n, double threshold) {
-		return fisherExactTestDownThreshold(k, N, D, n, threshold);
+		return fisherExactTestDown(k+1, N, D, n, threshold);
+	}
+
+	public double pValueDown(int k, int N, int D, int n) {
+		return fisherExactTestDown(k+1, N, D, n, 1.0);
 	}
 
 	/**
-	 * Fisher's exact test for 'k' or more
-	 * It also compares to a 'threshold' value to speedup the process. Whenever 
-	 * cumulative probability is over the threshold, 1.0 is returned
+	 * Fisher's exact test for more than 'k'
+	 * It also compares to a 'threshold' value to speedup the process. 
+	 * Whenever cumulative probability is over the threshold, 1.0 is returned
 	 * This is useful when we are interested on very small p-values
 	 * 
 	 * @param k : white marbles drawn
@@ -354,7 +374,11 @@ public class FisherExactTest {
 	 * @return Cumulative probability or 1.0 (if cumulative is over the threshold)
 	 */
 	public double pValueUp(int k, int N, int D, int n, double threshold) {
-		return fisherExactTestUpThreshold(k, N, D, n, threshold);
+		return fisherExactTestUp(k, N, D, n, threshold);
+	}
+
+	public double pValueUp(int k, int N, int D, int n) {
+		return fisherExactTestUp(k, N, D, n, 1.0);
 	}
 
 	/**
