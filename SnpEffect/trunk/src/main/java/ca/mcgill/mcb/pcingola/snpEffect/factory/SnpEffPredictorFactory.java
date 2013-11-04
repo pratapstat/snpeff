@@ -457,6 +457,8 @@ public abstract class SnpEffPredictorFactory {
 				for (Exon ex : tr) {
 					// No frame info? => try to find matching CDS
 					if (ex.getFrame() < 0) {
+
+						// Chech a CDS that matches an exon
 						for (Cds cds : tr.getCds()) {
 							// CDS matches the exon coordinates? => Copy frame info
 							if (tr.isStrandPlus() && (ex.getStart() == cds.getStart())) ex.setFrame(cds.getFrame());
@@ -467,7 +469,7 @@ public abstract class SnpEffPredictorFactory {
 			}
 
 		// Mark Transcripts for removal
-		if (verbose) System.out.print("\n\tFixing suspicious transcripts (first exon has non-zero frame): ");
+		if (verbose) System.out.print("\n\tFixing suspicious transcripts (first exon has non-zero first frame): ");
 		HashSet<Transcript> trToDelete = new HashSet<Transcript>();
 		for (Gene gene : genome.getGenes())
 			for (Transcript tr : gene) {
@@ -476,12 +478,14 @@ public abstract class SnpEffPredictorFactory {
 				// No exons? Nothing to do
 				if ((exons == null) || exons.isEmpty()) continue;
 
-				Exon exonFirst = exons.get(0); // Get first exon
+				Exon exonFirst = tr.getFirstCodingExon(); // Get first exon
+				// Exon exonFirst =  exons.get(0); // Get first exon
 				if (exonFirst.getFrame() <= 0) continue; // Frame OK (or missing), nothing to do
 
 				// First exon is not zero? => Create a UTR5 prime to compensate
 				Utr5prime utr5 = null;
 				int frame = exonFirst.getFrame();
+
 				if (tr.isStrandPlus()) {
 					int end = exonFirst.getStart() + (frame - 1);
 					utr5 = new Utr5prime(exonFirst, exonFirst.getStart(), end, tr.getStrand(), exonFirst.getId());

@@ -13,7 +13,7 @@ public class Cds extends Marker {
 
 	private static final long serialVersionUID = 1636197649250882952L;
 
-	byte frame = 0;
+	byte frame = -1; // Frame can be {-1, 0, 1, 2}, where '-1' means unknown
 
 	public Cds() {
 		super();

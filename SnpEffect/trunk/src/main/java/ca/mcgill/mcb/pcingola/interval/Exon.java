@@ -31,7 +31,7 @@ public class Exon extends MarkerSeq {
 
 	private static final long serialVersionUID = 5324352193278472543L;
 
-	byte frame = 0;
+	byte frame = -1; // Frame can be {-1, 0, 1, 2}, where '-1' means unknown
 	int rank; // Exon rank in transcript
 	SpliceSiteAcceptor spliceSiteAcceptor;
 	SpliceSiteDonor spliceSiteDonor;
@@ -214,7 +214,9 @@ public class Exon extends MarkerSeq {
 	public String toString() {
 		return getChromosomeName() + ":" + start + "-" + end //
 				+ ((id != null) && (id.length() > 0) ? " '" + id + "'" : "") //
-				+ " rank:" + rank //
+				// + " rank:" + rank //
+				+ ", rank: " + rank //
+				+ ", frame: " + (frame >= 0 ? "" + frame : ".") //
 				+ (sequence != null ? ", sequence: " + sequence : "");
 	}
 

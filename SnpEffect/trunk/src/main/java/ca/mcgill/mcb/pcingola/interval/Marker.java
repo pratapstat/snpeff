@@ -454,7 +454,7 @@ public class Marker extends Interval implements TxtSerializable {
 	}
 
 	/**
-	 * how much do intervals intersect?
+	 * How much do intervals intersect?
 	 * @return  number of bases these intervals intersect
 	 */
 	public int intersectSize(Marker interval) {

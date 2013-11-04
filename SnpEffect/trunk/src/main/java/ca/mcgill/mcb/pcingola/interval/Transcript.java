@@ -651,6 +651,21 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 	}
 
 	/**
+	 * Return the UTR that hits position 'pos'
+	 * @param pos
+	 * @return An UTR intersecting 'pos' (null if not found)
+	 */
+	public List<Utr> findUtrs(Marker marker) {
+		List<Utr> utrs = new LinkedList<Utr>();
+
+		// Is it in UTR instead of CDS? 
+		for (Utr utr : utrs)
+			if (utr.intersects(marker)) utrs.add(utr);
+
+		return utrs.isEmpty() ? null : utrs;
+	}
+
+	/**
 	 * Find the first position after 'pos' within an exon
 	 * @param pos
 	 * @return
@@ -909,6 +924,10 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 	 */
 	public boolean isUtr(int pos) {
 		return findUtr(pos) != null;
+	}
+
+	public boolean isUtr(Marker marker) {
+		return findUtrs(marker) != null;
 	}
 
 	/**
@@ -1227,8 +1246,8 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 				sb.append("\t\t5'UTR   :\t" + utr + "\n");
 
 			sb.append("\t\tExons:\n");
-			for (Exon eint : sorted())
-				sb.append("\t\t" + eint + "\n");
+			for (Exon exon : sorted())
+				sb.append("\t\t" + exon + "\n");
 
 			for (Utr utr : get3primeUtrs())
 				sb.append("\t\t3'UTR   :\t" + utr + "\n");
@@ -1286,4 +1305,71 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 		if (missingUtrs.size() > 0) return addMissingUtrs(missingUtrs, verbose); // Anything left? => There was a missing UTR
 		return false;
 	}
+
+	public synchronized String zzzCodingSequence(Exon exon) {
+
+		return "";
+	}
+
+	/**
+	 * Check frames
+	 */
+	public synchronized String zzz() {
+		String cds = "";
+
+		// Concatenate all exons
+		List<Exon> exons = sortedStrand();
+		StringBuilder sequence = new StringBuilder();
+		int utr5len = 0, utr3len = 0;
+
+		// 5 prime UTR length
+		int utr5Start = Integer.MAX_VALUE, utr5Stop = -1;
+		for (Utr utr : get5primeUtrs()) {
+			utr5len += utr.size();
+			utr5Start = Math.min(utr5Start, utr.getStart());
+			utr5Stop = Math.max(utr5Stop, utr.getEnd());
+		}
+		Marker utr5 = new Marker(this, utr5Start, utr5Stop, strand, "");
+
+		// Append all exon sequences
+		boolean missingSequence = false;
+		for (Exon exon : exons) {
+			String seq = "";
+			int utrOverlap = 0;
+
+			if (utr5.includes(exon)) {
+				// The whole exon is included => No sequence to add
+			} else {
+				// Add sequence
+				missingSequence |= !exon.hasSequence(); // If there is no sequence, we are in trouble
+				seq = exon.getSequence();
+
+				if (utr5.intersects(exon)) utrOverlap = utr5.intersectSize(exon);
+			}
+
+			if (utrOverlap > 0) seq = seq.substring(utrOverlap);
+
+			// FIXME : Frame check
+			Gpr.debug("Does exon match FRAME!!?!?");
+			sequence.append(seq);
+		}
+
+		if (missingSequence) cds = ""; // One or more exons does not have sequence. Nothing to do
+		else {
+			// OK, all exons have sequences
+
+			// 3 prime UTR length
+			for (Utr utr : get3primeUtrs())
+				utr3len += utr.size();
+
+			// Cut 5 prime UTR and 3 prime UTR points
+			int subEnd = sequence.length() - utr3len;
+
+			if (utr5len > subEnd) cds = "";
+			else cds = sequence.substring(utr5len, subEnd);
+		}
+
+		return cds;
+	}
+
 }
