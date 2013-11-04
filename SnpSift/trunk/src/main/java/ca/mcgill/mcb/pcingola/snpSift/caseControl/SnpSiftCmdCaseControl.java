@@ -9,7 +9,6 @@ import ca.mcgill.mcb.pcingola.ped.TfamEntry;
 import ca.mcgill.mcb.pcingola.probablility.CochranArmitageTest;
 import ca.mcgill.mcb.pcingola.probablility.FisherExactTest;
 import ca.mcgill.mcb.pcingola.snpSift.SnpSift;
-import ca.mcgill.mcb.pcingola.snpSift.coEvolution.SnpSiftCmdCoEvolution.ModelCoevolution;
 import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.util.Timer;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
@@ -37,13 +36,10 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 	protected String vcfFileName;
 	protected PedPedigree pedigree;
 	protected double pvalueThreshold;
+	protected boolean useChiSquare;
 	String name;
 	String posMin = "";
 	double pValueMin = 1.0;
-
-	public void init() {
-		pvalueThreshold = 1.0;
-	}
 
 	public SnpSiftCmdCaseControl(String args[]) {
 		super(args, "casecontrol");
@@ -177,6 +173,12 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 
 	}
 
+	@Override
+	public void init() {
+		pvalueThreshold = 1.0;
+		useChiSquare = false;
+	}
+
 	/**
 	 * Is this a valid 'groups' string?
 	 * @param groupsStr
@@ -198,8 +200,14 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		int D = 2 * (nCase[0] + nCase[1] + nCase[2]); // All cases
 		int n = 2 * nControl[2] + nControl[1] + 2 * nCase[2] + nCase[1]; // A/A + A/a
 
-//		double pdown = FisherExactTest.get().fisherExactTestDown(k, N, D, n, pvalueThreshold);
-//		double pup = FisherExactTest.get().fisherExactTestUp(k, N, D, n, pvalueThreshold);
+		// Use ChiSquare approximation?
+		if (useChiSquare) return FisherExactTest.get().chiSquareApproximation(k, N, D, n);
+
+		//		double pdown = FisherExactTest.get().fisherExactTestDown(k, N, D, n, pvalueThreshold);
+		//		double pup = FisherExactTest.get().fisherExactTestUp(k, N, D, n, pvalueThreshold);
+		//		double pdown = FisherExactTest.get().pValueDown(k, N, D, n, pvalueThreshold);
+		//		double pup = FisherExactTest.get().pValueUp(k, N, D, n, pvalueThreshold);
+
 		double pdown = FisherExactTest.get().pValueDown(k, N, D, n, pvalueThreshold);
 		double pup = FisherExactTest.get().pValueUp(k, N, D, n, pvalueThreshold);
 
@@ -213,6 +221,7 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		for (int argc = 0; argc < args.length; argc++) {
 			if (args[argc].equals("-tfam")) tfamFile = args[++argc];
 			else if (args[argc].equals("-name")) name = args[++argc];
+			else if (args[argc].equals("-chi2")) useChiSquare = true;
 			else if ((groups == null) && (tfamFile == null) && isGroupString(args[argc])) groups = args[argc];
 			else if (vcfFileName == null) vcfFileName = args[argc];
 			else usage("Unkown parameter '" + args[argc] + "'");
@@ -267,6 +276,9 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		int D = nCase[0] + nCase[1] + nCase[2]; // All cases
 		int n = nControl[2] + nControl[1] + nCase[2] + nCase[1]; // a/a + A/a
 
+		// Use ChiSquare approximation?
+		if (useChiSquare) return FisherExactTest.get().chiSquareApproximation(k, N, D, n);
+
 		double pdown = FisherExactTest.get().pValueDown(k, N, D, n, pvalueThreshold);
 		double pup = FisherExactTest.get().pValueUp(k, N, D, n, pvalueThreshold);
 
@@ -284,6 +296,9 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		int N = nControl[0] + nControl[1] + nControl[2] + nCase[0] + nCase[1] + nCase[2];
 		int D = nCase[0] + nCase[1] + nCase[2]; // All cases
 		int n = nControl[2] + nCase[2]; // a/a
+
+		// Use ChiSquare approximation?
+		if (useChiSquare) return FisherExactTest.get().chiSquareApproximation(k, N, D, n);
 
 		double pdown = FisherExactTest.get().pValueDown(k, N, D, n, pvalueThreshold);
 		double pup = FisherExactTest.get().pValueUp(k, N, D, n, pvalueThreshold);
@@ -394,6 +409,7 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar caseControl [-v] [-name nameString] { -tfam file.tfam | <CaseControlString> } file.vcf");
 		System.err.println("Where:");
 		System.err.println("\t<CaseControlString> : A string of {'+', '-', '0'}, one per sample, to identify two groups (case='+', control='-', neutral='0')");
+		System.err.println("\t -chi2              : Use ChiSquare approximarion instead of Fisher exact test.");
 		System.err.println("\t -name nameStr      : A name to be added after to 'Cases' or 'Controls' tags");
 		System.err.println("\t -tfam file.tfam    : A TFAM file having case/control informations (phenotype colmun)");
 		System.err.println("\tfile.vcf            : A VCF file (variants and genotype data)");
