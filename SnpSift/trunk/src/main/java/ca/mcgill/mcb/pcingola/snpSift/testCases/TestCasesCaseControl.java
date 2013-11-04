@@ -16,7 +16,7 @@ import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
  */
 public class TestCasesCaseControl extends TestCase {
 
-	public static boolean verbose = true;
+	public static boolean verbose = false;
 	public static boolean debug = false;
 
 	void checkCaseControlString(String vcfFile, String geoupStr, String casesStr, String controlStr) {
@@ -43,65 +43,65 @@ public class TestCasesCaseControl extends TestCase {
 		}
 	}
 
-	//	public void test_01() {
-	//		checkCaseControlTfam("test/test.private.01.vcf", "test/test.private.01.tfam", "0,0,0", "0,0,0");
-	//	}
-	//
-	//	public void test_01_Str() {
-	//		checkCaseControlString("test/test.private.01.vcf", "--", "0,0,0", "0,0,0");
-	//	}
-	//
-	//	public void test_02() {
-	//		checkCaseControlTfam("test/test.private.02.vcf", "test/test.private.01.tfam", "0,0,0", "2,0,4");
-	//	}
-	//
-	//	public void test_02_Str() {
-	//		checkCaseControlString("test/test.private.02.vcf", "--", "0,0,0", "2,0,4");
-	//	}
-	//
-	//	public void test_02_Str2() {
-	//		checkCaseControlString("test/test.private.02.vcf", "-+", "1,0,2", "1,0,2");
-	//	}
-	//
-	//	public void test_03() {
-	//		checkCaseControlTfam("test/test.private.03.vcf", "test/test.private.01.tfam", "0,0,0", "0,1,1");
-	//	}
-	//
-	//	public void test_03_Str() {
-	//		checkCaseControlString("test/test.private.03.vcf", "--", "0,0,0", "0,1,1");
-	//	}
-	//
-	//	public void test_03_Str2() {
-	//		checkCaseControlString("test/test.private.03.vcf", "+-", "0,1,1", "0,0,0");
-	//	}
-	//
-	//	public void test_03_Str3() {
-	//		checkCaseControlString("test/test.private.03.vcf", "0+", "0,0,0", "0,0,0");
-	//	}
-	//
-	//	public void test_04() {
-	//		checkCaseControlTfam("test/test.private.04.vcf", "test/test.private.01.tfam", "0,0,0", "1,0,2");
-	//	}
-	//
-	//	public void test_04_Str() {
-	//		checkCaseControlString("test/test.private.04.vcf", "--", "0,0,0", "1,0,2");
-	//	}
-	//
-	//	public void test_05() {
-	//		checkCaseControlTfam("test/test.private.05.vcf", "test/test.private.05.tfam", "0,0,0", "0,0,0");
-	//	}
-	//
-	//	public void test_06() {
-	//		checkCaseControlTfam("test/test.private.06.vcf", "test/test.private.05.tfam", "0,1,1", "0,0,0");
-	//	}
-	//
-	//	public void test_07() {
-	//		checkCaseControlTfam("test/test.private.07.vcf", "test/test.private.05.tfam", "0,1,1", "0,1,1");
-	//	}
-	//
-	//	public void test_08() {
-	//		checkCaseControlTfam("test/test.private.08.vcf", "test/test.private.05.tfam", "0,2,2", "0,1,1");
-	//	}
+	public void test_01() {
+		checkCaseControlTfam("test/test.private.01.vcf", "test/test.private.01.tfam", "0,0,0", "0,0,0");
+	}
+
+	public void test_01_Str() {
+		checkCaseControlString("test/test.private.01.vcf", "--", "0,0,0", "0,0,0");
+	}
+
+	public void test_02() {
+		checkCaseControlTfam("test/test.private.02.vcf", "test/test.private.01.tfam", "0,0,0", "2,0,4");
+	}
+
+	public void test_02_Str() {
+		checkCaseControlString("test/test.private.02.vcf", "--", "0,0,0", "2,0,4");
+	}
+
+	public void test_02_Str2() {
+		checkCaseControlString("test/test.private.02.vcf", "-+", "1,0,2", "1,0,2");
+	}
+
+	public void test_03() {
+		checkCaseControlTfam("test/test.private.03.vcf", "test/test.private.01.tfam", "0,0,0", "0,1,1");
+	}
+
+	public void test_03_Str() {
+		checkCaseControlString("test/test.private.03.vcf", "--", "0,0,0", "0,1,1");
+	}
+
+	public void test_03_Str2() {
+		checkCaseControlString("test/test.private.03.vcf", "+-", "0,1,1", "0,0,0");
+	}
+
+	public void test_03_Str3() {
+		checkCaseControlString("test/test.private.03.vcf", "0+", "0,0,0", "0,0,0");
+	}
+
+	public void test_04() {
+		checkCaseControlTfam("test/test.private.04.vcf", "test/test.private.01.tfam", "0,0,0", "1,0,2");
+	}
+
+	public void test_04_Str() {
+		checkCaseControlString("test/test.private.04.vcf", "--", "0,0,0", "1,0,2");
+	}
+
+	public void test_05() {
+		checkCaseControlTfam("test/test.private.05.vcf", "test/test.private.05.tfam", "0,0,0", "0,0,0");
+	}
+
+	public void test_06() {
+		checkCaseControlTfam("test/test.private.06.vcf", "test/test.private.05.tfam", "0,1,1", "0,0,0");
+	}
+
+	public void test_07() {
+		checkCaseControlTfam("test/test.private.07.vcf", "test/test.private.05.tfam", "0,1,1", "0,1,1");
+	}
+
+	public void test_08() {
+		checkCaseControlTfam("test/test.private.08.vcf", "test/test.private.05.tfam", "0,2,2", "0,1,1");
+	}
 
 	/**
 	 * Compare to results from PLINK using ChiSquare approximation
@@ -122,11 +122,15 @@ public class TestCasesCaseControl extends TestCase {
 			double pDom = ve.getInfoFloat("P_DOM");
 			double pAllelic = ve.getInfoFloat("P_ALLELIC");
 			double pRec = ve.getInfoFloat("P_REC");
+			double pTrend = ve.getInfoFloat("P_TREND");
+			double pGeno = ve.getInfoFloat("P_GENO");
 
 			// Calculated values
 			double pDomCc = ve.getInfoFloat(SnpSiftCmdCaseControl.VCF_INFO_CC_DOM);
 			double pAllelicCc = ve.getInfoFloat(SnpSiftCmdCaseControl.VCF_INFO_CC_ALL);
 			double pRecCc = ve.getInfoFloat(SnpSiftCmdCaseControl.VCF_INFO_CC_REC);
+			double pTrendCc = ve.getInfoFloat(SnpSiftCmdCaseControl.VCF_INFO_CC_TREND);
+			double pGenoCc = ve.getInfoFloat(SnpSiftCmdCaseControl.VCF_INFO_CC_GENO);
 
 			if (pAllelic > 0) {
 				double ratio = pAllelic / pAllelicCc;
@@ -143,6 +147,18 @@ public class TestCasesCaseControl extends TestCase {
 			if (pRec > 0) {
 				double ratio = pRec / pRecCc;
 				if (verbose) System.out.println("\tRecessive\tRatio: " + ratio + "\tPLINK: " + pRec + "\tCalculated: " + pRecCc + "\t");
+				Assert.assertEquals(1.0, ratio, maxDiff);
+			}
+
+			if (pTrend > 0) {
+				double ratio = pTrend / pTrendCc;
+				if (verbose) System.out.println("\tTrend    \tRatio: " + ratio + "\tPLINK: " + pTrend + "\tCalculated: " + pTrendCc + "\t");
+				Assert.assertEquals(1.0, ratio, maxDiff);
+			}
+
+			if (pGeno > 0) {
+				double ratio = pGeno / pGenoCc;
+				if (verbose) System.out.println("\tGenotypic\tRatio: " + ratio + "\tPLINK: " + pGeno + "\tCalculated: " + pGenoCc + "\t");
 				Assert.assertEquals(1.0, ratio, maxDiff);
 			}
 
@@ -204,5 +220,4 @@ public class TestCasesCaseControl extends TestCase {
 			if (verbose) System.out.println("");
 		}
 	}
-
 }

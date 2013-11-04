@@ -538,14 +538,14 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	 */
 	double[] pvalues(int nCase[], int nControl[]) {
 		// pValues
-		double pCodominant = pCodominant(nControl, nCase);
+		double pTrend = pTrend(nControl, nCase);
 		double pAllelic = pAllelic(nControl, nCase);
 		double pDominant = pDominant(nControl, nCase);
 		swapMinorAllele(nControl, nCase); // Swap if minor allele is reference
 		double pRecessive = pRecessive(nControl, nCase);
 
 		// Return an array of pvalues
-		double pvalues[] = { pAllelic, pDominant, pRecessive, pCodominant };
+		double pvalues[] = { pAllelic, pDominant, pRecessive, pTrend };
 		return pvalues;
 	}
 

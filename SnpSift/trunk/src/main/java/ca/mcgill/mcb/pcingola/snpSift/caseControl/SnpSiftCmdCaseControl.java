@@ -29,6 +29,7 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 	public static final String VCF_INFO_CC_ALL = "CC_ALL";
 	public static final String VCF_INFO_CC_DOM = "CC_DOM";
 	public static final String VCF_INFO_CC_REC = "CC_REC";
+	public static final String VCF_INFO_CC_TREND = "CC_TREND";
 
 	protected Boolean caseControl[];
 	protected String tfamFile;
@@ -54,10 +55,11 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		List<String> addh = super.addHeader();
 		addh.add("##INFO=<ID=" + VCF_INFO_CASE + name + ",Number=3,Type=Integer,Description=\"Number of variants in cases: Hom, Het, Count\">");
 		addh.add("##INFO=<ID=" + VCF_INFO_CONTROL + name + ",Number=3,Type=Integer,Description=\"Number of variants in controls: Hom, Het, Count\">");
-		addh.add("##INFO=<ID=" + VCF_INFO_CC_DOM + name + ",Number=1,Type=Float,Description=\"p-value using dominant model (Fisher exact)\">");
-		addh.add("##INFO=<ID=" + VCF_INFO_CC_REC + name + ",Number=1,Type=Float,Description=\"p-value using recessive model (Fisher exact)\">");
-		addh.add("##INFO=<ID=" + VCF_INFO_CC_ALL + name + ",Number=1,Type=Float,Description=\"p-value using allele count model (Fisher exact)\">");
-		addh.add("##INFO=<ID=" + VCF_INFO_CC_GENO + name + ",Number=1,Type=Float,Description=\"p-value using genotype / codominant model (CochranArmitage)\">");
+		addh.add("##INFO=<ID=" + VCF_INFO_CC_DOM + name + ",Number=1,Type=Float,Description=\"p-value using dominant model (Fisher exact test)\">");
+		addh.add("##INFO=<ID=" + VCF_INFO_CC_REC + name + ",Number=1,Type=Float,Description=\"p-value using recessive model (Fisher exact test)\">");
+		addh.add("##INFO=<ID=" + VCF_INFO_CC_ALL + name + ",Number=1,Type=Float,Description=\"p-value using allele count model (Fisher exact test)\">");
+		addh.add("##INFO=<ID=" + VCF_INFO_CC_GENO + name + ",Number=1,Type=Float,Description=\"p-value using genotypic model (ChiSquare)\">");
+		addh.add("##INFO=<ID=" + VCF_INFO_CC_TREND + name + ",Number=1,Type=Float,Description=\"p-value using trend model (CochranArmitage)\">");
 		return addh;
 	}
 
@@ -112,7 +114,8 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		vcfEntry.addInfo(VCF_INFO_CONTROL + name, ctrlHom + "," + ctrlHet + "," + ctrl);
 
 		// Annotate pValues
-		vcfEntry.addInfo(VCF_INFO_CC_GENO + name, pValueStr(vcfEntry, pCodominant(nControl, nCase)));
+		vcfEntry.addInfo(VCF_INFO_CC_TREND + name, pValueStr(vcfEntry, pTrend(nControl, nCase)));
+		vcfEntry.addInfo(VCF_INFO_CC_GENO + name, pValueStr(vcfEntry, pGenotypic(nControl, nCase)));
 		swapMinorAllele(nControl, nCase); // Swap if minor allele is reference
 		vcfEntry.addInfo(VCF_INFO_CC_ALL + name, "" + pValueStr(vcfEntry, pAllelic(nControl, nCase)));
 		vcfEntry.addInfo(VCF_INFO_CC_DOM + name, "" + pValueStr(vcfEntry, pDominant(nControl, nCase)));
@@ -250,16 +253,6 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 	}
 
 	/**
-	 * Codominant model
-	 * @param nControl
-	 * @param nCase
-	 * @return
-	 */
-	protected double pCodominant(int nControl[], int nCase[]) {
-		return CochranArmitageTest.get().p(nControl, nCase, CochranArmitageTest.WEIGHT_CODOMINANT);
-	}
-
-	/**
 	* Dominant model: Either a/A or A/A causes the disease
 	* @param nControl
 	* @param nCase
@@ -301,6 +294,68 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		double pup = FisherExactTest.get().pValueUp(k, N, D, n, pvalueThreshold);
 
 		return Math.min(pup, pdown);
+	}
+
+	/**
+	 * Trend model
+	 * @param nControl
+	 * @param nCase
+	 * @return
+	 */
+	protected double pTrend(int nControl[], int nCase[]) {
+		// Null hypothesis of no association
+		double pvalue = CochranArmitageTest.get().p(nControl, nCase, CochranArmitageTest.WEIGHT_TREND);
+		// We use a two tail test, so we multiple by 2
+		return Math.min(2.0 * pvalue, 1.0);
+	}
+
+	/**
+	 * Genotypic model (Chi Square)
+	 * @param nControl
+	 * @param nCase
+	 * @return
+	 */
+	protected double pGenotypic(int nControl[], int nCase[]) {
+		int rows = 2;
+		int cols = 3;
+
+		int n[][] = new int[rows][cols];
+		for (int j = 0; j < cols; j++) {
+			n[0][j] = nCase[j];
+			n[1][j] = nControl[j];
+		}
+
+		// Totals by row & column
+		int total = 0;
+		int totalRow[] = new int[2];
+		int totalCol[] = new int[3];
+
+		for (int i = 0; i < rows; i++)
+			totalRow[i] = 0;
+
+		for (int j = 0; j < cols; j++)
+			totalCol[j] = 0;
+
+		for (int i = 0; i < rows; i++)
+			for (int j = 0; j < cols; j++) {
+				totalRow[i] += n[i][j];
+				totalCol[j] += n[i][j];
+				total += n[i][j];
+			}
+
+		// Calculate ChiSquare
+		double chi2 = 0.0;
+		for (int i = 0; i < rows; i++)
+			for (int j = 0; j < cols; j++) {
+				double eij = (totalCol[j] * totalRow[i]) / ((double) total); // Expected value for this row & column
+				double diff = (n[i][j] - eij);
+				chi2 += diff * diff / eij;
+			}
+
+		// Null hypothesis of no association
+		// Degrees of freedom: 2
+		double pvalue = 1 - flanagan.analysis.Stat.chiSquareCDF(chi2, 2);
+		return pvalue;
 	}
 
 	/**
