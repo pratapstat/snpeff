@@ -170,7 +170,6 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 			}
 			Timer.showStdErr("Total : " + caseControl.length + " entries. Cases: " + countCase + ", controls: " + countCtrl + ", ignored: " + countIgnored);
 		}
-
 	}
 
 	@Override
@@ -203,11 +202,7 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		// Use ChiSquare approximation?
 		if (useChiSquare) return FisherExactTest.get().chiSquareApproximation(k, N, D, n);
 
-		//		double pdown = FisherExactTest.get().fisherExactTestDown(k, N, D, n, pvalueThreshold);
-		//		double pup = FisherExactTest.get().fisherExactTestUp(k, N, D, n, pvalueThreshold);
-		//		double pdown = FisherExactTest.get().pValueDown(k, N, D, n, pvalueThreshold);
-		//		double pup = FisherExactTest.get().pValueUp(k, N, D, n, pvalueThreshold);
-
+		// Use Fisher exact test
 		double pdown = FisherExactTest.get().pValueDown(k, N, D, n, pvalueThreshold);
 		double pup = FisherExactTest.get().pValueUp(k, N, D, n, pvalueThreshold);
 
@@ -279,6 +274,7 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		// Use ChiSquare approximation?
 		if (useChiSquare) return FisherExactTest.get().chiSquareApproximation(k, N, D, n);
 
+		// Use Fisher exact test
 		double pdown = FisherExactTest.get().pValueDown(k, N, D, n, pvalueThreshold);
 		double pup = FisherExactTest.get().pValueUp(k, N, D, n, pvalueThreshold);
 
@@ -300,6 +296,7 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		// Use ChiSquare approximation?
 		if (useChiSquare) return FisherExactTest.get().chiSquareApproximation(k, N, D, n);
 
+		// Use Fisher exact test
 		double pdown = FisherExactTest.get().pValueDown(k, N, D, n, pvalueThreshold);
 		double pup = FisherExactTest.get().pValueUp(k, N, D, n, pvalueThreshold);
 
