@@ -44,7 +44,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	boolean isMulti;
 	boolean genesMatch[];
 	int minAlleleCount;
-	String rFileName = Gpr.HOME + "/coEvolution.txt";
+	String rFileName;
 	ModelCoevolution model;
 	List<String> sampleIds;
 	ArrayList<byte[]> genotypes;
@@ -160,6 +160,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		minAlleleCount = 10;
 		pvalueThreshold = 1e-4;
 		model = ModelCoevolution.ABS;
+		rFileName = "coEvolution.txt";
 	}
 
 	/**
@@ -293,6 +294,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 				if (arg.equalsIgnoreCase("-minAc")) minAlleleCount = Gpr.parseIntSafe(args[++argc]);
 				else if (arg.equalsIgnoreCase("-maxP")) pvalueThreshold = Gpr.parseDoubleSafe(args[++argc]);
 				else if (arg.equalsIgnoreCase("-model")) model = ModelCoevolution.valueOf(args[++argc].toUpperCase());
+				else if (arg.equalsIgnoreCase("-out")) rFileName = args[++argc];
 				else if (arg.equalsIgnoreCase("-genes")) {
 					String genesStr = args[++argc];
 					genes = new HashSet<String>();
@@ -679,6 +681,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		System.err.println("\t-maxP  <num>    : Maximum p-value to report. Default: " + pvalueThreshold);
 		System.err.println("\t-minAc <num>    : Filter using minimum number of alleles. Default: " + minAlleleCount);
 		System.err.println("\t-model <model>  : Model to use {ABS, MAX}. Default: " + model);
+		System.err.println("\t-out    <file>  : Raw data output. Default: " + rFileName);
 		System.err.println("\tfile.tfam       : A TFAM file having case/control informations (phenotype colmun)");
 		System.err.println("\tfile.vcf        : A VCF file (variants and genotype data)");
 		System.exit(1);
