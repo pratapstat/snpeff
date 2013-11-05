@@ -15,6 +15,7 @@ public class Zzz {
 
 	public static void main(String[] args) {
 		String genome = "testLukas";
+		//		genome = "testHg3770Chr22";
 		String vcfFileName = null; // Gpr.HOME + "/snpEff/testLukas.1.vcf";
 
 		// Load config file

@@ -681,6 +681,17 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 	}
 
 	/**
+	 * Calculate frame (as specified in GTF / GFF) using sequence length
+	 * References: http://mblab.wustl.edu/GTF22.html
+	 * 
+	 * @param length
+	 * @return
+	 */
+	int frameFomrLength(int length) {
+		return (3 - (length % 3)) % 3;
+	}
+
+	/**
 	 * Create a list of 3 prime UTRs
 	 */
 	public List<Utr3prime> get3primeUtrs() {
@@ -1306,11 +1317,6 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 		return false;
 	}
 
-	public synchronized String zzzCodingSequence(Exon exon) {
-
-		return "";
-	}
-
 	/**
 	 * Check frames
 	 */
@@ -1323,13 +1329,19 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 		int utr5len = 0, utr3len = 0;
 
 		// 5 prime UTR length
-		int utr5Start = Integer.MAX_VALUE, utr5Stop = -1;
+		int utr5Start = Integer.MAX_VALUE, utr5End = -1;
 		for (Utr utr : get5primeUtrs()) {
 			utr5len += utr.size();
 			utr5Start = Math.min(utr5Start, utr.getStart());
-			utr5Stop = Math.max(utr5Stop, utr.getEnd());
+			utr5End = Math.max(utr5End, utr.getEnd());
 		}
-		Marker utr5 = new Marker(this, utr5Start, utr5Stop, strand, "");
+
+		// Nothing found? Use transcript's coordinates
+		if (utr5End == -1) {
+			utr5Start = start;
+			utr5End = end;
+		}
+		Marker utr5 = new Marker(this, utr5Start, utr5End, strand, "");
 
 		// Append all exon sequences
 		boolean missingSequence = false;
@@ -1350,7 +1362,22 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 			if (utrOverlap > 0) seq = seq.substring(utrOverlap);
 
 			// FIXME : Frame check
-			Gpr.debug("Does exon match FRAME!!?!?");
+			int frameEx = exon.getFrame();
+			if (frameEx < 0) {
+				// Nothing to do (assume current frame is right
+			} else {
+				// Calculate frame
+				// References: http://mblab.wustl.edu/GTF22.html
+				int frame = frameFomrLength(sequence.length());
+
+				Gpr.debug("Exon:" + exon.getRank() + "\tFrame: " + frame + "\texon.frame: " + frameEx);
+				// Does calculated frame match?
+				if (frame != frameEx) {
+					// Add "N" to sequence until we get the expected frame
+					while (frameFomrLength(sequence.length()) != frameEx)
+						sequence.append('N');
+				}
+			}
 			sequence.append(seq);
 		}
 
@@ -1370,6 +1397,11 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 		}
 
 		return cds;
+	}
+
+	public synchronized String zzzCodingSequence(Exon exon) {
+
+		return "";
 	}
 
 }

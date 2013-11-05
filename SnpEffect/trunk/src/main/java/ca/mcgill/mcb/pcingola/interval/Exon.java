@@ -29,6 +29,8 @@ public class Exon extends MarkerSeq {
 		ALTTENATIVE_POLY_A, // The last exon.
 	}
 
+	public static int ToStringVersion = 2;
+
 	private static final long serialVersionUID = 5324352193278472543L;
 
 	byte frame = -1; // Frame can be {-1, 0, 1, 2}, where '-1' means unknown
@@ -212,12 +214,23 @@ public class Exon extends MarkerSeq {
 
 	@Override
 	public String toString() {
-		return getChromosomeName() + ":" + start + "-" + end //
-				+ ((id != null) && (id.length() > 0) ? " '" + id + "'" : "") //
-				// + " rank:" + rank //
-				+ ", rank: " + rank //
-				+ ", frame: " + (frame >= 0 ? "" + frame : ".") //
-				+ (sequence != null ? ", sequence: " + sequence : "");
-	}
+		switch (ToStringVersion) {
+		case 1:
+			// Old format version: Used in some testCases
+			return getChromosomeName() + ":" + start + "-" + end //
+					+ ((id != null) && (id.length() > 0) ? " '" + id + "'" : "") //
+					+ " rank:" + rank //
+					+ (sequence != null ? ", sequence: " + sequence : "");
 
+		case 2:
+			return getChromosomeName() + ":" + start + "-" + end //
+					+ ((id != null) && (id.length() > 0) ? " '" + id + "'" : "") //
+					+ ", rank: " + rank //
+					+ ", frame: " + (frame >= 0 ? "" + frame : ".") //
+					+ (sequence != null ? ", sequence: " + sequence : "");
+
+		default:
+			throw new RuntimeException("Unknown format version: " + ToStringVersion);
+		}
+	}
 }
