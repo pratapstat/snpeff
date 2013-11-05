@@ -37,7 +37,7 @@ public class Zzz {
 			for (Transcript tr : gene) {
 				System.out.println(tr);
 				System.out.println("CDS: " + tr.cds());
-				System.out.println("CDS: " + tr.zzz());
+				System.out.println("CDS: " + tr.frameCorrection());
 			}
 		}
 

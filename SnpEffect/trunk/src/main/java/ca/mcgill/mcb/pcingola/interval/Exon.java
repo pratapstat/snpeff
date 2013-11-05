@@ -126,6 +126,29 @@ public class Exon extends MarkerSeq {
 		return spliceSiteDonor;
 	}
 
+	/**
+	 * Correct exons according to frame information
+	 * Shift the start position one base
+	 */
+	public void frameCorrection(int frameCorrection) {
+		if (frameCorrection <= 0) return; // Nothing to do
+
+		// Can correct?
+		if (size() <= frameCorrection) throw new RuntimeException("Exon Too short, cannot correct frame!\n" + this);
+
+		// Correct start or end coordinates
+		if (isStrandPlus()) start += frameCorrection;
+		else end -= frameCorrection;
+
+		// Correct frame
+		frame = (byte) ((frame + frameCorrection) % 3);
+
+		// Correct sequence
+		String sequence = getSequence();
+		if (!sequence.isEmpty()) sequence = sequence.substring(frameCorrection);
+		setSequence(sequence);
+	}
+
 	public int getFrame() {
 		return frame;
 	}
@@ -233,4 +256,5 @@ public class Exon extends MarkerSeq {
 			throw new RuntimeException("Unknown format version: " + ToStringVersion);
 		}
 	}
+
 }

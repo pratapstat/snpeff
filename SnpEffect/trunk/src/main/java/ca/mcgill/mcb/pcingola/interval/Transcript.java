@@ -12,6 +12,7 @@ import ca.mcgill.mcb.pcingola.snpEffect.ChangeEffect.EffectType;
 import ca.mcgill.mcb.pcingola.snpEffect.Config;
 import ca.mcgill.mcb.pcingola.stats.ObservedOverExpectedCpG;
 import ca.mcgill.mcb.pcingola.util.Gpr;
+import ca.mcgill.mcb.pcingola.util.GprSeq;
 
 /**
  * Codon position
@@ -681,14 +682,100 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 	}
 
 	/**
-	 * Calculate frame (as specified in GTF / GFF) using sequence length
-	 * References: http://mblab.wustl.edu/GTF22.html
-	 * 
-	 * @param length
-	 * @return
+	 * Correct exons according to frame information
 	 */
-	int frameFomrLength(int length) {
-		return (3 - (length % 3)) % 3;
+	public synchronized boolean frameCorrection() {
+		boolean corrected = false;
+
+		// Concatenate all exons to create a CDS
+		String cds = "";
+		List<Exon> exons = sortedStrand();
+		StringBuilder sequence = new StringBuilder();
+		int utr5len = 0, utr3len = 0;
+
+		// 5'UTR length
+		int utr5Start = Integer.MAX_VALUE, utr5End = -1;
+		for (Utr utr : get5primeUtrs()) {
+			utr5len += utr.size();
+			utr5Start = Math.min(utr5Start, utr.getStart());
+			utr5End = Math.max(utr5End, utr.getEnd());
+		}
+
+		// UTR not found? Create a fake UTR that doesn't overlap the transcript
+		if (utr5End == -1) {
+			utr5Start = start;
+			utr5End = end;
+		}
+		Marker utr5 = isStrandPlus() ? new Marker(this, start - 1, start - 1, strand, "") : new Marker(this, end + 1, end + 1, strand, "");
+
+		// Append all exon sequences
+		boolean missingSequence = false;
+		for (Exon exon : exons) {
+			String seq = "";
+			int utrOverlap = 0;
+
+			if (utr5.includes(exon)) {
+				// The whole exon is included => No sequence change
+			} else {
+				// Add sequence
+				missingSequence |= !exon.hasSequence(); // If there is no sequence, we are in trouble
+				seq = exon.getSequence();
+
+				if (utr5.intersects(exon)) utrOverlap = utr5.intersectSize(exon);
+			}
+
+			if (utrOverlap > 0) seq = seq.substring(utrOverlap);
+
+			// FIXME : Frame check
+			if (exon.getFrame() < 0) {
+				// Nothing to do (assume current frame is right
+			} else {
+				// Calculate frame
+				// References: http://mblab.wustl.edu/GTF22.html
+				int frame = GprSeq.frameFomrLength(sequence.length());
+
+				// Does calculated frame match?
+				if (frame != exon.getFrame()) {
+					if (utrOverlap > 0) {
+						throw new RuntimeException("Fatal Error: First exon needs correction: This should never happen!"//
+								+ "\n\tThis method is supposed to be called AFTER method"//
+								+ "\n\tSnpEffPredictorFactory.frameCorrectionFirstCodingExon(), which"//
+								+ "\n\tshould have taken care of this problem." //
+						);
+					} else {
+
+						// Correct exon until we get the expected frame
+						int frameReal = GprSeq.frameFomrLength(sequence.length());
+						while (frameReal != exon.getFrame()) {
+							Gpr.debug("Correcting exon frame:\tExpected frame: " + frameReal + "\tExon.frame: " + exon.getFrame());
+							exon.frameCorrection(1);
+							corrected = true;
+						}
+
+						// Get new exon's sequence
+						seq = exon.getSequence();
+					}
+				}
+			}
+			sequence.append(seq);
+		}
+
+		if (missingSequence) cds = ""; // One or more exons does not have sequence. Nothing to do
+		else {
+			// OK, all exons have sequences
+
+			// 3 prime UTR length
+			for (Utr utr : get3primeUtrs())
+				utr3len += utr.size();
+
+			// Cut 5 prime UTR and 3 prime UTR points
+			int subEnd = sequence.length() - utr3len;
+
+			if (utr5len > subEnd) cds = "";
+			else cds = sequence.substring(utr5len, subEnd);
+		}
+
+		return corrected;
 	}
 
 	/**
@@ -1315,88 +1402,6 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 		Markers missingUtrs = exons.minus(minus); // Perform interval minus
 		if (missingUtrs.size() > 0) return addMissingUtrs(missingUtrs, verbose); // Anything left? => There was a missing UTR
 		return false;
-	}
-
-	/**
-	 * Check frames
-	 */
-	public synchronized String zzz() {
-		String cds = "";
-
-		// Concatenate all exons
-		List<Exon> exons = sortedStrand();
-		StringBuilder sequence = new StringBuilder();
-		int utr5len = 0, utr3len = 0;
-
-		// 5 prime UTR length
-		int utr5Start = Integer.MAX_VALUE, utr5End = -1;
-		for (Utr utr : get5primeUtrs()) {
-			utr5len += utr.size();
-			utr5Start = Math.min(utr5Start, utr.getStart());
-			utr5End = Math.max(utr5End, utr.getEnd());
-		}
-
-		// Nothing found? Use transcript's coordinates
-		if (utr5End == -1) {
-			utr5Start = start;
-			utr5End = end;
-		}
-		Marker utr5 = new Marker(this, utr5Start, utr5End, strand, "");
-
-		// Append all exon sequences
-		boolean missingSequence = false;
-		for (Exon exon : exons) {
-			String seq = "";
-			int utrOverlap = 0;
-
-			if (utr5.includes(exon)) {
-				// The whole exon is included => No sequence to add
-			} else {
-				// Add sequence
-				missingSequence |= !exon.hasSequence(); // If there is no sequence, we are in trouble
-				seq = exon.getSequence();
-
-				if (utr5.intersects(exon)) utrOverlap = utr5.intersectSize(exon);
-			}
-
-			if (utrOverlap > 0) seq = seq.substring(utrOverlap);
-
-			// FIXME : Frame check
-			int frameEx = exon.getFrame();
-			if (frameEx < 0) {
-				// Nothing to do (assume current frame is right
-			} else {
-				// Calculate frame
-				// References: http://mblab.wustl.edu/GTF22.html
-				int frame = frameFomrLength(sequence.length());
-
-				Gpr.debug("Exon:" + exon.getRank() + "\tFrame: " + frame + "\texon.frame: " + frameEx);
-				// Does calculated frame match?
-				if (frame != frameEx) {
-					// Add "N" to sequence until we get the expected frame
-					while (frameFomrLength(sequence.length()) != frameEx)
-						sequence.append('N');
-				}
-			}
-			sequence.append(seq);
-		}
-
-		if (missingSequence) cds = ""; // One or more exons does not have sequence. Nothing to do
-		else {
-			// OK, all exons have sequences
-
-			// 3 prime UTR length
-			for (Utr utr : get3primeUtrs())
-				utr3len += utr.size();
-
-			// Cut 5 prime UTR and 3 prime UTR points
-			int subEnd = sequence.length() - utr3len;
-
-			if (utr5len > subEnd) cds = "";
-			else cds = sequence.substring(utr5len, subEnd);
-		}
-
-		return cds;
 	}
 
 	public synchronized String zzzCodingSequence(Exon exon) {
