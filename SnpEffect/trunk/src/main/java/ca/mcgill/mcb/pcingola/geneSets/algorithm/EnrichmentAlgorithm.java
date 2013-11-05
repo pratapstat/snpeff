@@ -58,7 +58,8 @@ public abstract class EnrichmentAlgorithm {
 	int minGeneSetSize = 0;
 	int maxGeneSetSize = Integer.MAX_VALUE;
 	int numberToSelect;
-	double maxPValue = 1.0;
+	double maxPValue = Double.NaN;
+	double maxPvalueAdjusted = 0.05;
 	StringBuilder output = new StringBuilder();
 	GeneSets geneSets;
 	Set<String> filterOutputGeneSets;
@@ -67,6 +68,10 @@ public abstract class EnrichmentAlgorithm {
 	public EnrichmentAlgorithm(GeneSets geneSets, int numberToSelect) {
 		this.geneSets = geneSets;
 		this.numberToSelect = numberToSelect;
+	}
+
+	public double getMaxPvalueAdjusted() {
+		return maxPvalueAdjusted;
 	}
 
 	public StringBuilder getOutput() {
@@ -80,7 +85,13 @@ public abstract class EnrichmentAlgorithm {
 	 */
 	protected boolean isShow(Result result) {
 		// Filter by pValue
-		if (result.getPvalueAdjusted() >= maxPValue) return false;
+		if (Double.isNaN(maxPValue)) {
+			// Use adjusted p-value
+			if (result.getPvalueAdjusted() >= maxPvalueAdjusted) return false;
+		} else {
+			// Use un-adjusted p-value
+			if (result.getPvalue().doubleValue() >= maxPValue) return false;
+		}
 
 		// Filter by Gene set name (show only if it is in this list)
 		if (filterOutputGeneSets != null) {
@@ -282,6 +293,10 @@ public abstract class EnrichmentAlgorithm {
 
 	public void setMaxPValue(double maxPValue) {
 		this.maxPValue = maxPValue;
+	}
+
+	public void setMaxPvalueAdjusted(double maxPvalueAdjusted) {
+		this.maxPvalueAdjusted = maxPvalueAdjusted;
 	}
 
 	public void setMinGeneSetSize(int minGeneSetSize) {

@@ -62,7 +62,8 @@ public class SnpEffCmdGsa extends SnpEff {
 	int numberofGeneSetsToSelect = 20;
 	int initGeneSetSize = 100;
 	int randIterations = 0;
-	double maxScore = 1.0;
+	double maxPvalueAdjusted = 0.05;
+	double maxPvalue = Double.NaN;
 	double interestingPerc = 0.05;
 	String inputFile = "";
 	String infoName = "";
@@ -331,7 +332,8 @@ public class SnpEffCmdGsa extends SnpEff {
 		// Initialize algorithm parameters
 		algorithm.setMaxGeneSetSize(maxGeneSetSize);
 		algorithm.setMinGeneSetSize(minGeneSetSize);
-		algorithm.setMaxPValue(maxScore);
+		algorithm.setMaxPValue(maxPvalue);
+		algorithm.setMaxPvalueAdjusted(maxPvalueAdjusted);
 		algorithm.setVerbose(verbose);
 		algorithm.setDebug(debug);
 		if (enrichmentAlgorithmType.isRank() && enrichmentAlgorithmType.isGreedy()) ((EnrichmentAlgorithmGreedyVariableSize) algorithm).setInitialSize(initGeneSetSize);
@@ -499,12 +501,18 @@ public class SnpEffCmdGsa extends SnpEff {
 					// Save results to file
 					if ((i + 1) < args.length) saveFile = args[++i];
 					else usage("Missing value in command line option '-save'");
-
 				} else if (arg.equals("-correction")) {
 					// Save results to file
 					if ((i + 1) < args.length) correctionCmd = args[++i];
 					else usage("Missing value in command line option '-correction'");
-
+				} else if (arg.equals("-maxPvalue")) {
+					// Save results to file
+					if ((i + 1) < args.length) maxPvalue = Gpr.parseDoubleSafe(args[++i]);
+					else usage("Missing value in command line option '-maxPvalue'");
+				} else if (arg.equals("-maxPvalueAdj")) {
+					// Save results to file
+					if ((i + 1) < args.length) maxPvalueAdjusted = Gpr.parseDoubleSafe(args[++i]);
+					else usage("Missing value in command line option '-maxPvalueAdj'");
 				} else if (arg.equals("-geneInterestingFile")) {
 					// Algorithm to use
 					if ((i + 1) < args.length) geneInterestingFile = args[++i];
@@ -857,7 +865,7 @@ public class SnpEffCmdGsa extends SnpEff {
 	public void usage(String message) {
 		if (message != null) System.err.println("Error: " + message + "\n");
 		System.err.println("snpEff version " + SnpEff.VERSION);
-		System.err.println("Usage: snpEff gsa [options] genome_version geneSets.gmt input_file");
+		System.err.println("Usage: snpEff gsa [options] genome_version geneSets.gmt [input_file]");
 		System.err.println("\n\tInput data options:");
 		System.err.println("\t-commands <file>              : Read commands from file (allows multiple analysis loading the database only once).");
 		System.err.println("\t-geneId                       : Use geneID instead of gene names. Default: " + useGeneId);
@@ -871,6 +879,8 @@ public class SnpEffCmdGsa extends SnpEff {
 		System.err.println("\t-correction <cmd>             : Correction of scores using command 'cmd' (e.g. an R script).");
 		System.err.println("\t-geneScore                    : Method to summarize gene scores {MIN, MAX, AVG, AVG_MIN_10, AVG_MAX_10, FISHER_CHI_SQUARE, Z_SCORES, SIMES}. Default: " + scoreSummary);
 		System.err.println("\t-geneScoreFile <file>         : Read gene score from file instead of calculating them. Format: 'geneId \\t score'");
+		System.err.println("\t-maxPvalue <num>              : Maximum un-adjusted p-value to show result. Default: None");
+		System.err.println("\t-maxPvalueAdj <num>           : Maximum un-adjusted p-value to show result. Default: " + maxPvalueAdjusted);
 		System.err.println("\t-saveGeneScoreFile <file>     : Save gene scores to file.");
 		System.err.println("\t-mapClosestGene               : Map to closest gene. Default: " + useClosestGene);
 		System.err.println("\t-rand <num>                   : Perform 'num' iterations using random scores. Default: " + randIterations);
