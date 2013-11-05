@@ -9,10 +9,23 @@
 library(epicalc)
 
 #---
+# Parse command line args
+#---
+
+args <- commandArgs(trailingOnly = TRUE)
+
+if( length(args) > 0 ) {
+    fileName <- args[1]
+    cat('Input file:', fileName, '\n')
+} else {
+	# Default parameters
+	fileName <- "coEvolution.pc.txt"
+}
+
+#---
 # Load data
 #---
 if( ! exists('d') ) {
-	fileName <- "coEvolution.pc.txt"
 
 	# Read data
 	cat('Reading data', fileName, '\n')
