@@ -716,8 +716,13 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 		// Other exons are corrected by changing the start (or end) coordinates.
 		boolean changedNonFirst = frameCorrectionNonFirstCodingExon();
 
+		boolean changed = changedFirst || changedNonFirst;
+
+		// We have to reset cached CDS data if anything changed
+		if (changed) resetCdsCache();
+
 		// Return true if there was any adjustment
-		return changedFirst || changedNonFirst;
+		return changed;
 	}
 
 	/** 
@@ -764,10 +769,6 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 	 * Correct exons according to frame information
 	 */
 	synchronized boolean frameCorrectionNonFirstCodingExon() {
-		if (false) {
-			Gpr.debug("NO FRAME CORRECTION!!!");
-			return false;
-		}
 		boolean corrected = false;
 
 		// Concatenate all exons to create a CDS
@@ -830,7 +831,7 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 						// Correct exon until we get the expected frame
 						int frameReal = GprSeq.frameFomrLength(sequence.length());
 						while (frameReal != exon.getFrame()) {
-							Gpr.debug("Correcting exon " + exon.getRank() + "\tExpected frame: " + frameReal + "\tExon.frame: " + exon.getFrame());
+							// Gpr.debug("Correcting exon " + exon.getRank() + "\tExpected frame: " + frameReal + "\tExon.frame: " + exon.getFrame());
 
 							// Correct both Exon and CDS
 							exon.frameCorrection(1);

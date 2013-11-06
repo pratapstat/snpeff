@@ -443,13 +443,15 @@ public abstract class SnpEffPredictorFactory {
 	 * Correct exon's coordinates, according to frame information
 	 */
 	void frameCorrection() {
-		if (verbose) System.out.print("Correcting exons based on frame information.\n");
+		if (verbose) System.out.print("\n\tCorrecting exons based on frame information.\n\t");
 
-		int i = 0;
+		int i = 1;
 		for (Gene gene : genome.getGenes())
 			for (Transcript tr : gene) {
 				boolean corrected = tr.frameCorrection();
-				if (verbose && corrected) Gpr.showMark(i++, 1);
+				if (verbose && corrected) {
+					Gpr.showMark(i++, 1);
+				}
 			}
 
 		if (verbose) System.out.print("");

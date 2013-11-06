@@ -4,7 +4,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
-import ca.mcgill.mcb.pcingola.snpEffect.commandLine.SnpEffCmdBuild;
+import ca.mcgill.mcb.pcingola.snpEffect.commandLine.SnpEff;
 import ca.mcgill.mcb.pcingola.snpEffect.commandLine.SnpEffCmdEff;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 
@@ -24,11 +24,11 @@ public class TestCasesExonFrame extends TestCase {
 	 */
 	public void test_01() {
 		String genomeName = "testLukas";
-		String args[] = { "-gff3", genomeName };
+		String args[] = { "build", "-v", "-noLog", "-gff3", genomeName };
 
-		SnpEffCmdBuild snpEffCmdBuild = new SnpEffCmdBuild();
-		snpEffCmdBuild.parseArgs(args);
-		boolean ok = snpEffCmdBuild.run();
+		SnpEff snpEff = new SnpEff();
+		snpEff.parseArgs(args);
+		boolean ok = snpEff.run();
 
 		Assert.assertTrue(ok);
 	}
