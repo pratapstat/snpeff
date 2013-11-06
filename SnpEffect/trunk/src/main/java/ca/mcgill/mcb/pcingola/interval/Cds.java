@@ -25,6 +25,24 @@ public class Cds extends Marker {
 		type = EffectType.CDS;
 	}
 
+	/**
+	 * Correct coordinates according to frame differences
+	 * @param frameCorrection
+	 */
+	public void frameCorrection(int frameCorrection) {
+		if (frameCorrection <= 0) return; // Nothing to do
+
+		// Can correct?
+		if (size() <= frameCorrection) throw new RuntimeException("Exon Too short, cannot correct frame!\n" + this);
+
+		// Correct start or end coordinates
+		if (isStrandPlus()) start += frameCorrection;
+		else end -= frameCorrection;
+
+		// Correct frame
+		frame = (byte) ((frame + frameCorrection) % 3);
+	}
+
 	public int getFrame() {
 		return frame;
 	}

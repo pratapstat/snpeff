@@ -16,7 +16,6 @@ import ca.mcgill.mcb.pcingola.interval.IntervalComparatorByEnd;
 import ca.mcgill.mcb.pcingola.interval.IntervalComparatorByStart;
 import ca.mcgill.mcb.pcingola.interval.Marker;
 import ca.mcgill.mcb.pcingola.interval.Transcript;
-import ca.mcgill.mcb.pcingola.interval.Utr5prime;
 import ca.mcgill.mcb.pcingola.snpEffect.Config;
 import ca.mcgill.mcb.pcingola.snpEffect.SnpEffectPredictor;
 import ca.mcgill.mcb.pcingola.util.Gpr;
@@ -446,7 +445,7 @@ public abstract class SnpEffPredictorFactory {
 		frameCorrectionFirstCodingExon(); // Correct first exon's frame by adding a fake UTR
 
 		// Correct non-first exon's coordinates, to match frame information
-		if (verbose) System.out.print("Correcting exons based on frame information.");
+		if (verbose) System.out.print("Correcting exons based on frame information.\n");
 		int i = 0;
 		for (Gene gene : genome.getGenes())
 			for (Transcript tr : gene) {
@@ -468,33 +467,10 @@ public abstract class SnpEffPredictorFactory {
 		if (verbose) System.out.print("\n\tFixing suspicious transcripts (first exon has non-zero first frame): ");
 		HashSet<Transcript> trToDelete = new HashSet<Transcript>();
 		for (Gene gene : genome.getGenes())
-			for (Transcript tr : gene) {
-				List<Exon> exons = tr.sortedStrand();
+			for (Transcript tr : gene)
+				tr.frameCorrectionFirstCodingExon();
 
-				// No exons? Nothing to do
-				if ((exons == null) || exons.isEmpty()) continue;
-
-				Exon exonFirst = tr.getFirstCodingExon(); // Get first exon
-				// Exon exonFirst =  exons.get(0); // Get first exon
-				if (exonFirst.getFrame() <= 0) continue; // Frame OK (or missing), nothing to do
-
-				// First exon is not zero? => Create a UTR5 prime to compensate
-				Utr5prime utr5 = null;
-				int frame = exonFirst.getFrame();
-
-				if (tr.isStrandPlus()) {
-					int end = exonFirst.getStart() + (frame - 1);
-					utr5 = new Utr5prime(exonFirst, exonFirst.getStart(), end, tr.getStrand(), exonFirst.getId());
-				} else {
-					int start = exonFirst.getEnd() - (frame - 1);
-					utr5 = new Utr5prime(exonFirst, start, exonFirst.getEnd(), tr.getStrand(), exonFirst.getId());
-				}
-
-				// Add UTR5'
-				tr.add(utr5);
-			}
-
-		if (verbose) System.out.print((trToDelete.size() > 0 ? "\n\t" : "") + "\tTotal: " + trToDelete.size() + " removed.");
+		if (verbose) System.out.println((trToDelete.size() > 0 ? "\n\t" : "") + "\tTotal: " + trToDelete.size() + " removed.");
 	}
 
 	/**

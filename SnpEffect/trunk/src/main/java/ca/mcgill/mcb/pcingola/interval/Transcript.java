@@ -640,6 +640,17 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 	}
 
 	/**
+	 * Find a CDS that matches exactly the exon
+	 * @param exon
+	 * @return
+	 */
+	public Cds findMatchingCds(Exon exon) {
+		for (Cds cds : cdss)
+			if (exon.includes(cds)) return cds;
+		return null;
+	}
+
+	/**
 	 * Return the UTR that hits position 'pos'
 	 * @param pos
 	 * @return An UTR intersecting 'pos' (null if not found)
@@ -685,18 +696,19 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 	 * Correct exons according to frame information
 	 */
 	public synchronized boolean frameCorrection() {
+		if (false) {
+			Gpr.debug("NO FRAME CORRECTION!!!");
+			return false;
+		}
 		boolean corrected = false;
 
 		// Concatenate all exons to create a CDS
-		String cds = "";
 		List<Exon> exons = sortedStrand();
 		StringBuilder sequence = new StringBuilder();
-		int utr5len = 0, utr3len = 0;
-
 		// 5'UTR length
 		int utr5Start = Integer.MAX_VALUE, utr5End = -1;
 		for (Utr utr : get5primeUtrs()) {
-			utr5len += utr.size();
+			utr.size();
 			utr5Start = Math.min(utr5Start, utr.getStart());
 			utr5End = Math.max(utr5End, utr.getEnd());
 		}
@@ -709,24 +721,25 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 		Marker utr5 = isStrandPlus() ? new Marker(this, start - 1, start - 1, strand, "") : new Marker(this, end + 1, end + 1, strand, "");
 
 		// Append all exon sequences
-		boolean missingSequence = false;
 		for (Exon exon : exons) {
 			String seq = "";
 			int utrOverlap = 0;
 
+			// Check if exon overlaps UTR
 			if (utr5.includes(exon)) {
 				// The whole exon is included => No sequence change
 			} else {
 				// Add sequence
-				missingSequence |= !exon.hasSequence(); // If there is no sequence, we are in trouble
 				seq = exon.getSequence();
-
-				if (utr5.intersects(exon)) utrOverlap = utr5.intersectSize(exon);
+				if (utr5.intersects(exon)) {
+					utrOverlap = utr5.intersectSize(exon);
+					if (utrOverlap > 0) seq = seq.substring(utrOverlap);
+				}
 			}
 
-			if (utrOverlap > 0) seq = seq.substring(utrOverlap);
-
-			// FIXME : Frame check
+			//---
+			// Frame check
+			//---
 			if (exon.getFrame() < 0) {
 				// Nothing to do (assume current frame is right
 			} else {
@@ -743,12 +756,18 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 								+ "\n\tshould have taken care of this problem." //
 						);
 					} else {
+						// Find matching cds
+						Cds cdsToCorrect = findMatchingCds(exon);
 
 						// Correct exon until we get the expected frame
 						int frameReal = GprSeq.frameFomrLength(sequence.length());
 						while (frameReal != exon.getFrame()) {
-							Gpr.debug("Correcting exon frame:\tExpected frame: " + frameReal + "\tExon.frame: " + exon.getFrame());
+							Gpr.debug("Correcting exon " + exon.getRank() + "\tExpected frame: " + frameReal + "\tExon.frame: " + exon.getFrame());
+
+							// Correct both Exon and CDS
 							exon.frameCorrection(1);
+							cdsToCorrect.frameCorrection(1);
+
 							corrected = true;
 						}
 
@@ -757,25 +776,51 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 					}
 				}
 			}
+
+			// Append sequence 
 			sequence.append(seq);
 		}
 
-		if (missingSequence) cds = ""; // One or more exons does not have sequence. Nothing to do
-		else {
-			// OK, all exons have sequences
+		return corrected;
+	}
 
-			// 3 prime UTR length
-			for (Utr utr : get3primeUtrs())
-				utr3len += utr.size();
+	/** 
+	 * Fix transcripts having non-zero frames in first exon 
+	 * 
+	 * Transcripts whose first exon has a non-zero frame indicate problems.
+	 * We add a 'fake' UTR5 to compensate for reading frame.
+	 * 
+	 * @param showEvery
+	 */
+	public synchronized void frameCorrectionFirstCodingExon() {
+		List<Exon> exons = sortedStrand();
 
-			// Cut 5 prime UTR and 3 prime UTR points
-			int subEnd = sequence.length() - utr3len;
+		// No exons? Nothing to do
+		if ((exons == null) || exons.isEmpty()) return;
 
-			if (utr5len > subEnd) cds = "";
-			else cds = sequence.substring(utr5len, subEnd);
+		Exon exonFirst = getFirstCodingExon(); // Get first exon
+		// Exon exonFirst =  exons.get(0); // Get first exon
+		if (exonFirst.getFrame() <= 0) return; // Frame OK (or missing), nothing to do
+
+		// First exon is not zero? => Create a UTR5 prime to compensate
+		Utr5prime utr5 = null;
+		int frame = exonFirst.getFrame();
+
+		if (isStrandPlus()) {
+			int end = exonFirst.getStart() + (frame - 1);
+			utr5 = new Utr5prime(exonFirst, exonFirst.getStart(), end, getStrand(), exonFirst.getId());
+		} else {
+			int start = exonFirst.getEnd() - (frame - 1);
+			utr5 = new Utr5prime(exonFirst, start, exonFirst.getEnd(), getStrand(), exonFirst.getId());
 		}
 
-		return corrected;
+		// Reset frame, since it was already corrected
+		exonFirst.setFrame(0);
+		Cds cds = findMatchingCds(exonFirst);
+		if (cds != null) cds.frameCorrection(cds.getFrame());
+
+		// Add UTR5'
+		add(utr5);
 	}
 
 	/**
@@ -1062,8 +1107,8 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 			last = ex.getEnd();
 		}
 
-		System.err.println("WARNING: Cannot find last exonic position before " + pos + " for transcript '" + id + "'");
-		return -1;
+		if (last < 0) System.err.println("WARNING: Cannot find last exonic position before " + pos + " for transcript '" + id + "'");
+		return pos;
 	}
 
 	/**
@@ -1180,9 +1225,6 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 	@Override
 	public void reset() {
 		super.reset();
-		cdsStart = -1;
-		cdsEnd = -1;
-		firstCodingExon = null;
 		sorted = null;
 		spliceBranchSites = new ArrayList<SpliceSiteBranch>();
 		utrs = new ArrayList<Utr>();
@@ -1190,6 +1232,13 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 		introns = null;
 		upstream = null;
 		downstream = null;
+		resetCdsCache();
+	}
+
+	public void resetCdsCache() {
+		cdsStart = -1;
+		cdsEnd = -1;
+		firstCodingExon = null;
 		cds = null;
 		cds2pos = null;
 	}
@@ -1402,11 +1451,6 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 		Markers missingUtrs = exons.minus(minus); // Perform interval minus
 		if (missingUtrs.size() > 0) return addMissingUtrs(missingUtrs, verbose); // Anything left? => There was a missing UTR
 		return false;
-	}
-
-	public synchronized String zzzCodingSequence(Exon exon) {
-
-		return "";
 	}
 
 }
