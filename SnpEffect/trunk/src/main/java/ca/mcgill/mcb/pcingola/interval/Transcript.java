@@ -756,6 +756,7 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 		}
 
 		// Reset frame, since it was already corrected
+		Gpr.debug("Adding UTR for frame correction");
 		exonFirst.setFrame(0);
 		Cds cds = findMatchingCds(exonFirst);
 		if (cds != null) cds.frameCorrection(cds.getFrame());
@@ -793,18 +794,24 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 
 		// Append all exon sequences
 		for (Exon exon : exons) {
+			if (!exon.hasSequence()) return false; // We don't need to correct if there is no sequence! (the problem only exists due to sequence frame)
+
 			String seq = "";
 			int utrOverlap = 0;
 
 			// Check if exon overlaps UTR
 			if (utr5.includes(exon)) {
 				// The whole exon is included => No sequence change
+				seq = "";
 			} else {
 				// Add sequence
 				seq = exon.getSequence();
 				if (utr5.intersects(exon)) {
 					utrOverlap = utr5.intersectSize(exon);
-					if (utrOverlap > 0) seq = seq.substring(utrOverlap);
+					if (utrOverlap > 0) {
+						if (utrOverlap < seq.length()) seq = seq.substring(utrOverlap);
+						else seq = "";
+					}
 				}
 			}
 
@@ -830,9 +837,9 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 						// Find matching cds
 						Cds cdsToCorrect = findMatchingCds(exon);
 
-						// Correct exon until we get the expected frame
-						Gpr.debug("Correcting exon [" + exon.getStart() + ", " + exon.getEnd() + "]\tExpected frame: " + frameReal + " (sequence length: " + sequence.length() + " )\tExon.frame: " + exon.getFrame());
+						// Gpr.debug("Correcting exon [" + exon.getStart() + ", " + exon.getEnd() + "]\tExpected frame: " + frameReal + " (sequence length: " + sequence.length() + " )\tExon.frame: " + exon.getFrame());
 
+						// Correct exon until we get the expected frame
 						while (frameReal != exon.getFrame()) {
 							// Correct both Exon and CDS
 							exon.frameCorrection(1);
@@ -840,7 +847,7 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 							corrected = true;
 						}
 
-						Gpr.debug("\tCorrected exon [" + exon.getStart() + ", " + exon.getEnd() + "]");
+						// Gpr.debug("\tCorrected exon [" + exon.getStart() + ", " + exon.getEnd() + "]");
 
 						// Get new exon's sequence
 						seq = exon.getSequence();

@@ -36,7 +36,7 @@ public class SeekableBufferedReader extends BufferedReader {
 
 	@Override
 	public void close() throws IOException {
-		if( raf != null ) {
+		if (raf != null) {
 			raf.close();
 			raf = null;
 			file = null;
@@ -54,8 +54,8 @@ public class SeekableBufferedReader extends BufferedReader {
 	 * @return Position of '\n' in the buffer or -1 if not found
 	 */
 	int findNl(int next, int last) {
-		for( int i = next; i < last; i++ ) {
-			if( buffer[i] == '\n' ) return i;
+		for (int i = next; i < last; i++) {
+			if (buffer[i] == '\n') return i;
 		}
 		return -1;
 	}
@@ -94,7 +94,7 @@ public class SeekableBufferedReader extends BufferedReader {
 		try {
 			file = new File(fileName);
 			raf = new RandomAccessFile(fileName, "r");
-		} catch(FileNotFoundException e) {
+		} catch (FileNotFoundException e) {
 			throw new IOException(e);
 		}
 	}
@@ -107,7 +107,8 @@ public class SeekableBufferedReader extends BufferedReader {
 		long pos = -1;
 		try {
 			pos = raf.getFilePointer() + next;
-		} catch(IOException e) {}
+		} catch (IOException e) {
+		}
 		return pos;
 	}
 
@@ -134,23 +135,23 @@ public class SeekableBufferedReader extends BufferedReader {
 	@Override
 	public String readLine() throws IOException {
 		StringBuilder sb = null;
-		while(true) {
-			if( last <= next ) {
+		while (true) {
+			if (last <= next) {
 				// Read buffer
 				next = 0;
 				last = raf.read(buffer);
 
 				// End of file? 
-				if( last < 0 ) return (sb == null ? null : sb.toString());
+				if (last < 0) return removeNewLine(sb);
 			}
 
 			// Find end of line
 			int nl = findNl(next, last);
-			if( sb == null ) sb = new StringBuilder();
-			if( nl >= 0 ) {
+			if (sb == null) sb = new StringBuilder();
+			if (nl >= 0) {
 				sb.append(new String(buffer, next, nl - next));
 				next = nl + 1;
-				return sb.toString();
+				return removeNewLine(sb);
 			} else {
 				sb.append(new String(buffer, next, last - next));
 				last = next;
@@ -161,6 +162,25 @@ public class SeekableBufferedReader extends BufferedReader {
 	@Override
 	public boolean ready() throws IOException {
 		throw new IOException("Unimplemented method!");
+	}
+
+	/**
+	 * Remove trailing newline characters
+	 * @param sb
+	 * @return
+	 */
+	String removeNewLine(StringBuilder sb) {
+		if (sb == null) return null;
+		if (sb.length() <= 0) return "";
+
+		// Remove trailing newlines
+		for (char c = sb.charAt(sb.length() - 1); c == '\r' || c == '\n';) {
+			sb.deleteCharAt(sb.length() - 1);
+
+			if (sb.length() > 0) c = sb.charAt(sb.length() - 1);
+			else break;
+		}
+		return sb.toString();
 	}
 
 	@Override

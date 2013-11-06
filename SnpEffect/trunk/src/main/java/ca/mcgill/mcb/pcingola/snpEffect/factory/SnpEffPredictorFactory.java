@@ -417,9 +417,6 @@ public abstract class SnpEffPredictorFactory {
 	 * Finish up procedure to ensure consistency
 	 */
 	void finishUp() {
-		// Coreect according to frame information
-		frameCorrection();
-
 		// Adjust
 		adjustTranscripts(); // Adjust transcripts: recalculate start, end, strand, etc.
 		adjustGenes(); // Adjust genes: recalculate start, end, strand, etc.
@@ -431,6 +428,9 @@ public abstract class SnpEffPredictorFactory {
 		// If some UTRs are missing: calculate UTR information from CDS whenever possible
 		if (verbose) System.out.print("\n\tCreate UTRs from CDS (if needed): ");
 		utrFromCds();
+
+		// Coreect according to frame information
+		frameCorrection();
 
 		// Remove empty chromosomes
 		removeEmptyChromos();

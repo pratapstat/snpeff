@@ -147,7 +147,7 @@ public class Exon extends MarkerSeq {
 
 		// Correct sequence
 		String sequence = getSequence();
-		if (!sequence.isEmpty()) sequence = sequence.substring(frameCorrection);
+		if (sequence.length() >= frameCorrection) sequence = sequence.substring(frameCorrection);
 		setSequence(sequence);
 	}
 
