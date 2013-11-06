@@ -130,7 +130,7 @@ public class GprSeq {
 	 * @param length
 	 * @return
 	 */
-	public static int frameFomrLength(int length) {
+	public static int frameFromLength(int length) {
 		return (3 - (length % 3)) % 3;
 	}
 

@@ -8,6 +8,8 @@ import ca.mcgill.mcb.pcingola.interval.SeqChange;
 import ca.mcgill.mcb.pcingola.interval.Transcript;
 import ca.mcgill.mcb.pcingola.snpEffect.ChangeEffect;
 import ca.mcgill.mcb.pcingola.snpEffect.ChangeEffect.WarningType;
+import ca.mcgill.mcb.pcingola.util.Gpr;
+import ca.mcgill.mcb.pcingola.util.GprSeq;
 
 /**
  * Analyze codon changes based on a SeqChange and a Transcript
@@ -124,6 +126,7 @@ public class CodonChange {
 		int firstCdsBaseInExon = 0; // Where the exon maps to the CDS (i.e. which CDS base number does the first base in this exon maps to).
 		for (Exon exon : exons) {
 			this.exon = exon;
+			Gpr.debug("Bases in cds: " + firstCdsBaseInExon + "\tframe: " + GprSeq.frameFromLength(firstCdsBaseInExon) + "\texon.frame: " + exon.getFrame());
 
 			if (exon.intersects(seqChange)) {
 				int cdsBaseInExon; // cdsBaseInExon: base number relative to the beginning of the coding part of this exon (i.e. excluding 5'UTRs)

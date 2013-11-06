@@ -782,12 +782,14 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 			utr5End = Math.max(utr5End, utr.getEnd());
 		}
 
-		// UTR not found? Create a fake UTR that doesn't overlap the transcript
+		// Create UTR
+		Marker utr5;
 		if (utr5End == -1) {
+			// UTR not found? Create a fake UTR that doesn't overlap the transcript
 			utr5Start = start;
 			utr5End = end;
-		}
-		Marker utr5 = isStrandPlus() ? new Marker(this, start - 1, start - 1, strand, "") : new Marker(this, end + 1, end + 1, strand, "");
+			utr5 = isStrandPlus() ? new Marker(this, start - 1, start - 1, strand, "") : new Marker(this, end + 1, end + 1, strand, "");
+		} else utr5 = new Marker(this, utr5Start, utr5End, strand, "");
 
 		// Append all exon sequences
 		for (Exon exon : exons) {
@@ -814,10 +816,10 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 			} else {
 				// Calculate frame
 				// References: http://mblab.wustl.edu/GTF22.html
-				int frame = GprSeq.frameFomrLength(sequence.length());
+				int frameReal = GprSeq.frameFromLength(sequence.length());
 
 				// Does calculated frame match?
-				if (frame != exon.getFrame()) {
+				if (frameReal != exon.getFrame()) {
 					if (utrOverlap > 0) {
 						throw new RuntimeException("Fatal Error: First exon needs correction: This should never happen!"//
 								+ "\n\tThis method is supposed to be called AFTER method"//
@@ -829,16 +831,16 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 						Cds cdsToCorrect = findMatchingCds(exon);
 
 						// Correct exon until we get the expected frame
-						int frameReal = GprSeq.frameFomrLength(sequence.length());
-						while (frameReal != exon.getFrame()) {
-							// Gpr.debug("Correcting exon " + exon.getRank() + "\tExpected frame: " + frameReal + "\tExon.frame: " + exon.getFrame());
+						Gpr.debug("Correcting exon [" + exon.getStart() + ", " + exon.getEnd() + "]\tExpected frame: " + frameReal + " (sequence length: " + sequence.length() + " )\tExon.frame: " + exon.getFrame());
 
+						while (frameReal != exon.getFrame()) {
 							// Correct both Exon and CDS
 							exon.frameCorrection(1);
 							cdsToCorrect.frameCorrection(1);
-
 							corrected = true;
 						}
+
+						Gpr.debug("\tCorrected exon [" + exon.getStart() + ", " + exon.getEnd() + "]");
 
 						// Get new exon's sequence
 						seq = exon.getSequence();

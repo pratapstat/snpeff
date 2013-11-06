@@ -17,7 +17,7 @@ public class Zzz {
 	public static void main(String[] args) {
 		boolean doCorrect = true;
 		String genome = "testLukas";
-		String vcfFileName = Gpr.HOME + "/snpEff/testLukas.1.vcf";
+		String vcfFileName = Gpr.HOME + "/snpEff/testLukas.vcf";
 
 		// Load config file
 		System.out.println("Loading config file");
@@ -38,8 +38,6 @@ public class Zzz {
 
 				if (doCorrect) {
 					tr.frameCorrection();
-					tr.resetCdsCache();
-					tr.adjust();
 					System.out.println("After: \n" + tr);
 					System.out.println("CDS: " + tr.cds());
 				}
@@ -75,9 +73,10 @@ public class Zzz {
 
 					// Show all effects
 					for (ChangeEffect changeEffect : effects)
-						System.out.println("\t" + changeEffect.toStringSimple(true) //
-								+ "\n\t" + changeEffect.toStringSimple(false) //
-								+ "\n\t" + changeEffect.toString(false, false) //
+						System.out.println("\t" + changeEffect //
+								+ "\n\tEff  : " + changeEffect.toStringSimple(false) //
+								+ "\n\tAA   :" + changeEffect.getAaChange() //
+								+ "\n\tCodon: " + changeEffect.getCodonChange() //
 						);
 				}
 			}

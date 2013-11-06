@@ -40,7 +40,9 @@ public class Cds extends Marker {
 		else end -= frameCorrection;
 
 		// Correct frame
-		frame = (byte) ((frame + frameCorrection) % 3);
+		frame = (byte) ((frame - frameCorrection) % 3);
+		while (frame < 0)
+			frame += 3;
 	}
 
 	public int getFrame() {

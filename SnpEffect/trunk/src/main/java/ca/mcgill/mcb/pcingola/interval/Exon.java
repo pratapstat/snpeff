@@ -141,7 +141,9 @@ public class Exon extends MarkerSeq {
 		else end -= frameCorrection;
 
 		// Correct frame
-		frame = (byte) ((frame + frameCorrection) % 3);
+		frame = (byte) ((frame - frameCorrection) % 3);
+		while (frame < 0)
+			frame += 3;
 
 		// Correct sequence
 		String sequence = getSequence();
