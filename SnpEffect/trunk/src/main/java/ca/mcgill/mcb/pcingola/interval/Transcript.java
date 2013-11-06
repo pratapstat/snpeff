@@ -693,9 +693,77 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 	}
 
 	/**
-	 * Correct exons according to frame information
+	 * Correct exons based on frame information.
+	 * 
+	 * E.g. if the frame information (form a genomic 
+	 * database file, such as a GTF) does not 
+	 * match the calculated frame, we correct exon's 
+	 * boundaries to make them match.
+	 * 
+	 * This is performed in two stages:
+	 *    i) First exon is corrected by adding a fake 5'UTR
+	 *    ii) Other exons are corrected by changing the start (or end) coordinates.
+	 *    
+	 * @return
 	 */
 	public synchronized boolean frameCorrection() {
+		// Copy frame information form CDSs to Exons (if missing)
+		frameFromCds();
+
+		// First exon is corrected by adding a fake 5'UTR
+		boolean changedFirst = frameCorrectionFirstCodingExon();
+
+		// Other exons are corrected by changing the start (or end) coordinates.
+		boolean changedNonFirst = frameCorrectionNonFirstCodingExon();
+
+		// Return true if there was any adjustment
+		return changedFirst || changedNonFirst;
+	}
+
+	/** 
+	 * Fix transcripts having non-zero frames in first exon 
+	 * 
+	 * Transcripts whose first exon has a non-zero frame indicate problems.
+	 * We add a 'fake' UTR5 to compensate for reading frame.
+	 * 
+	 * @param showEvery
+	 */
+	synchronized boolean frameCorrectionFirstCodingExon() {
+		List<Exon> exons = sortedStrand();
+
+		// No exons? Nothing to do
+		if ((exons == null) || exons.isEmpty()) return false;
+
+		Exon exonFirst = getFirstCodingExon(); // Get first exon
+		// Exon exonFirst =  exons.get(0); // Get first exon
+		if (exonFirst.getFrame() <= 0) return false; // Frame OK (or missing), nothing to do
+
+		// First exon is not zero? => Create a UTR5 prime to compensate
+		Utr5prime utr5 = null;
+		int frame = exonFirst.getFrame();
+
+		if (isStrandPlus()) {
+			int end = exonFirst.getStart() + (frame - 1);
+			utr5 = new Utr5prime(exonFirst, exonFirst.getStart(), end, getStrand(), exonFirst.getId());
+		} else {
+			int start = exonFirst.getEnd() - (frame - 1);
+			utr5 = new Utr5prime(exonFirst, start, exonFirst.getEnd(), getStrand(), exonFirst.getId());
+		}
+
+		// Reset frame, since it was already corrected
+		exonFirst.setFrame(0);
+		Cds cds = findMatchingCds(exonFirst);
+		if (cds != null) cds.frameCorrection(cds.getFrame());
+
+		// Add UTR5'
+		add(utr5);
+		return true;
+	}
+
+	/**
+	 * Correct exons according to frame information
+	 */
+	synchronized boolean frameCorrectionNonFirstCodingExon() {
 		if (false) {
 			Gpr.debug("NO FRAME CORRECTION!!!");
 			return false;
@@ -784,43 +852,23 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 		return corrected;
 	}
 
-	/** 
-	 * Fix transcripts having non-zero frames in first exon 
-	 * 
-	 * Transcripts whose first exon has a non-zero frame indicate problems.
-	 * We add a 'fake' UTR5 to compensate for reading frame.
-	 * 
-	 * @param showEvery
+	/**
+	 * Copy frame info from CDSs into Exons
 	 */
-	public synchronized void frameCorrectionFirstCodingExon() {
-		List<Exon> exons = sortedStrand();
+	void frameFromCds() {
+		for (Exon ex : this) {
+			// No frame info? => try to find matching CDS
+			if (ex.getFrame() < 0) {
 
-		// No exons? Nothing to do
-		if ((exons == null) || exons.isEmpty()) return;
-
-		Exon exonFirst = getFirstCodingExon(); // Get first exon
-		// Exon exonFirst =  exons.get(0); // Get first exon
-		if (exonFirst.getFrame() <= 0) return; // Frame OK (or missing), nothing to do
-
-		// First exon is not zero? => Create a UTR5 prime to compensate
-		Utr5prime utr5 = null;
-		int frame = exonFirst.getFrame();
-
-		if (isStrandPlus()) {
-			int end = exonFirst.getStart() + (frame - 1);
-			utr5 = new Utr5prime(exonFirst, exonFirst.getStart(), end, getStrand(), exonFirst.getId());
-		} else {
-			int start = exonFirst.getEnd() - (frame - 1);
-			utr5 = new Utr5prime(exonFirst, start, exonFirst.getEnd(), getStrand(), exonFirst.getId());
+				// Chech a CDS that matches an exon
+				for (Cds cds : getCds()) {
+					// CDS matches the exon coordinates? => Copy frame info
+					if (isStrandPlus() && (ex.getStart() == cds.getStart())) ex.setFrame(cds.getFrame());
+					else if (isStrandMinus() && (ex.getEnd() == cds.getEnd())) ex.setFrame(cds.getFrame());
+				}
+			}
 		}
 
-		// Reset frame, since it was already corrected
-		exonFirst.setFrame(0);
-		Cds cds = findMatchingCds(exonFirst);
-		if (cds != null) cds.frameCorrection(cds.getFrame());
-
-		// Add UTR5'
-		add(utr5);
 	}
 
 	/**

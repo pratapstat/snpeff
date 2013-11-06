@@ -3,7 +3,6 @@ package ca.mcgill.mcb.pcingola.snpEffect.factory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import ca.mcgill.mcb.pcingola.fileIterator.FastaFileIterator;
@@ -440,68 +439,20 @@ public abstract class SnpEffPredictorFactory {
 		if (verbose) System.out.println("");
 	}
 
+	/**
+	 * Correct exon's coordinates, according to frame information
+	 */
 	void frameCorrection() {
-		frameFromCds(); // Copy frame information form CDSs to Exons (if missing)
-		frameCorrectionFirstCodingExon(); // Correct first exon's frame by adding a fake UTR
-
-		// Correct non-first exon's coordinates, to match frame information
 		if (verbose) System.out.print("Correcting exons based on frame information.\n");
+
 		int i = 0;
 		for (Gene gene : genome.getGenes())
 			for (Transcript tr : gene) {
 				boolean corrected = tr.frameCorrection();
 				if (verbose && corrected) Gpr.showMark(i++, 1);
 			}
-	}
 
-	/** 
-	 * Fix transcripts having non-zero frames in first exon 
-	 * 
-	 * Transcripts whose first exon has a non-zero frame indicate problems.
-	 * We add a 'fake' UTR5 to compensate for reading frame.
-	 * 
-	 * @param showEvery
-	 */
-	void frameCorrectionFirstCodingExon() {
-		// Mark Transcripts for removal
-		if (verbose) System.out.print("\n\tFixing suspicious transcripts (first exon has non-zero first frame): ");
-		HashSet<Transcript> trToDelete = new HashSet<Transcript>();
-		for (Gene gene : genome.getGenes())
-			for (Transcript tr : gene)
-				tr.frameCorrectionFirstCodingExon();
-
-		if (verbose) System.out.println((trToDelete.size() > 0 ? "\n\t" : "") + "\tTotal: " + trToDelete.size() + " removed.");
-	}
-
-	/**
-	 * Copy frame info from CDSs into Exons
-	 * @param showEvery
-	 */
-	void frameFromCds() {
-		// Update Exon.frame data (if not available)
-		if (verbose) System.out.print("\n\tUpdating frame info from CDSs to Exons.\n");
-		int i = 0;
-		for (Gene gene : genome.getGenes())
-			for (Transcript tr : gene) {
-				for (Exon ex : tr) {
-					// No frame info? => try to find matching CDS
-					if (ex.getFrame() < 0) {
-
-						// Chech a CDS that matches an exon
-						for (Cds cds : tr.getCds()) {
-							// CDS matches the exon coordinates? => Copy frame info
-							if (tr.isStrandPlus() && (ex.getStart() == cds.getStart())) ex.setFrame(cds.getFrame());
-							else if (tr.isStrandMinus() && (ex.getEnd() == cds.getEnd())) ex.setFrame(cds.getFrame());
-							else {
-							}
-
-							// Show some progress
-							if (verbose) Gpr.showMark(i, MARK);
-							i++;
-						}
-					}
-				}
-			}
+		if (verbose) System.out.print("");
 	}
 
 	/**
