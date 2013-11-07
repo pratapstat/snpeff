@@ -6,13 +6,14 @@ import ca.mcgill.mcb.pcingola.snpEffect.ChangeEffect;
 import ca.mcgill.mcb.pcingola.snpEffect.ChangeEffect.EffectType;
 import ca.mcgill.mcb.pcingola.snpEffect.ChangeEffect.ErrorType;
 import ca.mcgill.mcb.pcingola.snpEffect.ChangeEffect.WarningType;
+import ca.mcgill.mcb.pcingola.util.Gpr;
 
 /**
  * Interval for an exon
  * 
  * @author pcingola
  */
-public class Exon extends MarkerSeq {
+public class Exon extends MarkerSeq implements MarkerWithFrame {
 
 	/**
 	 * Characterize exons based on alternative splicing
@@ -134,7 +135,7 @@ public class Exon extends MarkerSeq {
 		if (frameCorrection <= 0) return; // Nothing to do
 
 		// Can correct?
-		if (size() <= frameCorrection) throw new RuntimeException("Exon Too short, cannot correct frame!\n" + this);
+		if (size() <= frameCorrection) Gpr.debug("Exon too short (size: " + size() + "), cannot correct frame!\n" + this);
 
 		// Correct start or end coordinates
 		if (isStrandPlus()) start += frameCorrection;
@@ -151,6 +152,7 @@ public class Exon extends MarkerSeq {
 		setSequence(sequence);
 	}
 
+	@Override
 	public int getFrame() {
 		return frame;
 	}
@@ -228,6 +230,7 @@ public class Exon extends MarkerSeq {
 	 * Frame can be {-1, 0, 1, 2}, where '-1' means unknown
 	 * @param frame
 	 */
+	@Override
 	public void setFrame(int frame) {
 		if ((frame > 2) || (frame < -1)) throw new RuntimeException("Invalid frame value: " + frame);
 		this.frame = (byte) frame;

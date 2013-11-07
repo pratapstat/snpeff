@@ -22,10 +22,9 @@ public class MarkerUtil {
 	 * @return A set of new markers that can replace the old ones, or the same set if no change is required.
 	 */
 	public static Map<Marker, Marker> collapseZeroGap(Markers markersOri) {
-		//		if (markersOri.size() <= 1) return this; // One marker or less? => Nothing to do
 		Map<Marker, Marker> collapse = new HashMap<Marker, Marker>();
 
-		// Sort markers by start and end
+		// Sort markers by start 
 		Markers sorted = new Markers();
 		sorted.add(markersOri);
 		sorted.sort(false, false);
@@ -46,6 +45,14 @@ public class MarkerUtil {
 				if (gapSize <= 0) {
 					countCollapsed++;
 					if (markerToAdd.getEnd() < m.getEnd()) markerToAdd.setEnd(m.getEnd()); // Set new end for this marker (we are collapsing it with the previous one)
+
+					// Do we need to correct frame information?
+					if (markerToAdd.isStrandMinus() && (markerToAdd instanceof MarkerWithFrame) && (m instanceof MarkerWithFrame)) {
+						MarkerWithFrame markerToAddWf = (MarkerWithFrame) markerToAdd;
+						MarkerWithFrame mwf = (MarkerWithFrame) m;
+						markerToAddWf.setFrame(mwf.getFrame());
+
+					}
 				} else markerToAdd = m.clone(); // Get ready for next iteration
 
 			}

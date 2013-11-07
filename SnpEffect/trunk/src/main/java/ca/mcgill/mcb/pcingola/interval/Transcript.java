@@ -714,6 +714,8 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 		boolean changedFirst = frameCorrectionFirstCodingExon();
 
 		// Other exons are corrected by changing the start (or end) coordinates.
+		// boolean changedNonFirst = false; 
+		// Gpr.debug("UNCOMMENT!");
 		boolean changedNonFirst = frameCorrectionNonFirstCodingExon();
 
 		boolean changed = changedFirst || changedNonFirst;
@@ -756,7 +758,6 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 		}
 
 		// Reset frame, since it was already corrected
-		Gpr.debug("Adding UTR for frame correction");
 		exonFirst.setFrame(0);
 		Cds cds = findMatchingCds(exonFirst);
 		if (cds != null) cds.frameCorrection(cds.getFrame());
@@ -775,6 +776,11 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 		// Concatenate all exons to create a CDS
 		List<Exon> exons = sortedStrand();
 		StringBuilder sequence = new StringBuilder();
+
+		// We don't need to correct if there is no sequence! (the problem only exists due to sequence frame)
+		for (Exon exon : exons)
+			if (!exon.hasSequence()) return false;
+
 		// 5'UTR length
 		int utr5Start = Integer.MAX_VALUE, utr5End = -1;
 		for (Utr utr : get5primeUtrs()) {
@@ -794,8 +800,6 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 
 		// Append all exon sequences
 		for (Exon exon : exons) {
-			if (!exon.hasSequence()) return false; // We don't need to correct if there is no sequence! (the problem only exists due to sequence frame)
-
 			String seq = "";
 			int utrOverlap = 0;
 
@@ -843,7 +847,7 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 						while (frameReal != exon.getFrame()) {
 							// Correct both Exon and CDS
 							exon.frameCorrection(1);
-							cdsToCorrect.frameCorrection(1);
+							if (cdsToCorrect != null) cdsToCorrect.frameCorrection(1);
 							corrected = true;
 						}
 
@@ -869,12 +873,16 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 		for (Exon ex : this) {
 			// No frame info? => try to find matching CDS
 			if (ex.getFrame() < 0) {
-
 				// Chech a CDS that matches an exon
 				for (Cds cds : getCds()) {
 					// CDS matches the exon coordinates? => Copy frame info
-					if (isStrandPlus() && (ex.getStart() == cds.getStart())) ex.setFrame(cds.getFrame());
-					else if (isStrandMinus() && (ex.getEnd() == cds.getEnd())) ex.setFrame(cds.getFrame());
+					if (isStrandPlus() && (ex.getStart() == cds.getStart())) {
+						ex.setFrame(cds.getFrame());
+						break;
+					} else if (isStrandMinus() && (ex.getEnd() == cds.getEnd())) {
+						ex.setFrame(cds.getFrame());
+						break;
+					}
 				}
 			}
 		}

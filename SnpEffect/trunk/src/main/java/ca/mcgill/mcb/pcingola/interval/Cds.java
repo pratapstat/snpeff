@@ -2,6 +2,7 @@ package ca.mcgill.mcb.pcingola.interval;
 
 import ca.mcgill.mcb.pcingola.serializer.MarkerSerializer;
 import ca.mcgill.mcb.pcingola.snpEffect.ChangeEffect.EffectType;
+import ca.mcgill.mcb.pcingola.util.Gpr;
 
 /**
  * Interval for a gene, as well as some other information: exons, utrs, cds, etc.
@@ -9,7 +10,7 @@ import ca.mcgill.mcb.pcingola.snpEffect.ChangeEffect.EffectType;
  * @author pcingola
  *
  */
-public class Cds extends Marker {
+public class Cds extends Marker implements MarkerWithFrame {
 
 	private static final long serialVersionUID = 1636197649250882952L;
 
@@ -33,7 +34,7 @@ public class Cds extends Marker {
 		if (frameCorrection <= 0) return; // Nothing to do
 
 		// Can correct?
-		if (size() <= frameCorrection) throw new RuntimeException("Exon Too short, cannot correct frame!\n" + this);
+		if (size() <= frameCorrection) Gpr.debug("CDS too short (size: " + size() + "), cannot correct frame!\n" + this);
 
 		// Correct start or end coordinates
 		if (isStrandPlus()) start += frameCorrection;
@@ -45,6 +46,7 @@ public class Cds extends Marker {
 			frame += 3;
 	}
 
+	@Override
 	public int getFrame() {
 		return frame;
 	}
@@ -70,9 +72,20 @@ public class Cds extends Marker {
 	 * Frame can be {-1, 0, 1, 2}, where '-1' means unknown
 	 * @param frame
 	 */
+	@Override
 	public void setFrame(int frame) {
 		if ((frame > 2) || (frame < -1)) throw new RuntimeException("Invalid frame value: " + frame);
 		this.frame = (byte) frame;
+	}
+
+	@Override
+	public String toString() {
+		return getChromosomeName() + "\t" + start + "-" + end //
+				+ " " //
+				+ type //
+				+ ((id != null) && (id.length() > 0) ? " '" + id + "'" : "") //
+				+ ", frame: " + frame //
+		;
 	}
 
 }

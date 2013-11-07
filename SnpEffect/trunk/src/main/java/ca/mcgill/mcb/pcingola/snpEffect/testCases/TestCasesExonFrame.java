@@ -25,9 +25,12 @@ public class TestCasesExonFrame extends TestCase {
 	}
 
 	/**
-	 * Build test database
+	 * Test database: Build, check and annotate
 	 */
-	public void test_00() {
+	public void test_01() {
+		//---
+		// Build database
+		//---
 		String genomeName = "testLukas";
 		String args[] = { "build", "-v", "-noLog", "-gff3", genomeName };
 
@@ -36,11 +39,10 @@ public class TestCasesExonFrame extends TestCase {
 		boolean ok = snpEff.run();
 
 		Assert.assertTrue(ok);
-	}
 
-	public void test_01() {
-		// Load database
-		String genomeName = "testLukas";
+		//---
+		// Load database and check some numbers		
+		//---
 		String configFile = Config.DEFAULT_CONFIG_FILE;
 		Config config = new Config(genomeName, configFile);
 		System.out.println("Loading database");
@@ -55,20 +57,17 @@ public class TestCasesExonFrame extends TestCase {
 		// Check parameters
 		Assert.assertEquals(454126, transcript.getCdsStart());
 		Assert.assertEquals(450599, transcript.getCdsEnd());
-	}
 
-	/**
-	 * Annotate using test database
-	 */
-	public void test_02() {
-		String genomeName = "testLukas";
+		//---
+		// Check annotations
+		//---
 		String vcfFileName = "tests/testLukas.vcf";
-		String args[] = { "-ud", "0", genomeName, vcfFileName };
+		String argsEff[] = { "-ud", "0", genomeName, vcfFileName };
 
 		// Annotate
-		SnpEffCmdEff snpEff = new SnpEffCmdEff();
-		snpEff.parseArgs(args);
-		List<VcfEntry> vcfEntries = snpEff.run(true);
+		SnpEffCmdEff snpEffCmdEff = new SnpEffCmdEff();
+		snpEffCmdEff.parseArgs(argsEff);
+		List<VcfEntry> vcfEntries = snpEffCmdEff.run(true);
 
 		// Analyze annotations
 		for (VcfEntry ve : vcfEntries) {
@@ -97,7 +96,6 @@ public class TestCasesExonFrame extends TestCase {
 
 			if (!found) throw new RuntimeException("Cannot find expected effect '" + expectedEffect + "', amino acid change '" + expectedAa + "' and codon change '" + expectedCodon + "'");
 		}
-
 	}
 
 }

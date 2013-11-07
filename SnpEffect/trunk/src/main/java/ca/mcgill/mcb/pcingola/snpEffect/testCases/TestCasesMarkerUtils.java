@@ -107,6 +107,9 @@ public class TestCasesMarkerUtils extends TestCase {
 		return sb.toString();
 	}
 
+	/**
+	 * Test for collapsing markers with zero gaps 
+	 */
 	public void test_collapseZeroGap() {
 		initRand();
 		int numMarkers = 20;
