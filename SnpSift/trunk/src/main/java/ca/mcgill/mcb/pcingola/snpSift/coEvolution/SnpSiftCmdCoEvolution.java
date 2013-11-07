@@ -160,7 +160,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		minAlleleCount = 10;
 		pvalueThreshold = 1e-4;
 		model = ModelCoevolution.ABS;
-		rFileName = "coEvolution.txt";
+		rFileName = null; // Don't write details unless specified in the command line
 	}
 
 	/**
@@ -534,6 +534,11 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	/**
 	 * Calculate the best p-value
 	 * 
+	 * Note: It looks like we could remove the recessive model 
+	 *       test (QQ plots show it's not doing much).
+	 *       Furthermore, using only Allellic model might be 
+	 *       enough...
+	 * 
 	 * @param nCase
 	 * @param nControl
 	 * @return
@@ -563,15 +568,20 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 			initMatchGenes();
 
 			// Open 'R' file
-			if (verbose) Timer.showStdErr("Writing results to file " + rFileName + "'");
-			rFile = new BufferedWriter(new FileWriter(rFileName));
+			if (rFileName != null) {
+				if (verbose) Timer.showStdErr("Writing results to file '" + rFileName + "'");
+				rFile = new BufferedWriter(new FileWriter(rFileName));
+			} else {
+				if (verbose) Timer.showStdErr("No results file will be generated.");
+				rFile = null;
+			}
 			writeRTitle();
 
 			// Run
 			if (debug) powerCalculation();
 			runCoEvolution();
 
-			rFile.close();
+			if (rFile != null) rFile.close();
 			if (verbose) Timer.showStdErr("Results written to file '" + rFileName + "'");
 		} catch (IOException e) {
 			throw new RuntimeException(e);
@@ -719,7 +729,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	 */
 	synchronized void writeR(String str) {
 		try {
-			rFile.write(str);
+			if (rFile != null) rFile.write(str);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
