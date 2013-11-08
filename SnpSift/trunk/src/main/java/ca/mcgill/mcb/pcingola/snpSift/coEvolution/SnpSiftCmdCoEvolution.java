@@ -44,8 +44,8 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	boolean isMulti;
 	boolean genesMatch[];
 	int minAlleleCount;
-	int showNonSignificant = 0; // Non significant test can be shown every now and then (if this value is positive)
-	long countTests = 0;
+	int showNonSignificant; // Non significant test can be shown every now and then (if this value is positive)
+	long countTests;
 	String rFileName;
 	ModelCoevolution model;
 	List<String> sampleIds;
@@ -171,6 +171,8 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		pvalueThreshold = 1e-4;
 		model = ModelCoevolution.ABS;
 		rFileName = null; // Don't write details unless specified in the command line
+		showNonSignificant = 0; // By default do not show any non-significant results
+		countTests = 0;
 	}
 
 	/**
@@ -538,10 +540,11 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		if (debug) Gpr.debug(entryId.get(i1) + "\t" + entryId.get(i2) + "\n\tCases: " + casesHom + "," + casesHet + "," + cases + "\n\tControls: " + ctrlHom + "," + ctrlHet + "," + ctrl);
 
 		// Return a tuple
+		long count = incCountTests();
 		if (pvalue > pvalueThreshold) {
 			// Over threshold? Show one every SHOW_NON_SIGNIFICANT values
 			// This is used to build the full QQ plot
-			if ((showNonSignificant <= 0) || (incCountTests() % showNonSignificant != 0)) return null;
+			if (!((showNonSignificant > 0) && (count % showNonSignificant == 0))) return null; // Do not show
 		}
 
 		writeR(i1, i2, pvalues, codes);
