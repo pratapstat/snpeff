@@ -7,8 +7,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import ca.mcgill.mcb.pcingola.fileIterator.NeedlemanWunsch;
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
+import ca.mcgill.mcb.pcingola.fileIterator.VcfRefAltAlign;
 import ca.mcgill.mcb.pcingola.interval.Chromosome;
 import ca.mcgill.mcb.pcingola.interval.Marker;
 import ca.mcgill.mcb.pcingola.interval.SeqChange;
@@ -297,35 +297,39 @@ public class VcfEntry extends Marker implements Iterable<VcfGenotype> {
 			return new SeqChange(chromo, start + startDiff, reference.substring(startDiff), alt.substring(startDiff), strand, id, quality, coverage);
 		}
 
-		// Case: Deletion 
-		// 20     2 .         TC      T      .   PASS  DP=100	
-		// 20     2 .         AGAC    AAC    .   PASS  DP=100	
-		if (reference.length() > alt.length()) {
-			NeedlemanWunsch nw = new NeedlemanWunsch(alt, reference);
-			nw.align();
-			int startDiff = nw.getOffset();
+		//---
+		// Simple Insertions, Deletions or Mixed Variants (substitutions) 
+		//---
+		VcfRefAltAlign align = new VcfRefAltAlign(alt, reference);
+		align.align();
+		int startDiff = align.getOffset();
+
+		switch (align.getChangeType()) {
+		case DEL:
+			// Case: Deletion 
+			// 20     2 .         TC      T      .   PASS  DP=100	
+			// 20     2 .         AGAC    AAC    .   PASS  DP=100
 			String ref = "*";
-			String ch = nw.getAlignment();
+			String ch = align.getAlignment();
 			if (!ch.startsWith("-")) throw new RuntimeException("Deletion '" + ch + "' does not start with '-'. This should never happen!");
-
 			return new SeqChange(chromo, start + startDiff, ref, ch, strand, id, quality, coverage);
-		}
 
-		// Case: Insertion of A { tC ; tCA } tC is the reference allele
-		// 20     2 .         TC      TCA    .   PASS  DP=100
-		if (reference.length() < alt.length()) {
-			NeedlemanWunsch nw = new NeedlemanWunsch(alt, reference);
-			nw.align();
-			int startDiff = nw.getOffset();
-			String ch = nw.getAlignment();
-			String ref = "*";
+		case INS:
+			// Case: Insertion of A { tC ; tCA } tC is the reference allele
+			// 20     2 .         TC      TCA    .   PASS  DP=100
+			ch = align.getAlignment();
+			ref = "*";
 			if (!ch.startsWith("+")) throw new RuntimeException("Insertion '" + ch + "' does not start with '+'. This should never happen!");
-
 			return new SeqChange(chromo, start + startDiff, ref, ch, strand, id, quality, coverage);
-		}
 
-		// Other change type?
-		throw new RuntimeException("Unsupported VCF change type '" + reference + "' => '" + alt + "'\nVcfEntry: " + this);
+		case MIXED:
+			// Case: Mixed variant (substitution)
+			return new SeqChange(chromo, start + startDiff, reference, alt, strand, id, quality, coverage);
+
+		default:
+			// Other change type?
+			throw new RuntimeException("Unsupported VCF change type '" + align.getChangeType() + "'\n\tRef: " + reference + "'\n\tAlt: '" + alt + "'\n\tVcfEntry: " + this);
+		}
 	}
 
 	public String[] getAlts() {

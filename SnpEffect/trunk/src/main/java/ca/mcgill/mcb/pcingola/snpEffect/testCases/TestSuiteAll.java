@@ -34,7 +34,7 @@ public class TestSuiteAll {
 		suite.addTestSuite(TestCasesDnaOverlap.class);
 
 		// Alignment
-		suite.addTestSuite(TestCasesNeedlemanWunsch.class);
+		suite.addTestSuite(TestCasesAlign.class);
 
 		// Intervals
 		suite.addTestSuite(TestCasesIntervals.class);
