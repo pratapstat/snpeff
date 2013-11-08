@@ -45,6 +45,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	boolean genesMatch[];
 	int minAlleleCount;
 	int showNonSignificant = 0; // Non significant test can be shown every now and then (if this value is positive)
+	long countTests = 0;
 	String rFileName;
 	ModelCoevolution model;
 	List<String> sampleIds;
@@ -154,6 +155,14 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 
 	public ArrayList<byte[]> getGenotypes() {
 		return genotypes;
+	}
+
+	/**
+	 * Count how many tests have been performed
+	 * @return
+	 */
+	synchronized long incCountTests() {
+		return ++countTests;
 	}
 
 	@Override
@@ -532,21 +541,11 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		if (pvalue > pvalueThreshold) {
 			// Over threshold? Show one every SHOW_NON_SIGNIFICANT values
 			// This is used to build the full QQ plot
-			if ((showNonSignificant > 0) && (incCountTests() % showNonSignificant != 0)) return null;
+			if ((showNonSignificant <= 0) || (incCountTests() % showNonSignificant != 0)) return null;
 		}
 
 		writeR(i1, i2, pvalues, codes);
 		return pvalues;
-	}
-
-	int countTests = 0;
-
-	/**
-	 * Count how many tests have been performed
-	 * @return
-	 */
-	synchronized int incCountTests() {
-		return countTests++;
 	}
 
 	/**
@@ -614,7 +613,6 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	/**
 	 * Analyze one entry compared to all other entries
 	 * @param i
-	 * @param pvalueThreshold
 	 * @return
 	 */
 	public String runCoEvolution(int i) {
@@ -655,7 +653,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	 * Run co-evolutionary algorithm
 	 */
 	void runCoEvolutionMulti() {
-		if (verbose) Timer.showStdErr("Running on " + numWorkers + " cpus.");
+		if (verbose) Timer.showStdErr("Starting analysis on " + numWorkers + " cpus.");
 
 		isMulti = true;
 
@@ -675,7 +673,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		WorkQueueCoEvolution workQueueCoEvolution = new WorkQueueCoEvolution(batchSize, 1, props);
 		workQueueCoEvolution.run(true);
 
-		if (verbose) Timer.showStdErr("Done!");
+		if (verbose) Timer.showStdErr("Done. Total tests performed: " + countTests);
 	}
 
 	/**
@@ -687,7 +685,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		for (int i = 0; i < genotypes.size(); i++)
 			runCoEvolution(i);
 
-		if (verbose) Timer.showStdErr("Done.");
+		if (verbose) Timer.showStdErr("Done. Total tests performed: " + countTests);
 	}
 
 	/**
