@@ -44,6 +44,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	boolean isMulti;
 	boolean genesMatch[];
 	int minAlleleCount;
+	int showNonSignificant = 0; // Non significant test can be shown every now and then (if this value is positive)
 	String rFileName;
 	ModelCoevolution model;
 	List<String> sampleIds;
@@ -292,6 +293,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 			if (isOpt(arg)) {
 				// Command line options
 				if (arg.equalsIgnoreCase("-minAc")) minAlleleCount = Gpr.parseIntSafe(args[++argc]);
+				else if (arg.equalsIgnoreCase("-show")) showNonSignificant = Gpr.parseIntSafe(args[++argc]);
 				else if (arg.equalsIgnoreCase("-maxP")) pvalueThreshold = Gpr.parseDoubleSafe(args[++argc]);
 				else if (arg.equalsIgnoreCase("-model")) model = ModelCoevolution.valueOf(args[++argc].toUpperCase());
 				else if (arg.equalsIgnoreCase("-out")) rFileName = args[++argc];
@@ -309,6 +311,8 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		// Sanity check
 		if (vcfFileName == null) usage("Missing paramter 'file.vcf'");
 		if (tfamFile == null) usage("Missing parameter 'file.tfam'");
+		if (showNonSignificant < 0) usage("Parameter '-show' must have a non-negative number");
+		if ((pvalueThreshold <= 0) || (pvalueThreshold > 1)) usage("Parameter '-maxP' must have a number between 0 and 1. Current value: " + pvalueThreshold);
 	}
 
 	/**
@@ -525,10 +529,24 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		if (debug) Gpr.debug(entryId.get(i1) + "\t" + entryId.get(i2) + "\n\tCases: " + casesHom + "," + casesHet + "," + cases + "\n\tControls: " + ctrlHom + "," + ctrlHet + "," + ctrl);
 
 		// Return a tuple
-		if (pvalue > pvalueThreshold) return null; // Over threshold? Don't even bother....
+		if (pvalue > pvalueThreshold) {
+			// Over threshold? Show one every SHOW_NON_SIGNIFICANT values
+			// This is used to build the full QQ plot
+			if ((showNonSignificant > 0) && (incCountTests() % showNonSignificant != 0)) return null;
+		}
 
 		writeR(i1, i2, pvalues, codes);
 		return pvalues;
+	}
+
+	int countTests = 0;
+
+	/**
+	 * Count how many tests have been performed
+	 * @return
+	 */
+	synchronized int incCountTests() {
+		return countTests++;
 	}
 
 	/**
@@ -692,6 +710,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		System.err.println("\t-minAc <num>    : Filter using minimum number of alleles. Default: " + minAlleleCount);
 		System.err.println("\t-model <model>  : Model to use {ABS, MAX}. Default: " + model);
 		System.err.println("\t-out    <file>  : Raw data output. Default: " + rFileName);
+		System.err.println("\t-show  <num>    : Show non-significant p-values every 'num' iterations. Default: " + showNonSignificant);
 		System.err.println("\tfile.tfam       : A TFAM file having case/control informations (phenotype colmun)");
 		System.err.println("\tfile.vcf        : A VCF file (variants and genotype data)");
 		System.exit(1);
