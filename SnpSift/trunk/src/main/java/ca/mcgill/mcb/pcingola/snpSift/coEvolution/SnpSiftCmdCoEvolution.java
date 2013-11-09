@@ -13,7 +13,6 @@ import akka.actor.UntypedActorFactory;
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
 import ca.mcgill.mcb.pcingola.ped.PedPedigree;
 import ca.mcgill.mcb.pcingola.ped.TfamEntry;
-import ca.mcgill.mcb.pcingola.probablility.FisherExactTest;
 import ca.mcgill.mcb.pcingola.snpSift.SnpSift;
 import ca.mcgill.mcb.pcingola.snpSift.caseControl.SnpSiftCmdCaseControl;
 import ca.mcgill.mcb.pcingola.snpSift.coEvolution.akka.MasterCoEvolution;
@@ -44,7 +43,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	boolean isMulti;
 	boolean genesMatch[];
 	int minAlleleCount;
-	int showNonSignificant; // Non significant test can be shown every now and then (if this value is positive)
+	int showNonSignificant; // Non significant test can be shown every now and then (if this value is positive). This is useful to get the full statistics spectrum (e.g. QQ plots)
 	long countTests;
 	String rFileName;
 	ModelCoevolution model;
@@ -368,25 +367,6 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	}
 
 	/**
-	* Dominant model: Either a/A or A/A causes the disease
-	* @param nControl
-	* @param nCase
-	* @return
-	*/
-	@Override
-	protected double pDominant(int nControl[], int nCase[]) {
-		int k = nCase[2] + nCase[1]; // Cases a/a + A/a
-		int N = nControl[0] + nControl[1] + nControl[2] + nCase[0] + nCase[1] + nCase[2];
-		int D = nCase[0] + nCase[1] + nCase[2]; // All cases
-		int n = nControl[2] + nControl[1] + nCase[2] + nCase[1]; // a/a + A/a
-
-		double pdown = FisherExactTest.get().fisherExactTestDown(k, N, D, n);
-		double pup = FisherExactTest.get().fisherExactTestUp(k, N, D, n);
-
-		return Math.min(pup, pdown);
-	}
-
-	/**
 	 * Power calculation
 	 */
 	void powerCalculation() {
@@ -422,7 +402,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 			nControl[1] = 0;
 			nControl[2] = 0;
 
-			double pvalues[] = pvalues(nCase, nControl);
+			double pvalues[] = pvalues(nCase, nControl, pvalueThreshold);
 			double pvalue = minPvalue(pvalues);
 			if (debug && pvalue <= pvalueThreshold) System.out.println("NumCases : " + numCases + "\tp-value: " + pvalue);
 			if (pvalue <= pvalueSignificant) powerStr = String.format("" //
@@ -480,7 +460,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		// Add info fields
 		if (debug) Gpr.debug("\n\tCases: " + casesHom + "," + casesHet + "," + cases + "\n\tControls: " + ctrlHom + "," + ctrlHet + "," + ctrl);
 
-		return minPvalue(pvalues(nControl, nCase));
+		return minPvalue(pvalues(nControl, nCase, pvalueThreshold));
 	}
 
 	/**
@@ -531,24 +511,37 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 			}
 		}
 
+		//---
 		// Calculate pValues
-		double pvalues[] = pvalues(nCase, nControl);
+		//---
+
+		// We only show results if pvalue is less than maxP 
+		// If showNonSignificant is set, we show 
+		// results once every 'showNonSignificant'
+		long count = incCountTests();
+		boolean show = false;
+		double pvalueTh = pvalueThreshold;
+		if ((showNonSignificant > 0) && (count % showNonSignificant == 0)) {
+			show = true;
+			// Are we forcing to show results? Then we should calculate p-value even if it is high
+			pvalueTh = 1.0;
+		}
+
+		double pvalues[] = pvalues(nCase, nControl, pvalueTh);
 		double pvalue = minPvalue(pvalues);
 
 		// Sanity check
 		if (pvalue == 0.0) Gpr.debug("p-value is zero!" + "\n\t" + entryId.get(i1) + "\t" + entryId.get(i2) + "\n\tCases: " + casesHom + "," + casesHet + "," + cases + "\n\tControls: " + ctrlHom + "," + ctrlHet + "," + ctrl);
 		if (debug) Gpr.debug(entryId.get(i1) + "\t" + entryId.get(i2) + "\n\tCases: " + casesHom + "," + casesHet + "," + cases + "\n\tControls: " + ctrlHom + "," + ctrlHet + "," + ctrl);
 
-		// Return a tuple
-		long count = incCountTests();
-		if (pvalue > pvalueThreshold) {
-			// Over threshold? Show one every SHOW_NON_SIGNIFICANT values
-			// This is used to build the full QQ plot
-			if (!((showNonSignificant > 0) && (count % showNonSignificant == 0))) return null; // Do not show
-		}
+		// If p-value is less than 'pvalueThreshold' we should show the result (it is 'significant')
+		show |= (pvalue <= pvalueThreshold);
 
-		writeR(i1, i2, pvalues, codes);
-		return pvalues;
+		if (show) {
+			writeR(i1, i2, pvalues, codes);
+			return pvalues;
+		}
+		return null;
 	}
 
 	/**
@@ -563,13 +556,13 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	 * @param nControl
 	 * @return
 	 */
-	double[] pvalues(int nCase[], int nControl[]) {
+	double[] pvalues(int nCase[], int nControl[], double pvalueTh) {
 		// pValues
 		double pTrend = pTrend(nControl, nCase);
-		double pAllelic = pAllelic(nControl, nCase);
-		double pDominant = pDominant(nControl, nCase);
+		double pAllelic = pAllelic(nControl, nCase, pvalueTh);
+		double pDominant = pDominant(nControl, nCase, pvalueTh);
 		swapMinorAllele(nControl, nCase); // Swap if minor allele is reference
-		double pRecessive = pRecessive(nControl, nCase);
+		double pRecessive = pRecessive(nControl, nCase, pvalueTh);
 
 		// Return an array of pvalues
 		double pvalues[] = { pAllelic, pDominant, pRecessive, pTrend };

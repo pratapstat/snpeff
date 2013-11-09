@@ -117,9 +117,9 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		vcfEntry.addInfo(VCF_INFO_CC_TREND + name, pValueStr(vcfEntry, pTrend(nControl, nCase)));
 		vcfEntry.addInfo(VCF_INFO_CC_GENO + name, pValueStr(vcfEntry, pGenotypic(nControl, nCase)));
 		swapMinorAllele(nControl, nCase); // Swap if minor allele is reference
-		vcfEntry.addInfo(VCF_INFO_CC_ALL + name, "" + pValueStr(vcfEntry, pAllelic(nControl, nCase)));
-		vcfEntry.addInfo(VCF_INFO_CC_DOM + name, "" + pValueStr(vcfEntry, pDominant(nControl, nCase)));
-		vcfEntry.addInfo(VCF_INFO_CC_REC + name, "" + pValueStr(vcfEntry, pRecessive(nControl, nCase)));
+		vcfEntry.addInfo(VCF_INFO_CC_ALL + name, "" + pValueStr(vcfEntry, pAllelic(nControl, nCase, pvalueThreshold)));
+		vcfEntry.addInfo(VCF_INFO_CC_DOM + name, "" + pValueStr(vcfEntry, pDominant(nControl, nCase, pvalueThreshold)));
+		vcfEntry.addInfo(VCF_INFO_CC_REC + name, "" + pValueStr(vcfEntry, pRecessive(nControl, nCase, pvalueThreshold)));
 	}
 
 	@Override
@@ -196,7 +196,7 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 	 * @param nCase
 	 * @return
 	 */
-	protected double pAllelic(int nControl[], int nCase[]) {
+	protected double pAllelic(int nControl[], int nCase[], double pvalueTh) {
 		int k = 2 * nCase[2] + nCase[1];
 		int N = 2 * (nControl[0] + nControl[1] + nControl[2] + nCase[0] + nCase[1] + nCase[2]);
 		int D = 2 * (nCase[0] + nCase[1] + nCase[2]); // All cases
@@ -206,8 +206,8 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		if (useChiSquare) return FisherExactTest.get().chiSquareApproximation(k, N, D, n);
 
 		// Use Fisher exact test
-		double pdown = FisherExactTest.get().pValueDown(k, N, D, n, pvalueThreshold);
-		double pup = FisherExactTest.get().pValueUp(k, N, D, n, pvalueThreshold);
+		double pdown = FisherExactTest.get().pValueDown(k, N, D, n, pvalueTh);
+		double pup = FisherExactTest.get().pValueUp(k, N, D, n, pvalueTh);
 
 		return Math.min(pup, pdown);
 	}
@@ -258,7 +258,7 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 	* @param nCase
 	* @return
 	*/
-	protected double pDominant(int nControl[], int nCase[]) {
+	protected double pDominant(int nControl[], int nCase[], double pvalueTh) {
 		int k = nCase[2] + nCase[1]; // Cases a/a + A/a
 		int N = nControl[0] + nControl[1] + nControl[2] + nCase[0] + nCase[1] + nCase[2];
 		int D = nCase[0] + nCase[1] + nCase[2]; // All cases
@@ -268,45 +268,10 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		if (useChiSquare) return FisherExactTest.get().chiSquareApproximation(k, N, D, n);
 
 		// Use Fisher exact test
-		double pdown = FisherExactTest.get().pValueDown(k, N, D, n, pvalueThreshold);
-		double pup = FisherExactTest.get().pValueUp(k, N, D, n, pvalueThreshold);
+		double pdown = FisherExactTest.get().pValueDown(k, N, D, n, pvalueTh);
+		double pup = FisherExactTest.get().pValueUp(k, N, D, n, pvalueTh);
 
 		return Math.min(pup, pdown);
-	}
-
-	/**
-	 * Recessive model: Only A/A causes the disease
-	 * @param nControl
-	 * @param nCase
-	 * @return
-	 */
-	protected double pRecessive(int nControl[], int nCase[]) {
-		int k = nCase[2]; // Cases a/a
-		int N = nControl[0] + nControl[1] + nControl[2] + nCase[0] + nCase[1] + nCase[2];
-		int D = nCase[0] + nCase[1] + nCase[2]; // All cases
-		int n = nControl[2] + nCase[2]; // a/a
-
-		// Use ChiSquare approximation?
-		if (useChiSquare) return FisherExactTest.get().chiSquareApproximation(k, N, D, n);
-
-		// Use Fisher exact test
-		double pdown = FisherExactTest.get().pValueDown(k, N, D, n, pvalueThreshold);
-		double pup = FisherExactTest.get().pValueUp(k, N, D, n, pvalueThreshold);
-
-		return Math.min(pup, pdown);
-	}
-
-	/**
-	 * Trend model
-	 * @param nControl
-	 * @param nCase
-	 * @return
-	 */
-	protected double pTrend(int nControl[], int nCase[]) {
-		// Null hypothesis of no association
-		double pvalue = CochranArmitageTest.get().p(nControl, nCase, CochranArmitageTest.WEIGHT_TREND);
-		// We use a two tail test, so we multiple by 2
-		return Math.min(2.0 * pvalue, 1.0);
 	}
 
 	/**
@@ -356,6 +321,41 @@ public class SnpSiftCmdCaseControl extends SnpSift {
 		// Degrees of freedom: 2
 		double pvalue = 1 - flanagan.analysis.Stat.chiSquareCDF(chi2, 2);
 		return pvalue;
+	}
+
+	/**
+	 * Recessive model: Only A/A causes the disease
+	 * @param nControl
+	 * @param nCase
+	 * @return
+	 */
+	protected double pRecessive(int nControl[], int nCase[], double pvalueTh) {
+		int k = nCase[2]; // Cases a/a
+		int N = nControl[0] + nControl[1] + nControl[2] + nCase[0] + nCase[1] + nCase[2];
+		int D = nCase[0] + nCase[1] + nCase[2]; // All cases
+		int n = nControl[2] + nCase[2]; // a/a
+
+		// Use ChiSquare approximation?
+		if (useChiSquare) return FisherExactTest.get().chiSquareApproximation(k, N, D, n);
+
+		// Use Fisher exact test
+		double pdown = FisherExactTest.get().pValueDown(k, N, D, n, pvalueTh);
+		double pup = FisherExactTest.get().pValueUp(k, N, D, n, pvalueTh);
+
+		return Math.min(pup, pdown);
+	}
+
+	/**
+	 * Trend model
+	 * @param nControl
+	 * @param nCase
+	 * @return
+	 */
+	protected double pTrend(int nControl[], int nCase[]) {
+		// Null hypothesis of no association
+		double pvalue = CochranArmitageTest.get().p(nControl, nCase, CochranArmitageTest.WEIGHT_TREND);
+		// We use a two tail test, so we multiple by 2
+		return Math.min(2.0 * pvalue, 1.0);
 	}
 
 	/**
