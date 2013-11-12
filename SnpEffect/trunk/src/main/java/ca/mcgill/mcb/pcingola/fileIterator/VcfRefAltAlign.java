@@ -9,7 +9,7 @@ import ca.mcgill.mcb.pcingola.interval.SeqChange.ChangeType;
  */
 public class VcfRefAltAlign extends NeedlemanWunsch {
 
-	public static final int MAX_SIZE = 1024 * 1024;
+	public static final int MAX_SIZE = 10000; // 1024 * 1024;
 
 	String stringA, stringB;
 	ChangeType changeType;
