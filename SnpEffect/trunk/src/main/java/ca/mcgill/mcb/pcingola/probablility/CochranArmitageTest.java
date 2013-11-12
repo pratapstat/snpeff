@@ -27,7 +27,7 @@ public class CochranArmitageTest {
 
 	public static final double WEIGHT_DOMINANT[] = { 1.0, 1.0, 0.0 };
 	public static final double WEIGHT_RECESSIVE[] = { 0.0, 1.0, 1.0 };
-	public static final double WEIGHT_CODOMINANT[] = { 0.0, 1.0, 2.0 };
+	public static final double WEIGHT_TREND[] = { 0.0, 1.0, 2.0 };
 
 	/** Singleton */
 	private static CochranArmitageTest cochranArmitageTest = new CochranArmitageTest();

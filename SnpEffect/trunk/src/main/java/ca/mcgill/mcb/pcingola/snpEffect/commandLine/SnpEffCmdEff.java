@@ -91,7 +91,7 @@ public class SnpEffCmdEff extends SnpEff {
 	boolean useSequenceOntolgy = false; // Use Sequence Ontolgy terms
 	boolean useOicr = false; // Use OICR tag
 	Boolean treatAllAsProteinCoding = null; // Only use coding genes. Default is 'null' which means 'auto'
-	boolean chromoPlots = true; // Create methylation by chromosome plots?
+	boolean chromoPlots = true; // Create mutations by chromosome plots?
 	boolean onlyRegulation = false; // Only build regulation tracks
 	boolean lossOfFunction = false; // Create loss of function LOF tag?
 	boolean useGeneId = false; // Use gene ID instead of gene name (VCF output)

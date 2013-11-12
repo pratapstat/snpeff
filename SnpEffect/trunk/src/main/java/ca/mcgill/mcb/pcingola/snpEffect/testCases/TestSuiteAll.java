@@ -34,7 +34,7 @@ public class TestSuiteAll {
 		suite.addTestSuite(TestCasesDnaOverlap.class);
 
 		// Alignment
-		suite.addTestSuite(TestCasesNeedlemanWunsch.class);
+		suite.addTestSuite(TestCasesAlign.class);
 
 		// Intervals
 		suite.addTestSuite(TestCasesIntervals.class);
@@ -60,12 +60,15 @@ public class TestSuiteAll {
 		// Filter transcripts
 		suite.addTestSuite(TestCasesFilterTranscripts.class);
 
-		// File format
+		// Build databases: File format
 		suite.addTestSuite(TestCasesFasta.class);
 		suite.addTestSuite(TestCasesGff3.class);
 		suite.addTestSuite(TestCasesGtf22.class);
 		suite.addTestSuite(TestCasesVcf.class);
 		suite.addTestSuite(TestCasesRefSeq.class);
+
+		// Build database: Exon frame
+		suite.addTestSuite(TestCasesExonFrame.class);
 
 		// File 
 		suite.addTestSuite(TestCasesSeekableReader.class);

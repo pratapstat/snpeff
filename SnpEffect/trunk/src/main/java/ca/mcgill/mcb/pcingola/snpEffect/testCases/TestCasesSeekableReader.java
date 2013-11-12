@@ -26,9 +26,11 @@ public class TestCasesSeekableReader extends TestCase {
 		SeekableBufferedReader sbr = new SeekableBufferedReader(fileName);
 		String line;
 		long hash = 0;
-		while ((line = sbr.readLine()) != null)
+		while ((line = sbr.readLine()) != null) {
 			hash += line.hashCode();
+		}
 
+		sbr.close();
 		return hash;
 	}
 
@@ -42,10 +44,20 @@ public class TestCasesSeekableReader extends TestCase {
 		BufferedReader br = new BufferedReader(new FileReader(new File(fileName)));
 		String line;
 		long hash = 0;
-		while ((line = br.readLine()) != null)
+		while ((line = br.readLine()) != null) {
 			hash += line.hashCode();
-
+		}
+		br.close();
 		return hash;
+	}
+
+	public void test_00() throws IOException {
+		String fileName = "tests/testLukas.vcf";
+		long hashExp = calcHashBufferedReader(fileName);
+		long hash = calcHash(fileName);
+		System.out.println(String.format("%016x\t%016x\t%s", hashExp, hash, fileName));
+
+		Assert.assertEquals(hashExp, hash);
 	}
 
 	/**
@@ -58,12 +70,14 @@ public class TestCasesSeekableReader extends TestCase {
 
 		for (String fileName : dir.list()) {
 			if (fileName.endsWith(".txt") || fileName.endsWith(".vcf")) {
-				fileName = dirName + fileName;
-				long hashExp = calcHashBufferedReader(fileName);
-				long hash = calcHash(fileName);
-				System.out.println(String.format("%016x\t%016x\t%s", hashExp, hash, fileName));
+				if (fileName.equals("testLukas.vcf")) {
+					fileName = dirName + fileName;
+					long hashExp = calcHashBufferedReader(fileName);
+					long hash = calcHash(fileName);
+					System.out.println(String.format("%016x\t%016x\t%s", hashExp, hash, fileName));
 
-				Assert.assertEquals(hashExp, hash);
+					Assert.assertEquals(hashExp, hash);
+				}
 			}
 		}
 	}

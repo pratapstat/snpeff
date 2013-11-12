@@ -41,7 +41,8 @@ with open(pcaFile) as f:
 #---
 # Read coEvolution file
 #---
-headerCol = 7
+headerCol = 10
+headerColId = 6
 print >> sys.stderr, "Reading coEvolution file: " + coEvFile
 with open(coEvFile) as f:
 	header = {}
@@ -56,14 +57,16 @@ with open(coEvFile) as f:
 			for pcnum in range(maxPc):
 				# Show 'PC' label
 				outLine = ""
-				for i in range(headerCol):
-					outLine += "PC{}".format(pcnum+1)
-					if i < (headerCol-1) : outLine += "\t"
+				for i in range(headerColId):
+					outLine += "PC{}\t".format(pcnum+1)
+
+				# pvalue column
+				outLine += "1.0\t1.0\t1.0\t1.0"
 
 				# Show PC values
 				for i in range(headerCol, len(header)):
 					id = header[i]
-					pc = id
+					pc = 0
 					pcs = pcas.get(id,[])
 					if pcs : pc = pcs[pcnum]
 					outLine += "\t{}".format(pc)

@@ -6,13 +6,14 @@ import ca.mcgill.mcb.pcingola.snpEffect.ChangeEffect;
 import ca.mcgill.mcb.pcingola.snpEffect.ChangeEffect.EffectType;
 import ca.mcgill.mcb.pcingola.snpEffect.ChangeEffect.ErrorType;
 import ca.mcgill.mcb.pcingola.snpEffect.ChangeEffect.WarningType;
+import ca.mcgill.mcb.pcingola.util.Gpr;
 
 /**
  * Interval for an exon
  * 
  * @author pcingola
  */
-public class Exon extends MarkerSeq {
+public class Exon extends MarkerSeq implements MarkerWithFrame {
 
 	/**
 	 * Characterize exons based on alternative splicing
@@ -29,9 +30,11 @@ public class Exon extends MarkerSeq {
 		ALTTENATIVE_POLY_A, // The last exon.
 	}
 
+	public static int ToStringVersion = 2;
+
 	private static final long serialVersionUID = 5324352193278472543L;
 
-	byte frame = 0;
+	byte frame = -1; // Frame can be {-1, 0, 1, 2}, where '-1' means unknown
 	int rank; // Exon rank in transcript
 	SpliceSiteAcceptor spliceSiteAcceptor;
 	SpliceSiteDonor spliceSiteDonor;
@@ -124,6 +127,32 @@ public class Exon extends MarkerSeq {
 		return spliceSiteDonor;
 	}
 
+	/**
+	 * Correct exons according to frame information
+	 * Shift the start position one base
+	 */
+	public void frameCorrection(int frameCorrection) {
+		if (frameCorrection <= 0) return; // Nothing to do
+
+		// Can correct?
+		if (size() <= frameCorrection) Gpr.debug("Exon too short (size: " + size() + "), cannot correct frame!\n" + this);
+
+		// Correct start or end coordinates
+		if (isStrandPlus()) start += frameCorrection;
+		else end -= frameCorrection;
+
+		// Correct frame
+		frame = (byte) ((frame - frameCorrection) % 3);
+		while (frame < 0)
+			frame += 3;
+
+		// Correct sequence
+		String sequence = getSequence();
+		if (sequence.length() >= frameCorrection) sequence = sequence.substring(frameCorrection);
+		setSequence(sequence);
+	}
+
+	@Override
 	public int getFrame() {
 		return frame;
 	}
@@ -201,6 +230,7 @@ public class Exon extends MarkerSeq {
 	 * Frame can be {-1, 0, 1, 2}, where '-1' means unknown
 	 * @param frame
 	 */
+	@Override
 	public void setFrame(int frame) {
 		if ((frame > 2) || (frame < -1)) throw new RuntimeException("Invalid frame value: " + frame);
 		this.frame = (byte) frame;
@@ -212,10 +242,24 @@ public class Exon extends MarkerSeq {
 
 	@Override
 	public String toString() {
-		return getChromosomeName() + ":" + start + "-" + end //
-				+ ((id != null) && (id.length() > 0) ? " '" + id + "'" : "") //
-				+ " rank:" + rank //
-				+ (sequence != null ? ", sequence: " + sequence : "");
+		switch (ToStringVersion) {
+		case 1:
+			// Old format version: Used in some testCases
+			return getChromosomeName() + ":" + start + "-" + end //
+					+ ((id != null) && (id.length() > 0) ? " '" + id + "'" : "") //
+					+ " rank:" + rank //
+					+ (sequence != null ? ", sequence: " + sequence : "");
+
+		case 2:
+			return getChromosomeName() + ":" + start + "-" + end //
+					+ ((id != null) && (id.length() > 0) ? " '" + id + "'" : "") //
+					+ ", rank: " + rank //
+					+ ", frame: " + (frame >= 0 ? "" + frame : ".") //
+					+ (sequence != null ? ", sequence: " + sequence : "");
+
+		default:
+			throw new RuntimeException("Unknown format version: " + ToStringVersion);
+		}
 	}
 
 }

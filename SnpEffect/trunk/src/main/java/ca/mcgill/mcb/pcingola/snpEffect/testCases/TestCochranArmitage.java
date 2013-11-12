@@ -29,7 +29,7 @@ public class TestCochranArmitage extends TestCase {
 	public void test_03() {
 		int N1[] = { 20, 20, 20 };
 		int N2[] = { 10, 20, 30 };
-		double test = CochranArmitageTest.get().test(N1, N2, CochranArmitageTest.WEIGHT_CODOMINANT);
+		double test = CochranArmitageTest.get().test(N1, N2, CochranArmitageTest.WEIGHT_TREND);
 		System.out.println("Test: " + test);
 		Assert.assertEquals(-2.284, test, 0.001);
 	}

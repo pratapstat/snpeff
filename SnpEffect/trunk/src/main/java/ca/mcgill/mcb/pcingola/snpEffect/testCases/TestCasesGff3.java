@@ -6,6 +6,7 @@ import java.util.List;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 import ca.mcgill.mcb.pcingola.interval.Chromosome;
+import ca.mcgill.mcb.pcingola.interval.Exon;
 import ca.mcgill.mcb.pcingola.interval.Gene;
 import ca.mcgill.mcb.pcingola.interval.Genome;
 import ca.mcgill.mcb.pcingola.interval.SpliceSite;
@@ -24,6 +25,7 @@ public class TestCasesGff3 extends TestCase {
 
 	public TestCasesGff3() {
 		super();
+		Exon.ToStringVersion = 1; // Set "toString()" version
 	}
 
 	/**

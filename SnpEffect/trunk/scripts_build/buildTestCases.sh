@@ -31,3 +31,6 @@ $SNPEFF build -noLog -gtf22 testHg3770Chr22
 
 # Test cases hg37.71
 $SNPEFF build -noLog -gtf22 testHg3771Chr1
+
+# Test cases 
+$SNPEFF build -noLog -gff3 testLukas

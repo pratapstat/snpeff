@@ -15,7 +15,7 @@ public class SeqChange extends Marker {
 		, MNP // Multiple nucleotide polymorphism (i.e. several bases are changed)
 		, INS // Insertion (i.e. some bases added)
 		, DEL // Deletion (some bases removed)
-		, MIXED // A mixture of insertion, deletions, SNPs and or MNPs
+		, MIXED // A mixture of insertion, deletions, SNPs and or MNPs (a.k.a. subtitution)
 		, Interval
 		// Just analyze interval hits. Not a sequence change (e.g. BED input format)
 	}
@@ -256,11 +256,16 @@ public class SeqChange extends Marker {
 				change = changeOptions[0] + "/" + changeOptions[1];
 			}
 
-			// Insertions
 			if (change.startsWith("+")) {
+				// Insertions
 				changeType = ChangeType.INS;
-			} else if (change.startsWith("-")) { // Deletions
+			} else if (change.startsWith("-")) {
+				// Deletions
 				changeType = ChangeType.DEL;
+				if (changeOptions[0].length() > 1) end = position + changeOptions[0].length() - 2; // Update 'end' position
+			} else if (change.startsWith("=")) {
+				// Mixed varaint (substitution)
+				changeType = ChangeType.MIXED;
 				if (changeOptions[0].length() > 1) end = position + changeOptions[0].length() - 2; // Update 'end' position
 			}
 

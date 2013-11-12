@@ -12,6 +12,7 @@ import ca.mcgill.mcb.pcingola.snpEffect.ChangeEffect.EffectType;
 import ca.mcgill.mcb.pcingola.snpEffect.Config;
 import ca.mcgill.mcb.pcingola.stats.ObservedOverExpectedCpG;
 import ca.mcgill.mcb.pcingola.util.Gpr;
+import ca.mcgill.mcb.pcingola.util.GprSeq;
 
 /**
  * Codon position
@@ -639,6 +640,17 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 	}
 
 	/**
+	 * Find a CDS that matches exactly the exon
+	 * @param exon
+	 * @return
+	 */
+	public Cds findMatchingCds(Exon exon) {
+		for (Cds cds : cdss)
+			if (exon.includes(cds)) return cds;
+		return null;
+	}
+
+	/**
 	 * Return the UTR that hits position 'pos'
 	 * @param pos
 	 * @return An UTR intersecting 'pos' (null if not found)
@@ -648,6 +660,21 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 		for (Utr utr : utrs)
 			if (utr.intersects(pos)) return utr;
 		return null;
+	}
+
+	/**
+	 * Return the UTR that hits position 'pos'
+	 * @param pos
+	 * @return An UTR intersecting 'pos' (null if not found)
+	 */
+	public List<Utr> findUtrs(Marker marker) {
+		List<Utr> utrs = new LinkedList<Utr>();
+
+		// Is it in UTR instead of CDS? 
+		for (Utr utr : utrs)
+			if (utr.intersects(marker)) utrs.add(utr);
+
+		return utrs.isEmpty() ? null : utrs;
 	}
 
 	/**
@@ -663,6 +690,203 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 
 		System.err.println("WARNING: Cannot find first exonic position after " + pos + " for transcript '" + id + "'");
 		return -1;
+	}
+
+	/**
+	 * Correct exons based on frame information.
+	 * 
+	 * E.g. if the frame information (form a genomic 
+	 * database file, such as a GTF) does not 
+	 * match the calculated frame, we correct exon's 
+	 * boundaries to make them match.
+	 * 
+	 * This is performed in two stages:
+	 *    i) First exon is corrected by adding a fake 5'UTR
+	 *    ii) Other exons are corrected by changing the start (or end) coordinates.
+	 *    
+	 * @return
+	 */
+	public synchronized boolean frameCorrection() {
+		// Copy frame information form CDSs to Exons (if missing)
+		frameFromCds();
+
+		// First exon is corrected by adding a fake 5'UTR
+		boolean changedFirst = frameCorrectionFirstCodingExon();
+
+		// Other exons are corrected by changing the start (or end) coordinates.
+		// boolean changedNonFirst = false; 
+		// Gpr.debug("UNCOMMENT!");
+		boolean changedNonFirst = frameCorrectionNonFirstCodingExon();
+
+		boolean changed = changedFirst || changedNonFirst;
+
+		// We have to reset cached CDS data if anything changed
+		if (changed) resetCdsCache();
+
+		// Return true if there was any adjustment
+		return changed;
+	}
+
+	/** 
+	 * Fix transcripts having non-zero frames in first exon 
+	 * 
+	 * Transcripts whose first exon has a non-zero frame indicate problems.
+	 * We add a 'fake' UTR5 to compensate for reading frame.
+	 * 
+	 * @param showEvery
+	 */
+	synchronized boolean frameCorrectionFirstCodingExon() {
+		List<Exon> exons = sortedStrand();
+
+		// No exons? Nothing to do
+		if ((exons == null) || exons.isEmpty()) return false;
+
+		Exon exonFirst = getFirstCodingExon(); // Get first exon
+		// Exon exonFirst =  exons.get(0); // Get first exon
+		if (exonFirst.getFrame() <= 0) return false; // Frame OK (or missing), nothing to do
+
+		// First exon is not zero? => Create a UTR5 prime to compensate
+		Utr5prime utr5 = null;
+		int frame = exonFirst.getFrame();
+
+		if (isStrandPlus()) {
+			int end = exonFirst.getStart() + (frame - 1);
+			utr5 = new Utr5prime(exonFirst, exonFirst.getStart(), end, getStrand(), exonFirst.getId());
+		} else {
+			int start = exonFirst.getEnd() - (frame - 1);
+			utr5 = new Utr5prime(exonFirst, start, exonFirst.getEnd(), getStrand(), exonFirst.getId());
+		}
+
+		// Reset frame, since it was already corrected
+		exonFirst.setFrame(0);
+		Cds cds = findMatchingCds(exonFirst);
+		if (cds != null) cds.frameCorrection(cds.getFrame());
+
+		// Add UTR5'
+		add(utr5);
+		return true;
+	}
+
+	/**
+	 * Correct exons according to frame information
+	 */
+	synchronized boolean frameCorrectionNonFirstCodingExon() {
+		boolean corrected = false;
+
+		// Concatenate all exons to create a CDS
+		List<Exon> exons = sortedStrand();
+		StringBuilder sequence = new StringBuilder();
+
+		// We don't need to correct if there is no sequence! (the problem only exists due to sequence frame)
+		for (Exon exon : exons)
+			if (!exon.hasSequence()) return false;
+
+		// 5'UTR length
+		int utr5Start = Integer.MAX_VALUE, utr5End = -1;
+		for (Utr utr : get5primeUtrs()) {
+			utr.size();
+			utr5Start = Math.min(utr5Start, utr.getStart());
+			utr5End = Math.max(utr5End, utr.getEnd());
+		}
+
+		// Create UTR
+		Marker utr5;
+		if (utr5End == -1) {
+			// UTR not found? Create a fake UTR that doesn't overlap the transcript
+			utr5Start = start;
+			utr5End = end;
+			utr5 = isStrandPlus() ? new Marker(this, start - 1, start - 1, strand, "") : new Marker(this, end + 1, end + 1, strand, "");
+		} else utr5 = new Marker(this, utr5Start, utr5End, strand, "");
+
+		// Append all exon sequences
+		for (Exon exon : exons) {
+			String seq = "";
+			int utrOverlap = 0;
+
+			// Check if exon overlaps UTR
+			if (utr5.includes(exon)) {
+				// The whole exon is included => No sequence change
+				seq = "";
+			} else {
+				// Add sequence
+				seq = exon.getSequence();
+				if (utr5.intersects(exon)) {
+					utrOverlap = utr5.intersectSize(exon);
+					if (utrOverlap > 0) {
+						if (utrOverlap < seq.length()) seq = seq.substring(utrOverlap);
+						else seq = "";
+					}
+				}
+			}
+
+			//---
+			// Frame check
+			//---
+			if (exon.getFrame() < 0) {
+				// Nothing to do (assume current frame is right
+			} else {
+				// Calculate frame
+				// References: http://mblab.wustl.edu/GTF22.html
+				int frameReal = GprSeq.frameFromLength(sequence.length());
+
+				// Does calculated frame match?
+				if (frameReal != exon.getFrame()) {
+					if (utrOverlap > 0) {
+						throw new RuntimeException("Fatal Error: First exon needs correction: This should never happen!"//
+								+ "\n\tThis method is supposed to be called AFTER method"//
+								+ "\n\tSnpEffPredictorFactory.frameCorrectionFirstCodingExon(), which"//
+								+ "\n\tshould have taken care of this problem." //
+						);
+					} else {
+						// Find matching cds
+						Cds cdsToCorrect = findMatchingCds(exon);
+
+						// Gpr.debug("Correcting exon [" + exon.getStart() + ", " + exon.getEnd() + "]\tExpected frame: " + frameReal + " (sequence length: " + sequence.length() + " )\tExon.frame: " + exon.getFrame());
+
+						// Correct exon until we get the expected frame
+						while (frameReal != exon.getFrame()) {
+							// Correct both Exon and CDS
+							exon.frameCorrection(1);
+							if (cdsToCorrect != null) cdsToCorrect.frameCorrection(1);
+							corrected = true;
+						}
+
+						// Gpr.debug("\tCorrected exon [" + exon.getStart() + ", " + exon.getEnd() + "]");
+
+						// Get new exon's sequence
+						seq = exon.getSequence();
+					}
+				}
+			}
+
+			// Append sequence 
+			sequence.append(seq);
+		}
+
+		return corrected;
+	}
+
+	/**
+	 * Copy frame info from CDSs into Exons
+	 */
+	void frameFromCds() {
+		for (Exon ex : this) {
+			// No frame info? => try to find matching CDS
+			if (ex.getFrame() < 0) {
+				// Chech a CDS that matches an exon
+				for (Cds cds : getCds()) {
+					// CDS matches the exon coordinates? => Copy frame info
+					if (isStrandPlus() && (ex.getStart() == cds.getStart())) {
+						ex.setFrame(cds.getFrame());
+						break;
+					} else if (isStrandMinus() && (ex.getEnd() == cds.getEnd())) {
+						ex.setFrame(cds.getFrame());
+						break;
+					}
+				}
+			}
+		}
+
 	}
 
 	/**
@@ -911,6 +1135,10 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 		return findUtr(pos) != null;
 	}
 
+	public boolean isUtr(Marker marker) {
+		return findUtrs(marker) != null;
+	}
+
 	/**
 	 * Is the last codon a STOP codon?
 	 * @return
@@ -945,8 +1173,8 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 			last = ex.getEnd();
 		}
 
-		System.err.println("WARNING: Cannot find last exonic position before " + pos + " for transcript '" + id + "'");
-		return -1;
+		if (last < 0) System.err.println("WARNING: Cannot find last exonic position before " + pos + " for transcript '" + id + "'");
+		return pos;
 	}
 
 	/**
@@ -1063,9 +1291,6 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 	@Override
 	public void reset() {
 		super.reset();
-		cdsStart = -1;
-		cdsEnd = -1;
-		firstCodingExon = null;
 		sorted = null;
 		spliceBranchSites = new ArrayList<SpliceSiteBranch>();
 		utrs = new ArrayList<Utr>();
@@ -1073,6 +1298,13 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 		introns = null;
 		upstream = null;
 		downstream = null;
+		resetCdsCache();
+	}
+
+	public void resetCdsCache() {
+		cdsStart = -1;
+		cdsEnd = -1;
+		firstCodingExon = null;
 		cds = null;
 		cds2pos = null;
 	}
@@ -1227,8 +1459,8 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 				sb.append("\t\t5'UTR   :\t" + utr + "\n");
 
 			sb.append("\t\tExons:\n");
-			for (Exon eint : sorted())
-				sb.append("\t\t" + eint + "\n");
+			for (Exon exon : sorted())
+				sb.append("\t\t" + exon + "\n");
 
 			for (Utr utr : get3primeUtrs())
 				sb.append("\t\t3'UTR   :\t" + utr + "\n");
@@ -1286,4 +1518,5 @@ public class Transcript extends IntervalAndSubIntervals<Exon> {
 		if (missingUtrs.size() > 0) return addMissingUtrs(missingUtrs, verbose); // Anything left? => There was a missing UTR
 		return false;
 	}
+
 }

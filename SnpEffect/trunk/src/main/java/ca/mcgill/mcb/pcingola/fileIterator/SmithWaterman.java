@@ -1,7 +1,7 @@
 package ca.mcgill.mcb.pcingola.fileIterator;
 
 /**
- * Smith-Waterman algorithm for sequence alignment (short strings, since it's not memory optimized)
+ * Smith-Waterman (local sequence alignment) algorithm for sequence alignment (short strings, since it's not memory optimized)
  * 
  * @author pcingola
  */

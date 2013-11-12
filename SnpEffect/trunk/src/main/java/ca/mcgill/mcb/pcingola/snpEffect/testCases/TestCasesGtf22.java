@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 import ca.mcgill.mcb.pcingola.interval.Chromosome;
+import ca.mcgill.mcb.pcingola.interval.Exon;
 import ca.mcgill.mcb.pcingola.interval.Gene;
 import ca.mcgill.mcb.pcingola.interval.Genome;
 import ca.mcgill.mcb.pcingola.interval.Transcript;
@@ -22,6 +23,7 @@ public class TestCasesGtf22 extends TestCase {
 
 	public TestCasesGtf22() {
 		super();
+		Exon.ToStringVersion = 1; // Show using old format
 	}
 
 	/**
@@ -104,6 +106,13 @@ public class TestCasesGtf22 extends TestCase {
 		String genome = "testMm37.61";
 		String gtfFile = "tests/ENSMUSG00000051951.gtf";
 		String resultFile = "tests/ENSMUSG00000051951.txt";
+		buildAndCompare(genome, gtfFile, null, resultFile);
+	}
+
+	public void testCaseMm37_61_ENSMUST00000070533() {
+		String genome = "testMm37.61";
+		String gtfFile = "tests/ENSMUST00000070533.gtf";
+		String resultFile = "tests/ENSMUST00000070533.txt";
 		buildAndCompare(genome, gtfFile, null, resultFile);
 	}
 

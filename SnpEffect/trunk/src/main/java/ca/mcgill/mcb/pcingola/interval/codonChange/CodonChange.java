@@ -124,7 +124,6 @@ public class CodonChange {
 		int firstCdsBaseInExon = 0; // Where the exon maps to the CDS (i.e. which CDS base number does the first base in this exon maps to).
 		for (Exon exon : exons) {
 			this.exon = exon;
-
 			if (exon.intersects(seqChange)) {
 				int cdsBaseInExon; // cdsBaseInExon: base number relative to the beginning of the coding part of this exon (i.e. excluding 5'UTRs)
 

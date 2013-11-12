@@ -27,8 +27,8 @@ public class FisherPValueAlgorithm extends EnrichmentAlgorithm {
 		int D = geneSets.getInterestingGenesCount(); // White marbles
 		int n = geneSet.getGeneCount(); // marbles drawn
 
-		double pValue = FisherExactTest.get().fisherExactTestUpThreshold(k, N, D, n, threshold);
-		if( debug ) Gpr.debug("k: " + k + "\tN: " + N + "\tD: " + D + "\tn: " + n + "\tpValue: " + pValue);
+		double pValue = FisherExactTest.get().fisherExactTestUp(k, N, D, n, threshold);
+		if (debug) Gpr.debug("k: " + k + "\tN: " + N + "\tD: " + D + "\tn: " + n + "\tpValue: " + pValue + "\t" + geneSet.getName());
 		return new Apfloat(pValue);
 	}
 }

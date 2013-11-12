@@ -2,6 +2,7 @@ package ca.mcgill.mcb.pcingola.snpEffect.testCases;
 
 import java.util.Random;
 
+import junit.framework.Assert;
 import junit.framework.TestCase;
 import ca.mcgill.mcb.pcingola.probablility.FisherExactTest;
 import ca.mcgill.mcb.pcingola.probablility.Hypergeometric;
@@ -15,6 +16,8 @@ import ca.mcgill.mcb.pcingola.util.Gpr;
  */
 public class TestCasesHypergeometric extends TestCase {
 
+	public static double MAX_DIFF = 0.00000000001;
+
 	boolean verbose = true;
 	double threshold = 0.01;
 	int numTests = 100;
@@ -26,6 +29,20 @@ public class TestCasesHypergeometric extends TestCase {
 		initRand();
 	}
 
+	void compareFisher(int k, int N, int D, int n, double result, double p) {
+		double abs = Math.abs(p - result);
+		double diff = abs / Math.min(p, result);
+
+		if ((abs > 1E-300) && (diff > MAX_DIFF)) {
+			String err = "\tDifference:" + diff //
+					+ "\n\tpValue:\t" + p //
+					+ "\n\tExpected:\t" + result //
+					+ "\n\tR: " + FisherExactTest.get().toR(k, N, D, n, true);
+			Gpr.debug("Error\n" + err);
+			throw new RuntimeException(err);
+		}
+	}
+
 	/**
 	 * Compare a result form a Fisher exact test (lower tail)
 	 * @param k
@@ -35,19 +52,11 @@ public class TestCasesHypergeometric extends TestCase {
 	 * @param result
 	 */
 	void compareFisherDown(int k, int N, int D, int n, double result) {
-		double p = FisherExactTest.get().pValueDown(k, N, D, n, threshold);
+		double p = FisherExactTest.get().fisherExactTestDown(k, N, D, n, threshold);
+		compareFisher(k, N, D, n, result, p);
 
-		double abs = Math.abs(p - result);
-		double diff = abs / Math.min(p, result);
-
-		if ((abs > 1E-300) && (diff > 0.00000000001)) {
-			String err = "Difference:" + diff //
-					+ "\n\t\tpValue:\t" + p //
-					+ "\n\tExpected:\t" + result //
-					+ "\n\tR: " + FisherExactTest.get().toR(k, N, D, n, true);
-			Gpr.debug(err);
-			throw new RuntimeException(err);
-		}
+		p = FisherExactTest.get().fisherExactTestDown(k, N, D, n);
+		compareFisher(k, N, D, n, result, p);
 	}
 
 	/**
@@ -60,19 +69,20 @@ public class TestCasesHypergeometric extends TestCase {
 	 */
 	void compareFisherUp(int k, int N, int D, int n, double result) {
 		double p = FisherExactTest.get().pValueUp(k, N, D, n, threshold);
+		compareFisher(k, N, D, n, result, p);
 
-		double abs = Math.abs(p - result);
-		double diff = abs / Math.min(p, result);
-		if ((abs > 1E-300) && (diff > 0.00000000001)) {
-			String err = "Difference:" + diff //
-					+ "\n\t\tpValue:\t" + p //
-					+ "\n\tExpected:\t" + result //
-					+ "\n\tR: " + FisherExactTest.get().toR(k, N, D, n, false);
-			Gpr.debug(err);
-			throw new RuntimeException(err);
-		}
+		p = FisherExactTest.get().fisherExactTestUp(k, N, D, n);
+		compareFisher(k, N, D, n, result, p);
 	}
 
+	/**
+	 * Compare hypergeometric results
+	 * @param k
+	 * @param N
+	 * @param D
+	 * @param n
+	 * @param result
+	 */
 	void compareHypergeometric(int k, int N, int D, int n, double result) {
 		double p = Hypergeometric.get().hypergeometric(k, N, D, n);
 
@@ -82,7 +92,7 @@ public class TestCasesHypergeometric extends TestCase {
 	}
 
 	/**
-	 * 
+	 * Create commands in R to run and get test results
 	 */
 	public void generate_test() {
 		boolean lowerTail = true;
@@ -102,8 +112,6 @@ public class TestCasesHypergeometric extends TestCase {
 				}
 			}
 		}
-
-		// assertEquals(90, minusInt.getEnd());
 	}
 
 	void initRand() {
@@ -547,4 +555,58 @@ public class TestCasesHypergeometric extends TestCase {
 		compareFisherDown(0, 100, 50, 0, 0);
 		compareFisherDown(0, 100, 0, 20, 0);
 	}
+
+	/**
+	 * Compare Fisher exact test to Chi^2 approximation
+	 * 
+	 * From R:
+		> data <- matrix(c(25, 5, 15, 15), ncol=2, byrow=T)
+		> data
+		     [,1] [,2]
+		[1,]   25    5
+		[2,]   15   15
+		
+		> chisq.test(data,correct=FALSE)
+		
+			Pearson's Chi-squared test
+		
+		data:  data
+		X-squared = 7.5, df = 1, p-value = 0.00617
+		
+		> fisher.test(data, alternative="greater")
+		
+			Fisher's Exact Test for Count Data
+		
+		data:  data
+		p-value = 0.006349
+		alternative hypothesis: true odds ratio is greater than 1
+		95 percent confidence interval:
+		 1.587561      Inf
+		sample estimates:
+		odds ratio 
+		  4.859427 
+	 */
+	public void test_06_fisher_vs_chi2() {
+		int n11 = 25, n12 = 5;
+		int n21 = 15, n22 = 15;
+
+		int k = n11;
+		int D = n11 + n12;
+		int N = n11 + n12 + n21 + n22;
+		int n = n11 + n21;
+
+		// Chi square approximation (without Yates correction)
+		double pChi = FisherExactTest.get().chiSquareApproximation(k, N, D, n);
+		if (verbose) System.out.println("Chi^2  p-value: " + pChi);
+		Assert.assertEquals(pChi, 0.00617, 0.00001);
+
+		// Fisher exact test
+		double pFish = FisherExactTest.get().fisherExactTestUp(k, N, D, n);
+		if (verbose) System.out.println("Fisher p-value: " + pFish);
+		Assert.assertEquals(pFish, 0.006349, 0.000001);
+
+		double ratio = pFish / pChi;
+		if (verbose) System.out.println("Ratio: " + ratio);
+	}
+
 }

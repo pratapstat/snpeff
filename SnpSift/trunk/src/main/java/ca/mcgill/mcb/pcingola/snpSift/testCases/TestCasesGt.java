@@ -67,8 +67,9 @@ public class TestCasesGt extends TestCase {
 			if (!ori.get(i).equals(un.get(i))) {
 				System.err.println("Line " + i + " differs:\n\t'" + ori.get(i) + "'\n\t'" + un.get(i) + "'");
 				diff = true;
+				Assert.assertEquals(false, diff); // We expect no differences.
 			}
 		}
-		Assert.assertEquals(false, diff); // We expect no differences.
+		// Assert.assertEquals(false, diff); // We expect no differences.
 	}
 }
