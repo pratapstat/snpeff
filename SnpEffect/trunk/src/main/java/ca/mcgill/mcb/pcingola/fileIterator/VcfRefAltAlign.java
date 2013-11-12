@@ -27,8 +27,8 @@ public class VcfRefAltAlign extends NeedlemanWunsch {
 				// OK Nothing else to do 
 			} else {
 				// Perform alignment only of sequences are not too long (we don't want an 'out of memory' issue)
-				int size = stringA.length() * stringB.length();
-				if (size < MAX_SIZE) {
+				long size = ((long) stringA.length()) * stringB.length();
+				if ((size > 0) && (size < MAX_SIZE)) {
 					scoreMatrix();
 					calcAlignment();
 
