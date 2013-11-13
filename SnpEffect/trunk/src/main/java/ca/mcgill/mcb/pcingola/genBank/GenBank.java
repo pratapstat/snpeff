@@ -33,7 +33,18 @@ public class GenBank extends Features {
 	 */
 	@Override
 	protected boolean isNewFeature(String line) {
-		return !line.substring(0, FEATURE_NAME_FIELD_LEN).trim().isEmpty(); // Feature name should be within the first 20 characters
+		// Extract feature string
+		int end = Math.min(FEATURE_NAME_FIELD_LEN, line.length());
+		String featName = line.substring(0, end).trim();
+
+		// Emtpy? Not a new feature
+		if (featName.isEmpty()) return false;
+
+		// Is it a number? => Not a new feature
+		featName = featName.split(" ")[0];
+		if (Gpr.parseIntSafe(featName) > 0) return false;
+
+		return true;
 	}
 
 	/**
@@ -100,12 +111,10 @@ public class GenBank extends Features {
 			// Field start
 			if (!line.startsWith(" ")) {
 				String kv[] = line.split(" ", 2);
-				if (kv.length > 1) {
-					name = kv[0];
-					value = kv[1];
-					if (debug) Gpr.debug("NAME: " + name + "\tvalue: " + value);
-					fieldLineNum = 0;
-				}
+				name = kv[0];
+				value = (kv.length > 1 ? kv[1] : "");
+				if (debug) Gpr.debug("Line: " + line + "\n\tNAME: " + name + "\tvalue: " + value);
+				fieldLineNum = 0;
 			}
 
 			// Parse field
@@ -118,5 +127,4 @@ public class GenBank extends Features {
 		// All features are loaded. We can parse them now
 		parseFeatures();
 	}
-
 }

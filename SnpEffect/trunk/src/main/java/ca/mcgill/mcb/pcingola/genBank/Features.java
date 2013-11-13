@@ -261,17 +261,22 @@ public abstract class Features implements Iterable<Feature> {
 				String kv[] = line.trim().split(" ", 2);
 				if (kv.length > 1) {
 					// Previous feature data is available? => Add it
-					if (type != null) {
-						addFeature(type, values);
-						values = new StringBuilder();
-					}
+					if (type != null) addFeature(type, values);
 
-					// Parse name
+					// Parse new feature's name
 					type = kv[0];
 					value = kv[1].trim();
+				} else {
+					// New type
+					type = line.trim();
+					value = "";
 				}
+
+				// New values
+				values = new StringBuilder();
 			} else value = line.trim();
 
+			// Append values to feature
 			if (value.startsWith("/")) values.append("\n");
 			values.append(value);
 		}
