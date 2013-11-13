@@ -11,12 +11,10 @@
 string tfam="$HOME/t2d1/pheno/pheno.tfam"
 string vcf="$HOME/t2d1/eff/hm.gt.vcf"
 
-int minAc=50
-real maxP=1e-06
-int showNonSignificant=10000
-cpusLocal = cpus
-print("CPUS: $cpus\n");
-cpus = 24
+int minAc=50						# Minimum Allele count in a variant
+real maxP=1e-06						# Maximum p-value to consider a variant for further analysis (logistic regression)
+int showNonSignificant=10000		# Show p-values even if non-significan (once every 'showNonSignificant')
+int numPc=3							# Number of PC to use in logistic regression
 
 # Available models
 string[] models = ["MAX", "ABS"]
@@ -44,7 +42,7 @@ for( string model : models ) {
 		string txt = "coevolution.genes.$model.txt"
 		if( out <- vcf ) {
 			print("CoEvolutionary model $model on genes: $genes\n")
-			sys $snpsift coevolution -v -cpus $cpus -minAc $minAc -maxP $maxP -model $model -genes "$genes" -out coevolution.genes.$model.txt $tfam $vcf > $out
+			#sys $snpsift coevolution -v -cpus $cpusLocal -minAc $minAc -maxP $maxP -model $model -genes "$genes" -out coevolution.genes.$model.txt $tfam $vcf > $out
 		}
 	} else {
 		# Run on a subset of genes
@@ -52,7 +50,7 @@ for( string model : models ) {
 		string txt = "coevolution.$model.txt"
 		if( out <- vcf ) {
 			print("CoEvolutionary model $model\n")
-			sys $snpsift coevolution -v -cpus $cpus -minAc $minAc -maxP $maxP -model $model -out coevolution.$model.txt $tfam $vcf > $out
+			#sys $snpsift coevolution -v -cpus $cpusLocal -minAc $minAc -maxP $maxP -model $model -out coevolution.$model.txt $tfam $vcf > $out
 		}
 	}
 }
@@ -65,7 +63,7 @@ wait
 # Note we split the file to run N processes
 string splitDir = "split"
 string pcDir = "split/pc"
-string logisticDir = "split/logistic"
+string logisticDir = "split/logistic_$numPc"
 splitDir.mkdir()
 pcDir.mkdir()
 logisticDir.mkdir()
@@ -77,38 +75,40 @@ for( string model : models ) {
 		string pc = "coevolution$g.$model.pc.txt"
 		string prefix = "coevolution$g.$model.pc.split."
 
-		int size = txt.size() / cpus
-		int filesSplitted = splitDir.dir("$prefix.*").size()
-		if( filesSplitted != cpus ) {
-			print("Splitting file $txt into $cpus files. File size: " + txt.size() + ", split size: $size\n");
-			sys split -C $size $txt $splitDir/$prefix
-		}
-
-		# Get header
-		string header = splitDir + "/header." + prefix + "txt"
-		sys head -n 2 $txt > $header
-        
-		# Create a task for each file
-		print("Adding PC information to files in $splitDir\n")
-		bool first = true
-		for( string split : splitDir.dir("$prefix.*") ) {
-			print("\t$split\n")
-			string splitPc = pcDir + "/" + split.baseName() + ".txt"
-
-			# Only first file has header
-			string cat = "$splitDir/$split"
-			if( ! first ) { cat = "$header $splitDir/$split" } 
-			first = false
-
-			# Merge PCs
-			if( pc <- split ) {
-				sys cat $cat | ./mergePc.py t2d.mds - > $splitPc
+		if( txt.exists() ) {
+			int size = ( txt.size() / cpusLocal ) + 1
+			int filesSplitted = splitDir.dir("$prefix.*").size()
+			if( filesSplitted != cpusLocal ) {
+				print("Splitting file $txt into $cpusLocal files. File size: " + txt.size() + ", split size: $size\n");
+				sys split -C $size $txt $splitDir/$prefix
 			}
-
-			# Run logistic regression
-			string logistic = logisticDir + "/" + split.baseName() + ".txt"
-			task( logistic <- splitPc, cpus = 1 ) {
-				sys Rscript coEvolution.r $splitPc | tee $logistic
+        
+			# Get header
+			string header = splitDir + "/header." + prefix + "txt"
+			sys head -n 2 $txt > $header
+            
+			# Create a task for each file
+			print("Adding PC information to files in $splitDir\n")
+			bool first = true
+			for( string split : splitDir.dir("$prefix.*") ) {
+				print("\t$split\n")
+				string splitPc = pcDir + "/" + split.baseName() + ".txt"
+        
+				# Only first file has header
+				string cat = "$splitDir/$split"
+				if( ! first ) { cat = "$header $splitDir/$split" } 
+				first = false
+        
+				# Merge PCs
+				if( pc <- split ) {
+					sys cat $cat | ./mergePc.py t2d.mds - > $splitPc
+				}
+        
+				# Run logistic regression
+				string logistic = logisticDir + "/" + split.baseName() + ".txt"
+				task( logistic <- splitPc, cpus = 2 ) {
+					sys Rscript coEvolution.r $splitPc $numPc| tee $logistic
+				}
 			}
 		}
 	}

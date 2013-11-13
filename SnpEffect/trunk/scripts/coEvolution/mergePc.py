@@ -43,35 +43,40 @@ with open(pcaFile) as f:
 #---
 headerCol = 10
 headerColId = 6
+header = {}
+
 print >> sys.stderr, "Reading coEvolution file: " + coEvFile
-with open(coEvFile) as f:
-	header = {}
 
-	for line in f.readlines():
-		line = line.rstrip()
-		print line
+if coEvFile == "-":
+	f = sys.stdin
+else:
+	f = open(coEvFile)
 
-		# First line? Read and parse header
-		if not header : 
-			header = line.split('\t')
-			for pcnum in range(maxPc):
-				# Show 'PC' label
-				outLine = ""
-				for i in range(headerColId):
-					outLine += "PC{}\t".format(pcnum+1)
+for line in f.readlines():
+	line = line.rstrip()
+	print line
 
-				# pvalue column
-				outLine += "1.0\t1.0\t1.0\t1.0"
+	# First line? Read and parse header
+	if not header : 
+		header = line.split('\t')
+		for pcnum in range(maxPc):
+			# Show 'PC' label
+			outLine = ""
+			for i in range(headerColId):
+				outLine += "PC{}\t".format(pcnum+1)
 
-				# Show PC values
-				for i in range(headerCol, len(header)):
-					id = header[i]
-					pc = 0
-					pcs = pcas.get(id,[])
-					if pcs : pc = pcs[pcnum]
-					outLine += "\t{}".format(pc)
+			# pvalue column
+			outLine += "1.0\t1.0\t1.0\t1.0"
 
-				print outLine
+			# Show PC values
+			for i in range(headerCol, len(header)):
+				id = header[i]
+				pc = 0
+				pcs = pcas.get(id,[])
+				if pcs : pc = pcs[pcnum]
+				outLine += "\t{}".format(pc)
 
+			print outLine
 
+f.close()
 
