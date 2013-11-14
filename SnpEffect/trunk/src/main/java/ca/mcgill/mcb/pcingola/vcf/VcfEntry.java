@@ -191,7 +191,7 @@ public class VcfEntry extends Marker implements Iterable<VcfGenotype> {
 
 		Boolean isHetero = null;
 
-		// If there is only one genotype field => parse fields
+		// No genotype fields => Parse fields (we only parse them if there is only one GT field)
 		if (genotypeFields == null) {
 
 			// Are there more than two tabs? (i.e. more than one format field + one genotype field)  

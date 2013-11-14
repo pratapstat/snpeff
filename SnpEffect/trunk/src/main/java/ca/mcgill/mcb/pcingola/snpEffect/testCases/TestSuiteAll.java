@@ -56,6 +56,7 @@ public class TestSuiteAll {
 		suite.addTestSuite(TestCasesMissenseSilentRatio.class);
 		suite.addTestSuite(TestCasesNoChange.class);
 		suite.addTestSuite(TestCasesTranscriptError.class);
+		suite.addTestSuite(TestCasesHugeVariants.class);
 
 		// Filter transcripts
 		suite.addTestSuite(TestCasesFilterTranscripts.class);
