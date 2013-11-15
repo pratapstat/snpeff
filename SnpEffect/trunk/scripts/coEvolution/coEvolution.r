@@ -97,7 +97,6 @@ for( idx in rowsToAnalyze ) {
 	#---
 	# Logistic regression
 	#---
-<<<<<<< .mine
 	if( PC == 10 ) {
 		# PC: First 10 components
 		lr0 <- glm( ph ~ gt + pc[1,] + pc[2,] + pc[3,] + pc[4,] + pc[5,] + pc[6,] + pc[7,] + pc[8,] + pc[9,] + pc[10,] , family=binomial)		# Full model, takes into account genotypes and PCs
@@ -111,19 +110,6 @@ for( idx in rowsToAnalyze ) {
 	# Likelyhood ratio test
 	lrt <- lrtest(lr0, lr1)
 	pvalue <- lrt$p.value	# p-value from likelihood ration test
-=======
-	# PC: First 10 components
-	lr0 <- glm( ph ~ gt + pc[1,] + pc[2,] + pc[3,] + pc[4,] + pc[5,] + pc[6,] + pc[7,] + pc[8,] + pc[9,] + pc[10,] , family=binomial)		# Full model, takes into account genotypes and PCs
-	lr1 <- glm( ph ~      pc[1,] + pc[2,] + pc[3,] + pc[4,] + pc[5,] + pc[6,] + pc[7,] + pc[8,] + pc[9,] + pc[10,] , family=binomial)		# Reduced model: only PCs, no genotypes
-
-	# PC: First 3 components
-	#lr0 <- glm( ph ~ gt + pc[1,] + pc[2,] + pc[3,], family=binomial)			# Full model, takes into account genotypes and PCs
-	#lr1 <- glm( ph ~      pc[1,] + pc[2,] + pc[3,], family=binomial)			# Reduced model: only PCs, no genotypes
-
-	# Likelyhood ratio test
-	lrt <- lrtest(lr0, lr1)												# Likeliehood ratio test
-	pvalue <- lrt$p.value												# p-value from likelihood ration test
->>>>>>> .r1055
 
 	# Show results
 	pvalueOri <- pvalues[idx]
