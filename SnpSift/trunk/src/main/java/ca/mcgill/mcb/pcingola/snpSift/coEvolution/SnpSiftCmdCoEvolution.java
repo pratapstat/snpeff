@@ -515,7 +515,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		// Calculate pValues
 		//---
 
-		// We only show results if pvalue is less than maxP 
+		// We only show results if p-value is less than maxP 
 		// If showNonSignificant is set, we show 
 		// results once every 'showNonSignificant'
 		long count = incCountTests();
