@@ -31,7 +31,6 @@ if( length(args) > 0 ) {
 # Load data
 #---
 if( ! exists('d') ) {
-
 	# Read data
 	cat('# Reading data', fileName, '\n')
 	d <- read.table(fileName, sep="\t", header=TRUE)
@@ -41,9 +40,23 @@ if( ! exists('d') ) {
 # Parse the data file
 #---
 minCol <- 11					# Columns 1-10 are [chr1, pos1, gene1, chr2, pos2, gene2, pllelic, pDominant, pRecessive, pCodominant]
-minRow <- 12					# Rows 1-11 are: [PC_1 ... PC_10, phenotypes ]
+minRow <- 14					# Rows 1-11 are: [PC_1 ... PC_10, sex, age, phenotypes ]
 maxCol <- length(d[1,])
 maxRow <- length(d[,1])
+
+# Extract sex
+sexRow <- minRow - 3			# Sex are in the third row before genotypes start
+sexCol <- minCol:maxCol
+sex <- as.numeric( d[sexRow,sexCol] ) - 1
+cat('# Sex:\n')
+print( table(sex) )
+
+# Extract age
+ageRow <- minRow - 2			# Ages are in the second row before genotypes start
+ageCol <- minCol:maxCol
+age <- as.numeric( d[ageRow,ageCol] ) - 1
+cat('# Age:\n')
+print( summary(age) )
 
 # Extract phenotypes
 phenoRow <- minRow - 1			# Phenotypes are in the last row before genotypes start
@@ -88,9 +101,10 @@ for( idx in rowsToAnalyze ) {
 
 	# Prepare data
 	gt <- as.numeric( genotypes[idx,] )
-	keep <- ( pheno >= 0 ) & (gt >= 0)	# No pheotype? No genotype? Don't use the sample
+	keep <- ( pheno >= 0 ) & (age > 0) & (sex >= 0) & (gt >= 0)		# Missing data? Don't use the sample
 	ph <- pheno[keep]
-	#gt <- factor( gt[keep] )
+	ag <- age[keep]
+	sx <- sex[keep]
 	gt <- gt[keep]
 	pc <- pcs[,keep]
 
@@ -99,12 +113,12 @@ for( idx in rowsToAnalyze ) {
 	#---
 	if( PC == 10 ) {
 		# PC: First 10 components
-		lr0 <- glm( ph ~ gt + pc[1,] + pc[2,] + pc[3,] + pc[4,] + pc[5,] + pc[6,] + pc[7,] + pc[8,] + pc[9,] + pc[10,] , family=binomial)		# Full model, takes into account genotypes and PCs
-		lr1 <- glm( ph ~      pc[1,] + pc[2,] + pc[3,] + pc[4,] + pc[5,] + pc[6,] + pc[7,] + pc[8,] + pc[9,] + pc[10,] , family=binomial)		# Reduced model: only PCs, no genotypes
+		lr0 <- glm( ph ~ gt + sx + ag + ag^2 + pc[1,] + pc[2,] + pc[3,] + pc[4,] + pc[5,] + pc[6,] + pc[7,] + pc[8,] + pc[9,] + pc[10,] , family=binomial)		# Full model, takes into account genotypes and PCs
+		lr1 <- glm( ph ~      sx + ag + ag^2 + pc[1,] + pc[2,] + pc[3,] + pc[4,] + pc[5,] + pc[6,] + pc[7,] + pc[8,] + pc[9,] + pc[10,] , family=binomial)		# Reduced model: only PCs, no genotypes
 	} else if ( PC == 3 ) {
 		# PC: First 3 components
-		lr0 <- glm( ph ~ gt + pc[1,] + pc[2,] + pc[3,], family=binomial)	# Full model, takes into account genotypes and PCs
-		lr1 <- glm( ph ~      pc[1,] + pc[2,] + pc[3,], family=binomial)	# Reduced model: only PCs, no genotypes
+		lr0 <- glm( ph ~ gt + sx + ag + ag^2 + pc[1,] + pc[2,] + pc[3,], family=binomial)	# Full model, takes into account genotypes and PCs
+		lr1 <- glm( ph ~      sx + ag + ag^2 + pc[1,] + pc[2,] + pc[3,], family=binomial)	# Reduced model: only PCs, no genotypes
 	}
 
 	# Likelyhood ratio test
