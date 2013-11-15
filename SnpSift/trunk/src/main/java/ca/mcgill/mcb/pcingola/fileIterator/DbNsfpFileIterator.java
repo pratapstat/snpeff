@@ -9,9 +9,7 @@ import java.lang.reflect.Constructor;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -90,10 +88,12 @@ public class DbNsfpFileIterator extends MarkerFileIterator<DbNsfpEntry> {
 
 	public static final String COLUMN_CHR_NAME = "chr";
 	public static final String COLUMN_POS_NAME = "pos(1-coor)";
+	public static final String ALT_NAME = "alt";
 
-	private final TObjectIntHashMap<String> columnNames = new TObjectIntHashMap<String>();
+	private final TObjectIntHashMap<String> columnNames2Idx = new TObjectIntHashMap<String>();
 	private int chromosomeIdx;
 	private int startIdx;
+	private int altIdx;
 
 	/**
 	 * Splits a separated string into an array of <code>String</code> tokens. If
@@ -127,8 +127,8 @@ public class DbNsfpFileIterator extends MarkerFileIterator<DbNsfpEntry> {
 	}
 
 	public Set<String> getFieldNames() {
-		if (columnNames.size() == 0) parseHeader(null);
-		return columnNames.keySet();
+		if (columnNames2Idx.size() == 0) parseHeader(null);
+		return columnNames2Idx.keySet();
 	}
 
 	/**
@@ -137,27 +137,35 @@ public class DbNsfpFileIterator extends MarkerFileIterator<DbNsfpEntry> {
 	 * @return
 	 */
 	public boolean hasField(String filedName) {
-		if (columnNames.size() == 0) parseHeader(null);
-		return columnNames.containsKey(filedName);
+		if (columnNames2Idx.size() == 0) parseHeader(null);
+		return columnNames2Idx.containsKey(filedName);
 	}
 
-	private DbNsfpEntry parseEntry(List<String[]> linesForEntry) {
-		Map<String, Map<String, String>> values = new HashMap<String, Map<String, String>>();
+	/**
+	 * Parse dbSNFP values (could be from multiple lines)
+	 * 
+	 * @param valuesForEntry
+	 * @return
+	 */
+	private DbNsfpEntry parseEntry(List<String[]> valuesForEntry) {
+		// Initialize DbNsfpEntry
+		String[] vals = valuesForEntry.get(0);
+		String chromosome = vals[chromosomeIdx];
+		int start = parsePosition(vals[startIdx]);
+		DbNsfpEntry dbNsfp = new DbNsfpEntry(getChromosome(chromosome), start);
 
-		String chromosome = null;
-		int start = -1;
-		for (String[] altAlleleValues : linesForEntry) {
-			Map<String, String> entryValues = new HashMap<String, String>();
-			chromosome = altAlleleValues[chromosomeIdx];
-			start = parsePosition(altAlleleValues[startIdx]);
-			for (String columnName : columnNames.keySet()) {
-				entryValues.put(columnName, altAlleleValues[columnNames.get(columnName)]);
+		// Add all entries
+		for (String[] altAlleleValues : valuesForEntry) {
+			String alt = altAlleleValues[altIdx];
+
+			for (String columnName : columnNames2Idx.keySet()) {
+				// Add all "columnName = value" pairs
+				int colIndex = columnNames2Idx.get(columnName);
+				String value = altAlleleValues[colIndex];
+				dbNsfp.add(alt, columnName, value);
 			}
-			values.put(entryValues.get("alt"), entryValues);
 		}
-
-		DbNsfpEntry entry = new DbNsfpEntry(getChromosome(chromosome), start, values);
-		return entry;
+		return dbNsfp;
 	}
 
 	/**
@@ -176,53 +184,58 @@ public class DbNsfpFileIterator extends MarkerFileIterator<DbNsfpEntry> {
 		}
 
 		// Parse column names
+		if (!line.startsWith("#")) throw new RuntimeException("First line is not a valid header!\n\tFirst line: " + line);
 		line = line.substring(1); // Remove first '#' character
 		String values[] = split(line, '\t');
 
 		// Add all column names to hash
+		chromosomeIdx = startIdx = altIdx = -1;
 		for (int idx = 0; idx < values.length; idx++) {
-			columnNames.put(values[idx].trim(), idx);
+			columnNames2Idx.put(values[idx].trim(), idx);
 
 			// Chromosome and position column numbers
 			if (values[idx].equals(COLUMN_CHR_NAME)) chromosomeIdx = idx;
 			else if (values[idx].equals(COLUMN_POS_NAME)) startIdx = idx;
+			else if (values[idx].equals(ALT_NAME)) altIdx = idx;
 		}
 
 		// Errors?
-		if (chromosomeIdx == -1 || startIdx == -1) throw new RuntimeException("Missing '" + COLUMN_CHR_NAME + "' and/or '" + COLUMN_POS_NAME + "' columns in dbNSFP file");
+		if (chromosomeIdx == -1) throw new RuntimeException("Missing '" + COLUMN_CHR_NAME + "' columns in dbNSFP file");
+		if (startIdx == -1) throw new RuntimeException("Missing '" + COLUMN_POS_NAME + "' columns in dbNSFP file");
+		if (altIdx == -1) throw new RuntimeException("Missing '" + ALT_NAME + "' columns in dbNSFP file");
 	}
 
 	@Override
 	protected DbNsfpEntry readNext() {
 		// Read another entry from the file
 		try {
-			List<String[]> linesForEntry = new ArrayList<String[]>();
+			List<String[]> valuesForEntry = new ArrayList<String[]>();
 			while (ready()) {
 				line = readLine();
 				if (line == null) return null; // End of file?
 
 				// Do we need to parse header?
-				if (columnNames.size() == 0) {
+				if (columnNames2Idx.size() == 0) {
 					parseHeader(line);
 					continue;
 				}
 
 				// Parse data
 				String values[] = split(line, '\t');
-				if (linesForEntry.size() > 0) {
-					String currentValues[] = linesForEntry.get(0);
+				if (valuesForEntry.size() > 0) {
+					String currentValues[] = valuesForEntry.get(0);
 					if (!currentValues[chromosomeIdx].equals(values[chromosomeIdx]) || !currentValues[startIdx].equals(values[startIdx])) {
 						nextLine = line;
 						break;
 					}
 				}
 
-				linesForEntry.add(values);
+				valuesForEntry.add(values);
 			}
 
-			if (linesForEntry.size() == 0) return null;
+			if (valuesForEntry.size() == 0) return null;
 
-			DbNsfpEntry entry = parseEntry(linesForEntry);
+			DbNsfpEntry entry = parseEntry(valuesForEntry);
 			return entry;
 
 		} catch (IOException e) {

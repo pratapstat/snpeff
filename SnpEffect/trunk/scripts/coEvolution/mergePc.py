@@ -6,21 +6,50 @@
 # Those values are used as covariates in a logistic regression model
 # See coEvolution.r
 #
+# Note: We need age as covariate (TFAM file, column after phenotype )
+#
+#
+#														Pablo Cingolani 2013
 #------------------------------------------------------------------------------
 
 import sys
 
 debug = False
 
+#------------------------------------------------------------------------------
+# Print a header line
+#------------------------------------------------------------------------------
+def printHeaderLine(title, values):
+	outLine = ""
+
+	# First columns are just 'title'
+	for i in range(headerColId):
+			outLine += title + "\t"
+
+	# No p-value on header
+	outLine += "1.0\t1.0\t1.0\t1.0"
+
+	# Add values on the following columns
+	for i in range(headerCol, len(header)):
+			id = header[i]
+			outLine += "\t{}".format( values.get(id, "-1") )
+
+	print outLine
+
+#------------------------------------------------------------------------------
+# Main
+#------------------------------------------------------------------------------
+
 #---
 # Parse command line arguments
 #---
-if len(sys.argv) != 3 :
-	print "Usage: {} pcaFile.txt coEvolution.txt".format(sys.argv[0])
+if len(sys.argv) != 4 :
+	print "Usage: {} pcaFile.txt pheno.age.tfam coEvolution.txt".format(sys.argv[0])
 	sys.exit(1)
 
 pcaFile = sys.argv[1]
-coEvFile = sys.argv[2]
+tfamFile = sys.argv[2]
+coEvFile = sys.argv[3]
 
 #---
 # Read PCA file
@@ -37,6 +66,21 @@ with open(pcaFile) as f:
 		if debug : print "Line\tID: {}\tPCAs: {}".format(id, pc)
 		if id : pcas[id] = pc
 
+#---
+# Read TFAM
+#---
+print >> sys.stderr, "Reading TFAM (with age) file: " + tfamFile
+sex = {}
+pheno = {}
+age = {}
+with open(tfamFile) as f:
+	for line in f:
+		f = line.rstrip().split('\t')
+		id, lsex, lpheno, lage = f[1], f[4], f[5], f[6]
+		sex[ id ] = lsex
+		pheno[ id ] = lpheno
+		age[ id ] = lage
+		if debug : print "Line\tID: {}\tSex: {}\tPheno: {}".format(id, sex, pheno)
 
 #---
 # Read coEvolution file
@@ -59,6 +103,8 @@ for line in f.readlines():
 	# First line? Read and parse header
 	if not header : 
 		header = line.split('\t')
+
+		# Show PC information
 		for pcnum in range(maxPc):
 			# Show 'PC' label
 			outLine = ""
@@ -77,6 +123,10 @@ for line in f.readlines():
 				outLine += "\t{}".format(pc)
 
 			print outLine
+
+		# Show sex information
+		printHeaderLine( "sex", sex)
+		printHeaderLine( "age", age)
 
 f.close()
 

@@ -144,10 +144,12 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 
 			// For each ALT
 			for (String alt : vcf.getAlts()) {
-				Map<String, String> values = currentDbEntry.getAltAlelleValues(alt);
+				// Are there any values to annotate?
+				if (currentDbEntry.hasValues(alt)) {
 
-				if (values != null) {
-					String val = values.get(fieldKey);
+					//Map<String, String> values = currentDbEntry.getAltAlelleValues(alt);
+					String val = currentDbEntry.getCsv(alt, fieldKey);
+
 					if (val == null) {
 						// No value: Don't add		
 					} else if (val.isEmpty() || val.equals(".")) {
