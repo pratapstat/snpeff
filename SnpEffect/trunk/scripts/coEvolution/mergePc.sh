@@ -1,7 +1,3 @@
 #!/bin/sh
 
-./mergePc.py t2d.mds head.txt > head.pc.txt
-
-# ./mergePc.py t2d.mds coevolution.MAX.txt > coevolution.MAX.pc.txt
-# ./mergePc.py t2d.mds coevolution.ABS.txt > coevolution.ABS.pc.txt
-# ./mergePc.py t2d.mds coevolution.genes.MAX.txt > coevolution.genes.MAX.pc.txt
+./mergePc.py t2d.mds $HOME/t2d1/pheno/pheno.age.tfam $HOME/t2d1/eff/hm1.gt.vcf > coEvolution.pheno.covariates.txt

@@ -517,13 +517,13 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		for (int idx = 0; idx < scores1.length; idx++) {
 			codes[idx] = -1;
 
+			int code1 = scores1[idx];
+			int code2 = scores2[idx];
+
+			checkSum1 += code1;
+			checkSum2 += code2;
+
 			if ((caseControl[idx] != null)) {
-				int code1 = scores1[idx];
-				int code2 = scores2[idx];
-
-				checkSum1 += code1;
-				checkSum2 += code2;
-
 				if ((code1 >= 0) && (code2 >= 0)) {
 					// Summarize two codes into one
 					int code = coEvolutionCode(code1, code2);
@@ -806,7 +806,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	 * Show title in R file
 	 */
 	void writeRResultsTitle() {
-		writeR("idx1\tidx2\tpos1\tgene1\tid1\tpos2\tgene2\tid2\tpAllelic\tpDominant\tpRecessive\tpCodominant\n");
+		writeR("idx1\tidx2\tpos1\tgene1\tid1\tpos2\tgene2\tid2\tpAllelic\tpDominant\tpRecessive\tpCodominant\tchecksum1\tchecksum2\n");
 	}
 
 }

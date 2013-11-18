@@ -96,7 +96,7 @@ public class SnpEffCmdGenes2Bed extends SnpEff {
 				if (!onlyProteinCoding || g.isProteinCoding()) {
 					// Expand interval
 					int start = g.getStart() - expandUpstreamDownstream;
-					int end = g.getEnd() + expandUpstreamDownstream;
+					int end = g.getEnd() + 1 + expandUpstreamDownstream;
 
 					// Show
 					System.out.println(g.getChromosomeName() + "\t" + start + "\t" + end + "\t" + g.getGeneName() + ";" + g.getId());
