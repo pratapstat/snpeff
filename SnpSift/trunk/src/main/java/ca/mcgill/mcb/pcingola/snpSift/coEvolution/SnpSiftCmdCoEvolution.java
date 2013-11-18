@@ -45,7 +45,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	int minAlleleCount;
 	int showNonSignificant; // Non significant test can be shown every now and then (if this value is positive). This is useful to get the full statistics spectrum (e.g. QQ plots)
 	long countTests;
-	String rFileName;
+	String rResultsFileName, rGtFileName;
 	ModelCoevolution model;
 	List<String> sampleIds;
 	ArrayList<byte[]> genotypes;
@@ -56,6 +56,14 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	public SnpSiftCmdCoEvolution(String args[]) {
 		super(args);
 		command = "coevolution";
+	}
+
+	void closeRfile() {
+		try {
+			if (rFile != null) rFile.close();
+		} catch (Exception e) {
+			throw new RuntimeException("Error closing R file.", e);
+		}
 	}
 
 	int coEvolutionCode(int code1, int code2) {
@@ -169,7 +177,8 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		minAlleleCount = 10;
 		pvalueThreshold = 1e-4;
 		model = ModelCoevolution.ABS;
-		rFileName = null; // Don't write details unless specified in the command line
+		rResultsFileName = null; // Don't write results unless specified in the command line
+		rGtFileName = null; // Don't write genotypes unless specified in the command line
 		showNonSignificant = 0; // By default do not show any non-significant results
 		countTests = 0;
 	}
@@ -202,6 +211,9 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		entryId = new ArrayList<String>();
 		double minp = 1.0;
 
+		// Open 'R' file
+		openRfile(rGtFileName, "Writing genotypes to file");
+
 		// Read file
 		if (verbose) Timer.showStdErr("Reading input file '" + vcfFileName + "'");
 		VcfFileIterator vcf = new VcfFileIterator(vcfFileName);
@@ -227,10 +239,14 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 
 					System.out.println(String.format("%s:%d\t%d\t%.2f\t%.4e\t%.4e\t", ve.getChromosomeName(), ve.getStart(), ve.mac(), logp, pvalue, minp));
 				}
+
+				// Write genotypes to "R" file
+				writeRGt(genoScores);
 			}
 		}
 
 		if (verbose) Timer.showStdErr("Finished loading VCF. Loaded: " + genotypes.size() + " lines." + (minp < 1 ? "\n\tMin p-value: " + minp : ""));
+		closeRfile();
 	}
 
 	/**
@@ -293,6 +309,22 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 
 	}
 
+	/**
+	 * Open a file and write data to be parsed by an R program
+	 * @param fileName
+	 * @param message
+	 */
+	void openRfile(String fileName, String message) {
+		try {
+			if (fileName != null) {
+				if (verbose) Timer.showStdErr(message + " '" + fileName + "'");
+				rFile = new BufferedWriter(new FileWriter(fileName));
+			}
+		} catch (Exception e) {
+			throw new RuntimeException("Error opening file '" + fileName + "'", e);
+		}
+	}
+
 	@Override
 	public void parse(String[] args) {
 		if (args.length <= 0) usage(null);
@@ -306,8 +338,13 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 				else if (arg.equalsIgnoreCase("-show")) showNonSignificant = Gpr.parseIntSafe(args[++argc]);
 				else if (arg.equalsIgnoreCase("-maxP")) pvalueThreshold = Gpr.parseDoubleSafe(args[++argc]);
 				else if (arg.equalsIgnoreCase("-model")) model = ModelCoevolution.valueOf(args[++argc].toUpperCase());
-				else if (arg.equalsIgnoreCase("-out")) rFileName = args[++argc];
-				else if (arg.equalsIgnoreCase("-genes")) {
+				else if (arg.equalsIgnoreCase("-out")) {
+					rResultsFileName = args[++argc];
+					// Create a name for genotype file
+					if (rGtFileName == null) rGtFileName = Gpr.dirName(rResultsFileName) + "/" + Gpr.baseName(rResultsFileName, Gpr.extName(rResultsFileName)) + "gt.txt";
+				} else if (arg.equalsIgnoreCase("-outGt")) {
+					rGtFileName = args[++argc];
+				} else if (arg.equalsIgnoreCase("-genes")) {
 					String genesStr = args[++argc];
 					genes = new HashSet<String>();
 					for (String g : genesStr.split(","))
@@ -474,6 +511,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		int ctrlHom = 0, ctrlHet = 0, ctrl = 0;
 		int nCase[] = new int[3];
 		int nControl[] = new int[3];
+		int checkSum1 = 0, checkSum2 = 0;
 
 		// Count genotypes
 		for (int idx = 0; idx < scores1.length; idx++) {
@@ -482,6 +520,9 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 			if ((caseControl[idx] != null)) {
 				int code1 = scores1[idx];
 				int code2 = scores2[idx];
+
+				checkSum1 += code1;
+				checkSum2 += code2;
 
 				if ((code1 >= 0) && (code2 >= 0)) {
 					// Summarize two codes into one
@@ -515,7 +556,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		// Calculate pValues
 		//---
 
-		// We only show results if pvalue is less than maxP 
+		// We only show results if p-value is less than maxP 
 		// If showNonSignificant is set, we show 
 		// results once every 'showNonSignificant'
 		long count = incCountTests();
@@ -538,7 +579,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		show |= (pvalue <= pvalueThreshold);
 
 		if (show) {
-			writeR(i1, i2, pvalues, codes);
+			writeRresults(i1, i2, pvalues, checkSum1, checkSum2);
 			return pvalues;
 		}
 		return null;
@@ -574,36 +615,25 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	 */
 	@Override
 	public void run() {
-		try {
-			// Load data
-			loadTfam();
-			loadVcf();
-			initMatchGenes();
+		// Load data
+		loadTfam();
+		loadVcf();
+		initMatchGenes();
 
-			// Open 'R' file
-			if (rFileName != null) {
-				if (verbose) Timer.showStdErr("Writing results to file '" + rFileName + "'");
-				rFile = new BufferedWriter(new FileWriter(rFileName));
-			} else {
-				if (verbose) Timer.showStdErr("No results file will be generated.");
-				rFile = null;
-			}
-			writeRTitle();
-
-			// Run
-			if (debug) powerCalculation();
-			runCoEvolution();
-
-			if (rFile != null) rFile.close();
-			if (verbose) Timer.showStdErr("Results written to file '" + rFileName + "'");
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		// Run
+		if (debug) powerCalculation();
+		runCoEvolution();
 	}
 
 	void runCoEvolution() {
+		// Open 'R' file
+		openRfile(rResultsFileName, "Writing results to file");
+		writeRResultsTitle();
+
 		if (numWorkers <= 1) runCoEvolutionSingle();
 		else runCoEvolutionMulti();
+
+		closeRfile();
 	}
 
 	/**
@@ -703,37 +733,12 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		System.err.println("\t-maxP  <num>    : Maximum p-value to report. Default: " + pvalueThreshold);
 		System.err.println("\t-minAc <num>    : Filter using minimum number of alleles. Default: " + minAlleleCount);
 		System.err.println("\t-model <model>  : Model to use {ABS, MAX}. Default: " + model);
-		System.err.println("\t-out    <file>  : Raw data output. Default: " + rFileName);
+		System.err.println("\t-out    <file>  : Write results to 'file'. Default: " + rResultsFileName);
+		System.err.println("\t-outGt  <file>  : Write genotypes to 'file'. Default: " + rGtFileName);
 		System.err.println("\t-show  <num>    : Show non-significant p-values every 'num' iterations. Default: " + showNonSignificant);
 		System.err.println("\tfile.tfam       : A TFAM file having case/control informations (phenotype colmun)");
 		System.err.println("\tfile.vcf        : A VCF file (variants and genotype data)");
 		System.exit(1);
-	}
-
-	/**
-	 * Show in a way that R can read (logistic regression)
-	 * @param i1
-	 * @param i2
-	 * @param codes
-	 */
-	void writeR(int i1, int i2, double pvalues[], byte codes[]) {
-		StringBuilder sb = new StringBuilder();
-
-		// Preapre string
-		sb.append(entryId.get(i1).replace(' ', '\t'));
-		sb.append('\t');
-		sb.append(entryId.get(i2).replace(' ', '\t'));
-
-		// Pvalues
-		for (int i = 0; i < pvalues.length; i++)
-			sb.append("\t" + pvalues[i]);
-
-		for (int i = 0; i < codes.length; i++)
-			sb.append("\t" + codes[i]);
-		sb.append('\n');
-
-		// Write it to file
-		writeR(sb.toString());
 	}
 
 	/**
@@ -749,28 +754,59 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	}
 
 	/**
-	 * Show title in R file
+	 * Write genotypes to an R file 
+	 * @param idx
+	 * @param codes
 	 */
-	void writeRTitle() {
+	void writeRGt(byte codes[]) {
 		StringBuilder sb = new StringBuilder();
 
-		// Write title
-		// { pAllelic, pDominant, pRecessive, pCodominant };
-		sb.append("pos1\tgene1\tid1\tpos2\tgene2\tid2\tpAllelic\tpDominant\tpRecessive\tpCodominant");
-		for (String sid : sampleIds)
-			sb.append("\t" + sid);
+		for (int i = 0; i < codes.length; i++)
+			sb.append((sb.length() > 0 ? "\t" : "") + codes[i]);
 		sb.append('\n');
 
-		// Write phenotypes
-		sb.append("pheno\tpheno\tpheno\tpheno\tpheno\tpheno\t1.0\t1.0\t1.0\t1.0");
-		for (int i = 0; i < caseControl.length; i++) {
-			int num = -1;
-			if (caseControl[i] != null) num = caseControl[i] ? 1 : 0;
-			sb.append("\t" + num);
-		}
-		sb.append('\n');
-
+		// Write it to file
 		writeR(sb.toString());
+	}
+
+	/**
+	 * Show in a way that R can read (logistic regression)
+	 * @param i1
+	 * @param i2
+	 * @param codes
+	 */
+	void writeRresults(int i1, int i2, double pvalues[], int checkSum1, int checkSum2) {
+		StringBuilder sb = new StringBuilder();
+
+		// Add indexes (one-based)
+		sb.append(i1 + 1);
+		sb.append('\t');
+		sb.append(i2 + 1);
+		sb.append('\t');
+
+		// Add variant data
+		sb.append(entryId.get(i1).replace(' ', '\t'));
+		sb.append('\t');
+		sb.append(entryId.get(i2).replace(' ', '\t'));
+
+		// Add p-values
+		for (int i = 0; i < pvalues.length; i++)
+			sb.append("\t" + pvalues[i]);
+
+		// Add checksums
+		sb.append("\t" + checkSum1 + "\t" + checkSum2);
+
+		sb.append('\n');
+
+		// Write it to file
+		writeR(sb.toString());
+	}
+
+	/**
+	 * Show title in R file
+	 */
+	void writeRResultsTitle() {
+		writeR("idx1\tidx2\tpos1\tgene1\tid1\tpos2\tgene2\tid2\tpAllelic\tpDominant\tpRecessive\tpCodominant\n");
 	}
 
 }

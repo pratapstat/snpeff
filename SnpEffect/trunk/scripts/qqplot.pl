@@ -38,7 +38,7 @@ close TXT;
 open R, "| R --vanilla --slave " or die "Cannot open R program\n";
 print R <<EOF;
 
-qqplot <- function( x, title ) {
+qqplot <- function( x, titleStr ) {
 	keep <- (x > 0) & (x <= 1) & ( ! is.na(x) );
 	x <- x[keep]
 	s <- sort(x);
@@ -49,13 +49,20 @@ qqplot <- function( x, title ) {
 	
 	# Show auto range
 	#par( mfrow=c(2,1) );
-	#plot( lx, ly, main=title, xlab="-Log[ rank / (N+1) ]", ylab="-Log[ p ]" );
+	#plot( lx, ly, main=titleStr, xlab="-Log[ rank / (N+1) ]", ylab="-Log[ p ]" );
 	#abline( 0 , 1 , col='red');
 
 	# Show full range in both plots
 	range <- c(0 , max(lx, ly) );
-	plot( lx, ly, xlim=range, ylim=range, main=title, xlab="-Log[ rank / (N+1) ]", ylab="-Log[ p ]" );
+	plot( lx, ly, xlim=range, ylim=range, main=titleStr, xlab="-Log[ rank / (N+1) ]", ylab="-Log[ p ]" );
 	abline( 0 , 1 , col='red');
+
+	# Calculate inflation
+	ones <- rep(1, length(lx) )
+	X <- cbind(ones, lx)
+	fit <- lm.fit(x=X, y=ly)
+	abline( fit\$coefficients[1], fit\$coefficients[2], col='green')
+	title( sub=paste("Inflation:", fit\$coefficients[2], "  Offset:", fit\$coefficients[1]) )
 }
 
 png('$pngFile', width = 1024, height = 1024);
