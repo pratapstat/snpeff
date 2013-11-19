@@ -11,7 +11,7 @@
 string tfam="$HOME/t2d1/pheno/pheno.age.tfam"
 string vcf="$HOME/t2d1/eff/hm.gt.vcf"
 
-int minAc=50						# Minimum Allele count in a variant
+int minAc=100						# Minimum Allele count in a variant
 real maxP=1e-06						# Maximum p-value to consider a variant for further analysis (logistic regression)
 int showNonSignificant=10000		# Show p-values even if non-significan (once every 'showNonSignificant')
 int numPc=3							# Number of PC to use in logistic regression
@@ -27,8 +27,8 @@ string genes = ""
 #genes = ""
 
 models = ["MAX"]
-genes = "BRCA1"
-maxP=0.99999999
+genes = "MMP11"
+maxP=1.0
 showNonSignificant=1
 
 # Programs
@@ -69,13 +69,13 @@ wait
 
 # Note we split the file to run N processes
 string splitDir = "split"
-string pcDir = "split/pc"
+string resultsDir = "split/results"
 string logisticDir = "split/logistic_$numPc"
 splitDir.mkdir()
-pcDir.mkdir()
+resultsDir.mkdir()
 logisticDir.mkdir()
 
-# Add PC information to result files
+# Split and run several R processes to calculate logistic regression
 for( string model : models ) {
 
 	string g = ""
@@ -83,44 +83,32 @@ for( string model : models ) {
 		g = ".genes"
 	}
 
-	string txt = "coevolution$g.$model.txt"
-	string pc = "coevolution$g.$model.pc.txt"
-	string prefix = "coevolution$g.$model.pc.split."
+	string results = "coevolution$g.$model.txt"
+	string genotypes = "coevolution$g.$model.gt.txt"
+	string phenoCov = "coEvolution.pheno.covariates.txt"
+	string prefix = "coevolution$g.$model.split."
 
-	if( txt.exists() ) {
-		int size = ( txt.size() / cpusLocal ) + 1
+	if( results.exists() ) {
+		int size = ( results.size() / cpusLocal ) + 1
 		size = min( maxRsize, size )
 		int filesSplitted = splitDir.dir("$prefix.*").size()
 		if( filesSplitted != cpusLocal ) {
-			print("Splitting file $txt into $cpusLocal files. File size: " + txt.size() + ", split size: $size\n");
-			sys split -C $size $txt $splitDir/$prefix
+			print("Splitting file $results into $cpusLocal files. File size: " + results.size() + ", split size: $size\n");
+			sys split -C $size $results $splitDir/$prefix
 		}
     
-		# Get header
-		string header = splitDir + "/header." + prefix + "txt"
-		sys head -n 2 $txt > $header
-        
 		# Create a task for each file
-		print("Adding PC information to files in $splitDir\n")
-		bool first = true
 		for( string split : splitDir.dir("$prefix.*") ) {
 			print("\t$split\n")
-			string splitPc = pcDir + "/" + split.baseName() + ".txt"
-    
-			# Only first file has header
-			string cat = "$splitDir/$split"
-			if( ! first ) { cat = "$header $splitDir/$split" } 
-			first = false
-    
-			# Merge PCs
-			if( pc <- split ) {
-				sys cat $cat | ./mergePc.py t2d.mds $tfam - > $splitPc
-			}
+			string splitResult = splitDir + "/" + split.baseName()
+			string logistic = logisticDir + "/" + split.baseName() + ".txt"
     
 			# Run logistic regression
-			string logistic = logisticDir + "/" + split.baseName() + ".txt"
-			task( logistic <- splitPc, cpus = 2 ) {
-				sys Rscript coEvolution.r $splitPc $numPc| tee $logistic
+			task( logistic <- splitResult, cpus = 2 ) {
+				sys head -n 1 $results > $splitResult.tmp
+				sys cat $splitResult | grep -v "^idx1" >> $splitResult.tmp
+				sys mv $splitResult.tmp $splitResult
+				sys Rscript coEvolution.r $splitResult $genotypes $phenoCov $numPc | tee $logistic
 			}
 		}
 	}
