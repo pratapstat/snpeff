@@ -41,7 +41,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	public static final int SHOW_EVERY = 1000;
 
 	boolean isMulti;
-	boolean genesMatch[];
+	boolean analyzeEntry[]; // Should we analyze this entry? Does it match a gene or a position that we want to analyze?
 	int minAlleleCount;
 	int showNonSignificant; // Non significant test can be shown every now and then (if this value is positive). This is useful to get the full statistics spectrum (e.g. QQ plots)
 	long countTests;
@@ -50,12 +50,52 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	List<String> sampleIds;
 	ArrayList<byte[]> genotypes;
 	ArrayList<String> entryId;
-	HashSet<String> genes;
+	HashSet<String> genes, chrPos;
 	BufferedWriter rFile;
 
 	public SnpSiftCmdCoEvolution(String args[]) {
 		super(args);
 		command = "coevolution";
+	}
+
+	/**
+	 * Should we analyze this entries
+	 * @param i
+	 * @param j
+	 * @return
+	 */
+	boolean analyzeEntries(int i, int j) {
+		return analyzeEntry[i] || analyzeEntry[j];
+	}
+
+	/**
+	 * Should we analyze this entry?
+	 * @param i
+	 * @return
+	 */
+	boolean analyzeEntry(int i) {
+		// Do we have a preferred list of genes or positions to focus on?
+		if ((genes == null) && (chrPos == null)) return true; // No 'genes' or 'chrPos' set? Everything matches
+
+		// Matching gene name to 'genes'.
+		// Get genes from entryId
+		String eid[] = entryId.get(i).split(" ");
+		if (genes != null) {
+			if (eid.length >= 2) {
+				// Any match?
+				String genesStr = eid[1];
+				for (String g : genesStr.split(","))
+					if (genes.contains(g)) return true;
+			}
+		}
+
+		// Does position match 'chrPos'
+		if (chrPos != null) {
+			String chrPosStr = eid[0].split("_")[0];
+			return chrPos.contains(chrPosStr);
+		}
+
+		return false;
 	}
 
 	void closeRfile() {
@@ -187,9 +227,9 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	 * Initialize genesMatch
 	 */
 	void initMatchGenes() {
-		genesMatch = new boolean[genotypes.size()];
-		for (int i = 0; i < genesMatch.length; i++)
-			genesMatch[i] = matchGenes(i);
+		analyzeEntry = new boolean[genotypes.size()];
+		for (int i = 0; i < analyzeEntry.length; i++)
+			analyzeEntry[i] = analyzeEntry(i);
 	}
 
 	/**
@@ -262,37 +302,6 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	}
 
 	/**
-	 * Does this entry matches "genes" command line option?
-	 * @param i
-	 * @return
-	 */
-	boolean matchGenes(int i) {
-		// Do we have a preferred list of genes to focus on?
-		if (genes == null) return true; // No 'genes' set? Everything matches
-
-		// Get genes from entryId
-		String eid[] = entryId.get(i).split(" ");
-		if (eid.length < 2) return false; // There is no genes information in this variant
-
-		// Any match?
-		String genesStr = eid[1];
-		for (String g : genesStr.split(","))
-			if (genes.contains(g)) return true;
-
-		return false;
-	}
-
-	/**
-	 * Do either entries match 'genes' from command line?
-	 * @param i
-	 * @param j
-	 * @return
-	 */
-	boolean matchGenes(int i, int j) {
-		return genesMatch[i] || genesMatch[j];
-	}
-
-	/**
 	 * Find the minimum non-zero pvalue
 	 * Note: If a p-value is exactly zero, there is something probably wrong with the statistic.
 	 * @param pvalues
@@ -349,6 +358,11 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 					genes = new HashSet<String>();
 					for (String g : genesStr.split(","))
 						genes.add(g);
+				} else if (arg.equalsIgnoreCase("-pos")) {
+					String genesStr = args[++argc];
+					chrPos = new HashSet<String>();
+					for (String cp : genesStr.split(","))
+						chrPos.add(cp);
 				}
 			} else if (tfamFile == null) tfamFile = arg;
 			else if (vcfFileName == null) vcfFileName = arg;
@@ -655,7 +669,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		for (int j = minj; j < numEntries; j++) {
 			if (i != j) {
 				// Does this entry match 'genes'?
-				if (matchGenes(i, j)) {
+				if (analyzeEntries(i, j)) {
 
 					double pvalues[] = pValue(i, j);
 					count++;
@@ -735,6 +749,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		System.err.println("\t-model <model>  : Model to use {ABS, MAX}. Default: " + model);
 		System.err.println("\t-out    <file>  : Write results to 'file'. Default: " + rResultsFileName);
 		System.err.println("\t-outGt  <file>  : Write genotypes to 'file'. Default: " + rGtFileName);
+		System.err.println("\t-pos <list>     : Comma separated list of genomic positions to analyze (chr:pos). Default: None");
 		System.err.println("\t-show  <num>    : Show non-significant p-values every 'num' iterations. Default: " + showNonSignificant);
 		System.err.println("\tfile.tfam       : A TFAM file having case/control informations (phenotype colmun)");
 		System.err.println("\tfile.vcf        : A VCF file (variants and genotype data)");
