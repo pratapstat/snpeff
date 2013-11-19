@@ -11,7 +11,7 @@
 string tfam="$HOME/t2d1/pheno/pheno.age.tfam"
 string vcf="$HOME/t2d1/eff/hm.gt.vcf"
 
-int minAc=100						# Minimum Allele count in a variant
+int minAc=30						# Minimum Allele count in a variant
 real maxP=1e-06						# Maximum p-value to consider a variant for further analysis (logistic regression)
 int showNonSignificant=10000		# Show p-values even if non-significan (once every 'showNonSignificant')
 int numPc=3							# Number of PC to use in logistic regression
@@ -19,6 +19,7 @@ int maxRsize=1024*1024*1024			# Process 1G per split
 
 # Available models
 string[] models = ["MAX", "ABS"]
+models = ["MAX"]
 
 # Gene set (T2D related)
 string genes = ""
@@ -26,10 +27,6 @@ string genes = ""
 #genes = "SLC30A8,IKZF2,PAX4,KISS1R"
 #genes = ""
 
-models = ["MAX"]
-genes = "MMP11"
-maxP=1.0
-showNonSignificant=1
 
 # Programs
 string snpsift = "java -Xmx10g -jar $HOME/snpEff/SnpSift.jar"
@@ -49,7 +46,7 @@ for( string model : models ) {
 		string txt = "coevolution.genes.$model.txt"
 		if( out <- vcf ) {
 			print("CoEvolutionary model $model on genes: $genes\n")
-			sys $snpsift coevolution -v -cpus $cpusLocal -minAc $minAc -maxP $maxP -model $model -genes "$genes" -out coevolution.genes.$model.txt $tfam $vcf > $out
+			sys $snpsift coevolution -v -cpus $cpusLocal -minAc $minAc -maxP $maxP -show $showNonSignificant -model $model -genes "$genes" -out coevolution.genes.$model.txt $tfam $vcf > $out
 		}
 	} else {
 		# Run on a subset of genes
@@ -57,7 +54,7 @@ for( string model : models ) {
 		string txt = "coevolution.$model.txt"
 		if( out <- vcf ) {
 			print("CoEvolutionary model $model\n")
-			sys $snpsift coevolution -v -cpus $cpusLocal -minAc $minAc -maxP $maxP -model $model -out coevolution.$model.txt $tfam $vcf > $out
+			sys $snpsift coevolution -v -cpus $cpusLocal -minAc $minAc -maxP $maxP -show $showNonSignificant -model $model -out coevolution.$model.txt $tfam $vcf > $out
 		}
 	}
 }

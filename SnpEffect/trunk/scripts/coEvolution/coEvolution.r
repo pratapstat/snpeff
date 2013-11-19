@@ -151,12 +151,12 @@ for( i in rowsToAnalyze ) {
 	pvalueOri <- pvalues[i]
 
 	#didx <- idx + minRow - 1
-	pos1 <- paste( dres[i,1] )
-	gene1 <- paste( dres[i,2] )
-	id1 <- paste( dres[i,3] )
-	pos2 <- paste( dres[i,4] )
-	gene2 <- paste( dres[i,5] )
-	id2 <- paste( dres[i,6] )
+	pos1 <- paste( dres[i,3] )
+	gene1 <- paste( dres[i,4] )
+	id1 <- paste( dres[i,5] )
+	pos2 <- paste( dres[i,6] )
+	gene2 <- paste( dres[i,7] )
+	id2 <- paste( dres[i,8] )
 	ratio <- pvalue / pvalueOri
 
 	# Show if p-value improves
