@@ -10,10 +10,11 @@
 import sys
 
 # Debug mode?
-debug = False
+debug = True
 
 # Value threshold
-minValue = 0 # float("-inf")
+minValue = float("-inf")
+maxValue = float("inf")
 
 #------------------------------------------------------------------------------
 # Load MSigDb file
@@ -30,9 +31,8 @@ def loadMsigDb(msigFile):
 #------------------------------------------------------------------------------
 # Process normalized GTEx file
 #------------------------------------------------------------------------------
-def readGtex(gtexFile):
+def readGtex(gtexFile, minValCount, minValue, maxValue):
 	column = []
-	minValCount = 0
 	countOk = 0
 	countNo = 0
 	gtexGenes = {}
@@ -53,8 +53,7 @@ def readGtex(gtexFile):
 				print >> sys.stderr, "OK, All required IDs found."
 
 			# We require at least these number of values
-			minValCount = len(column) / 2
-			print >> sys.stderr, "Filter:\n\tMinimum number of values: {}\n\tMinimum value: {}\n".format(minValCount, minValue)
+			print >> sys.stderr, "Filter:\n\tMinimum number of values: {}\n\tMinimum value: {}\n\tMaximum value: {}\n".format(minValCount, minValue, maxValue)
 
 		else :
 			geneId, geneName = fields[0], fields[1]
@@ -65,7 +64,7 @@ def readGtex(gtexFile):
 				val = fields[idx]
 				if val != "NA":
 					 v = float(val)
-					 if v >= minValue: vals.append( v )
+					 if (v >= minValue) and (v <= maxValue): vals.append( v )
 
 			# Show results
 			if len(vals) >= minValCount:
@@ -76,9 +75,9 @@ def readGtex(gtexFile):
 			else:
 				countNo += 1
 				gtexGenes[geneName] = 0
-				if debug: print "NO\t{}\t{}\t{} / {}q\t{}".format(geneId, geneName, len(vals), len(column), vals)
+				if debug: print "NO\t{}\t{}\t{} / {}\t{}".format(geneId, geneName, len(vals), len(column), vals)
 
-	print >> sys.stderr, "Count OK: {}\nCount No: {}\n".format( countOk, countNo)
+	print >> sys.stderr, "\tNumber of genes that passed  : {}\n\tNumber of genes filtered out : {}\n".format( countOk, countNo)
 	return gtexGenes
 
 #------------------------------------------------------------------------------
@@ -88,20 +87,23 @@ def readGtex(gtexFile):
 #---
 # Command line parameters
 #---
-if len(sys.argv) != 4 :
-	print >> sys.stderr, "Usage: " + sys.argv[0] + " msigDb.gmt gtex_normalized.txt gtexExperimentId_1,gtexExperimentId_2,...,gtexExperimentId_N"
+if len(sys.argv) < 4 :
+	print >> sys.stderr, "Usage: " + sys.argv[0] + " msigDb.gmt gtex_normalized.txt gtexExperimentId_1,gtexExperimentId_2,...,gtexExperimentId_N minCount minValue maxValue"
 	sys.exit(1)
 
 msigFile = sys.argv[1]
 gtexFile = sys.argv[2]
 gtexExperimentIds = sys.argv[3]
+minValCount = int( sys.argv[4] ) if len(sys.argv) > 4 else 1
+minValue = float( sys.argv[5] ) if len(sys.argv) > 5 else float("-inf")
+maxValue = float( sys.argv[6] ) if len(sys.argv) > 6 else float("inf")
 
 # Create a hash of IDs
 ids = dict( (id,1) for id in gtexExperimentIds.split(",") )
 
 # Read files
 geneSets = loadMsigDb(msigFile)
-gtexGenes = readGtex(gtexFile)
+gtexGenes = readGtex(gtexFile, minValCount, minValue, maxValue)
 
 # Create new gene sets
 for gsName in geneSets:
@@ -116,5 +118,4 @@ for gsName in geneSets:
 
 	# Show results
 	if debug: print "{} / {}\t{}".format( count, len(geneSet), out)
-	else:
-		if count > 0: print out
+	elif count > 0: print out

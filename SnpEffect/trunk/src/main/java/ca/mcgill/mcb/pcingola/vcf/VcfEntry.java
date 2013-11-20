@@ -490,8 +490,7 @@ public class VcfEntry extends Marker implements Iterable<VcfGenotype> {
 	}
 
 	public VcfGenotype getVcfGenotype(int index) {
-		if (vcfGenotypes == null) parseGenotypes();
-		return vcfGenotypes.get(index);
+		return getVcfGenotypes().get(index);
 	}
 
 	public List<VcfGenotype> getVcfGenotypes() {
@@ -627,8 +626,7 @@ public class VcfEntry extends Marker implements Iterable<VcfGenotype> {
 
 	@Override
 	public Iterator<VcfGenotype> iterator() {
-		if (vcfGenotypes == null) parseGenotypes();
-		return vcfGenotypes.iterator();
+		return getVcfGenotypes().iterator();
 	}
 
 	/**
@@ -637,27 +635,30 @@ public class VcfEntry extends Marker implements Iterable<VcfGenotype> {
 	 * @return
 	 */
 	public int mac() {
-		long mac = -1;
-		if (vcfGenotypes == null) parseGenotypes();
+		long ac = -1;
 
 		// Do we have it annotated as AF or MAF?
-		if (hasField("AC")) mac = getInfoInt("AC");
-		else if (hasField("MAC")) mac = getInfoInt("MAC");
+		if (hasField("MAC")) return (int) getInfoInt("MAC");
+		else if (hasField("AC")) ac = getInfoInt("AC");
 		else {
 			// No annotations, we have to calculate
-			int ac = 0;
+			ac = 0;
 			for (VcfGenotype gen : this) {
 				int genCode = gen.getGenotypeCode();
 				if (genCode > 0) ac += genCode;
 			}
-			mac = ac;
 		}
 
-		// Always use the Minor Allele Count
-		int count2 = vcfGenotypes.size() / 2;
-		if ((count2 > 1) && (mac > count2)) mac = vcfGenotypes.size() - mac;
+		// How many samples (alleles) do we have?
+		int numSamples = 0;
+		List<String> sampleNames = vcfFileIterator.getVcfHeader().getSampleNames();
+		if (sampleNames != null) numSamples = sampleNames.size();
+		else numSamples = getVcfGenotypes().size();
 
-		return (int) mac;
+		// Always use the Minor Allele Count
+		if ((numSamples > 1) && (ac > numSamples)) ac = 2 * numSamples - ac;
+
+		return (int) ac;
 	}
 
 	/**
@@ -851,17 +852,21 @@ public class VcfEntry extends Marker implements Iterable<VcfGenotype> {
 	 * Parse GENOTPYE entries
 	 */
 	void parseGenotypes() {
-		vcfGenotypes = new ArrayList<VcfGenotype>();
+		if (isCompressedGenotypes()) {
+			uncompressGenotypes();
+		} else {
+			vcfGenotypes = new ArrayList<VcfGenotype>();
 
-		// No genotype string? => Nothing to do
-		if (genotypeFieldsStr == null) return;
+			// No genotype string? => Nothing to do
+			if (genotypeFieldsStr == null) return;
 
-		// Split genotypes and parse them
-		genotypeFields = genotypeFieldsStr.split("\t");
-		for (int i = 0; i < genotypeFields.length; i++) {
-			String gen = genotypeFields[i];
-			if (gen.equals(VcfFileIterator.MISSING)) gen = "";
-			addGenotype(gen);
+			// Split genotypes and parse them
+			genotypeFields = genotypeFieldsStr.split("\t");
+			for (int i = 0; i < genotypeFields.length; i++) {
+				String gen = genotypeFields[i];
+				if (gen.equals(VcfFileIterator.MISSING)) gen = "";
+				addGenotype(gen);
+			}
 		}
 	}
 
@@ -1128,6 +1133,7 @@ public class VcfEntry extends Marker implements Iterable<VcfGenotype> {
 			default:
 				throw new RuntimeException("Unknown code '" + gt[i] + "'");
 			}
+
 			addGenotype(gtStr);
 		}
 

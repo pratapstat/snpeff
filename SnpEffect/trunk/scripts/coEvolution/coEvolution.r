@@ -16,52 +16,50 @@ args <- commandArgs(trailingOnly = TRUE)
 
 if( length(args) > 0 ) {
 	# Parse command line arguments
-    fileName <- args[1]
-    PC <- args[2]
+    resultsFileName <- args[1]	# Results from previous steps (pairs of genomic positions we want to further investigate)
+    gtFileName <- args[2]		# Gentypes
+    phenoFileName <- args[3]	# Phenotypes and coveriates
+    PC <- args[4]				# Number of PC to use (only 3 and 10 are supported)
     cat('# Parameters:\n')
-    cat('# \tInput file:', fileName, '\n')
+    cat('# \tResults file    :', resultsFileName, '\n')
+    cat('# \tGenotypes file  :', gtFileName, '\n')
+    cat('# \tPhenotyprs file :', phenoFileName, '\n')
     cat('# \tNumber of principal components:', PC, '\n')
 } else {
 	# Default parameters
-	fileName <- "coEvolution.pc.txt"
+    resultsFileName <- "coevolution.txt"
+    gtFileName <- "coevolution.gt.txt"
+    phenoFileName <- "coEvolution.pheno.covariates.txt"
 	PC <- 3
 }
 
 #---
 # Load data
 #---
-if( ! exists('d') ) {
+if( ! exists('dres') ) {
 	# Read data
-	cat('# Reading data', fileName, '\n')
-	d <- read.table(fileName, sep="\t", header=TRUE)
+	cat('# Reading results from', resultsFileName, '\n')
+	dres <- read.table(resultsFileName, sep="\t", header=TRUE)
+
+	cat('# Reading phenotypes from', phenoFileName, '\n')
+	dpheno <- read.table(phenoFileName, sep="\t", header=TRUE)
+
+	numSamples <- dim(dpheno)[2] - 1
+
+	cat('# Reading genotypes from', gtFileName, '\n')
+	genotypes <- matrix( scan(gtFileName, sep="\t", what = integer()), ncol=numSamples, byrow=TRUE )
 }
 
 #---
 # Parse the data file
 #---
-minCol <- 11					# Columns 1-10 are [chr1, pos1, gene1, chr2, pos2, gene2, pllelic, pDominant, pRecessive, pCodominant]
-minRow <- 14					# Rows 1-11 are: [PC_1 ... PC_10, sex, age, phenotypes ]
-maxCol <- length(d[1,])
-maxRow <- length(d[,1])
-
-# Extract sex
-sexRow <- minRow - 3			# Sex are in the third row before genotypes start
-sexCol <- minCol:maxCol
-sex <- as.numeric( d[sexRow,sexCol] ) - 1
-cat('# Sex:\n')
-print( table(sex) )
-
-# Extract age
-ageRow <- minRow - 2			# Ages are in the second row before genotypes start
-ageCol <- minCol:maxCol
-age <- as.numeric( d[ageRow,ageCol] ) - 1
-cat('# Age:\n')
-print( summary(age) )
+maxRow <- dim(dpheno)[1]
+maxCol <- dim(dpheno)[2]
+cols <- 2:maxCol
 
 # Extract phenotypes
-phenoRow <- minRow - 1			# Phenotypes are in the last row before genotypes start
-phenoCol <- minCol:maxCol
-pheno <- as.numeric( d[phenoRow,phenoCol] )
+phenoRow <- 1			
+pheno <- as.numeric( dpheno[phenoRow,cols] ) - 1
 
 cat('# Phenotypes:\n')
 cat('#     Cases    :', sum(pheno == 1), '\n' )
@@ -70,19 +68,29 @@ cat('#     Missing  :', sum(pheno == -1), '\n' )
 cat('#     Max      :', max(pheno), '\n' )
 cat('#     Min      :', min(pheno), '\n' )
 
-# Extract principal components (used as covariates)
-pcRows <- 1:(phenoRow-1)
-pcCols <- minCol:maxCol
-pcs <-  data.matrix( d[pcRows,pcCols] )
+# Extract sex
+sexRow <- maxRow - 1
+sex <- as.numeric( dpheno[sexRow,cols] ) - 1
+cat('#\n# Sex:\n')
+cat('#     Female  :', sum(sex == 1), '\n' )
+cat('#     Male    :', sum(sex == 0), '\n' )
+cat('#     Unknown :', sum(sex < 0), '\n' )
 
-# Extract genotypes
-genoCols <- minCol:maxCol
-genoRows <- minRow:maxRow
-genotypes <- data.matrix( d[genoRows, genoCols] )
+# Extract age
+ageRow <- maxRow
+age <- as.numeric( dpheno[ageRow,cols] )
+cat('#\n# Age:\n')
+cat('#     Unknown :', sum(age < 0), '\n' )
+cat('#     Avg     :', mean(age[age>0]), '\n' )
+cat('#     Max     :', max(age), '\n' )
+
+# Extract principal components (used as covariates)
+pcRows <- 2:(maxRow-2)
+pcs <- data.matrix( dpheno[pcRows,cols] )
 
 # Extract p_values
-pvalueCol <- (minCol-4):(minCol-1) 			# Last columns before genotypes has p_values
-pvaluesMat <- data.matrix( d[genoRows, pvalueCol] )
+pvalueCol <- 9:12
+pvaluesMat <- data.matrix( dres[, pvalueCol] )
 pvalues <- apply(pvaluesMat, 1, min)		# Min pvalue in each row
 cat('# \n# p-values:\n')
 cat('#     Min :', min(pvalues), '\n' )
@@ -93,32 +101,46 @@ cat('#     Max :', max(pvalues), '\n' )
 #---
 
 cat('\nLogistic regression:\n')
-keep <- ( pheno >= 0 )	# No pheotype? Don't use the sample
 
-rowsToAnalyze <- minRow:(minRow+1)
-rowsToAnalyze <- 1:(dim(genotypes)[1])
-for( idx in rowsToAnalyze ) {
-
+rowsToAnalyze <- 1:dim(dres)[1]
+for( i in rowsToAnalyze ) {
 	# Prepare data
-	gt <- as.numeric( genotypes[idx,] )
-	keep <- ( pheno >= 0 ) & (age > 0) & (sex >= 0) & (gt >= 0)		# Missing data? Don't use the sample
+	idx1 <- dres$idx1[i]
+	idx2 <- dres$idx2[i]
+
+	checksum1 <- dres$checksum1[i]
+	checksum2 <- dres$checksum2[i]
+
+	gt1 <- genotypes[idx1,]
+	gt2 <- genotypes[idx2,]
+
+	if( sum(gt1) != checksum1 ) { stop(paste("Checksum error in entry ", i, "\n\tIndex: ", idx1, "\n\tChecksum: ", sum(gt1), ' != ', checksum1, '\n')); }
+	if( sum(gt2) != checksum2 ) { stop(paste("Checksum error in entry ", i, "\n\tIndex: ", idx2, "\n\tChecksum: ", sum(gt2), ' != ', checksum2, '\n')); }
+
+	# Any missing data? Don't use the sample
+	keep <- ( pheno >= 0 ) & (age > 0) & (sex >= 0) & (gt1 >= 0) & (gt2 >= 0)
+
 	ph <- pheno[keep]
 	ag <- age[keep]
 	sx <- sex[keep]
-	gt <- gt[keep]
+	gt1 <- gt1[keep]
+	gt2 <- gt2[keep]
 	pc <- pcs[,keep]
+
+	maxg12 <- pmax(gt1 - gt2, 0)
+	maxg21 <- pmax(gt2 - gt1, 0)
 
 	#---
 	# Logistic regression
 	#---
 	if( PC == 10 ) {
 		# PC: First 10 components
-		lr0 <- glm( ph ~ gt + sx + ag + ag^2 + pc[1,] + pc[2,] + pc[3,] + pc[4,] + pc[5,] + pc[6,] + pc[7,] + pc[8,] + pc[9,] + pc[10,] , family=binomial)		# Full model, takes into account genotypes and PCs
-		lr1 <- glm( ph ~      sx + ag + ag^2 + pc[1,] + pc[2,] + pc[3,] + pc[4,] + pc[5,] + pc[6,] + pc[7,] + pc[8,] + pc[9,] + pc[10,] , family=binomial)		# Reduced model: only PCs, no genotypes
+		lr0 <- glm( ph ~ maxg12 + maxg21 + gt1 + gt1 + sx + ag + ag^2 + pc[1,] + pc[2,] + pc[3,] + pc[4,] + pc[5,] + pc[6,] + pc[7,] + pc[8,] + pc[9,] + pc[10,] , family=binomial)		# Full model, takes into account genotypes and PCs
+		lr1 <- glm( ph ~                   gt1 + gt1 + sx + ag + ag^2 + pc[1,] + pc[2,] + pc[3,] + pc[4,] + pc[5,] + pc[6,] + pc[7,] + pc[8,] + pc[9,] + pc[10,] , family=binomial)		# Reduced model: only PCs, no genotypes
 	} else if ( PC == 3 ) {
 		# PC: First 3 components
-		lr0 <- glm( ph ~ gt + sx + ag + ag^2 + pc[1,] + pc[2,] + pc[3,], family=binomial)	# Full model, takes into account genotypes and PCs
-		lr1 <- glm( ph ~      sx + ag + ag^2 + pc[1,] + pc[2,] + pc[3,], family=binomial)	# Reduced model: only PCs, no genotypes
+		lr0 <- glm( ph ~ maxg12 + maxg21 + gt1 + gt2 + sx + ag + ag^2 + pc[1,] + pc[2,] + pc[3,], family=binomial)	# Full model, takes into account genotypes and PCs
+		lr1 <- glm( ph ~                   gt1 + gt2 + sx + ag + ag^2 + pc[1,] + pc[2,] + pc[3,], family=binomial)	# Reduced model: only PCs, no genotypes
 	}
 
 	# Likelyhood ratio test
@@ -126,21 +148,20 @@ for( idx in rowsToAnalyze ) {
 	pvalue <- lrt$p.value	# p-value from likelihood ration test
 
 	# Show results
-	pvalueOri <- pvalues[idx]
+	pvalueOri <- pvalues[i]
 
-	didx <- idx + minRow - 1
-	pos1 <- paste( d[didx,1] )
-	gene1 <- paste( d[didx,2] )
-	id1 <- paste( d[didx,3] )
-	pos2 <- paste( d[didx,4] )
-	gene2 <- paste( d[didx,5] )
-	id2 <- paste( d[didx,6] )
+	#didx <- idx + minRow - 1
+	pos1 <- paste( dres[i,3] )
+	gene1 <- paste( dres[i,4] )
+	id1 <- paste( dres[i,5] )
+	pos2 <- paste( dres[i,6] )
+	gene2 <- paste( dres[i,7] )
+	id2 <- paste( dres[i,8] )
 	ratio <- pvalue / pvalueOri
 
-	if( pvalue < pvalueOri ) {
-		cat( paste("=>", idx, pvalue, pvalueOri, ratio, pos1, gene1, id1, pos2, gene2, id2, sep="\t") , '\n')
-	} else {
-		cat( paste("  ", idx, pvalue, pvalueOri, ratio, pos1, gene1, id1, pos2, gene2, id2, sep="\t") , '\n')
-	}
+	# Show if p-value improves
+	ind = "  "
+	if( pvalue < pvalueOri ) ind = "=>"
+	cat( paste(ind, i, pvalue, pvalueOri, ratio, pos1, gene1, id1, pos2, gene2, id2, sep="\t") , '\n')
 }
 
