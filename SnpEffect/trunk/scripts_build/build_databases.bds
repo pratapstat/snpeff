@@ -27,16 +27,18 @@ bool addBuild(string type, string genome) {
 
 	# No 'genes' file? Error
 	if( geneFiles.isEmpty() ) {
-		print("Error: No genes file for $genome\n")
+		warning("No genes file for $genome\n")
 		return( false );
 	}
 
 	string geneFile = geneFiles.head()
 	if( built.hasKey(genome) ) {
-		print("INFO: Genome $genome already built\n")
+		print("INFO : Genome $genome already built\n")
 	} else if( db <- geneFile ) {
 		print("BUILD:\t$type\t$genome\n")
 		task $snpeffBuild -$type $genome 2>&1 | tee build.$genome.out
+	} else {
+		print("OKi  :\t$type\t$genome\n")
 	}
 
 	# Mark as built
@@ -52,10 +54,14 @@ addBuild("refseq", "hg19")
 addBuild("gff2", "amel2")
 
 # Look into all directories
-for(string genome : snpeffData.dir() ) {
+print("Available databases:\n")
+string dbids = sys $snpeff databases | cut -f 1 | tail -n +3
+
+print("Building:\n")
+for(string genome : dbids.stdout().lines()  ) {
 
 	# Get genome name and genes file
-	genome = genome.baseName()
+	genome = genome.trim().baseName()
 	string dir = "$snpeffData/$genome"
 	string[] geneFiles = dir.dir("genes.*")
 
@@ -74,10 +80,13 @@ for(string genome : snpeffData.dir() ) {
 
 		# Build
 		addBuild(type, genome)
+	} else {
+		warning("No genes file found for '$genome', dir '$dir'\n")
 	}
 }
 
 wait
+print("Done!\n")
 
 # #---
 # # Build genomes
