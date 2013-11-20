@@ -27,8 +27,8 @@ if( length(args) > 0 ) {
     cat('# \tNumber of principal components:', PC, '\n')
 } else {
 	# Default parameters
-    resultsFileName <- "coEvolution.txt"
-    gtFileName <- "coEvolution.gt.txt"
+    resultsFileName <- "coevolution.txt"
+    gtFileName <- "coevolution.gt.txt"
     phenoFileName <- "coEvolution.pheno.covariates.txt"
 	PC <- 3
 }

@@ -262,7 +262,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 				parseVcfHeader(vcf);
 			}
 
-			// Use if at least 'MIN_MAC' minor allele counts
+			// Use if at least 'MIN_MAC' minor allele counts			
 			int mac = ve.mac();
 			if (ve.isVariant() && (mac >= minAlleleCount)) {
 				byte genoScores[] = genotypesScores(ve);
@@ -616,7 +616,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		double pTrend = pTrend(nControl, nCase);
 		double pAllelic = pAllelic(nControl, nCase, pvalueTh);
 		double pDominant = pDominant(nControl, nCase, pvalueTh);
-		swapMinorAllele(nControl, nCase); // Swap if minor allele is reference
+		swapMinorAllele(nControl, nCase); // Swap if minor allele is reference. Should not be necesary, since genotypesScores() already swaps them
 		double pRecessive = pRecessive(nControl, nCase, pvalueTh);
 
 		// Return an array of pvalues
