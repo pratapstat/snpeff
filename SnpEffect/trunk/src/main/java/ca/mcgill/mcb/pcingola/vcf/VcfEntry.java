@@ -490,8 +490,7 @@ public class VcfEntry extends Marker implements Iterable<VcfGenotype> {
 	}
 
 	public VcfGenotype getVcfGenotype(int index) {
-		if (vcfGenotypes == null) parseGenotypes();
-		return vcfGenotypes.get(index);
+		return getVcfGenotypes().get(index);
 	}
 
 	public List<VcfGenotype> getVcfGenotypes() {
@@ -654,7 +653,7 @@ public class VcfEntry extends Marker implements Iterable<VcfGenotype> {
 		int numSamples = 0;
 		List<String> sampleNames = vcfFileIterator.getVcfHeader().getSampleNames();
 		if (sampleNames != null) numSamples = sampleNames.size();
-		else if (vcfGenotypes != null) numSamples = getVcfGenotypes().size();
+		else numSamples = getVcfGenotypes().size();
 
 		// Always use the Minor Allele Count
 		if ((numSamples > 1) && (ac > numSamples)) ac = 2 * numSamples - ac;
@@ -1134,6 +1133,7 @@ public class VcfEntry extends Marker implements Iterable<VcfGenotype> {
 			default:
 				throw new RuntimeException("Unknown code '" + gt[i] + "'");
 			}
+
 			addGenotype(gtStr);
 		}
 
