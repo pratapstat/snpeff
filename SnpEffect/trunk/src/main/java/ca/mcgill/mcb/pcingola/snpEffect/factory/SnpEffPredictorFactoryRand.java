@@ -32,6 +32,8 @@ public class SnpEffPredictorFactoryRand extends SnpEffPredictorFactoryGff {
 		this.maxGeneLen = maxGeneLen;
 		this.maxTranscripts = maxTranscripts;
 		this.maxExons = maxExons;
+
+		frameCorrection = false;
 	}
 
 	@Override

@@ -34,6 +34,7 @@ public abstract class SnpEffPredictorFactory {
 	boolean debug = false;
 	boolean verbose = false;
 	boolean readSequences = true; // Do not read sequences from GFF file (this is only used for debugging)
+	boolean frameCorrection;
 	String fileName;
 	String fastaFile; // Only used for debugging or testing
 	String line;
@@ -58,6 +59,8 @@ public abstract class SnpEffPredictorFactory {
 		markersById = new HashMap<String, Marker>();
 		genesById = new HashMap<String, Gene>();
 		transcriptsById = new HashMap<String, Transcript>();
+
+		frameCorrection = false;
 	}
 
 	protected void add(Cds cds) {
@@ -429,8 +432,8 @@ public abstract class SnpEffPredictorFactory {
 		if (verbose) System.out.print("\n\tCreate UTRs from CDS (if needed): ");
 		utrFromCds();
 
-		// Coreect according to frame information
-		frameCorrection();
+		// Correct according to frame information
+		if (frameCorrection) frameCorrection();
 
 		// Remove empty chromosomes
 		removeEmptyChromos();
