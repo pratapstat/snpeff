@@ -57,3 +57,7 @@ rm -vf data/*/*.bin
 #---
 ./scripts_build/uploadSourceForge.sh
 
+# Other stuff to do:
+#		db_GRCh.sh		Create human databases pack (gwasCatalog, Epigenome, dbSnp, etc.)
+#
+
