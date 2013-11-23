@@ -23,7 +23,7 @@ public class GuessTableTypes {
 	HashMap<String, Integer> names2index;
 
 	public static void main(String[] args) {
-		GuessTableTypes zzz = new GuessTableTypes(Gpr.HOME + "/snpEff/db/dbNSFP/dbNSFP2.0.chr22.txt.gz");
+		GuessTableTypes zzz = new GuessTableTypes(Gpr.HOME + "/snpEff/db/dbNSFP/dbNSFP2.1.head.txt");
 		zzz.guessTypes();
 		System.out.println(zzz);
 	}
