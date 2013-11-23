@@ -47,7 +47,7 @@
 
 6) Update Galaxy's snpEff.xml
 		# Create galaxy genomes list 
-		scripts_build/galaxy_genomes.sh		 
+		scripts_build/galaxy.sh		 
 
 7) Upload to Galaxy ToolShed: http://toolshed.g2.bx.psu.edu/
 		Reference: http://wiki.g2.bx.psu.edu/Tool%20Shed

@@ -1055,18 +1055,18 @@ $ java -jar SnpSift.jar gwasCat gwascatalog.txt test.vcf | tee test.gwas.vcf
 				<br>
 				There are two options:
 				<ul>
-					<li> You can download the file from SnpEff's site <a href="http://sourceforge.net/projects/snpeff/files/databases/dbNSFP2.0.txt.gz">here</a>.
+					<li> You can download the file from SnpEff's site <a href="http://sourceforge.net/projects/snpeff/files/databases/dbNSFP2.1.txt.gz">here</a>.
 					<li> You can create it yourself, downloading the files from <a href="https://sites.google.com/site/jpopgen/dbNSFP">DbNsfp</a> site.
 					Creating a file that SnpSift can use is simple, just follow this guidelines:
 <pre>
 # Download dbNSFP database
-$ wget http://dbnsfp.houstonbioinformatics.org/dbNSFPzip/dbNSFP2.0.zip
+$ wget http://dbnsfp.houstonbioinformatics.org/dbNSFPzip/dbNSFP2.1.zip
 
 # Uncompress
-$ unzip dbNSFP2.0.zip
+$ unzip dbNSFP2.1.zip
 
 # Create a single file version
-$ (head -n 1 dbNSFP2.0_variant.chr1 ; cat dbNSFP2.0_variant.chr* | grep -v "^#" ) > dbNSFP2.0.txt
+$ (head -n 1 dbNSFP2.1_variant.chr1 ; cat dbNSFP2.1_variant.chr* | grep -v "^#" ) > dbNSFP2.1.txt
 </pre>
 				</ul>
 				</p>
@@ -1075,11 +1075,11 @@ $ (head -n 1 dbNSFP2.0_variant.chr1 ; cat dbNSFP2.0_variant.chr* | grep -v "^#" 
 <pre>
 # Donload and uncompress database (you need to do this only once):
 # WARNING: The database is 3Gb when compressed and 30Gb uncompressed.
-wget http://sourceforge.net/projects/snpeff/files/databases/dbNSFP2.0.txt.gz
-gunzip dbNSFP2.0.txt.gz
+wget http://sourceforge.net/projects/snpeff/files/databases/dbNSFP2.1.txt.gz
+gunzip dbNSFP2.1.txt.gz
 
 # Annotate using dbNSFP
-java -jar SnpSift.jar dbnsfp -v dbNSFP2.0.txt myFile.vcf > myFile.annotated.vcf
+java -jar SnpSift.jar dbnsfp -v dbNSFP2.1.txt myFile.vcf > myFile.annotated.vcf
 </pre>
 
 				<i class="icon-warning-sign"></i> You can now specify which fields you want to use for annotation using the '-f' command line option followed by a comma separated list of field names.
