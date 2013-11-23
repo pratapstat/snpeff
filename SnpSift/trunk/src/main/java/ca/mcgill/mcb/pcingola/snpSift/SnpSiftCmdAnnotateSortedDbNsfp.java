@@ -8,6 +8,7 @@ import java.util.Map;
 
 import ca.mcgill.mcb.pcingola.fileIterator.DbNsfpEntry;
 import ca.mcgill.mcb.pcingola.fileIterator.DbNsfpFileIterator;
+import ca.mcgill.mcb.pcingola.fileIterator.GuessTableTypes;
 import ca.mcgill.mcb.pcingola.fileIterator.SeekableBufferedReader;
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
 import ca.mcgill.mcb.pcingola.util.Gpr;
@@ -220,122 +221,124 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 	@Override
 	public void init() {
 		fieldsToAdd = new HashMap<String, String>();
-
-		/**
-		 * All available fields. This is from the DbNSFP README file
-		 * Reference: http://dbnsfp.houstonbioinformatics.org/dbNSFPzip/dbNSFP2.0b3.readme.txt
-		 * FIXME: It is a terrible idea to hard-code this...I will regret it soon.
-		 */
-
-		fieldsDescription = new HashMap<String, String>();
-		// The first four fields are not used:
-		fieldsDescription.put("chr", "chromosome number");
-		fieldsDescription.put("pos(1-coor)", "physical position on the chromosome as to hg19 (1-based coordinate)");
-		fieldsDescription.put("ref", "reference nucleotide allele (as on the + strand)");
-		fieldsDescription.put("alt", "alternative nucleotide allele (as on the + strand)");
-		fieldsDescription.put("aaref", "reference amino acid");
-		fieldsDescription.put("aaalt", "alternative amino acid");
-		fieldsDescription.put("hg18_pos(1-coor)", "physical position on the chromosome as to hg18 (1-based coordinate)");
-		fieldsDescription.put("genename", "gene name");
-		fieldsDescription.put("Uniprot_acc", "Uniprot accession number. Multiple entries separated by ';'.");
-		fieldsDescription.put("Uniprot_id", "Uniprot ID number. Multiple entries separated by ';'.");
-		fieldsDescription.put("Uniprot_aapos", "amino acid position as to Uniprot. Multiple entries separated by ';'.");
-		fieldsDescription.put("Interpro_domain", "domain or conserved site on which the variant locates. Domain annotations come from Interpro database. The number in the brackets following a specific domain is the count of times Interpro assigns the variant position to that domain, typically coming from different predicting databases. ");
-		fieldsDescription.put("cds_strand", "coding sequence (CDS) strand (+ or -)");
-		fieldsDescription.put("refcodon", "reference codon");
-		fieldsDescription.put("SLR_test_statistic", "SLR test statistic for testing natural selection on codons. A negative value indicates negative selection, and a positive value indicates positive selection. Larger magnitude of the value suggests stronger evidence.");
-		fieldsDescription.put("codonpos", "position on the codon (1, 2 or 3)");
-		fieldsDescription.put("fold-degenerate", "degenerate type (0, 2 or 3)");
-		fieldsDescription.put("Ancestral_allele", "Ancestral allele (based on 1000 genomes reference data). ACTG : high-confidence call, actg : low-confindence call, N : failure, - : the extant species contains an insertion at this postion, . : no coverage in the alignment");
-		fieldsDescription.put("Ensembl_geneid", "Ensembl gene id");
-		fieldsDescription.put("Ensembl_transcriptid", "Ensembl transcript ids (separated by ';')");
-		fieldsDescription.put("aapos", "amino acid position as to the protein '-1' if the variant is a splicing site SNP (2bp on each end of an intron)");
-		fieldsDescription.put("SIFT_score", "SIFT score, If a score is smaller than 0.05 the corresponding NS is predicted as 'D(amaging)'; otherwise it is predicted as 'T(olerated)'.");
-		fieldsDescription.put("Polyphen2_HDIV_score", "Polyphen2 score based on HumDiv, i.e. hdiv_prob. The score ranges from 0 to 1, and the corresponding prediction is 'probably damaging' if it is in [0.957,1]; 'possibly damaging' if it is in [0.453,0.956]; 'benign' if it is in [0,0.452]. Score cutoff for binary classification is 0.5, i.e. the prediction is 'neutral' if the score is smaller than 0.5 and 'deleterious' if the score is larger than 0.5. Multiple entries separated by ';'.");
-		fieldsDescription.put("Polyphen2_HDIV_pred", "Polyphen2 prediction based on HumDiv, 'D' ('porobably damaging'), 'P' ('possibly damaging') and 'B' ('benign'). Multiple entries separated by ';'.");
-		fieldsDescription.put("Polyphen2_HVAR_score", "Polyphen2 score based on HumVar, i.e. hvar_prob. The score ranges from 0 to 1, and the corresponding prediction is 'probably damaging' if it is in [0.909,1]; 'possibly damaging' if it is in [0.447,0.908]; 'benign' if it is in [0,0.446]. Score cutoff for binary classification is 0.5, i.e. the prediction is 'neutral' if the score is smaller than 0.5 and 'deleterious' if the score is larger than 0.5. Multiple entries separated by ';'.");
-		fieldsDescription.put("Polyphen2_HVAR_pred", "Polyphen2 prediction based on HumVar, 'D' ('porobably damaging'), 'P' ('possibly damaging') and 'B' ('benign'). Multiple entries separated by ';'.");
-		fieldsDescription.put("LRT_score", "LRT score");
-		fieldsDescription.put("LRT_pred", "LRT prediction, D(eleterious), N(eutral) or U(nknown)");
-		fieldsDescription.put("MutationTaster_score", "MutationTaster score");
-		fieldsDescription.put("MutationTaster_pred", "MutationTaster prediction, 'A' ('disease_causing_automatic'), 'D' ('disease_causing'), 'N' ('polymorphism') or 'P' ('polymorphism_automatic')");
-		fieldsDescription.put("GERP++_NR", "GERP++ neutral rate");
-		fieldsDescription.put("GERP++_RS", "GERP++ RS score, the larger the score, the more conserved the site.");
-		fieldsDescription.put("phyloP", "PhyloP score, the larger the score, the more conserved the site.");
-		fieldsDescription.put("29way_pi", "The estimated stationary distribution of A, C, G and T at the site, using SiPhy algorithm based on 29 mammals genomes. ");
-		fieldsDescription.put("29way_logOdds", "SiPhy score based on 29 mammals genomes. The larger the score, the more conserved the site.");
-		fieldsDescription.put("LRT_Omega", "estimated nonsynonymous-to-synonymous-rate ratio (¦Ø, reported by LRT)");
-		fieldsDescription.put("UniSNP_ids", "rs numbers from UniSNP, which is a cleaned version of dbSNP build 129, in format: rs number1;rs number2;...");
-		fieldsDescription.put("1000Gp1_AC", "Alternative allele counts in the whole 1000 genomes phase 1 (1000Gp1) data.");
-		fieldsDescription.put("1000Gp1_AF", "Alternative allele frequency in the whole 1000Gp1 data.");
-		fieldsDescription.put("1000Gp1_AFR_AC", "Alternative allele counts in the 1000Gp1 African descendent samples.");
-		fieldsDescription.put("1000Gp1_AFR_AF", "Alternative allele frequency in the 1000Gp1 African descendent samples.");
-		fieldsDescription.put("1000Gp1_EUR_AC", "Alternative allele counts in the 1000Gp1 European descendent samples.");
-		fieldsDescription.put("1000Gp1_EUR_AF", "Alternative allele frequency in the 1000Gp1 European descendent samples.");
-		fieldsDescription.put("1000Gp1_AMR_AC", "Alternative allele counts in the 1000Gp1 American descendent samples.");
-		fieldsDescription.put("1000Gp1_AMR_AF", "Alternative allele frequency in the 1000Gp1 American descendent samples.");
-		fieldsDescription.put("1000Gp1_ASN_AC", "Alternative allele counts in the 1000Gp1 Asian descendent samples.");
-		fieldsDescription.put("1000Gp1_ASN_AF", "Alternative allele frequency in the 1000Gp1 Asian descendent samples.");
-		fieldsDescription.put("ESP6500_AA_AF", "Alternative allele frequency in the Afrian American samples of the NHLBI GO Exome Sequencing Project (ESP6500 data set).");
-		fieldsDescription.put("ESP6500_EA_AF", "Alternative allele frequency in the European American samples of the NHLBI GO Exome Sequencing Project (ESP6500 data set).");
-		fieldsDescription.put("MutationAssessor_score", "MutationAssessor functional impact combined score");
-		fieldsDescription.put("MutationAssessor_pred", "MutationAssessor functional impact of a variant : predicted functional (high, medium), predicted non-functional (low, neutral)");
-		fieldsDescription.put("FATHMM_score", "FATHMM default score (weighted for human inherited-disease mutations with Disease Ontology); If a score is smaller than -1.5 the corresponding NS is predicted as D(AMAGING); otherwise it is predicted as T(OLERATED). If there's more than one scores associated with the same NS due to isoforms, the smallest score (most damaging) was used.");
-
-		// Field type
 		fieldsType = new HashMap<String, String>();
-		fieldsType.put("chr", "String");
-		fieldsType.put("pos(1-coor)", "Integer");
-		fieldsType.put("ref", "String");
-		fieldsType.put("alt", "String");
-		fieldsType.put("aaref", "String");
-		fieldsType.put("aaalt", "String");
-		fieldsType.put("hg18_pos(1-coor)", "Integer");
-		fieldsType.put("genename", "String");
-		fieldsType.put("Uniprot_acc", "String");
-		fieldsType.put("Uniprot_id", "String");
-		fieldsType.put("Uniprot_aapos", "String");
-		fieldsType.put("Interpro_domain", "String");
-		fieldsType.put("cds_strand", "String");
-		fieldsType.put("refcodon", "String");
-		fieldsType.put("SLR_test_statistic", "String");
-		fieldsType.put("codonpos", "Integer");
-		fieldsType.put("fold-degenerate", "Integer");
-		fieldsType.put("Ancestral_allele", "String");
-		fieldsType.put("Ensembl_geneid", "String");
-		fieldsType.put("Ensembl_transcriptid", "String");
-		fieldsType.put("aapos", "Integer");
-		fieldsType.put("SIFT_score", "Float");
-		fieldsType.put("Polyphen2_HDIV_score", "Float");
-		fieldsType.put("Polyphen2_HDIV_pred", "String");
-		fieldsType.put("Polyphen2_HVAR_score", "Float");
-		fieldsType.put("Polyphen2_HVAR_pred", "String");
-		fieldsType.put("LRT_score", "Float");
-		fieldsType.put("LRT_pred", "String");
-		fieldsType.put("MutationTaster_score", "Float");
-		fieldsType.put("MutationTaster_pred", "String");
-		fieldsType.put("GERP++_NR", "Float");
-		fieldsType.put("GERP++_RS", "Float");
-		fieldsType.put("phyloP", "Float");
-		fieldsType.put("29way_pi", "String");
-		fieldsType.put("29way_logOdds", "Float");
-		fieldsType.put("LRT_Omega", "Float");
-		fieldsType.put("UniSNP_ids", "String");
-		fieldsType.put("1000Gp1_AC", "Integer");
-		fieldsType.put("1000Gp1_AF", "Float");
-		fieldsType.put("1000Gp1_AFR_AC", "Integer");
-		fieldsType.put("1000Gp1_AFR_AF", "Float");
-		fieldsType.put("1000Gp1_EUR_AC", "Integer");
-		fieldsType.put("1000Gp1_EUR_AF", "Float");
-		fieldsType.put("1000Gp1_AMR_AC", "Integer");
-		fieldsType.put("1000Gp1_AMR_AF", "Float");
-		fieldsType.put("1000Gp1_ASN_AC", "Integer");
-		fieldsType.put("1000Gp1_ASN_AF", "Float");
-		fieldsType.put("ESP6500_AA_AF", "Float");
-		fieldsType.put("ESP6500_EA_AF", "Float");
-		fieldsType.put("MutationAssessor_score", "Float");
-		fieldsType.put("MutationAssessor_pred", "String");
-		fieldsType.put("FATHMM_score", "Float");
+		fieldsDescription = new HashMap<String, String>();
+
+		//		/**
+		//		 * All available fields. This is from the DbNSFP README file
+		//		 * Reference: http://dbnsfp.houstonbioinformatics.org/dbNSFPzip/dbNSFP2.0b3.readme.txt
+		//		 * FIXME: It is a terrible idea to hard-code this...I will regret it soon.
+		//		 */
+		//
+		//		fieldsDescription = new HashMap<String, String>();
+		//		// The first four fields are not used:
+		//		fieldsDescription.put("chr", "chromosome number");
+		//		fieldsDescription.put("pos(1-coor)", "physical position on the chromosome as to hg19 (1-based coordinate)");
+		//		fieldsDescription.put("ref", "reference nucleotide allele (as on the + strand)");
+		//		fieldsDescription.put("alt", "alternative nucleotide allele (as on the + strand)");
+		//		fieldsDescription.put("aaref", "reference amino acid");
+		//		fieldsDescription.put("aaalt", "alternative amino acid");
+		//		fieldsDescription.put("hg18_pos(1-coor)", "physical position on the chromosome as to hg18 (1-based coordinate)");
+		//		fieldsDescription.put("genename", "gene name");
+		//		fieldsDescription.put("Uniprot_acc", "Uniprot accession number. Multiple entries separated by ';'.");
+		//		fieldsDescription.put("Uniprot_id", "Uniprot ID number. Multiple entries separated by ';'.");
+		//		fieldsDescription.put("Uniprot_aapos", "amino acid position as to Uniprot. Multiple entries separated by ';'.");
+		//		fieldsDescription.put("Interpro_domain", "domain or conserved site on which the variant locates. Domain annotations come from Interpro database. The number in the brackets following a specific domain is the count of times Interpro assigns the variant position to that domain, typically coming from different predicting databases. ");
+		//		fieldsDescription.put("cds_strand", "coding sequence (CDS) strand (+ or -)");
+		//		fieldsDescription.put("refcodon", "reference codon");
+		//		fieldsDescription.put("SLR_test_statistic", "SLR test statistic for testing natural selection on codons. A negative value indicates negative selection, and a positive value indicates positive selection. Larger magnitude of the value suggests stronger evidence.");
+		//		fieldsDescription.put("codonpos", "position on the codon (1, 2 or 3)");
+		//		fieldsDescription.put("fold-degenerate", "degenerate type (0, 2 or 3)");
+		//		fieldsDescription.put("Ancestral_allele", "Ancestral allele (based on 1000 genomes reference data). ACTG : high-confidence call, actg : low-confindence call, N : failure, - : the extant species contains an insertion at this postion, . : no coverage in the alignment");
+		//		fieldsDescription.put("Ensembl_geneid", "Ensembl gene id");
+		//		fieldsDescription.put("Ensembl_transcriptid", "Ensembl transcript ids (separated by ';')");
+		//		fieldsDescription.put("aapos", "amino acid position as to the protein '-1' if the variant is a splicing site SNP (2bp on each end of an intron)");
+		//		fieldsDescription.put("SIFT_score", "SIFT score, If a score is smaller than 0.05 the corresponding NS is predicted as 'D(amaging)'; otherwise it is predicted as 'T(olerated)'.");
+		//		fieldsDescription.put("Polyphen2_HDIV_score", "Polyphen2 score based on HumDiv, i.e. hdiv_prob. The score ranges from 0 to 1, and the corresponding prediction is 'probably damaging' if it is in [0.957,1]; 'possibly damaging' if it is in [0.453,0.956]; 'benign' if it is in [0,0.452]. Score cutoff for binary classification is 0.5, i.e. the prediction is 'neutral' if the score is smaller than 0.5 and 'deleterious' if the score is larger than 0.5. Multiple entries separated by ';'.");
+		//		fieldsDescription.put("Polyphen2_HDIV_pred", "Polyphen2 prediction based on HumDiv, 'D' ('porobably damaging'), 'P' ('possibly damaging') and 'B' ('benign'). Multiple entries separated by ';'.");
+		//		fieldsDescription.put("Polyphen2_HVAR_score", "Polyphen2 score based on HumVar, i.e. hvar_prob. The score ranges from 0 to 1, and the corresponding prediction is 'probably damaging' if it is in [0.909,1]; 'possibly damaging' if it is in [0.447,0.908]; 'benign' if it is in [0,0.446]. Score cutoff for binary classification is 0.5, i.e. the prediction is 'neutral' if the score is smaller than 0.5 and 'deleterious' if the score is larger than 0.5. Multiple entries separated by ';'.");
+		//		fieldsDescription.put("Polyphen2_HVAR_pred", "Polyphen2 prediction based on HumVar, 'D' ('porobably damaging'), 'P' ('possibly damaging') and 'B' ('benign'). Multiple entries separated by ';'.");
+		//		fieldsDescription.put("LRT_score", "LRT score");
+		//		fieldsDescription.put("LRT_pred", "LRT prediction, D(eleterious), N(eutral) or U(nknown)");
+		//		fieldsDescription.put("MutationTaster_score", "MutationTaster score");
+		//		fieldsDescription.put("MutationTaster_pred", "MutationTaster prediction, 'A' ('disease_causing_automatic'), 'D' ('disease_causing'), 'N' ('polymorphism') or 'P' ('polymorphism_automatic')");
+		//		fieldsDescription.put("GERP++_NR", "GERP++ neutral rate");
+		//		fieldsDescription.put("GERP++_RS", "GERP++ RS score, the larger the score, the more conserved the site.");
+		//		fieldsDescription.put("phyloP", "PhyloP score, the larger the score, the more conserved the site.");
+		//		fieldsDescription.put("29way_pi", "The estimated stationary distribution of A, C, G and T at the site, using SiPhy algorithm based on 29 mammals genomes. ");
+		//		fieldsDescription.put("29way_logOdds", "SiPhy score based on 29 mammals genomes. The larger the score, the more conserved the site.");
+		//		fieldsDescription.put("LRT_Omega", "estimated nonsynonymous-to-synonymous-rate ratio (¦Ø, reported by LRT)");
+		//		fieldsDescription.put("UniSNP_ids", "rs numbers from UniSNP, which is a cleaned version of dbSNP build 129, in format: rs number1;rs number2;...");
+		//		fieldsDescription.put("1000Gp1_AC", "Alternative allele counts in the whole 1000 genomes phase 1 (1000Gp1) data.");
+		//		fieldsDescription.put("1000Gp1_AF", "Alternative allele frequency in the whole 1000Gp1 data.");
+		//		fieldsDescription.put("1000Gp1_AFR_AC", "Alternative allele counts in the 1000Gp1 African descendent samples.");
+		//		fieldsDescription.put("1000Gp1_AFR_AF", "Alternative allele frequency in the 1000Gp1 African descendent samples.");
+		//		fieldsDescription.put("1000Gp1_EUR_AC", "Alternative allele counts in the 1000Gp1 European descendent samples.");
+		//		fieldsDescription.put("1000Gp1_EUR_AF", "Alternative allele frequency in the 1000Gp1 European descendent samples.");
+		//		fieldsDescription.put("1000Gp1_AMR_AC", "Alternative allele counts in the 1000Gp1 American descendent samples.");
+		//		fieldsDescription.put("1000Gp1_AMR_AF", "Alternative allele frequency in the 1000Gp1 American descendent samples.");
+		//		fieldsDescription.put("1000Gp1_ASN_AC", "Alternative allele counts in the 1000Gp1 Asian descendent samples.");
+		//		fieldsDescription.put("1000Gp1_ASN_AF", "Alternative allele frequency in the 1000Gp1 Asian descendent samples.");
+		//		fieldsDescription.put("ESP6500_AA_AF", "Alternative allele frequency in the Afrian American samples of the NHLBI GO Exome Sequencing Project (ESP6500 data set).");
+		//		fieldsDescription.put("ESP6500_EA_AF", "Alternative allele frequency in the European American samples of the NHLBI GO Exome Sequencing Project (ESP6500 data set).");
+		//		fieldsDescription.put("MutationAssessor_score", "MutationAssessor functional impact combined score");
+		//		fieldsDescription.put("MutationAssessor_pred", "MutationAssessor functional impact of a variant : predicted functional (high, medium), predicted non-functional (low, neutral)");
+		//		fieldsDescription.put("FATHMM_score", "FATHMM default score (weighted for human inherited-disease mutations with Disease Ontology); If a score is smaller than -1.5 the corresponding NS is predicted as D(AMAGING); otherwise it is predicted as T(OLERATED). If there's more than one scores associated with the same NS due to isoforms, the smallest score (most damaging) was used.");
+		//
+		//		// Field type
+		//		fieldsType = new HashMap<String, String>();
+		//		fieldsType.put("chr", "String");
+		//		fieldsType.put("pos(1-coor)", "Integer");
+		//		fieldsType.put("ref", "String");
+		//		fieldsType.put("alt", "String");
+		//		fieldsType.put("aaref", "String");
+		//		fieldsType.put("aaalt", "String");
+		//		fieldsType.put("hg18_pos(1-coor)", "Integer");
+		//		fieldsType.put("genename", "String");
+		//		fieldsType.put("Uniprot_acc", "String");
+		//		fieldsType.put("Uniprot_id", "String");
+		//		fieldsType.put("Uniprot_aapos", "String");
+		//		fieldsType.put("Interpro_domain", "String");
+		//		fieldsType.put("cds_strand", "String");
+		//		fieldsType.put("refcodon", "String");
+		//		fieldsType.put("SLR_test_statistic", "String");
+		//		fieldsType.put("codonpos", "Integer");
+		//		fieldsType.put("fold-degenerate", "Integer");
+		//		fieldsType.put("Ancestral_allele", "String");
+		//		fieldsType.put("Ensembl_geneid", "String");
+		//		fieldsType.put("Ensembl_transcriptid", "String");
+		//		fieldsType.put("aapos", "Integer");
+		//		fieldsType.put("SIFT_score", "Float");
+		//		fieldsType.put("Polyphen2_HDIV_score", "Float");
+		//		fieldsType.put("Polyphen2_HDIV_pred", "String");
+		//		fieldsType.put("Polyphen2_HVAR_score", "Float");
+		//		fieldsType.put("Polyphen2_HVAR_pred", "String");
+		//		fieldsType.put("LRT_score", "Float");
+		//		fieldsType.put("LRT_pred", "String");
+		//		fieldsType.put("MutationTaster_score", "Float");
+		//		fieldsType.put("MutationTaster_pred", "String");
+		//		fieldsType.put("GERP++_NR", "Float");
+		//		fieldsType.put("GERP++_RS", "Float");
+		//		fieldsType.put("phyloP", "Float");
+		//		fieldsType.put("29way_pi", "String");
+		//		fieldsType.put("29way_logOdds", "Float");
+		//		fieldsType.put("LRT_Omega", "Float");
+		//		fieldsType.put("UniSNP_ids", "String");
+		//		fieldsType.put("1000Gp1_AC", "Integer");
+		//		fieldsType.put("1000Gp1_AF", "Float");
+		//		fieldsType.put("1000Gp1_AFR_AC", "Integer");
+		//		fieldsType.put("1000Gp1_AFR_AF", "Float");
+		//		fieldsType.put("1000Gp1_EUR_AC", "Integer");
+		//		fieldsType.put("1000Gp1_EUR_AF", "Float");
+		//		fieldsType.put("1000Gp1_AMR_AC", "Integer");
+		//		fieldsType.put("1000Gp1_AMR_AF", "Float");
+		//		fieldsType.put("1000Gp1_ASN_AC", "Integer");
+		//		fieldsType.put("1000Gp1_ASN_AF", "Float");
+		//		fieldsType.put("ESP6500_AA_AF", "Float");
+		//		fieldsType.put("ESP6500_EA_AF", "Float");
+		//		fieldsType.put("MutationAssessor_score", "Float");
+		//		fieldsType.put("MutationAssessor_pred", "String");
+		//		fieldsType.put("FATHMM_score", "Float");
 	}
 
 	/**
@@ -343,6 +346,19 @@ public class SnpSiftCmdAnnotateSortedDbNsfp extends SnpSift {
 	 * @throws IOException
 	 */
 	public void initAnnotate() throws IOException {
+		// Guess data types from table information
+		GuessTableTypes guessTableTypes = new GuessTableTypes(dbNsfpFileName);
+		guessTableTypes.guessTypes();
+		if (!guessTableTypes.parsedHeader()) throw new RuntimeException("Could not parse header from file '" + dbNsfpFileName + "'");
+		VcfInfoType types[] = guessTableTypes.getTypes();
+		String fieldNames[] = guessTableTypes.getFieldNames();
+		for (int i = 0; i < fieldNames.length; i++) {
+			String type = (types[i] != null ? types[i].toString() : "String");
+			fieldsType.put(fieldNames[i], type);
+			fieldsDescription.put(fieldNames[i], "Field '" + fieldNames[i] + "' from dbNSFP");
+		}
+
+		// Open VCF file
 		vcfFile = new VcfFileIterator(vcfFileName);
 
 		// Check and open dbNsfp

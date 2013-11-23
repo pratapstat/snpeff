@@ -32,6 +32,12 @@ public class GuessTableTypes {
 		this.fileName = fileName;
 	}
 
+	public boolean foundAllTypes() {
+		for (int i = 0; i < types.length; i++)
+			if (types[i] == null) return false;
+		return true;
+	}
+
 	public String[] getFieldNames() {
 		return fieldNames;
 	}
@@ -123,27 +129,40 @@ public class GuessTableTypes {
 
 	/**
 	 * Find column names form header and guess data types from values
+	 * 
+	 * @return true of OK, false if there was an error parsing header or data
 	 */
-	public void guessTypes() {
-		LineFileIterator lfi = new LineFileIterator(fileName);
+	public boolean guessTypes() {
 		boolean header = true;
+		if (headerPrefix == null) headerPrefix = "";
+
+		// Iterate parsing lines until we guessed all data types (lines can have empty values, so we may not be able to guess them in the first line).
+		LineFileIterator lfi = new LineFileIterator(fileName);
 		for (String line : lfi) {
 			if (header) {
 				// Parse header
 				header = false;
-				if (line.startsWith(headerPrefix)) line = line.substring(headerPrefix.length());
-				fieldNames = line.split(columnSeparator);
-				types = new VcfInfoType[fieldNames.length];
-				multipleValues = new boolean[fieldNames.length];
 
-				names2index = new HashMap<String, Integer>();
-				for (int i = 0; i < fieldNames.length; i++)
-					names2index.put(fieldNames[i], i);
+				// Make sure this is the header
+				if (headerPrefix.isEmpty() || line.startsWith(headerPrefix)) {
+					line = line.substring(headerPrefix.length());
+					fieldNames = line.split(columnSeparator);
+					types = new VcfInfoType[fieldNames.length];
+					multipleValues = new boolean[fieldNames.length];
+
+					names2index = new HashMap<String, Integer>();
+					for (int i = 0; i < fieldNames.length; i++)
+						names2index.put(fieldNames[i], i);
+				} else {
+					// Cannot parse header!
+					return false;
+				}
+
 			} else {
 				// Parse data
 				boolean done = true;
 				String values[] = line.split(columnSeparator);
-				for (int i = 0; i < values.length; i++) {
+				for (int i = 0; i < fieldNames.length; i++) {
 					// We don't know the type yet? Try to guess it
 					if (types[i] == null) {
 						types[i] = guessType(values[i]);
@@ -155,9 +174,15 @@ public class GuessTableTypes {
 				}
 
 				// Have we guessed all types? => We are done
-				if (done) break;
+				if (done) {
+					lfi.close();
+					return true;
+				}
 			}
 		}
+
+		lfi.close();
+		return false;
 	}
 
 	/**
@@ -178,6 +203,10 @@ public class GuessTableTypes {
 		Integer idx = names2index.get(fieldName);
 		if (idx == null) return null;
 		return multipleValues[idx];
+	}
+
+	public boolean parsedHeader() {
+		return fieldNames != null;
 	}
 
 	public void setColumnSeparator(String columnSeparator) {
