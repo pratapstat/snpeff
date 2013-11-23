@@ -14,6 +14,12 @@ string snpeffData="$snpeffDir/data"
 string snpeff="java -Xmx10G -jar snpEff.jar "
 string snpeffBuild="$snpeff build -v"
 
+string buildDir="$snpeffDir/build"
+string buildSummary="build.out"
+
+# Dry run: Don't build databases
+bool dryrun = false
+
 # Variables
 string{} built
 
@@ -35,75 +41,93 @@ bool addBuild(string type, string genome) {
 	if( built.hasKey(genome) ) {
 		print("INFO : Genome $genome already built\n")
 	} else if( db <- geneFile ) {
-		print("BUILD:\t$type\t$genome\n")
-		task $snpeffBuild -$type $genome 2>&1 | tee build.$genome.out
+		if( dryrun ) {
+			print("DRY RUN:\t$type\t$genome\n")
+		} else {
+			print("BUILD:\t$type\t$genome\n")
+			task $snpeffBuild -$type $genome 2>&1 | tee $buildDir/build.$genome.out
+		}
 	} else {
-		print("OKi  :\t$type\t$genome\n")
+		print("OK  :\t$type\t$genome\n")
 	}
 
 	# Mark as built
 	built{genome} = genome
+	return( true )
+}
+
+#-------------------------------------------------------------------------------
+# Build all databases
+#-------------------------------------------------------------------------------
+
+bool buildAll() {
+	print("Build: Start\n")
+	buildDir.mkdir()	# Make sure build dir exists
+	
+	# Special cases
+	addBuild("refseq", "hg19")
+	addBuild("gff2", "amel2")
+
+	# Look into all directories
+	print("Available databases:\n")
+	string dbids = sys $snpeff databases | cut -f 1 | tail -n +3
+
+	print("Building:\n")
+	for(string genome : dbids.stdout().lines()  ) {
+
+		# Get genome name and genes file
+		genome = genome.trim().baseName()
+		string dir = "$snpeffData/$genome"
+		string[] geneFiles = dir.dir("genes.*")
+
+		if( ! geneFiles.isEmpty() ) {
+			# Find genes' file type
+			string geneFile = geneFiles.head()
+			geneFile = geneFile.baseName(".gz")
+
+			# Get type from gene's file extention
+			string type = geneFile.extName()
+
+			# Convert type names
+			if( type == "gtf" )			{ type = "gtf22" }
+			else if( type == "gff" )	{ type = "gff3" }
+			else if( type == "gb" )		{ type = "genbank" }
+
+			# Build
+			addBuild(type, genome)
+		} else {
+			warning("No genes file found for '$genome', dir '$dir'\n")
+		}
+	}
+
+	wait
+
+	# Create build summary
+	print("Build: Checking build logs!\n")
+	if( ! dryrun )	sys cat $buildDir/build.*.out | ./scripts_build/buildCheck.pl | tee $buildSummary
+
+	print("Build: Done!\n")
+	return( true )
+}
+
+#-------------------------------------------------------------------------------
+# Build special databases
+#-------------------------------------------------------------------------------
+
+bool buildSpecial() {
+	
+	for( string hg : snpeffData.dir("GRCh37.7.*") ) {
+		print("Building NextProt for $hg\n")
+		if( ! dryrun )	task $snpeff buildNextProt -v $hg db/nextProt/
+	}
+	
+	return( true )
 }
 
 #-------------------------------------------------------------------------------
 # Main
 #-------------------------------------------------------------------------------
 
-# Special cases
-addBuild("refseq", "hg19")
-addBuild("gff2", "amel2")
+# buildAll()
+# buildSpecial()
 
-# Look into all directories
-print("Available databases:\n")
-string dbids = sys $snpeff databases | cut -f 1 | tail -n +3
-
-print("Building:\n")
-for(string genome : dbids.stdout().lines()  ) {
-
-	# Get genome name and genes file
-	genome = genome.trim().baseName()
-	string dir = "$snpeffData/$genome"
-	string[] geneFiles = dir.dir("genes.*")
-
-	if( ! geneFiles.isEmpty() ) {
-		# Find genes' file type
-		string geneFile = geneFiles.head()
-		geneFile = geneFile.baseName(".gz")
-
-		# Get type from gene's file extention
-		string type = geneFile.extName()
-
-		# Convert type names
-		if( type == "gtf" )			{ type = "gtf22" }
-		else if( type == "gff" )	{ type = "gff3" }
-		else if( type == "gb" )		{ type = "genbank" }
-
-		# Build
-		addBuild(type, genome)
-	} else {
-		warning("No genes file found for '$genome', dir '$dir'\n")
-	}
-}
-
-wait
-print("Done!\n")
-
-# #---
-# # Build genomes
-# #---
-# ./scripts/queue.pl 24 24 1 queue_build.txt
-# 
-# #---
-# # Special builds: Human
-# #---
-# $snpeff buildNextProt -v GRCh37.$ENSEMBL_RELEASE db/nextProt/
-# 
-# #---
-# # Create build reports
-# #---
-# echo "Creating build report : cds_check.txt"
-# grep "CDS check" *.stdout | cut -f 3- -d : | grep -v "^$" | sort | tee cds_check.txt
-# 
-# echo "Creating build report : protein_check.txt"
-# grep "Protein check" *.stdout | cut -f 3- -d : | grep -v "^$" | sort | tee protein_check.txt
-# 

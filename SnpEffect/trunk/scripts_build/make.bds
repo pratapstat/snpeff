@@ -1,0 +1,699 @@
+#!/usr/bin/env bds
+
+#-------------------------------------------------------------------------------
+#
+# Create databases
+#
+#-------------------------------------------------------------------------------
+
+#---
+# Commands to run
+#---
+string snpeffDir="$HOME/snpEff"
+string snpeffData="$snpeffDir/data"
+string snpeff="java -Xmx10G -jar snpEff.jar "
+string snpeffBuild="$snpeff build -v"
+
+string buildDir="$snpeffDir/build"
+string buildSummary="build.out"
+
+# Dry run: Don't build databases
+bool dryrun = false
+
+# Variables
+string{} built
+
+#-------------------------------------------------------------------------------
+# Add a build command
+#-------------------------------------------------------------------------------
+bool addBuild(string type, string genome) {
+	string dir = "$snpeffData/$genome"
+	string db = "$dir/snpEffectPredictor.bin"
+	string[] geneFiles = dir.dir("genes.*") 
+
+	# No 'genes' file? Error
+	if( geneFiles.isEmpty() ) {
+		warning("No genes file for $genome\n")
+		return( false );
+	}
+
+	string geneFile = geneFiles.head()
+	if( built.hasKey(genome) ) {
+		print("INFO : Genome $genome already built\n")
+	} else if( db <- geneFile ) {
+		if( dryrun ) {
+			print("DRY RUN:\t$type\t$genome\n")
+		} else {
+			print("BUILD:\t$type\t$genome\n")
+			task $snpeffBuild -$type $genome 2>&1 | tee $buildDir/build.$genome.out
+		}
+	} else {
+		print("OK  :\t$type\t$genome\n")
+	}
+
+	# Mark as built
+	built{genome} = genome
+	return( true )
+}
+
+#-------------------------------------------------------------------------------
+# Build all databases
+#-------------------------------------------------------------------------------
+
+bool buildAll() {
+	print("Build: Start\n")
+	buildDir.mkdir()	# Make sure build dir exists
+	
+	# Special cases
+	addBuild("refseq", "hg19")
+	addBuild("gff2", "amel2")
+
+	# Look into all directories
+	print("Available databases:\n")
+	string dbids = sys $snpeff databases | cut -f 1 | tail -n +3
+
+	print("Building:\n")
+	for(string genome : dbids.stdout().lines()  ) {
+
+		# Get genome name and genes file
+		genome = genome.trim().baseName()
+		string dir = "$snpeffData/$genome"
+		string[] geneFiles = dir.dir("genes.*")
+
+		if( ! geneFiles.isEmpty() ) {
+			# Find genes' file type
+			string geneFile = geneFiles.head()
+			geneFile = geneFile.baseName(".gz")
+
+			# Get type from gene's file extention
+			string type = geneFile.extName()
+
+			# Convert type names
+			if( type == "gtf" )			{ type = "gtf22" }
+			else if( type == "gff" )	{ type = "gff3" }
+			else if( type == "gb" )		{ type = "genbank" }
+
+			# Build
+			addBuild(type, genome)
+		} else {
+			warning("No genes file found for '$genome', dir '$dir'\n")
+		}
+	}
+
+	wait
+
+	# Create build summary
+	print("Build: Checking build logs!\n")
+	if( ! dryrun )	sys cat $buildDir/build.*.out | ./scripts_build/buildCheck.pl | tee $buildSummary
+
+	print("Build: Done!\n")
+	return( true )
+}
+
+#-------------------------------------------------------------------------------
+# Build special databases
+#-------------------------------------------------------------------------------
+
+bool buildSpecial() {
+	
+	for( string hg : snpeffData.dir("GRCh37.7.*") ) {
+		print("Building NextProt for $hg\n")
+		if( ! dryrun )	task $snpeff buildNextProt -v $hg db/nextProt/
+	}
+	
+	return( true )
+}
+
+#-------------------------------------------------------------------------------
+# Main
+#-------------------------------------------------------------------------------
+
+# buildAll()
+# buildSpecial()
+
+#===================================================================================================
+# download_darned.sh
+#
+#		#!/bin/sh
+#		
+#		dir="db/darned/"
+#		
+#		mkdir -p $dir
+#		
+#		# Download
+#		wget -O $dir/hg19.txt "http://beamish.ucc.ie/static/downloads/hg19.txt"
+#		
+#		echo "Convert TXT to VCF"
+#		cat $dir/hg19.txt | sort -k1,1 -k2n,2n | ./scripts_build/darnedToVcf.pl > $dir/darned.hg19.vcf
+#		
+#===================================================================================================
+# download_ensembl_bfmpp.sh
+#
+#		#!/bin/sh -e
+#
+#		#-------------------------------------------------------------------------------
+#		# Download ENSEMBL's Bacteria, Fungi, Metazoa, Plants, Protist
+#		#
+#		# Note: This uses the alternative site ftp://ftp.ensemblgenomes.org
+#		#       instead of the usual ftp://ftp.ensembl.org
+#		#
+#		#
+#		#																Pablo Cingolani
+#		#-------------------------------------------------------------------------------
+#		source `dirname $0`/config.sh
+#
+#		#mkdir download
+#		cd download
+#
+#		site="ftp://ftp.ensemblgenomes.org"
+#
+#		wget_wait=1
+#		wget="wget --wait=$wget_wait -r -nc "
+#
+#		# #---
+#		# # Download from ENSEMBL
+#		# #---
+#		# 
+#		# for org in bacteria fungi metazoa misc_data plants protists
+#		# do
+#		# 	# Download GTF files (annotations)
+#		# 	$wget -A "*gtf.gz" "$site/pub/$org/release-$ENSEMBL_BFMPP_RELEASE/gtf/"
+#		# 	 
+#		# 	# Download FASTA files (reference genomes)
+#		# 	$wget -A "*dna.toplevel.fa.gz" "$site/pub/$org/release-$ENSEMBL_BFMPP_RELEASE/fasta/"
+#		# 
+#		# 	# Download CDS sequences
+#		# 	$wget -A "*cdna.all.fa.gz" "$site/pub/$org/release-$ENSEMBL_BFMPP_RELEASE/fasta/"
+#		# 
+#		# 	# Download PROTEIN sequences
+#		# 	$wget -A "*.pep.all.fa.gz" "$site/pub/$org/release-$ENSEMBL_BFMPP_RELEASE/fasta/"
+#		# 
+#		# done
+#		# 
+#		# #---
+#		# # Create directory structure
+#		# #---
+#		# 
+#		# # Move all downloaded file to this directory
+#		# for f in `find ftp.ensemblgenomes.org -type f`
+#		# do
+#		# 	mv -v "$f" .
+#		# done
+#		# 
+#		# # Gene annotations files
+#		# for gtf in *.gtf.gz
+#		# do
+#		# 	short=`../scripts/file2GenomeName.pl $gtf | cut -f 5`
+#		# 	echo ANNOTATIONS: $short
+#		# 
+#		# 	mkdir -p data/$short
+#		# 	cp $gtf data/$short/genes.gtf.gz
+#		# done
+#		#  
+#		# # Reference genomes files
+#		# mkdir -p data/genomes
+#		# for fasta in *.dna.toplevel.fa.gz
+#		# do
+#		# 	genome=`../scripts/file2GenomeName.pl $fasta | cut -f 5`
+#		# 	echo REFERENCE: $genome
+#		# 
+#		# 	mkdir -p data/$genome
+#		# 	cp $fasta data/genomes/$genome.fa.gz
+#		# done
+#		# 
+#		# # CDS genomes files
+#		# for fasta in *.cdna.all.fa.gz
+#		# do
+#		# 	genome=`../scripts/file2GenomeName.pl $fasta | cut -f 5`
+#		# 	echo CDS: $genome $fasta
+#		# 
+#		# 	mkdir -p data/$genome
+#		# 	cp $fasta data/$genome/cds.fa.gz
+#		# done
+#		# 
+#		# # Protein seuqence files
+#		# for pep in *.pep.all.fa.gz
+#		# do
+#		# 	short=`../scripts/file2GenomeName.pl $pep | cut -f 5`
+#		# 	echo PROTEIN: $short
+#		# 
+#		# 	mkdir -p data/$short
+#		# 	cp $pep data/$short/protein.fa.gz
+#		# done
+#		# 
+#		# #---
+#		# # Config file entries
+#		# #---
+#		# 
+#		# (
+#		# for fasta in *.cdna.all.fa.gz
+#		# do
+#		# 	genome=`../scripts/file2GenomeName.pl $fasta | cut -f 4`
+#		# 	short=`../scripts/file2GenomeName.pl $fasta | cut -f 5`
+#		# 
+#		# 	# Individual genome entry
+#		# 	echo -e "$short.genome : $genome"
+#		# 	echo -e "$short.reference : ftp://ftp.ensembl.org/pub/release-$ENSEMBL_BFMPP_RELEASE/gtf/"
+#		# 	echo
+#		# done
+#		# ) | tee ../snpEff.ensembl_bfmpp.$ENSEMBL_BFMPP_RELEASE.config
+#
+#		#---
+#		# ENSEMBL is files in a way that is not fully compatible with Java's gzip library
+#		#---
+#
+#		rm -vf queue_gunzip.txt queue_gunzip.txt
+#		for g in `find data -iname "*.gz"`
+#		do
+#			f=`dirname $g`/`basename $g .gz`
+#			echo "Un-compress / compress: $g"
+#			echo "gunzip -v $g" >> queue_gunzip.txt
+#			echo "gzip -v $f" >> queue_gzip.txt
+#		done
+#
+#		# Uncompress all files
+#		../scripts/queue.pl 22 22 0 queue_gunzip.txt
+#
+#		# Compress all files
+#		../scripts/queue.pl 22 22 0 queue_gzip.txt
+#
+#		# #---
+#		# # Back to parent dir
+#		# #---
+#		# cd - > /dev/null
+#		# 
+#		# #---
+#		# # Move data dir to 'real' data dir
+#		# #---
+#		# mv download/data/genomes/* data/genomes/
+#		# rmdir download/data/genomes
+#		# mv download/data/* data/
+#
+#===================================================================================================
+# download_ensembl.sh
+#
+#		#!/bin/sh -e
+#
+#		source `dirname $0`/config.sh
+#
+#		#mkdir download
+#		cd download
+#
+#		#---
+#		# Download from ENSEMBL
+#		#---
+#
+#		# Download GTF files (annotations)
+#		wget -r -A "*gtf.gz" "ftp://ftp.ensembl.org/pub/release-$ENSEMBL_RELEASE/gtf/"
+#
+#		# Download FASTA files (reference genomes)
+#		wget -r -A "*dna.toplevel.fa.gz" "ftp://ftp.ensembl.org/pub/release-$ENSEMBL_RELEASE/fasta/"
+#
+#		# Download CDS sequences
+#		wget -r -A "*cdna.all.fa.gz" "ftp://ftp.ensembl.org/pub/release-$ENSEMBL_RELEASE/fasta/"
+#
+#		# Download PROTEIN sequences
+#		wget -r -A "*.pep.all.fa.gz" "ftp://ftp.ensembl.org/pub/release-$ENSEMBL_RELEASE/fasta/"
+#
+#		# Download regulation tracks
+#		wget -r -A "*AnnotatedFeatures.gff.gz" "ftp://ftp.ensembl.org/pub/release-$ENSEMBL_RELEASE/regulation/"
+#		wget -r -A "*MotifFeatures.gff.gz" "ftp://ftp.ensembl.org/pub/release-$ENSEMBL_RELEASE/regulation/"
+#
+#		#---
+#		# Create directory structure
+#		#---
+#
+#		# Move all GTF and FASTA downloaded files to this directory
+#		mv `find ftp.ensembl.org -type f -iname "*gtf.gz" -or -iname "*.fa.gz"` .
+#
+#		# Gene annotations files
+#		for gtf in *.gtf.gz
+#		do
+#			short=`../scripts/file2GenomeName.pl $gtf | cut -f 5`
+#			echo ANNOTATIONS: $short
+#
+#			mkdir -p data/$short
+#			cp $gtf data/$short/genes.gtf.gz
+#		done
+#		 
+#		# Reference genomes files
+#		mkdir -p data/genomes
+#		for fasta in *.dna.toplevel.fa.gz
+#		do
+#			genome=`../scripts/file2GenomeName.pl $fasta | cut -f 5`
+#			echo REFERENCE: $genome
+#
+#			cp $fasta data/genomes/$genome.fa.gz
+#		done
+#
+#		# CDS genomes files
+#		for fasta in *.cdna.all.fa.gz
+#		do
+#			genome=`../scripts/file2GenomeName.pl $fasta | cut -f 5`
+#			echo CDS: $genome
+#
+#			cp $fasta data/$genome/cds.fa.gz
+#		done
+#
+#		# Protein seuqence files
+#		for pep in *.pep.all.fa.gz
+#		do
+#			short=`../scripts/file2GenomeName.pl $pep | cut -f 5`
+#			echo PROTEIN: $short
+#
+#			mkdir -p data/$short
+#			cp $pep data/$short/protein.fa.gz
+#		done
+#
+#		# Regunation tracks
+#		mkdir -p data/GRCh37.$ENSEMBL_RELEASE/
+#		cp ftp.ensembl.org/pub/release-$ENSEMBL_RELEASE/regulation/homo_sapiens/AnnotatedFeatures.gff.gz data/GRCh37.$ENSEMBL_RELEASE/regulation.gff.gz
+#		cp ftp.ensembl.org/pub/release-$ENSEMBL_RELEASE/regulation/homo_sapiens/MotifFeatures.gff.gz data/GRCh37.$ENSEMBL_RELEASE/motif.gff.gz
+#
+#		mkdir -p data/GRCm38.$ENSEMBL_RELEASE/
+#		cp ftp.ensembl.org/pub/release-$ENSEMBL_RELEASE/regulation/mus_musculus/AnnotatedFeatures.gff.gz data/GRCm38.$ENSEMBL_RELEASE/regulation.gff.gz
+#		cp ftp.ensembl.org/pub/release-$ENSEMBL_RELEASE/regulation/mus_musculus/MotifFeatures.gff.gz data/GRCm38.$ENSEMBL_RELEASE/motif.gff.gz
+#
+#		#---
+#		# Config file entries
+#		#---
+#
+#		(
+#		for fasta in *.cdna.all.fa.gz
+#		do
+#			genome=`../scripts/file2GenomeName.pl $fasta | cut -f 4`
+#			short=`../scripts/file2GenomeName.pl $fasta | cut -f 5`
+#
+#			# Individual genome entry
+#			echo -e "$short.genome : $genome"
+#			echo -e "$short.reference : ftp://ftp.ensembl.org/pub/release-$ENSEMBL_RELEASE/gtf/"
+#			echo
+#		done
+#		) | tee ../snpEff.ensembl.$ENSEMBL_RELEASE.config
+#
+#		#---
+#		# ENSEMBL is compressing files in a way that is not fully compatible with Java's gzip library
+#		#---
+#
+#		rm -vf queue_gunzip.txt queue_gunzip.txt
+#		for g in `find . -iname "*.gz"`
+#		do
+#			f=`dirname $g`/`basename $g .gz`
+#			echo "Un-compress / compress: $g"
+#			echo "gunzip -v $g" >> queue_gunzip.txt
+#			echo "gzip -v $f" >> queue_gzip.txt
+#		done
+#
+#		# Uncompress all files
+#		../scripts/queue.pl 22 22 1 queue_gunzip.txt
+#
+#		# Compress all files
+#		../scripts/queue.pl 22 22 1 queue_gzip.txt
+#
+#		#---
+#		# Back to parent dir
+#		#---
+#		cd - > /dev/null
+#
+#		#---
+#		# Move data dir to 'real' data dir
+#		#---
+#
+#		mv download/data/genomes/* data/genomes/
+#		rmdir download/data/genomes
+#
+#		mv download/data/* data/
+#
+#		echo "Done!"
+#
+#===================================================================================================
+# download_epigenome.sh
+#
+#		#!/bin/sh
+#
+#		cd db/epigenome/
+#
+#		#wget -r --no-parent --no-clobber -A "*.bed.gz" http://www.genboree.org/EdaccData/Current-Release/sample-experiment/Pancreatic_Islets/
+#		#wget -r --no-parent --no-clobber -A "*.bed.gz" http://www.genboree.org/EdaccData/Current-Release/sample-experiment/Adult_Liver/
+#		#wget -r --no-parent --no-clobber -A "*.bed.gz" http://www.genboree.org/EdaccData/Current-Release/sample-experiment/Adipose_Tissue/
+#		#wget -r --no-parent --no-clobber -A "*.bed.gz" http://www.genboree.org/EdaccData/Current-Release/sample-experiment/Skeletal_Muscle/
+#
+#		url="http://www.genboree.org/EdaccData/Current-Release/sample-experiment"
+#
+#		# Download all antries in directory
+#		for dir in `wget -q -O - $url | cut -f 2 -d \" | grep "/$" | grep -v "\.\./"`
+#		do
+#			echo $dir
+#			wget -nv -r --no-parent --no-clobber -A "*.bed.gz" "$url/$dir"
+#		done
+#
+#===================================================================================================
+# download_hg19.sh
+#
+#		#!/bin/sh -e
+#
+#		#-------------------------------------------------------------------------------
+#		#
+#		# Download hg19 annotations
+#		#
+#		# Script created by Sarmady, Mahdi
+#		#
+#		#	If you remember, a while ago I asked if you can add transcript versions 
+#		#	to RefSeq annotations. I found a way to add them without having you change 
+#		#	anything. Today I basically downloaded (from ucsc) a modified version of 
+#		#	refGene table with transcript versions concatenated to their names (by 
+#		#	getting version numbers from gbCdnaInfo table as  described here 
+#		#	http://www.biostars.org/p/52066/ ). I tested it with a huge vcf and it 
+#		#	works flawlessly.
+#		#
+#		#-------------------------------------------------------------------------------
+#
+#		REF=hg19
+#
+#		mkdir -p $REF || true
+#		cd data/$REF/
+#
+#		#---
+#		# Download latest datasets
+#		#---
+#
+#		# Genome sequence
+#		wget http://hgdownload.cse.ucsc.edu/goldenPath/$REF/bigZips/chromFa.tar.gz
+#
+#		# Protein sequences
+#		wget ftp://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.protein.faa.gz
+#
+#		# CDS sequences
+#		wget ftp://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.rna.fna.gz
+#
+#		# RefLink
+#		wget http://hgdownload.cse.ucsc.edu/goldenPath/$REF/database/refLink.txt.gz
+#		gunzip refLink.txt.gz
+#
+#		#---
+#		# Create FASTA file
+#		#---
+#		rm -rvf chr
+#		mkdir chr 
+#		cd chr
+#		tar -xvzf ../chromFa.tar.gz
+#
+#		FASTA=../$REF.fa
+#		echo Creating FASTA file
+#		rm -vf $FASTA
+#		cat chr[1-9].fa    >> $FASTA
+#		cat chr??.fa   >> $FASTA
+#		cat chr[A-Z].fa    >> $FASTA
+#		cat chr???*.fa >> $FASTA
+#
+#		cd -
+#
+#		# Compress genome file
+#		$HOME/tools/pigz/pigz hg19.fa
+#		cp hg19.fa.gz $HOME/snpEff/data/genomes/
+#
+#		#---
+#		# Download Gene information
+#		#---
+#
+#		echo "Query MySql database"
+#
+#		(
+#		echo "use hg19;"
+#		echo "select rg.bin as '#bin'"
+#		echo "		, CONCAT(rg.name,'.',gi.version) as 'name'"
+#		echo "		, rg.chrom, rg.strand"
+#		echo "		, rg.txStart"
+#		echo "		, rg.txEnd"
+#		echo "		, rg.cdsStart"
+#		echo "		, rg.cdsEnd"
+#		echo "		, rg.exonCount"
+#		echo "		, rg.exonStarts"
+#		echo "		, rg.exonEnds"
+#		echo "		, rg.score"
+#		echo "		, rg.name2"
+#		echo "		, rg.cdsStartStat"
+#		echo "		, rg.cdsEndStat"
+#		echo "		, rg.exonFrames"
+#		echo "	from refGene rg"
+#		echo "	inner join gbCdnaInfo gi"
+#		echo "		on rg.name=gi.acc"
+#		echo ";"
+#		) | mysql --user=genome --host=genome-mysql.cse.ucsc.edu -A hg19 > genes.txt
+#
+#		# Compress file
+#		gzip genes.txt
+#
+#		#---
+#		# Create CDS and protein files
+#		#---
+#
+#		# Protein fasta
+#		zcat human.protein.faa.gz \
+#			| ../../scripts_build/hg19_proteinFasta2NM.pl refLink.txt \
+#			| ../../scripts_build/hg19_proteinFastaReplaceName.pl genes.txt.gz \
+#			> protein.fa
+#		gzip protein.fa
+#
+#		# CDS fasta
+#		zcat human.rna.fna.gz | sed "s/^>gi|[0-9]*|ref|\(.*\)|.*/>\1/" > cds.fa 
+#		gzip cds.fa
+#
+#===================================================================================================
+# download_ncbi.sh
+#
+#		#!/bin/sh -e
+#
+#		queueFile=queue_build_ncbi.txt
+#
+#		#mkdir download/ncbi
+#		cd download/ncbi
+#
+#		#---
+#		# Download from NCBI (Bacterial genoms)
+#		#---
+#
+#		# wget -r -np -nc -A "gbk,html" "http://ftp.ncbi.nih.gov/genomes/Bacteria/"
+#
+#		#---
+#		# Create directory structure
+#		#---
+#
+#		# # Move all downloaded file to this directory
+#		# mv ftp.ncbi.nih.gov/genomes/Bacteria/* .
+#		# rmdir ftp.ncbi.nih.gov/genomes/Bacteria
+#		# rmdir ftp.ncbi.nih.gov/genomes
+#		# rmdir ftp.ncbi.nih.gov
+#
+#		# # Remove old queue file
+#		# touch $queueFile
+#		# rm $queueFile
+#		# 
+#		# for dir in `find . -mindepth 1 -maxdepth 1 -type d `
+#		# do
+#		# 	# Config file entries
+#		# 	gen=`basename $dir`
+#		# 	echo -e "$gen.genome : $gen\n" | tee -a ncbi_append.snpEff.config
+#		# 
+#		# 	# Collapse all fine into one 
+#		# 	cd $dir
+#		# 	cat *.gbk > genes.gb
+#		# 	cd - > /dev/null
+#		# 
+#		# 	# Build queue file
+#		# 	echo "java -Xmx4G -jar snpEff.jar build -v -genbank $gen" >> $queueFile
+#		# done
+#
+#		#---
+#		# Move to data directory
+#		#---
+#
+#		echo Move to DATA dir
+#		for dir in `find . -mindepth 1 -maxdepth 1 -type d `
+#		do
+#			echo "    $dir"
+#			mv $dir ../../data/
+#		done
+#
+#		cd -
+#===================================================================================================
+# download_nextProt.sh
+#
+#		#!/bin/sh
+#
+#		mkdir -p db/nextProt/
+#		cd db/nextProt/
+#
+#		for chr in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 21 22 X Y MT
+#		do
+#			wget "ftp://ftp.nextprot.org/pub/current_release/xml/nextprot_chromosome_$chr.xml.gz"
+#		done
+#===================================================================================================
+# download_Pwms_Jaspar.sh
+#
+#		#!/bin/sh
+#
+#		mkdir -p db/jaspar/
+#		cd db/jaspar/
+#
+#		wget "http://jaspar.binf.ku.dk/html/DOWNLOAD/JASPAR_CORE/pfm/redundant/pfm_all.txt"
+#		gzip pfm_all.txt
+#		mv pfm_all.txt.gz pwms.bin
+#
+#		echo "File pwms.bin created"
+#===================================================================================================
+
+
+
+
+
+#===================================================================================================
+# uploadSourceForge.sh
+#
+#		#!/bin/sh
+#		
+#		#-------------------------------------------------------------------------------
+#		#
+#		# Upload files to SourceForge web 
+#		#
+#		#																Pablo Cingolani
+#		#-------------------------------------------------------------------------------
+#		
+#		# Include variables
+#		source `dirname $0`/config.sh
+#		
+#		#---
+#		# Upload to ZIP files and databases
+#		#---
+#		# Core program
+#		echo
+#		echo "Upload snpEff_latest_core.zip and snpEff_v${SNPEFF_VERSION}_core.zip"
+#		cp snpEff_v${SNPEFF_VERSION}_core.zip snpEff_latest_core.zip
+#		scp snpEff_v${SNPEFF_VERSION}_core.zip snpEff_latest_core.zip pcingola,snpeff@frs.sourceforge.net:/home/frs/project/s/sn/snpeff/
+#		
+#		# Individual databases
+#		echo
+#		echo "Upload databases"
+#		scp snpEff_v${SNPEFF_VERSION}_*.zip pcingola,snpeff@frs.sourceforge.net:/home/frs/project/s/sn/snpeff/databases/v${SNPEFF_VERSION}/
+#		
+#		#---
+#		# Update SnpEff web pages
+#		#---
+#		
+#		# Create versions file (html/versions.txt)
+#		./scripts_build/versions.sh
+#		
+#		# Upload HTML pages
+#		cd $HOME/workspace/SnpEff/html/
+#		
+#		# Copy html and txt files 
+#		echo
+#		echo "Upload web pages"
+#		scp style.css *.html *.txt pcingola,snpeff@frs.sourceforge.net:htdocs/
+#				
+#		# Copy images
+#		echo
+#		echo "Upload web pages images"
+#		scp -r  images/ pcingola,snpeff@frs.sourceforge.net:htdocs/images/
+#		
+#===================================================================================================
