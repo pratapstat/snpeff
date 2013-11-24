@@ -8,4 +8,3 @@ gzip pfm_all.txt
 mv pfm_all.txt.gz pwms.bin
 
 echo "File pwms.bin created"
-
