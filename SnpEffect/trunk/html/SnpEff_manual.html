@@ -599,7 +599,17 @@ java -Xmx4g -jar snpEff.jar dm5.34 s.vcf > s.eff.vcf
 				Files used as input to SnpEff must comply with standard formats.
 				Here we describe supported input data formats.
 				</p>
-				
+
+				<i class="icon-hand-right"></i> You can use "-" as input file name to spedicfy <b>STDIN</b>. 
+				<br>
+				For example, you can easily stream files like this:
+				<br>
+				<br>
+<pre>
+cat file.vcf | java -Xmx4g -jar snpEff.jar hg19 - > file.eff.vcf
+</pre>
+
+
 				<p><h3>VCF</h3>
 				As we mentioned before, <a class="body"class="body" href="http://www.1000genomes.org/wiki/Analysis/Variant%20Call%20Format/vcf-variant-call-format-version-41">Variant Call Format (VCF)</a> is the recomended format for input files.
 				This is the format used by the "1000 Genomes Project", and is currently considered the de-facto standard for genomic variants.

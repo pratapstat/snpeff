@@ -80,15 +80,17 @@ public class Jaspar implements Iterable<Pwm> {
 	 */
 	int[] parseWeights(String line, String lineType) {
 		// Sanity check
-		if (!line.startsWith(lineType)) throw new RuntimeException("Error: Expecting weight for '" + lineType + "', found : " + line);
-		line = line.replace('[', ' ').replace(']', ' ');
+		if (line.startsWith(lineType)) line = line.substring(lineType.length());
+
+		// line = line.replace('[', ' ').replace(']', ' ');
+		line = line.replace('[', ' ').replace(']', ' ').trim();
 
 		// Split weights
 		String weightStr[] = line.split("\\s+");
 		// Populate weight array
-		int weight[] = new int[weightStr.length - 1];
+		int weight[] = new int[weightStr.length];
 		for (int i = 0; i < weight.length; i++)
-			weight[i] = Gpr.parseIntSafe(weightStr[i + 1]);
+			weight[i] = Gpr.parseIntSafe(weightStr[i]);
 
 		return weight;
 	}

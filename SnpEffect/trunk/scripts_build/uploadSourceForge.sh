@@ -37,10 +37,10 @@ cd $HOME/workspace/SnpEff/html/
 # Copy html and txt files 
 echo
 echo "Upload web pages"
-scp style.css *.html *.txt pcingola,snpeff@frs.sourceforge.net:htdocs/
+scp -C style.css *.html *.txt pcingola,snpeff@frs.sourceforge.net:htdocs/
 		
 # Copy images
 echo
 echo "Upload web pages images"
-scp -r  images/ pcingola,snpeff@frs.sourceforge.net:htdocs/images/
+scp -C -r images/ pcingola,snpeff@frs.sourceforge.net:htdocs/images/
 

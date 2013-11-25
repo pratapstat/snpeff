@@ -67,6 +67,7 @@ public class TestSuiteAll {
 		suite.addTestSuite(TestCasesGtf22.class);
 		suite.addTestSuite(TestCasesVcf.class);
 		suite.addTestSuite(TestCasesRefSeq.class);
+		suite.addTestSuite(TestCasesJaspar.class);
 
 		// Build database: Exon frame
 		suite.addTestSuite(TestCasesExonFrame.class);

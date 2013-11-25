@@ -58,7 +58,7 @@ public class TestCasesDbNsfp extends TestCase {
 	 */
 	public void test_02() {
 		String vcfFileName = "test/test_dbnsfp_multiple.vcf";
-		String fields = "genename,Ensembl_geneid,Ensembl_transcriptid";
+		String fields = "genename,Ensembl_geneid,Ensembl_transcriptid,aaref,aaalt";
 		String args[] = { "-f", fields, "test/test_dbnsfp_multiple_lines.txt", vcfFileName };
 
 		SnpSiftCmdAnnotateSortedDbNsfp cmd = new SnpSiftCmdAnnotateSortedDbNsfp(args);
@@ -80,6 +80,8 @@ public class TestCasesDbNsfp extends TestCase {
 			Assert.assertEquals("ENST00000368485,ENST00000515190", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.VCF_INFO_PREFIX + "Ensembl_transcriptid"));
 			Assert.assertEquals("IL6R", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.VCF_INFO_PREFIX + "genename"));
 			Assert.assertEquals("ENSG00000160712", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.VCF_INFO_PREFIX + "Ensembl_geneid"));
+			Assert.assertEquals("A,L", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.VCF_INFO_PREFIX + "aaalt"));
+			Assert.assertEquals("D,I", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.VCF_INFO_PREFIX + "aaref"));
 
 			cmd.endAnnotate();
 		} catch (Exception e) {
