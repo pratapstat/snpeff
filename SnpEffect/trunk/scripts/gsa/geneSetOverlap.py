@@ -40,6 +40,7 @@ setFile = sys.argv[2]
 geneSets = loadMsigDb(msigFile)
 testSets = loadMsigDb(setFile)
 
+print "{}%\t{}\t{}\t{}\t{}".format("overlap", "count", "len", "gsetName1", "gsetName2")
 for gsetName1 in testSets:
 	abslen = len(testSets[gsetName1])
 	if abslen > 5:
@@ -47,7 +48,7 @@ for gsetName1 in testSets:
 			count = len(testSets[gsetName1] & geneSets[gsetName2])
 			if count > 0:
 				overlap = (100.0 * count) / abslen
-				print "{}%\t{} / {}\t{}\t{}".format(overlap, count, abslen, gsetName1, gsetName2)
+				print "{}%\t{}\t{}\t{}\t{}".format(overlap, count, abslen, gsetName1, gsetName2)
 
 
 
