@@ -162,7 +162,7 @@ public class SnpSiftCmdFilter extends SnpSift {
 		// Split by semicolon and filter out the undesired values
 		boolean removed = false;
 		for (String f : filter.split(";")) {
-			if (!f.equals(filterStr)) sbFilter.append((sbFilter.length() > 0 ? ";" : "") + filterStr); // Append if it does not match filterStr
+			if (!f.equals(filterStr)) sbFilter.append((sbFilter.length() > 0 ? ";" : "") + f); // Append if it does not match filterStr
 			else removed = true;
 		}
 
