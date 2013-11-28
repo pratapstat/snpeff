@@ -55,6 +55,7 @@ public class SnpEffCmdGsa extends SnpEff {
 	boolean useClosestGene = false; // Map to 'any' closest gene?
 	boolean useGeneId = false; // Use geneId instead of geneName
 	boolean usePvalues = true;
+	boolean removeUnusedSets = false; // TODO: Add a comamand line option?
 	boolean orderDescending = false; // If 'true', high scores are better (sort descending and get the first values) 
 	int upDownStreamLength = SnpEffectPredictor.DEFAULT_UP_DOWN_LENGTH;
 	int minGeneSetSize = 0;
@@ -293,6 +294,10 @@ public class SnpEffCmdGsa extends SnpEff {
 			if (enrichmentAlgorithmType.isRank()) {
 				geneSetsRanked = new GeneSetsRanked(geneSets);
 				geneSetsRanked.rankByValue(!orderDescending);
+
+				if (removeUnusedSets) geneSetsRanked.removeUnusedSets(); // Remove unused gene sets
+			} else {
+				if (removeUnusedSets) geneSets.removeUnusedSets(); // Remove unused gene sets
 			}
 		}
 
