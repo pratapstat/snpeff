@@ -186,7 +186,7 @@ public abstract class EnrichmentAlgorithm {
 							+ "</td>\t</tr>");
 				} else {
 					// Show as "normal" TXT 
-					print("\t" + it //
+					print(it //
 
 							+ "\t" + result.getPvalue() //
 							+ "\t" + result.getPvalueAdjusted() //
@@ -200,7 +200,7 @@ public abstract class EnrichmentAlgorithm {
 				}
 
 			}
-		} else print("\t" + it + "\tNULL");
+		} // else print("\t" + it + "\tNULL");
 	}
 
 	/**
@@ -208,7 +208,7 @@ public abstract class EnrichmentAlgorithm {
 	 */
 	void printTitle() {
 		if (htmlTable) print("<table border=0> <tr bgcolor=\"" + HTML_BG_COLOR_TITLE + "\"> <th>Rank</th>\t<th>p-value</th>\t<th>p-value adj</th>\t<th>Latest result</th>\t<th>Size</th>\t<th>Description</th>\t<th>Interesting genes </th>\t<th> Score </th> </tr>");
-		else if (verbose) print("\tIteration\tp-value\tp-value adj\tLatest result\tSize\tDescription\tResult\tInteresting genes");
+		else if (verbose) print("Iteration\tp-value\tp-value adj\tLatest result\tSize\tDescription\tResult\tInteresting genes");
 	}
 
 	/**

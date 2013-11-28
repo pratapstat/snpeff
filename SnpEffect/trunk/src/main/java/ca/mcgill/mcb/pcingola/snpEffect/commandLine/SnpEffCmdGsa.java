@@ -55,6 +55,7 @@ public class SnpEffCmdGsa extends SnpEff {
 	boolean useClosestGene = false; // Map to 'any' closest gene?
 	boolean useGeneId = false; // Use geneId instead of geneName
 	boolean usePvalues = true;
+	boolean removeUnusedSets = false; // TODO: Add a comamand line option?
 	boolean orderDescending = false; // If 'true', high scores are better (sort descending and get the first values) 
 	int upDownStreamLength = SnpEffectPredictor.DEFAULT_UP_DOWN_LENGTH;
 	int minGeneSetSize = 0;
@@ -293,6 +294,10 @@ public class SnpEffCmdGsa extends SnpEff {
 			if (enrichmentAlgorithmType.isRank()) {
 				geneSetsRanked = new GeneSetsRanked(geneSets);
 				geneSetsRanked.rankByValue(!orderDescending);
+
+				if (removeUnusedSets) geneSetsRanked.removeUnusedSets(); // Remove unused gene sets
+			} else {
+				if (removeUnusedSets) geneSets.removeUnusedSets(); // Remove unused gene sets
 			}
 		}
 
@@ -336,7 +341,12 @@ public class SnpEffCmdGsa extends SnpEff {
 		algorithm.setMaxPvalueAdjusted(maxPvalueAdjusted);
 		algorithm.setVerbose(verbose);
 		algorithm.setDebug(debug);
-		if (enrichmentAlgorithmType.isRank() && enrichmentAlgorithmType.isGreedy()) ((EnrichmentAlgorithmGreedyVariableSize) algorithm).setInitialSize(initGeneSetSize);
+
+		// if (enrichmentAlgorithmType.isRank() && enrichmentAlgorithmType.isGreedy()) {
+		if (enrichmentAlgorithmType.isGreedy()) {
+			if (debug) Gpr.debug("Setting initGeneSetSize:" + initGeneSetSize);
+			((EnrichmentAlgorithmGreedyVariableSize) algorithm).setInitialSize(initGeneSetSize);
+		}
 
 		// Run algorithm
 		algorithm.select();
@@ -363,7 +373,10 @@ public class SnpEffCmdGsa extends SnpEff {
 		// Read gene set database
 		if (verbose) Timer.showStdErr("Reading MSigDb from file: '" + msigdb + "'");
 		geneSets = enrichmentAlgorithmType.isRank() ? new GeneSetsRanked(msigdb) : new GeneSets(msigdb);
-		if (verbose) Timer.showStdErr("Done. Total:\n\t" + geneSets.getGeneSetCount() + " gene sets\n\t" + geneSets.getGeneCount() + " genes");
+		if (verbose) Timer.showStdErr("Done." //
+				+ "\n\t\tGene sets added : " + geneSets.getGeneSetCount() //
+				+ "\n\t\tGenes added     : " + geneSets.getGeneCount() //
+		);
 	}
 
 	/**
@@ -588,7 +601,7 @@ public class SnpEffCmdGsa extends SnpEff {
 		String lines[] = Gpr.readFile(geneScoreFile).split("\n");
 
 		// Parse each line
-		double minp = 1.0;
+		double minp = Double.POSITIVE_INFINITY, maxp = Double.NEGATIVE_INFINITY;
 		for (String line : lines) {
 			String rec[] = line.split("\\s");
 			String geneId = rec[0].trim();
@@ -597,12 +610,14 @@ public class SnpEffCmdGsa extends SnpEff {
 			if ((score > 0) && (score <= 1.0)) { // Assume that a p-value of zero is a parsing error
 				geneScore.put(geneId, score);
 				minp = Math.min(minp, score);
+				maxp = Math.max(maxp, score);
 			} else if (verbose) System.err.println("\tWarning: Ignoring entry (zero p-value):\t'" + line + "'");
 		}
 
 		if (verbose) Timer.showStdErr("Done."//
-				+ "\n\tAdded       : " + geneScore.size() //
-				+ "\n\tMin p-value : " + minp //
+				+ "\n\tScores added        : " + geneScore.size() //
+				+ "\n\tMin score (p-value) : " + minp //
+				+ "\n\tMax score (p-value) : " + maxp //
 		);
 	}
 
@@ -742,6 +757,7 @@ public class SnpEffCmdGsa extends SnpEff {
 		// Normal usage: Just run analysis
 		if (commandsFile == null) return runAnalisis();
 
+		// Run several commands (no need to reload genomic database each time)
 		return runCommands();
 	}
 

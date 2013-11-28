@@ -30,6 +30,10 @@ import ca.mcgill.mcb.pcingola.util.Timer;
 @SuppressWarnings("serial")
 public class GeneSets implements Iterable<GeneSet>, Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -359594418467719013L;
 	public static boolean debug = false; // Debug mode for this class?
 	public static double LOG2 = Math.log(2); // We use this constant often
 	public static long PRINT_SOMETHING_TIME = 5000; // Print something every X seconds
@@ -342,8 +346,28 @@ public class GeneSets implements Iterable<GeneSet>, Serializable {
 		geneSetsByGene = new HashMap<String, HashSet<GeneSet>>();
 	}
 
+	public boolean isInteresting(String geneName) {
+		return interestingGenes.contains(geneName);
+	}
+
 	public boolean isRanked() {
 		return false;
+	}
+
+	/**
+	 * Is this gene set used? I.e. is there at least one gene 'used'? (e.g. interesting or ranked)
+	 * @param gs
+	 * @return
+	 */
+	protected boolean isUsed(GeneSet gs) {
+		for (String gene : gs) {
+			if (isUsed(gene)) return true;
+		}
+		return false;
+	}
+
+	protected boolean isUsed(String geneName) {
+		return isInteresting(geneName);
 	}
 
 	/**
@@ -494,11 +518,36 @@ public class GeneSets implements Iterable<GeneSet>, Serializable {
 		return true;
 	}
 
+	public void remove(GeneSet geneSet) {
+		if (geneSet == null) return;
+		geneSetsByName.remove(geneSet.getName());
+	}
+
 	/**
 	 * Remove a GeneSet
 	 */
 	public void removeGeneSet(String geneSetName) {
-		geneSetsByName.remove(geneSetName);
+		remove(getGeneSet(geneSetName));
+	}
+
+	/**
+	 * Remove unused gene sets
+	 */
+	public void removeUnusedSets() {
+		// Is it unused? => Remove
+		LinkedList<GeneSet> todelete = new LinkedList<GeneSet>();
+		for (GeneSet gs : this) {
+			if (!isUsed(gs)) todelete.add(gs);
+		}
+
+		// Remove gene sets
+		for (GeneSet gs : todelete)
+			remove(gs);
+
+		Gpr.debug("Removind unused gene sets:" //
+				+ "\n\t\tTotal removed: " + todelete.size() //
+				+ "\n\t\tRemaining: " + geneSetsByName.size() //
+		);
 	}
 
 	/**

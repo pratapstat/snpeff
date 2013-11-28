@@ -6,6 +6,8 @@ import java.util.List;
 import org.apfloat.Apcomplex;
 import org.apfloat.Apfloat;
 
+import ca.mcgill.mcb.pcingola.util.Gpr;
+
 /**
  * Store a result form a greedy search algorithm
  *
@@ -48,7 +50,7 @@ public class Result implements Comparable<Result> {
 	 * @param count
 	 */
 	public void addGeneSetCount(int count) {
-		geneSetCount.add(count);
+		if (count > 0) geneSetCount.add(count);
 	}
 
 	@Override
@@ -87,7 +89,18 @@ public class Result implements Comparable<Result> {
 	 * @return
 	 */
 	public double getPvalueAdjusted() {
-		if (geneSetCount.size() != geneSets.size()) throw new RuntimeException("Incompatible gene count sizes.\n\tGeneSetCount.size : " + geneSetCount.size() + "\n\tGeneSets.size: " + geneSets.size());
+		if (geneSetCount.size() != geneSets.size()) {
+
+			for (GeneSet gs : geneSets)
+				Gpr.debug("Gene set: " + gs.getName());
+			for (Integer c : geneSetCount)
+				Gpr.debug("Gene set count: " + c);
+
+			throw new RuntimeException("Incompatible gene count sizes." //
+					+ "\n\tGeneSetCount.size : " + geneSetCount.size() //
+					+ "\n\tGeneSets.size     : " + geneSets.size() //
+			);
+		}
 
 		double adj = 1.0;
 		for (int i = 0; i < geneSetCount.size(); i++)
@@ -133,12 +146,11 @@ public class Result implements Comparable<Result> {
 
 	/**
 	 * Assign geneSets 
-	 * @param geneSets
+	 * @param newGeneSets
 	 */
-	public void setGeneSets(List<GeneSet> geneSets) {
-		ArrayList<GeneSet> l = new ArrayList<GeneSet>();
-		l.addAll(geneSets);
-		this.geneSets = l;
+	public void setGeneSets(List<GeneSet> newGeneSets) {
+		geneSets = new ArrayList<GeneSet>();
+		geneSets.addAll(newGeneSets);
 	}
 
 	public void setPvalue(Apfloat pValue) {

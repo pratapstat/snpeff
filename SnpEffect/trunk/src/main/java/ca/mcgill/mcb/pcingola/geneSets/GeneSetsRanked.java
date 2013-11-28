@@ -15,6 +15,7 @@ import java.util.Set;
 @SuppressWarnings("serial")
 public class GeneSetsRanked extends GeneSets {
 
+	private static final long serialVersionUID = -7922357470081599803L;
 	int maxRank; // Maximum rank in this collection
 	HashMap<String, Integer> rankByGene; // Ranked genes
 
@@ -147,6 +148,29 @@ public class GeneSetsRanked extends GeneSets {
 	@Override
 	public boolean isRanked() {
 		return true;
+	}
+
+	public boolean isRanked(String geneName) {
+		return rankByGene.containsKey(geneName);
+	}
+
+	/**
+	 * Is this gene set used? I.e. is there at least one gene 'used'? (e.g. interesting or ranked)
+	 * @param gs
+	 * @return
+	 */
+	@Override
+	protected boolean isUsed(GeneSet gs) {
+		for (String gene : gs) {
+			if (isInteresting(gene)) return true;
+			if (isRanked(gene)) return true;
+		}
+		return true;
+	}
+
+	@Override
+	protected boolean isUsed(String geneName) {
+		return isRanked(geneName);
 	}
 
 	/**

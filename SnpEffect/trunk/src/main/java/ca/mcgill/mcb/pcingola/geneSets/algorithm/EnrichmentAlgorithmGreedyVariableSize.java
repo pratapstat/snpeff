@@ -32,7 +32,7 @@ public abstract class EnrichmentAlgorithmGreedyVariableSize extends EnrichmentAl
 	@Override
 	protected Result greedyPvalue(Result prevResult) {
 		// Min or Max gene sizes have been set? => Use 'regular algorthm"
-		if ((this.maxGeneSetSize < Integer.MAX_VALUE) || (this.minGeneSetSize > 0)) return super.greedyPvalue(prevResult);
+		if ((maxGeneSetSize < Integer.MAX_VALUE) || (minGeneSetSize > 0)) return super.greedyPvalue(prevResult);
 
 		// Use "search by size ranges" algorithm (look for small gene sets first, then for larger ones)
 		int minGeneSetSize = 1;

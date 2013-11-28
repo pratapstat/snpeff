@@ -5,12 +5,12 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apfloat.Apcomplex;
 import org.apfloat.Apfloat;
 
 import ca.mcgill.mcb.pcingola.geneSets.GeneSet;
 import ca.mcgill.mcb.pcingola.geneSets.GeneSets;
 import ca.mcgill.mcb.pcingola.geneSets.Result;
+import ca.mcgill.mcb.pcingola.util.Gpr;
 
 /**
  * A generic greedy enrichment algorithm for selecting gene-sets
@@ -24,6 +24,7 @@ public abstract class EnrichmentAlgorithmGreedy extends EnrichmentAlgorithm {
 	protected boolean adjustedPvalue = true;
 	protected double maxPvalue = DEFAULT_MAX_PVALUE;
 	protected double maxPvalueAjusted = DEFAULT_MAX_PVALUE;
+	Date start, latest;
 
 	public EnrichmentAlgorithmGreedy(GeneSets geneSets, int numberToSelect) {
 		super(geneSets, numberToSelect);
@@ -44,11 +45,12 @@ public abstract class EnrichmentAlgorithmGreedy extends EnrichmentAlgorithm {
 	 * @return
 	 */
 	protected Result greedyPvalue(Result prevResult, int minGeneSetSize, int maxGeneSetSize) {
-		Apfloat pValue = Apcomplex.ONE;
+		Apfloat pValue = Apfloat.ONE;
 		int geneSetCount = 0;
 		HashSet<GeneSet> genesetSet = new HashSet<GeneSet>();
 		if (prevResult.getGeneSets() != null) genesetSet.addAll(prevResult.getGeneSets());
-		Date start = new Date(), latest = new Date();
+		start = new Date();
+		latest = new Date();
 
 		// Use previous result as "best"
 		Result best = new Result(prevResult);
@@ -72,31 +74,23 @@ public abstract class EnrichmentAlgorithmGreedy extends EnrichmentAlgorithm {
 				pValue = pValue(geneSetListNew);
 
 				// Is it better? => Store it
-				if ((pValue.compareTo(Apcomplex.ZERO) > 0) && (pValue.compareTo(best.getPvalue()) < 0)) best.set(geneSetListNew, pValue);
+				if ((pValue.compareTo(Apfloat.ZERO) > 0) && (pValue.compareTo(best.getPvalue()) < 0)) best.set(geneSetListNew, pValue);
 
-				// Show something every now and then?
-				Date now = new Date();
-				long elapsed = now.getTime() - latest.getTime();
-				long elapsedStart = now.getTime() - start.getTime();
-				if (verbose && (elapsed > PRINT_SOMETHING_TIME)) {
-					latest = now;
-					System.err.println("\t\t\tElapsed:" + (elapsedStart / 1000) + " secs\tGene sets: " + geneSetListNew + "\tpValue: " + pValue + "\tbestPvalue: " + best.getPvalue() + "\t" + best.getGeneSets());
-				}
-
+				showProgress(geneSetListNew, pValue, best); // Show some progress every now and then
 				geneSetCount++;
 			}
 		}
 
 		// Update gene set counts. This is used in order to adjust pValue
 		best.addGeneSetCount(geneSetCount);
-
+		if (debug) Gpr.debug("Select: Best p-value: " + best.getPvalueDouble());
 		return best;
 	}
 
 	@Override
 	void printTitle() {
 		if (htmlTable) System.out.println("<table border=0> <tr bgcolor=\"" + HTML_BG_COLOR_TITLE + "\"> <th>Iteration</th>\t<th>p-value</th>\t<th>p-value adj</th>\t<th>Latest result</th>\t<th>Size</th>\t<th>Description</th>\t<th>Interesting genes </th>\t<th> Score </th> </tr>");
-		else if (verbose) System.out.println("\tIteration\tp-value\tp-value adj\tLatest result\tSize\tDescription\tResult\tInteresting genes");
+		else if (verbose) System.out.println("Iteration\tp-value\tp-value adj\tLatest result\tSize\tDescription\tResult\tInteresting genes");
 	}
 
 	/**
@@ -118,7 +112,7 @@ public abstract class EnrichmentAlgorithmGreedy extends EnrichmentAlgorithm {
 
 			// Stop here
 			if (stopCriteria(result)) {
-				if (verbose) System.out.println("\tStop criteria met.");
+				if (debug) System.out.println("\tStop criteria met.");
 				break;
 			}
 		}
@@ -154,6 +148,23 @@ public abstract class EnrichmentAlgorithmGreedy extends EnrichmentAlgorithm {
 	@Override
 	public void setVerbose(boolean verbose) {
 		this.verbose = verbose;
+	}
+
+	/** 
+	 * Show something every now and then?
+	 * 
+	 * @param geneSetListNew
+	 * @param pValue
+	 * @param best
+	 */
+	void showProgress(List<GeneSet> geneSetListNew, Apfloat pValue, Result best) {
+		Date now = new Date();
+		long elapsed = now.getTime() - latest.getTime();
+		long elapsedStart = now.getTime() - start.getTime();
+		if (verbose && (elapsed > PRINT_SOMETHING_TIME)) {
+			latest = now;
+			System.err.println("\t\t\tElapsed:" + (elapsedStart / 1000) + " secs\tGene sets: " + geneSetListNew + "\tpValue: " + pValue + "\tbestPvalue: " + best.getPvalue() + "\t" + best.getGeneSets());
+		}
 	}
 
 	/**
