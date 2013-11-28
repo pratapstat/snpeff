@@ -23,7 +23,6 @@ public class TestCasesFilterALL extends TestCase {
 		SnpSiftCmdFilter vcfFilter = new SnpSiftCmdFilter();
 		String expression = "(EFF[ALL].EFFECT = 'DOWNSTREAM')";
 		List<VcfEntry> list = vcfFilter.filter("test/downstream.vcf", expression, true);
-		Gpr.debug("LIST SIZE: " + list.size());
 
 		// Check that it satisfies the condition
 		System.out.println("Expression: '" + expression + "'");
