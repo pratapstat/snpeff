@@ -1098,7 +1098,9 @@ public class VcfEntry extends Marker implements Iterable<VcfGenotype> {
 		String naStr = getInfo(VCF_INFO_NAS);
 
 		// Parse 'sparse' entries
-		int numSamples = getVcfFileIterator().getVcfHeader().getSampleNames().size();
+		List<String> sampleNames = getVcfFileIterator().getVcfHeader().getSampleNames();
+		if (sampleNames == null) throw new RuntimeException("Cannot find sample names in VCF header. Unable to uncompress genotypes.");
+		int numSamples = sampleNames.size();
 		byte gt[] = new byte[numSamples];
 		parseSparseGt(naStr, gt, -1);
 		parseSparseGt(heStr, gt, 1);
