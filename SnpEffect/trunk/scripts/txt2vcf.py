@@ -1,5 +1,26 @@
 #!/usr/bin/env python
 
+#-------------------------------------------------------------------------------
+#
+# Convert simple TXT files into VCF-like files
+#
+# Notes: 
+#	i) TXT file is supposed to have a title line (first line is column names)
+#	ii) TXT is tab separated
+#
+# Usage:
+#	cat file.txt | ./txt2vcf.py chrom pos ref alt info_1 ... info_N
+#
+#	where :
+#		'chrom', 'pos', etc. are the names of the columns for CHROM, POS, etc.
+#
+#		'info_1' ... 'info_N' will be added to the INFO fields using 
+#		the same names as field name
+#
+#
+# 															Pablo Cingolani
+#-------------------------------------------------------------------------------
+
 import sys
 
 # Parse command line argument

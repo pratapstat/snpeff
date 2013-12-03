@@ -40,6 +40,8 @@ public class SnpSiftCmdVarType extends SnpSift {
 		//
 		newHeaders.add("##INFO=<ID=HOM,Number=0,Type=Flag,Description=\"Variant is homozygous\">");
 		newHeaders.add("##INFO=<ID=HET,Number=0,Type=Flag,Description=\"Variant is heterozygous\">");
+		//
+		newHeaders.add("##INFO=<ID=" + VARTYPE + ",Number=A,Type=String,Description=\"Comma separated list of variant types. One per allele\">");
 		return newHeaders;
 	}
 
@@ -61,7 +63,8 @@ public class SnpSiftCmdVarType extends SnpSift {
 			if (sb.length() > 0) sb.append(",");
 			sb.append(sq.getChangeType());
 		}
-		vcfEntry.addInfo(VARTYPE, sb.toString());
+
+		if (sb.length() > 0) vcfEntry.addInfo(VARTYPE, sb.toString());
 	}
 
 	/**

@@ -34,20 +34,38 @@ public class TestCasesVarType extends TestCase {
 		}
 	}
 
-	public void test_DEL() {
-		checkAllVarType("test/varType_del.vcf", "DEL");
+	void checkVarTypeField(String file, String varTypeExpected) {
+		SnpSiftCmdVarType varType = new SnpSiftCmdVarType(null);
+
+		VcfFileIterator vcf = new VcfFileIterator(file);
+		for (VcfEntry ve : vcf) {
+			// Annotate
+			varType.annotate(ve);
+
+			// Check that all variants are the ones expected
+			String varTypeAnnotated = ve.getInfo(SnpSiftCmdVarType.VARTYPE);
+			Assert.assertEquals(varTypeExpected, varTypeAnnotated);
+		}
 	}
 
-	public void test_INS() {
-		checkAllVarType("test/varType_ins.vcf", "INS");
+	public void test_01_SNP() {
+		checkAllVarType("test/varType_snp.vcf", "SNP");
 	}
 
-	public void test_MNP() {
+	public void test_02_MNP() {
 		checkAllVarType("test/varType_mnp.vcf", "MNP");
 	}
 
-	public void test_SNP() {
-		checkAllVarType("test/varType_snp.vcf", "SNP");
+	public void test_03_INS() {
+		checkAllVarType("test/varType_ins.vcf", "INS");
+	}
+
+	public void test_04_DEL() {
+		checkAllVarType("test/varType_del.vcf", "DEL");
+	}
+
+	public void test_05_multiple() {
+		checkVarTypeField("test/varType_multiple.vcf", "SNP,INS");
 	}
 
 }
