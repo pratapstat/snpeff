@@ -36,7 +36,7 @@ c = d$scoreCount	# number of variants
 
 # Filter out p-values of zero OR counts of zero (because of log)
 #keep = (p > 0) & (c > 0) 
-keep = (p > 0) & (c > 0) & (c > minScoreCount)	
+keep = (p > 0) & (p < 1 ) & (c > 0) & (c > minScoreCount)	
 
 p = p[keep]
 lp = qnorm(p)				# Convert to z-scores using an inverse normal distribution
