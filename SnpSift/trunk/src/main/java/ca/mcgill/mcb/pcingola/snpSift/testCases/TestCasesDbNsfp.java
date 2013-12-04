@@ -5,7 +5,7 @@ import junit.framework.TestCase;
 import org.junit.Assert;
 
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
-import ca.mcgill.mcb.pcingola.snpSift.SnpSiftCmdAnnotateSortedDbNsfp;
+import ca.mcgill.mcb.pcingola.snpSift.SnpSiftCmdDbNsfp;
 import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 
@@ -22,7 +22,7 @@ public class TestCasesDbNsfp extends TestCase {
 	public void test_01() {
 		String vcfFileName = "test/test_dbNSFP_chr1_69134.vcf";
 		String args[] = { "test/dbNSFP2.0b3.chr1_69134.txt", vcfFileName };
-		SnpSiftCmdAnnotateSortedDbNsfp cmd = new SnpSiftCmdAnnotateSortedDbNsfp(args);
+		SnpSiftCmdDbNsfp cmd = new SnpSiftCmdDbNsfp(args);
 		cmd.setVerbose(verbose);
 		cmd.setDebug(debug);
 
@@ -38,14 +38,14 @@ public class TestCasesDbNsfp extends TestCase {
 			if (debug) Gpr.debug(vcfEntry);
 
 			// Check all values
-			Assert.assertEquals("2.31", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.VCF_INFO_PREFIX + "GERP++_RS"));
-			Assert.assertEquals("2.31", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.VCF_INFO_PREFIX + "GERP++_NR"));
-			Assert.assertEquals("0.004785", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.VCF_INFO_PREFIX + "ESP6500_AA_AF"));
-			Assert.assertEquals("8.5094", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.VCF_INFO_PREFIX + "29way_logOdds"));
-			Assert.assertEquals("B", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.VCF_INFO_PREFIX + "Polyphen2_HVAR_pred"));
-			Assert.assertEquals("0.090000", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.VCF_INFO_PREFIX + "SIFT_score"));
-			Assert.assertEquals("Q8NH21", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.VCF_INFO_PREFIX + "Uniprot_acc"));
-			Assert.assertEquals("ENST00000534990,ENST00000335137", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.VCF_INFO_PREFIX + "Ensembl_transcriptid"));
+			Assert.assertEquals("2.31", vcfEntry.getInfo(SnpSiftCmdDbNsfp.VCF_INFO_PREFIX + "GERP++_RS"));
+			Assert.assertEquals("2.31", vcfEntry.getInfo(SnpSiftCmdDbNsfp.VCF_INFO_PREFIX + "GERP++_NR"));
+			Assert.assertEquals("0.004785", vcfEntry.getInfo(SnpSiftCmdDbNsfp.VCF_INFO_PREFIX + "ESP6500_AA_AF"));
+			Assert.assertEquals("8.5094", vcfEntry.getInfo(SnpSiftCmdDbNsfp.VCF_INFO_PREFIX + "29way_logOdds"));
+			Assert.assertEquals("B", vcfEntry.getInfo(SnpSiftCmdDbNsfp.VCF_INFO_PREFIX + "Polyphen2_HVAR_pred"));
+			Assert.assertEquals("0.090000", vcfEntry.getInfo(SnpSiftCmdDbNsfp.VCF_INFO_PREFIX + "SIFT_score"));
+			Assert.assertEquals("Q8NH21", vcfEntry.getInfo(SnpSiftCmdDbNsfp.VCF_INFO_PREFIX + "Uniprot_acc"));
+			Assert.assertEquals("ENST00000534990,ENST00000335137", vcfEntry.getInfo(SnpSiftCmdDbNsfp.VCF_INFO_PREFIX + "Ensembl_transcriptid"));
 
 			cmd.endAnnotate();
 		} catch (Exception e) {
@@ -61,7 +61,7 @@ public class TestCasesDbNsfp extends TestCase {
 		String fields = "genename,Ensembl_geneid,Ensembl_transcriptid,aaref,aaalt";
 		String args[] = { "-f", fields, "test/test_dbnsfp_multiple_lines.txt", vcfFileName };
 
-		SnpSiftCmdAnnotateSortedDbNsfp cmd = new SnpSiftCmdAnnotateSortedDbNsfp(args);
+		SnpSiftCmdDbNsfp cmd = new SnpSiftCmdDbNsfp(args);
 		cmd.setVerbose(verbose);
 		cmd.setDebug(debug);
 
@@ -77,11 +77,11 @@ public class TestCasesDbNsfp extends TestCase {
 			if (debug) Gpr.debug(vcfEntry);
 
 			// Check all values
-			Assert.assertEquals("ENST00000368485,ENST00000515190", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.VCF_INFO_PREFIX + "Ensembl_transcriptid"));
-			Assert.assertEquals("IL6R", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.VCF_INFO_PREFIX + "genename"));
-			Assert.assertEquals("ENSG00000160712", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.VCF_INFO_PREFIX + "Ensembl_geneid"));
-			Assert.assertEquals("A,L", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.VCF_INFO_PREFIX + "aaalt"));
-			Assert.assertEquals("D,I", vcfEntry.getInfo(SnpSiftCmdAnnotateSortedDbNsfp.VCF_INFO_PREFIX + "aaref"));
+			Assert.assertEquals("ENST00000368485,ENST00000515190", vcfEntry.getInfo(SnpSiftCmdDbNsfp.VCF_INFO_PREFIX + "Ensembl_transcriptid"));
+			Assert.assertEquals("IL6R", vcfEntry.getInfo(SnpSiftCmdDbNsfp.VCF_INFO_PREFIX + "genename"));
+			Assert.assertEquals("ENSG00000160712", vcfEntry.getInfo(SnpSiftCmdDbNsfp.VCF_INFO_PREFIX + "Ensembl_geneid"));
+			Assert.assertEquals("A,L", vcfEntry.getInfo(SnpSiftCmdDbNsfp.VCF_INFO_PREFIX + "aaalt"));
+			Assert.assertEquals("D,I", vcfEntry.getInfo(SnpSiftCmdDbNsfp.VCF_INFO_PREFIX + "aaref"));
 
 			cmd.endAnnotate();
 		} catch (Exception e) {
