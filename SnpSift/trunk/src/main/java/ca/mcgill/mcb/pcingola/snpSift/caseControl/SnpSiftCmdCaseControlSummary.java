@@ -17,7 +17,7 @@ import ca.mcgill.mcb.pcingola.ped.PedPedigree;
 import ca.mcgill.mcb.pcingola.ped.TfamEntry;
 import ca.mcgill.mcb.pcingola.snpEffect.ChangeEffect;
 import ca.mcgill.mcb.pcingola.snpSift.SnpSift;
-import ca.mcgill.mcb.pcingola.snpSift.SnpSiftCmdAnnotateSortedDbNsfp;
+import ca.mcgill.mcb.pcingola.snpSift.SnpSiftCmdDbNsfp;
 import ca.mcgill.mcb.pcingola.stats.CountByType;
 import ca.mcgill.mcb.pcingola.util.Timer;
 import ca.mcgill.mcb.pcingola.vcf.VcfEffect;
@@ -168,7 +168,7 @@ public class SnpSiftCmdCaseControlSummary extends SnpSift {
 	void parseDbNsfpFields(VcfFileIterator vcf) {
 		VcfHeader vcfHeader = vcf.getVcfHeader();
 		for (VcfInfo vcfInfo : vcfHeader.getVcfInfo())
-			if (vcfInfo.getId().startsWith(SnpSiftCmdAnnotateSortedDbNsfp.VCF_INFO_PREFIX)) infoFields.add(vcfInfo.getId());
+			if (vcfInfo.getId().startsWith(SnpSiftCmdDbNsfp.VCF_INFO_PREFIX)) infoFields.add(vcfInfo.getId());
 		Collections.sort(infoFields);
 
 	}
@@ -199,7 +199,7 @@ public class SnpSiftCmdCaseControlSummary extends SnpSift {
 		// TODO: Test code, move somewhere else
 		VcfHeader vcfHeader = vcf.getVcfHeader();
 		for (VcfInfo vcfInfo : vcfHeader.getVcfInfo())
-			if (vcfInfo.getId().startsWith(SnpSiftCmdAnnotateSortedDbNsfp.VCF_INFO_PREFIX)) infoFields.add(vcfInfo.getId());
+			if (vcfInfo.getId().startsWith(SnpSiftCmdDbNsfp.VCF_INFO_PREFIX)) infoFields.add(vcfInfo.getId());
 		Collections.sort(infoFields);
 
 		return sampleIds;

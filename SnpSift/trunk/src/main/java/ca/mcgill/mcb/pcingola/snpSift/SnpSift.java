@@ -191,7 +191,7 @@ public class SnpSift {
 		else if (command.startsWith("CCS")) cmd = new SnpSiftCmdCaseControlSummary(args);
 		else if (command.startsWith("CONC")) cmd = new SnpSiftCmdConcordance(args);
 		else if (command.startsWith("COVMAT")) cmd = new SnpSiftCmdCovarianceMatrix(args);
-		else if (command.startsWith("DBNSFP")) cmd = new SnpSiftCmdAnnotateSortedDbNsfp(args);
+		else if (command.startsWith("DBNSFP")) cmd = new SnpSiftCmdDbNsfp(args);
 		else if (command.startsWith("EX")) cmd = new SnpSiftCmdExtractFields(args);
 		else if (command.startsWith("FI")) cmd = new SnpSiftCmdFilter(args);
 		else if (command.startsWith("GWASCAT")) cmd = new SnpSiftCmdGwasCatalog(args);
