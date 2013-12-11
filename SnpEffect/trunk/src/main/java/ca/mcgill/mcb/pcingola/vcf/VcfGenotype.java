@@ -266,7 +266,11 @@ public class VcfGenotype {
 			}
 
 		} catch (Exception e) {
-			throw new RuntimeException("Error parsing fields on line:\n\tFormat: '" + vcfEntry.getFormat() + "'\n\tValues: '" + values + "'", e);
+			throw new RuntimeException("Error parsing fields on line:" //
+					+ "\n\tFormat   : '" + vcfEntry.getFormat() + "'" //
+					+ "\n\tValues   : '" + values + "'" //
+					+ "\n\tVcf line : " + vcfEntry //
+			, e);
 		}
 	}
 
