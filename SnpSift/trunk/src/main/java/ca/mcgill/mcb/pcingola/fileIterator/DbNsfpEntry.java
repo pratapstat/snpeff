@@ -14,7 +14,9 @@ import ca.mcgill.mcb.pcingola.interval.Marker;
  */
 public class DbNsfpEntry extends Marker {
 	private static final long serialVersionUID = -3275792763917755927L;
+
 	AutoHashMap<String, HashMap<String, String>> values = new AutoHashMap<String, HashMap<String, String>>(new HashMap<String, String>());
+	boolean collapseRepeatedValues = true;
 
 	public DbNsfpEntry(Marker parent, int start) {
 		super(parent, start, start, 1, "");
@@ -30,6 +32,10 @@ public class DbNsfpEntry extends Marker {
 		// Get map by alt
 		HashMap<String, String> altVals = values.getOrCreate(alt);
 
+		// We cannot use comma or semicolon, so we replace them by '|'
+		value = value.replace(';', '|');
+		value = value.replace(',', '|');
+
 		// Represent empty values as '.'
 		if (value.isEmpty()) value = ".";
 
@@ -41,12 +47,14 @@ public class DbNsfpEntry extends Marker {
 
 		// Append new value, but first make sure we are not repeating values
 		boolean shouldAdd = true;
-		String currvals[] = altVals.get(columnName).split("\t");
-		for (String v : currvals)
-			if (v.equalsIgnoreCase(value)) {
-				shouldAdd = false;
-				break;
-			}
+		if (collapseRepeatedValues) {
+			String currvals[] = altVals.get(columnName).split("\t");
+			for (String v : currvals)
+				if (v.equalsIgnoreCase(value)) {
+					shouldAdd = false;
+					break;
+				}
+		}
 
 		// Value already in the map? don't add twice
 		if (shouldAdd) {
@@ -86,6 +94,10 @@ public class DbNsfpEntry extends Marker {
 	 */
 	public boolean hasValues(String allele) {
 		return values.containsKey(allele);
+	}
+
+	public void setCollapseRepeatedValues(boolean collapseRepeatedValues) {
+		this.collapseRepeatedValues = collapseRepeatedValues;
 	}
 
 	@Override

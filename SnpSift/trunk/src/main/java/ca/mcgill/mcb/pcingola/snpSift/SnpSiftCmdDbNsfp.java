@@ -42,6 +42,7 @@ public class SnpSiftCmdDbNsfp extends SnpSift {
 	protected Map<String, String> fieldsDescription;
 	protected Map<String, String> fieldsType;
 	protected boolean annotateAll; // Annotate empty fields as well?
+	protected boolean collapseRepeatedValues; // Collapse values if repeated?
 	protected String dbNsfpFileName;
 	protected String vcfFileName;
 	protected int count = 0;
@@ -146,7 +147,7 @@ public class SnpSiftCmdDbNsfp extends SnpSift {
 				// Are there any values to annotate?
 				if (currentDbEntry.hasValues(alt)) {
 
-					//Map<String, String> values = currentDbEntry.getAltAlelleValues(alt);
+					// Map<String, String> values = currentDbEntry.getAltAlelleValues(alt);
 					String val = currentDbEntry.getCsv(alt, fieldKey);
 
 					if (val == null) {
@@ -221,6 +222,8 @@ public class SnpSiftCmdDbNsfp extends SnpSift {
 		fieldsToAdd = new HashMap<String, String>();
 		fieldsType = new HashMap<String, String>();
 		fieldsDescription = new HashMap<String, String>();
+		annotateAll = false;
+		collapseRepeatedValues = true;
 	}
 
 	/**
@@ -245,6 +248,7 @@ public class SnpSiftCmdDbNsfp extends SnpSift {
 
 		// Check and open dbNsfp
 		dbNsfpFile = new DbNsfpFileIterator(new SeekableBufferedReader(dbNsfpFileName));
+		dbNsfpFile.setCollapseRepeatedValues(collapseRepeatedValues);
 
 		indexDb = index(dbNsfpFileName);
 		currentDbEntry = null;
@@ -269,7 +273,10 @@ public class SnpSiftCmdDbNsfp extends SnpSift {
 
 			if (arg.equals("-a")) annotateAll = true;
 			else if (arg.equals("-f")) fieldsNamesToAdd = args[++i]; // Filed to be used
-			else if (dbNsfpFileName == null) dbNsfpFileName = arg;
+			else if (arg.equalsIgnoreCase("-noCollapse")) {
+				collapseRepeatedValues = false;
+				annotateAll = true;
+			} else if (dbNsfpFileName == null) dbNsfpFileName = arg;
 			else if (vcfFileName == null) vcfFileName = arg;
 		}
 
@@ -346,6 +353,7 @@ public class SnpSiftCmdDbNsfp extends SnpSift {
 				+ "Options:\n" //
 				+ "\t-a : Annotate fields, even if the database has an empty value (annotates using '.' for empty).\n" //
 				+ "\t-f : A comma sepparated list of fields to add. Default: '" + DEFAULT_FIELDS_NAMES_TO_ADD + "'.\n" //
+				+ "\t-noCollapse : Collapse repeated values from dbNSFP (implies '-a'). Default: '" + collapseRepeatedValues + "'.\n" //
 		);
 		System.exit(1);
 	}
