@@ -86,11 +86,14 @@ public class DbNsfpFileIterator extends MarkerFileIterator<DbNsfpEntry> {
 		}
 	}
 
+	boolean collapseRepeatedValues = true;
+
 	public static final String COLUMN_CHR_NAME = "chr";
+
 	public static final String COLUMN_POS_NAME = "pos(1-coor)";
 	public static final String ALT_NAME = "alt";
-
 	private final TObjectIntHashMap<String> columnNames2Idx = new TObjectIntHashMap<String>();
+
 	private int chromosomeIdx;
 	private int startIdx;
 	private int altIdx;
@@ -153,6 +156,7 @@ public class DbNsfpFileIterator extends MarkerFileIterator<DbNsfpEntry> {
 		String chromosome = vals[chromosomeIdx];
 		int start = parsePosition(vals[startIdx]);
 		DbNsfpEntry dbNsfp = new DbNsfpEntry(getChromosome(chromosome), start);
+		dbNsfp.setCollapseRepeatedValues(collapseRepeatedValues);
 
 		// Add all entries
 		for (String[] altAlleleValues : valuesForEntry) {
@@ -247,6 +251,10 @@ public class DbNsfpFileIterator extends MarkerFileIterator<DbNsfpEntry> {
 	public void seek(long pos) throws IOException {
 		super.seek(pos);
 		nextLine = null;
+	}
+
+	public void setCollapseRepeatedValues(boolean collapseRepeatedValues) {
+		this.collapseRepeatedValues = collapseRepeatedValues;
 	}
 
 }

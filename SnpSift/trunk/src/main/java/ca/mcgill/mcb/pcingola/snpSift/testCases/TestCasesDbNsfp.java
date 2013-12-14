@@ -45,7 +45,7 @@ public class TestCasesDbNsfp extends TestCase {
 			Assert.assertEquals("B", vcfEntry.getInfo(SnpSiftCmdDbNsfp.VCF_INFO_PREFIX + "Polyphen2_HVAR_pred"));
 			Assert.assertEquals("0.090000", vcfEntry.getInfo(SnpSiftCmdDbNsfp.VCF_INFO_PREFIX + "SIFT_score"));
 			Assert.assertEquals("Q8NH21", vcfEntry.getInfo(SnpSiftCmdDbNsfp.VCF_INFO_PREFIX + "Uniprot_acc"));
-			Assert.assertEquals("ENST00000534990,ENST00000335137", vcfEntry.getInfo(SnpSiftCmdDbNsfp.VCF_INFO_PREFIX + "Ensembl_transcriptid"));
+			Assert.assertEquals("ENST00000534990|ENST00000335137", vcfEntry.getInfo(SnpSiftCmdDbNsfp.VCF_INFO_PREFIX + "Ensembl_transcriptid"));
 
 			cmd.endAnnotate();
 		} catch (Exception e) {
@@ -82,6 +82,42 @@ public class TestCasesDbNsfp extends TestCase {
 			Assert.assertEquals("ENSG00000160712", vcfEntry.getInfo(SnpSiftCmdDbNsfp.VCF_INFO_PREFIX + "Ensembl_geneid"));
 			Assert.assertEquals("A,L", vcfEntry.getInfo(SnpSiftCmdDbNsfp.VCF_INFO_PREFIX + "aaalt"));
 			Assert.assertEquals("D,I", vcfEntry.getInfo(SnpSiftCmdDbNsfp.VCF_INFO_PREFIX + "aaref"));
+
+			cmd.endAnnotate();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * Test dbnsfp having multiple lines per variant, without collapsing
+	 */
+	public void test_03() {
+		String vcfFileName = "test/test_dbnsfp_multiple_noCollapse.vcf";
+		String fields = "aaalt,Ensembl_transcriptid,Polyphen2_HDIV_score,Polyphen2_HVAR_pred";
+		String args[] = { "-nocollapse", "-f", fields, "test/test_dbnsfp_multiple_noCollapse.txt", vcfFileName };
+
+		SnpSiftCmdDbNsfp cmd = new SnpSiftCmdDbNsfp(args);
+		cmd.setVerbose(verbose);
+		cmd.setDebug(debug);
+
+		try {
+			cmd.initAnnotate();
+
+			// Get entry.
+			// Note: There is only one entry to annotate (the VCF file has one line)
+			VcfFileIterator vcfFile = new VcfFileIterator(vcfFileName);
+			VcfEntry vcfEntry = vcfFile.next();
+
+			cmd.annotate(vcfEntry);
+			if (debug) Gpr.debug(vcfEntry);
+
+			// Check all values
+			// dbNSFP_Ensembl_transcriptid=ENST00000347404,ENST00000537835,ENST00000378535,ENST00000228280;dbNSFP_Polyphen2_HDIV_score=0.449,.,0.192;dbNSFP_Polyphen2_HVAR_pred=B,.,B;dbNSFP_aaalt=A,R,T
+			Assert.assertEquals("ENST00000347404,ENST00000537835,ENST00000378535|ENST00000228280", vcfEntry.getInfo("dbNSFP_Ensembl_transcriptid"));
+			Assert.assertEquals("0.449,.,0.192", vcfEntry.getInfo("dbNSFP_Polyphen2_HDIV_score"));
+			Assert.assertEquals("B,.,B", vcfEntry.getInfo("dbNSFP_Polyphen2_HVAR_pred"));
+			Assert.assertEquals("A,R,T", vcfEntry.getInfo("dbNSFP_aaalt"));
 
 			cmd.endAnnotate();
 		} catch (Exception e) {
