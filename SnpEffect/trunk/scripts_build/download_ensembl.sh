@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#//!/bin/sh -e
 
 source `dirname $0`/config.sh
 
@@ -71,7 +71,7 @@ do
 	cp $pep data/$short/protein.fa.gz
 done
 
-# Regunation tracks
+# Regulation tracks
 mkdir -p data/GRCh37.$ENSEMBL_RELEASE/
 cp ftp.ensembl.org/pub/release-$ENSEMBL_RELEASE/regulation/homo_sapiens/AnnotatedFeatures.gff.gz data/GRCh37.$ENSEMBL_RELEASE/regulation.gff.gz
 cp ftp.ensembl.org/pub/release-$ENSEMBL_RELEASE/regulation/homo_sapiens/MotifFeatures.gff.gz data/GRCh37.$ENSEMBL_RELEASE/motif.gff.gz
@@ -96,6 +96,28 @@ do
 	echo
 done
 ) | tee ../snpEff.ensembl.$ENSEMBL_RELEASE.config
+
+# Append to config file
+cat ../snpEff.ensembl.$ENSEMBL_RELEASE.config >> ../snpEff.config
+
+#---
+# Rezip files (unzip and gzip) to avoid issues with block gzip libraries in Java
+#---
+cd -
+./scripts_build/rezip.bds download/data/genomes/*.gz
+./scripts_build/rezip.bds download/data/*/*.gz
+
+#---
+# Move data to 'data' dir
+#---
+
+echo Moving files to data dir
+mv download/data/genomes/* data/genomes/
+rmdir download/data/genomes
+mv download/data/* data/
+
+echo "Copying additional data"
+cp db/jaspar/pwms.bin data/GRCh37.$ENSEMBL_RELEASE/
 
 echo "Done!"
 
