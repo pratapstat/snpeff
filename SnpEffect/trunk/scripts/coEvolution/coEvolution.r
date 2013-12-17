@@ -8,11 +8,24 @@
 
 library(epicalc)
 
+#--------------------------------------------------------------------------------
+# Histogram using non-NA values
+#--------------------------------------------------------------------------------
+
+histNA <- function( x ) {
+	plot( density( x[ ! is.na(x) ] ) )
+}
+
+#--------------------------------------------------------------------------------
+# Main
+#--------------------------------------------------------------------------------
+
 #---
 # Parse command line args
 #---
 
 args <- commandArgs(trailingOnly = TRUE)
+useNorm <- TRUE
 
 if( length(args) > 0 ) {
 	# Parse command line arguments
@@ -23,13 +36,14 @@ if( length(args) > 0 ) {
     cat('# Parameters:\n')
     cat('# \tResults file    :', resultsFileName, '\n')
     cat('# \tGenotypes file  :', gtFileName, '\n')
-    cat('# \tPhenotyprs file :', phenoFileName, '\n')
+    cat('# \tPhenotypes file :', phenoFileName, '\n')
     cat('# \tNumber of principal components:', PC, '\n')
+    cat('# \tUse normalized age, age^2, sex:', useNorm, '\n')
 } else {
 	# Default parameters
-    resultsFileName <- "coevolution.txt"
-    gtFileName <- "coevolution.gt.txt"
-    phenoFileName <- "coEvolution.pheno.covariates.txt"
+    resultsFileName	<- "coEvolution.MAX.txt"
+    gtFileName		<- "coEvolution.MAX.gt.txt"
+    phenoFileName	<- "coEvolution.pheno.covariates.txt"
 	PC <- 3
 }
 
@@ -64,9 +78,13 @@ pheno <- as.numeric( dpheno[phenoRow,cols] ) - 1
 cat('# Phenotypes:\n')
 cat('#     Cases    :', sum(pheno == 1), '\n' )
 cat('#     Controls :', sum(pheno == 0), '\n' )
-cat('#     Missing  :', sum(pheno == -1), '\n' )
+cat('#     Missing  :', sum(pheno <  0), '\n' )
 cat('#     Max      :', max(pheno), '\n' )
 cat('#     Min      :', min(pheno), '\n' )
+
+phenoN <- pheno
+phenoN[ pheno < 0 ] <- NA
+phenoN <- as.vector( scale( phenoN ) )
 
 # Extract sex
 sexRow <- maxRow - 1
@@ -76,6 +94,10 @@ cat('#     Female  :', sum(sex == 1), '\n' )
 cat('#     Male    :', sum(sex == 0), '\n' )
 cat('#     Unknown :', sum(sex < 0), '\n' )
 
+sexN <- sex
+sexN[ sex < 0 ] <- NA
+sexN <- as.vector( scale( sexN ) )
+
 # Extract age
 ageRow <- maxRow
 age <- as.numeric( dpheno[ageRow,cols] )
@@ -83,6 +105,15 @@ cat('#\n# Age:\n')
 cat('#     Unknown :', sum(age < 0), '\n' )
 cat('#     Avg     :', mean(age[age>0]), '\n' )
 cat('#     Max     :', max(age), '\n' )
+
+# Normalize age
+ageN <- age
+ageN[age <= 0] <- NA
+ageN <- as.vector( scale(ageN) )
+
+age2N <- age^2
+age2N[age <= 0] <- NA
+age2N <- as.vector( scale(age2N) )
 
 # Extract principal components (used as covariates)
 pcRows <- 2:(maxRow-2)
@@ -103,6 +134,9 @@ cat('#     Max :', max(pvalues), '\n' )
 cat('\nLogistic regression:\n')
 
 rowsToAnalyze <- 1:dim(dres)[1]
+keepPAS <- ( pheno >= 0 ) & (age > 0) & (sex >= 0)
+keepPAS <- ( pheno >= 0 ) & ( !is.na(ageN) ) & ( ! is.na(sexN) )
+
 for( i in rowsToAnalyze ) {
 	# Prepare data
 	idx1 <- dres$idx1[i]
@@ -118,29 +152,39 @@ for( i in rowsToAnalyze ) {
 	if( sum(gt2) != checksum2 ) { stop(paste("Checksum error in entry ", i, "\n\tIndex: ", idx2, "\n\tChecksum: ", sum(gt2), ' != ', checksum2, '\n')); }
 
 	# Any missing data? Don't use the sample
-	keep <- ( pheno >= 0 ) & (age > 0) & (sex >= 0) & (gt1 >= 0) & (gt2 >= 0)
+	keep <- keepPAS & (gt1 >= 0) & (gt2 >= 0)
 
 	ph <- pheno[keep]
-	ag <- age[keep]
-	sx <- sex[keep]
+	if( useNorm ) {
+		ag <- ageN[keep]
+		ag2 <- age2N[keep]
+		sx <- sexN[keep]
+	} else {
+		ag <- age[keep]
+		ag2 <- age[keep]^2
+		sx <- sex[keep]
+	}
+
 	gt1 <- gt1[keep]
 	gt2 <- gt2[keep]
 	pc <- pcs[,keep]
 
 	maxg12 <- pmax(gt1 - gt2, 0)
 	maxg21 <- pmax(gt2 - gt1, 0)
+	prod12 <- gt1 * gt1				# Note: This is not vector multiplication, is element by element multiplication (result is a vector of the same size)
 
 	#---
 	# Logistic regression
 	#---
 	if( PC == 10 ) {
 		# PC: First 10 components
-		lr0 <- glm( ph ~ maxg12 + maxg21 + gt1 + gt1 + sx + ag + ag^2 + pc[1,] + pc[2,] + pc[3,] + pc[4,] + pc[5,] + pc[6,] + pc[7,] + pc[8,] + pc[9,] + pc[10,] , family=binomial)		# Full model, takes into account genotypes and PCs
-		lr1 <- glm( ph ~                   gt1 + gt1 + sx + ag + ag^2 + pc[1,] + pc[2,] + pc[3,] + pc[4,] + pc[5,] + pc[6,] + pc[7,] + pc[8,] + pc[9,] + pc[10,] , family=binomial)		# Reduced model: only PCs, no genotypes
+		lr0 <- glm( ph ~ maxg12 + maxg21 + gt1 + gt1 + sx + ag + ag2 + pc[1,] + pc[2,] + pc[3,] + pc[4,] + pc[5,] + pc[6,] + pc[7,] + pc[8,] + pc[9,] + pc[10,] , family=binomial)		# Full model, takes into account genotypes and PCs
+		lr1 <- glm( ph ~                   gt1 + gt1 + sx + ag + ag2 + pc[1,] + pc[2,] + pc[3,] + pc[4,] + pc[5,] + pc[6,] + pc[7,] + pc[8,] + pc[9,] + pc[10,] , family=binomial)		# Reduced model: only PCs, no genotypes
 	} else if ( PC == 3 ) {
 		# PC: First 3 components
-		lr0 <- glm( ph ~ maxg12 + maxg21 + gt1 + gt2 + sx + ag + ag^2 + pc[1,] + pc[2,] + pc[3,], family=binomial)	# Full model, takes into account genotypes and PCs
-		lr1 <- glm( ph ~                   gt1 + gt2 + sx + ag + ag^2 + pc[1,] + pc[2,] + pc[3,], family=binomial)	# Reduced model: only PCs, no genotypes
+		#lr0 <- glm( ph ~ maxg12 + maxg21 + gt1 + gt2 + sx + ag + ag2 + pc[1,] + pc[2,] + pc[3,], family=binomial)	# Full model, takes into account genotypes and PCs
+		lr0 <- glm( ph ~ prod12          + gt1 + gt2 + sx + ag + ag2 + pc[1,] + pc[2,] + pc[3,], family=binomial)	# Full model, takes into account genotypes and PCs
+		lr1 <- glm( ph ~                   gt1 + gt2 + sx + ag + ag2 + pc[1,] + pc[2,] + pc[3,], family=binomial)	# Reduced model: only PCs, no genotypes
 	}
 
 	# Likelyhood ratio test
