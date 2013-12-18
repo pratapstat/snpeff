@@ -37,7 +37,7 @@ echo "Query MySql database (KnownGenes)"
 
 (
 echo "use hg19;"
-echo "select  kg.name"
+echo "select  kg.name as '#name'"
 echo "		, kg.chrom"
 echo "		, kg.strand"
 echo "		, kg.txStart"
@@ -54,5 +54,6 @@ echo ";"
 ) | mysql --user=genome --host=genome-mysql.cse.ucsc.edu -A hg19 > genes.txt
 
 # Compress file
+rm -f genes.txt.gz || true
 gzip genes.txt
 
