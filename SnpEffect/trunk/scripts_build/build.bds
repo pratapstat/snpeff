@@ -83,6 +83,7 @@ bool buildAll() {
 	
 	# Special cases
 	addBuild("refseq", "hg19")
+	addBuild("knowngenes", "hg19kg")
 	addBuild("gff2", "amel2")
 
 	# Look into all directories
@@ -133,9 +134,24 @@ bool buildAll() {
 
 bool buildSpecial() {
 	
+	# Note: This takes a huge amount of memory, don't run multiple of these process because the server will crash
+	# TODO: Add amount of memory to the taks and remove the constraint
+	print("Buils special.\n\tFIXME: Create a 'task' instead of a 'sys'\n")
+
+	# XML files used to build NextProt
+	string dirNextProt = "$dirSnpeff/db/nextProt/"
+	string[] xmlFiles = dirNextProt.dirPath(".*.xml")
+
+	# Check each genome version
 	for( string hg : dirData.dir("GRCh37.7.*") ) {
-		print("Building NextProt for $hg\n")
-		if( ! dryrun )	sys $snpeffXl buildNextProt -v $hg db/nextProt/
+		string npfile = "$dirData/$hg/nextProt.bin"
+
+		if( npfile <- xmlFiles ) {
+			print("NextProt ($hg): Build\n")
+			if( ! dryrun )	sys $snpeffXl buildNextProt -v $hg db/nextProt/
+		} else {
+			print("NextProt ($hg): OK\n")
+		}
 	}
 	
 	return( true )
@@ -151,6 +167,7 @@ void downloadAll() {
 
 	# Human specific databases
 	sys ./scripts_build/download_hg19.sh
+	sys ./scripts_build/download_hg19kg.sh
 	sys ./scripts_build/download_nextProt.sh
 	sys ./scripts_build/download_Pwms_Jaspar.sh
 	sys ./scripts_build/download_clinvar.sh 
@@ -192,7 +209,6 @@ if( build ) {
 	buildAll()
 	buildSpecial()
 }
-	buildSpecial()
 
 # Create distribution files
 if( distro ) sys ./scripts_build/distro.sh
