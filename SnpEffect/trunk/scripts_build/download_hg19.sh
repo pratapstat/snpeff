@@ -18,7 +18,7 @@
 
 REF=hg19
 
-mkdir -p $REF || true
+mkdir -p data/$REF || true
 cd data/$REF/
 
 #---
