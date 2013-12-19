@@ -29,7 +29,6 @@ public class VcfEntry extends Marker implements Iterable<VcfGenotype> {
 	}
 
 	public static final double ALLELE_FEQUENCY_COMMON = 0.05;
-
 	public static final double ALLELE_FEQUENCY_LOW = 0.01;
 
 	public static final String VCF_INFO_HOMS = "HO";
@@ -477,6 +476,17 @@ public class VcfEntry extends Marker implements Iterable<VcfGenotype> {
 		return lineNum;
 	}
 
+	/**
+	 * number of samples in this VCF file
+	 * @return
+	 */
+	public int getNumberOfSamples() {
+		if (vcfFileIterator == null) return 0;
+		VcfHeader vh = vcfFileIterator.getVcfHeader();
+		if (vh == null) return 0;
+		return vh.getNumberOfSamples();
+	}
+
 	public double getQuality() {
 		return (quality != null ? quality : 0);
 	}
@@ -538,7 +548,7 @@ public class VcfEntry extends Marker implements Iterable<VcfGenotype> {
 	 * @return
 	 */
 	public boolean isCompressedGenotypes() {
-		return !hasGenotypes() && (hasInfo(VCF_INFO_HOMS) || hasInfo(VCF_INFO_HETS) || hasInfo(VCF_INFO_NAS));
+		return !hasGenotypes() && (getNumberOfSamples() > 0) && (hasInfo(VCF_INFO_HOMS) || hasInfo(VCF_INFO_HETS) || hasInfo(VCF_INFO_NAS));
 	}
 
 	public boolean isDel() {
