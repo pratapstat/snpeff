@@ -201,7 +201,7 @@
 					<tr> <td> Simple installation </td> <td> Installation is as simple as downloading a ZIP file and double clicking on it. </td> </tr>
 					<tr> <td> Genomes </td> <td> Human genome, as well as all model organisms are supported. Over 2,500 genomes are supported, which includes most mammalian, plant, bacterial and fungal genomes with published genomic data. </td> </tr>
 					<tr> <td> Speed </td> <td> SnpEff is really fast. It can annotate up to 1,000,000 variants per minute. </td> </tr>
-					<tr> <td> GATK integration </td> <td> SnpEff can be easily integrated with <a href="http://www.broadinstitute.org/gatk/">GATK</a> pipleines.</td> </tr>
+					<tr> <td> GATK integration </td> <td> SnpEff can be easily integrated with <a href="http://www.broadinstitute.org/gatk/">GATK</a> pipelines.</td> </tr>
 					<tr> <td> GUI </td> <td> Web based user interface via Galaxy project </td> </tr>
 					<tr> <td> Input and Output formats </td> 
 						<td> 
@@ -218,7 +218,7 @@
 					<tr> <td> Variant impact </td> <td> SnpEff provides a simple assessment of the putative impact of the variant (e.g. HIGH, MODERATE or LOW impact).</td> </tr>
 					<tr> <td> Cancer tissue analysis </td> <td> Somatic vs Germline mutations can be calculated on the fly. This is very useful for the cancer researcher community. </td> </tr>
 					<tr> <td> Loss of Function (LOF) assessment </td> <td> SnpEff can estimate if a variant is deemed to have a loss of function on the protein. </td> </tr>
-					<tr> <td> Nonsense mediate decay (NMD) assessment </td> <td> Some mutations may cause mRNA to be degraded thus not translated into a protein. MND analysis marks mutations that are estimated to trigger nonsense mediated decay.</td> </tr>
+					<tr> <td> Nonsense mediate decay (NMD) assessment </td> <td> Some mutations may cause mRNA to be degraded thus not translated into a protein. NMD analysis marks mutations that are estimated to trigger nonsense mediated decay.</td> </tr>
 					<tr> <td> HGVS notation</td> <td> SnpEff can provide output in HGVS notation, which is quite popular in clinical and translation research environments.</td> </tr>
 					<tr> <td> User annotations</td> <td> A user can provide custom annotations (by means of BED files).</td> </tr>
 					<tr> <td> Public databases </td> 
@@ -1477,7 +1477,7 @@ java –Xmx4g -jar snpEff.jar –v \
 	file.vcf.gz > file.eff.vcf
 </pre>
 
-				SnpEff adds 'LOF' and 'MND' tags to INFO fields (column 8 in VCF format).  LOF and NMD tags have the following format:
+				SnpEff adds 'LOF' and 'NMD' tags to INFO fields (column 8 in VCF format).  LOF and NMD tags have the following format:
 <pre>
 Gene | ID | num_transcripts | percent_affected
 </pre>
