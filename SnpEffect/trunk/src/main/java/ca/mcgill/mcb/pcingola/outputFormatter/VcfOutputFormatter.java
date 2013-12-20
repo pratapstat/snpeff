@@ -278,7 +278,6 @@ public class VcfOutputFormatter extends OutputFormatter {
 
 		// Add custom markers info fields
 		if (addCustomFields) {
-			Gpr.debug("Add custom fields");
 			for (ChangeEffect changeEffect : changeEffects) {
 				if (changeEffect.hasAdditionalAnnotations()) {
 					Custom custom = (Custom) changeEffect.getMarker();
