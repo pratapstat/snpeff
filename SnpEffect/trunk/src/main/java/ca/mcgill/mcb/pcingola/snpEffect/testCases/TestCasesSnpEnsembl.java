@@ -53,15 +53,6 @@ public class TestCasesSnpEnsembl extends TestCase {
 		compareToEnsembl.compareEnsembl(ensemblFile, trName);
 	}
 
-	// ERROR: This transcript is not properly defined by ENSEMBL (I think)
-	//	public void test_01_ENST00000310701() {
-	//		init("testHg3763Chr1");
-	//		String trName = "ENST00000310701";
-	//		String ensemblFile = "./tests/" + trName + "_ensembl.txt";
-	//
-	//		compareEnsemblFile(ensemblFile, trName);
-	//	}
-
 	public void test_03() {
 		String ensemblFile = "./tests/ENST00000382896_ensembl.txt";
 		String trName = "ENST00000382896";

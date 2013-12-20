@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
+import ca.mcgill.mcb.pcingola.interval.Custom;
 import ca.mcgill.mcb.pcingola.interval.Exon;
 import ca.mcgill.mcb.pcingola.interval.Gene;
 import ca.mcgill.mcb.pcingola.interval.Genome;
@@ -19,6 +20,7 @@ import ca.mcgill.mcb.pcingola.snpEffect.ChangeEffect;
 import ca.mcgill.mcb.pcingola.snpEffect.ChangeEffect.FunctionalClass;
 import ca.mcgill.mcb.pcingola.snpEffect.LossOfFunction;
 import ca.mcgill.mcb.pcingola.util.Gpr;
+import ca.mcgill.mcb.pcingola.util.KeyValue;
 import ca.mcgill.mcb.pcingola.vcf.VcfEffect;
 import ca.mcgill.mcb.pcingola.vcf.VcfEffect.FormatVersion;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
@@ -100,6 +102,7 @@ public class VcfOutputFormatter extends OutputFormatter {
 		//---
 		HashSet<String> effs = new HashSet<String>();
 		HashSet<String> oicr = (useOicr ? new HashSet<String>() : null);
+		boolean addCustomFields = false;
 		for (ChangeEffect changeEffect : changeEffects) {
 			// In GATK mode, skip changeEffects having errors or warnings (unless ALL effects have warnings)
 			if (gatk && !allWarnings && (changeEffect.hasError() || changeEffect.hasWarning())) continue;
@@ -230,7 +233,6 @@ public class VcfOutputFormatter extends OutputFormatter {
 
 				//---
 				// Add OICR data
-				// 
 				//---
 				if (useOicr && (tr != null)) {
 					StringBuilder sb = new StringBuilder();
@@ -243,6 +245,12 @@ public class VcfOutputFormatter extends OutputFormatter {
 
 					oicr.add(sb.toString());
 				}
+
+				//---
+				// Is this annotated using a 'custom' interval? 
+				// If so, there might be additional "key=value" pairs
+				//---
+				addCustomFields |= changeEffect.hasAdditionalAnnotations();
 			}
 		}
 
@@ -266,6 +274,21 @@ public class VcfOutputFormatter extends OutputFormatter {
 			LossOfFunction lof = new LossOfFunction(config, changeEffects);
 			if (lof.isLof()) vcfEntry.addInfo(LossOfFunction.VCF_INFO_LOF_NAME, lof.toStringVcfLof());
 			if (lof.isNmd()) vcfEntry.addInfo(LossOfFunction.VCF_INFO_NMD_NAME, lof.toStringVcfNmd());
+		}
+
+		// Add custom markers info fields
+		if (addCustomFields) {
+			Gpr.debug("Add custom fields");
+			for (ChangeEffect changeEffect : changeEffects) {
+				if (changeEffect.hasAdditionalAnnotations()) {
+					Custom custom = (Custom) changeEffect.getMarker();
+					for (KeyValue<String, String> kv : custom) {
+						String key = VcfEntry.vcfInfoSafe(custom.getLabel() + "_" + kv.key);
+						String value = VcfEntry.vcfInfoSafe(kv.value);
+						vcfEntry.addInfo(key, value);
+					}
+				}
+			}
 		}
 
 		needAddInfo = false; // Don't add info twice
@@ -324,6 +347,18 @@ public class VcfOutputFormatter extends OutputFormatter {
 		if (useOicr) newLines.add("##INFO=<ID=OICR,Number=.,Type=String,Description=\"Format: ( Transcript | Distance from begining cDNA )\">");
 
 		return newLines;
+	}
+
+	/**
+	 * Does this
+	 * @param changeEffect
+	 * @return
+	 */
+	boolean hasAnnotations(ChangeEffect changeEffect) {
+		return changeEffect.getMarker() != null // Do we have a marker?
+				&& (changeEffect.getMarker() instanceof Custom) // Is it 'custom'?
+				&& ((Custom) changeEffect.getMarker()).hasAnnotations() // Does it have additional annotations?
+		;
 	}
 
 	public void setGatk(boolean gatk) {
