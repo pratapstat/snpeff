@@ -36,7 +36,9 @@ public class Utr5prime extends Utr {
 		StringBuffer sb = new StringBuffer();
 		for (Utr5prime utr : utrs()) {
 			Exon ex = (Exon) utr.getParent();
-			String utrSeq = ex.getSequence().substring(0, utr.size()); // UTR5' may stop before end of exon
+			String sequence = ex.getSequence();
+			String utrSeq = ex.getSequence();
+			if (utr.size() < utrSeq.length()) utrSeq = utrSeq.substring(0, utr.size()); // UTR5' may stop before end of exon
 			sb.append(utrSeq);
 		}
 
