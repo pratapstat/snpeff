@@ -3748,7 +3748,6 @@ GCA_000162475.1.18 	 Granulicatella_elegans_atcc_700633   GCA_000162475.1.18
 GCA_000178955.2.18 	 Granulicella_mallensis_mp5actx8   GCA_000178955.2.18
 Granulicella_mallensis_MP5ACTX8_uid49957 	 Granulicella_mallensis_MP5ACTX8_uid49957   Granulicella_mallensis_MP5ACTX8_uid49957
 grape 	 Grape   grape
-GRCh37.70 	 GRCh37.70   GRCh37.70
 GCA_000176515.1.18 	 Grimontia_hollisae_cip_101886   GCA_000176515.1.18
 kw1407.2012 	 Grosmannia_clavigera   kw1407.2012
 GCA_000195005.1.18 	 Haemophilus_aegyptius_atcc_11116   GCA_000195005.1.18
@@ -4111,6 +4110,7 @@ GRCh37.65 	 Homo_sapiens   GRCh37.65
 GRCh37.66 	 Homo_sapiens   GRCh37.66
 GRCh37.68 	 Homo_sapiens   GRCh37.68
 GRCh37.69 	 Homo_sapiens   GRCh37.69
+GRCh37.70 	 Homo_sapiens   GRCh37.70
 GRCh37.71 	 Homo_sapiens   GRCh37.71
 GRCh37.72 	 Homo_sapiens   GRCh37.72
 GRCh37.73 	 Homo_sapiens   GRCh37.73
@@ -4729,6 +4729,7 @@ MMUL_1.71 	 Macaca_mulatta   MMUL_1.71
 MMUL_1.72 	 Macaca_mulatta   MMUL_1.72
 MMUL_1.73 	 Macaca_mulatta   MMUL_1.73
 MMUL_1.74 	 Macaca_mulatta   MMUL_1.74
+KF862711 	 Macadamia   KF862711
 GCA_000010585.1.18 	 Macrococcus_caseolyticus_jcsc5402   GCA_000010585.1.18
 Macrococcus_caseolyticus_JCSC5402_uid59003 	 Macrococcus_caseolyticus_JCSC5402_uid59003   Macrococcus_caseolyticus_JCSC5402_uid59003
 Meug_1.0.64 	 Macropus_eugenii   Meug_1.0.64
@@ -6762,7 +6763,6 @@ GCA_000153925.1.18 	 Ruminococcus_torques_atcc_27756   GCA_000153925.1.18
 GCA_000210035.1.18 	 Ruminococcus_torques_l2_14   GCA_000210035.1.18
 GCA_000218895.1.18 	 Runella_slithyformis_dsm_19594   GCA_000218895.1.18
 Runella_slithyformis_DSM_19594_uid68317 	 Runella_slithyformis_DSM_19594_uid68317   Runella_slithyformis_DSM_19594_uid68317
-S288C_PF 	 S288C_PF   S288C_PF
 GCA_000231055.3.18 	 Saccharomonospora_azurea_na_128   GCA_000231055.3.18
 GCA_000236985.2.18 	 Saccharomonospora_azurea_szmc_14600   GCA_000236985.2.18
 GCA_000244975.1.18 	 Saccharomonospora_cyanea_na_134   GCA_000244975.1.18

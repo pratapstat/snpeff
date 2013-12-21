@@ -342,7 +342,7 @@ public class Marker extends Interval implements TxtSerializable {
 		hashCode = hashCode * 31 + start;
 		hashCode = hashCode * 31 + end;
 		hashCode = hashCode * 31 + strand;
-		hashCode = hashCode * 31 + id.hashCode();
+		if (id != null) hashCode = hashCode * 31 + id.hashCode();
 		return hashCode;
 	}
 
