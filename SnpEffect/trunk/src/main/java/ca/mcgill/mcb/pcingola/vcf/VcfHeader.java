@@ -15,6 +15,7 @@ import java.util.List;
  */
 public class VcfHeader {
 
+	int numberOfSamples = -1;
 	StringBuffer header;
 	HashMap<String, VcfInfo> vcfInfoById;
 	ArrayList<String> sampleNames;
@@ -84,6 +85,18 @@ public class VcfHeader {
 
 	public String[] getLines() {
 		return header.toString().split("\n");
+	}
+
+	/**
+	 * Number of samples
+	 * @return
+	 */
+	public int getNumberOfSamples() {
+		if (numberOfSamples < 0) {
+			getSampleNames();
+			numberOfSamples = (sampleNames != null ? sampleNames.size() : 0);
+		}
+		return numberOfSamples;
 	}
 
 	/**

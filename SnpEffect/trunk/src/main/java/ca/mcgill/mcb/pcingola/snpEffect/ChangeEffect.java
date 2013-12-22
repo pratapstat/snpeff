@@ -204,7 +204,6 @@ public class ChangeEffect implements Cloneable, Comparable<ChangeEffect> {
 	static final boolean COMPATIBLE_v1_8 = true; // Activate this in order to get the same out as version 1.8. This is only for testing & debugging 
 
 	SeqChange seqChange = null;
-
 	SeqChange seqChangeRef = null;
 	EffectType effectType = EffectType.NONE;
 	EffectImpact effectImpact = null;
@@ -775,6 +774,17 @@ public class ChangeEffect implements Cloneable, Comparable<ChangeEffect> {
 		return warning;
 	}
 
+	/**
+	 * Do we have an associated marker with additional annotations? 
+	 * @return
+	 */
+	public boolean hasAdditionalAnnotations() {
+		return getMarker() != null // Do we have a marker?
+				&& (getMarker() instanceof Custom) // Is it 'custom'?
+				&& ((Custom) getMarker()).hasAnnotations() // Does it have additional annotations?
+		;
+	}
+
 	public boolean hasError() {
 		return (error != null) && (!error.isEmpty());
 	}
@@ -1085,4 +1095,5 @@ public class ChangeEffect implements Cloneable, Comparable<ChangeEffect> {
 	String vcfSafe(String str) {
 		return str;
 	}
+
 }

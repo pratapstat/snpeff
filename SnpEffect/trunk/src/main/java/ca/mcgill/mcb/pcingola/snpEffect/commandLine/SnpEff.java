@@ -47,8 +47,8 @@ public class SnpEff implements CommandLine {
 
 	// Version info
 	public static final String SOFTWARE_NAME = "SnpEff";
-	public static final String REVISION = "b";
-	public static final String BUILD = "2013-12-13";
+	public static final String REVISION = "e";
+	public static final String BUILD = "2013-12-21";
 	public static final String VERSION_MAJOR = "3.4";
 	public static final String VERSION_SHORT = VERSION_MAJOR + REVISION;
 	public static final String VERSION_NO_NAME = VERSION_SHORT + " (build " + BUILD + "), by " + Pcingola.BY;
@@ -261,9 +261,15 @@ public class SnpEff implements CommandLine {
 		// Convert 'SeqChange' markers to 'Custom' markers
 		Markers markers = new Markers();
 		for (Marker m : markersSeqChange) {
-			Custom custom = new Custom(m.getParent(), m.getStart(), m.getEnd(), m.getStrand(), m.getId(), label);
-			custom.setScore(((SeqChange) m).getScore());
-			markers.add(custom);
+			if (m instanceof Custom) {
+				((Custom) m).setLabel(label);
+				markers.add(m);
+			} else {
+				// Not a custom interval? Create one
+				Custom custom = new Custom(m.getParent(), m.getStart(), m.getEnd(), m.getStrand(), m.getId(), label);
+				custom.setScore(((SeqChange) m).getScore());
+				markers.add(custom);
+			}
 		}
 
 		// Number added

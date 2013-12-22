@@ -104,6 +104,9 @@ public class TestSuiteAll {
 		// Reactome
 		suite.addTestSuite(TestCasesReactome.class);
 
+		// Annotate using custom intervals
+		suite.addTestSuite(TestCasesCutsomIntervals.class);
+
 		return suite;
 	}
 }

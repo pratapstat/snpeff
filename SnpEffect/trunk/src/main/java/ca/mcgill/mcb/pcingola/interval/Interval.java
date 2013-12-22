@@ -96,7 +96,7 @@ public class Interval implements Comparable<Interval>, Serializable, Cloneable {
 		hashCode = hashCode * 31 + start;
 		hashCode = hashCode * 31 + end;
 		hashCode = hashCode * 31 + strand;
-		hashCode = hashCode * 31 + id.hashCode();
+		if (id != null) hashCode = hashCode * 31 + id.hashCode();
 		return hashCode;
 	}
 

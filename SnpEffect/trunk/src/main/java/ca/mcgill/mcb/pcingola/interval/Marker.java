@@ -34,7 +34,7 @@ public class Marker extends Interval implements TxtSerializable {
 		if ((parent != null) && !parent.includes(this)) {
 			String err = "";
 			if (isShowWarningIfParentDoesNotInclude()) err = "WARNING: " + this.getClass().getSimpleName() + " is not included in parent " + parent.getClass().getSimpleName() + ". " //
-					+ "\t" + this.getClass().getSimpleName() + " '" + this.getId() + "'  [ " + this.getStart() + " , " + this.getEnd() + " ]" //
+					+ "\t" + this.getClass().getSimpleName() + " '" + getId() + "'  [ " + getStart() + " , " + getEnd() + " ]" //
 					+ "\t" + parent.getClass().getSimpleName() + " '" + parent.getId() + "' [ " + parent.getStart() + " , " + parent.getEnd() + " ]";
 
 			// Adjust parent?
@@ -111,7 +111,7 @@ public class Marker extends Interval implements TxtSerializable {
 			//			- How does a zero length marker behaves in an INSERTION?
 			//			- How does a zero length marker intersect?
 			return null; // SeqChange completely includes this marker => The whole marker deleted
-		} else if (this.includes(seqChange)) m.end += lenChange; // This marker completely includes seqChange. But seqChange does not include marker (i.e. they are not equal). Only 'end' coordinate needs to be updated
+		} else if (includes(seqChange)) m.end += lenChange; // This marker completely includes seqChange. But seqChange does not include marker (i.e. they are not equal). Only 'end' coordinate needs to be updated
 		else {
 			// SeqChange is partially included in this marker.
 			// This is treated as three different type of deletions:
@@ -342,7 +342,7 @@ public class Marker extends Interval implements TxtSerializable {
 		hashCode = hashCode * 31 + start;
 		hashCode = hashCode * 31 + end;
 		hashCode = hashCode * 31 + strand;
-		hashCode = hashCode * 31 + id.hashCode();
+		if (id != null) hashCode = hashCode * 31 + id.hashCode();
 		return hashCode;
 	}
 
