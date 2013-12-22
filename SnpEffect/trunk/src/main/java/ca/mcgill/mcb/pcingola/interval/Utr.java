@@ -22,6 +22,6 @@ public abstract class Utr extends Marker {
 
 	public abstract boolean isUtr5prime();
 
-	abstract String utrDistance(SeqChange snp, Transcript tint);
+	abstract String utr5primeDistance(SeqChange snp, Transcript tint);
 
 }

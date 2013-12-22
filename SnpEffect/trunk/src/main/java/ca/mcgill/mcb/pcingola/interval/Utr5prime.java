@@ -31,12 +31,24 @@ public class Utr5prime extends Utr {
 		type = EffectType.UTR_5_PRIME;
 	}
 
+	synchronized List<Utr5prime> get5primeUtrs() {
+		if (utrs == null) {
+			Transcript tr = (Transcript) findParent(Transcript.class);
+
+			// Get UTRs and sort them
+			utrs = tr.get5primeUtrs();
+			if (isStrandPlus()) Collections.sort(utrs, new IntervalComparatorByStart()); // Sort by start position 
+			else Collections.sort(utrs, new IntervalComparatorByEnd(true)); // Sort by end position (reversed)
+		}
+
+		return utrs;
+	}
+
 	public String getSequence() {
 		// Create UTR sequence
 		StringBuffer sb = new StringBuffer();
-		for (Utr5prime utr : utrs()) {
+		for (Utr5prime utr : get5primeUtrs()) {
 			Exon ex = (Exon) utr.getParent();
-			String sequence = ex.getSequence();
 			String utrSeq = ex.getSequence();
 			if (utr.size() < utrSeq.length()) utrSeq = utrSeq.substring(0, utr.size()); // UTR5' may stop before end of exon
 			sb.append(utrSeq);
@@ -64,9 +76,9 @@ public class Utr5prime extends Utr {
 		}
 
 		// Is it START_GAINED?
-		Transcript tint = (Transcript) findParent(Transcript.class);
-		String utrDistStr = utrDistance(seqChange, tint);
-		String gained = startGained(seqChange, tint);
+		Transcript tr = (Transcript) findParent(Transcript.class);
+		String utrDistStr = utr5primeDistance(seqChange, tr);
+		String gained = startGained(seqChange, tr);
 
 		if (gained.length() > 0) changeEffect.set(this, EffectType.START_GAINED, gained + ", " + EffectType.UTR_5_PRIME + ": " + utrDistStr);
 		else changeEffect.set(this, type, utrDistStr);
@@ -104,10 +116,11 @@ public class Utr5prime extends Utr {
 		if (!seqChange.isSnp()) return ""; // FIXME: Only SNPs supported! 
 
 		// Calculate SNP position relative to UTRs
-		int pos = seqChange.distanceBases(utrs(), isStrandMinus());
+		int pos = seqChange.distanceBases(get5primeUtrs(), isStrandMinus());
 
 		// Change base at SNP position
-		char[] chars = getSequence().toCharArray();
+		String sequence = getSequence();
+		char[] chars = sequence.toCharArray();
 		char snpBase = seqChange.netChange(this).charAt(0);
 		if (isStrandMinus()) snpBase = GprSeq.wc(snpBase);
 		chars[pos] = snpBase;
@@ -124,23 +137,10 @@ public class Utr5prime extends Utr {
 	 * @return
 	 */
 	@Override
-	String utrDistance(SeqChange seqChange, Transcript tr) {
+	String utr5primeDistance(SeqChange seqChange, Transcript tr) {
 		boolean fromEnd = !(strand < 0); // We want distance from beginning of transcript (TSS = End of 5'UTR)
-		int dist = seqChange.distanceBases(utrs(), fromEnd) + 1;
+		int dist = seqChange.distanceBases(get5primeUtrs(), fromEnd) + 1;
 		return dist + " bases from TSS";
-	}
-
-	synchronized List<Utr5prime> utrs() {
-		if (utrs == null) {
-			Transcript tr = (Transcript) findParent(Transcript.class);
-
-			// Get UTRs and sort them
-			utrs = tr.get5primeUtrs();
-			if (isStrandPlus()) Collections.sort(utrs, new IntervalComparatorByStart()); // Sort by start position 
-			else Collections.sort(utrs, new IntervalComparatorByEnd(true)); // Sort by end position (reversed)
-		}
-
-		return utrs;
 	}
 
 }

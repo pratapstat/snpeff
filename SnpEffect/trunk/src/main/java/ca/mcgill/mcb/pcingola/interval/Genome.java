@@ -525,7 +525,7 @@ public class Genome extends Marker implements Serializable, Iterable<Chromosome>
 		sb.append("# Number of chromosomes      : " + getChromosomes().size() + "\n");
 		sb.append("# Chromosomes names [sizes]  : ");
 		for (Chromosome chr : getChromosomesSortedSize())
-			sb.append("'" + chr.getId() + "' [" + chr.size() + "]\t");
+			sb.append("#\t\t'" + chr.getId() + "' [" + chr.size() + "]\n");
 
 		return sb.toString();
 	}

@@ -8430,6 +8430,7 @@ testHg3770Chr22 	 TestCase   testHg3770Chr22
 testHg3771Chr1 	 TestCase   testHg3771Chr1
 testENST00000398332 	 Test_ENST00000398332   testENST00000398332
 testEgrandis 	 Test   testEgrandis
+test_robking 	 Test   test_robking
 GCA_000283615.1.18 	 Tetragenococcus_halophilus_nbrc_12172   GCA_000283615.1.18
 Tetragenococcus_halophilus_uid74441 	 Tetragenococcus_halophilus_uid74441   Tetragenococcus_halophilus_uid74441
 TETRAODON8.64 	 Tetraodon_nigroviridis   TETRAODON8.64

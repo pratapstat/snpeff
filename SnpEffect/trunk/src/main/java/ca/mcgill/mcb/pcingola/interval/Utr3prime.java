@@ -44,7 +44,7 @@ public class Utr3prime extends Utr {
 		}
 
 		Transcript tr = (Transcript) findParent(Transcript.class);
-		String utrDistStr = utrDistance(seqChange, tr);
+		String utrDistStr = utr5primeDistance(seqChange, tr);
 		changeEffect.set(this, type, utrDistStr);
 
 		Exon exon = (Exon) findParent(Exon.class);
@@ -61,7 +61,7 @@ public class Utr3prime extends Utr {
 	 * @return
 	 */
 	@Override
-	String utrDistance(SeqChange snp, Transcript tr) {
+	String utr5primeDistance(SeqChange snp, Transcript tr) {
 		List<Utr3prime> utrs = tr.get3primeUtrs();
 		boolean fromEnd = strand < 0; // We want distance from end of transcript (beginning of 3'UTR)
 		int dist = snp.distanceBases(utrs, fromEnd) + 1;
