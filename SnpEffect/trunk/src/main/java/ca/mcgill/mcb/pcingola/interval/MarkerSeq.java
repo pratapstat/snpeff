@@ -169,7 +169,7 @@ public class MarkerSeq extends Marker {
 	}
 
 	/**
-	 * Base in this exon at position 'index'
+	 * Base in this marker at position 'index' (relative to marker start)
 	 * @param idx
 	 * @return
 	 */
@@ -180,6 +180,18 @@ public class MarkerSeq extends Marker {
 		}
 
 		return sequence.getBases(index, len);
+	}
+
+	/**
+	 * Base at position 'pos' (genomic coordinates)
+	 * @param pos : Genomic coordinates
+	 * @param len : Number of bases
+	 * @return
+	 */
+	public String basesAtPos(int pos, int len) {
+		int index = pos - start;
+		if (index < 0) return "";
+		return basesAt(index, len);
 	}
 
 	/**
