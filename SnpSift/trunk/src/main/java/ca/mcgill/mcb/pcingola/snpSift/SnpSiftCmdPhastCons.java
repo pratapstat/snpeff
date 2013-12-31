@@ -157,7 +157,7 @@ public class SnpSiftCmdPhastCons extends SnpSift {
 		score = null;
 
 		// Find a file that matches a phastCons name
-		String wigFile = findPhastConsFile(phastConsDir, ".*/chr" + chromo + ".*wigFix.*");
+		String wigFile = findPhastConsFile(phastConsDir, ".*/chr" + chromo + "\\..*wigFix.*");
 		if ((wigFile == null) || !Gpr.exists(wigFile)) {
 			if (wigFile != null) Timer.showStdErr("Cannot open PhastCons file '" + wigFile + "' for chromosome '" + chromo + "'\n\tEntry:\t" + marker);
 			return false;
