@@ -5980,6 +5980,7 @@ Pf3D7v72 	 Plasmodium_falciparum   Pf3D7v72
 Pf3D7v90 	 Plasmodium_falciparum   Pf3D7v90
 Pf3D7v91 	 Plasmodium_falciparum   Pf3D7v91
 plasmo72 	 Plasmodium_falciparum   plasmo72
+pberghei 	 Plasmodium   pberghei
 GCA_000170895.1.18 	 Plesiocystis_pacifica_sir_1   GCA_000170895.1.18
 GCA_000317025.1.18 	 Pleurocapsa_sp_pcc_7327   GCA_000317025.1.18
 GCA_000153225.1.18 	 Polaribacter_irgensii_23_p   GCA_000153225.1.18
@@ -8650,6 +8651,7 @@ ASM17099v1.18 	 Trichoderma_virens   ASM17099v1.18
 GCA_000014265.1.18 	 Trichodesmium_erythraeum_ims101   GCA_000014265.1.18
 Trichodesmium_erythraeum_IMS101_uid57925 	 Trichodesmium_erythraeum_IMS101_uid57925   Trichodesmium_erythraeum_IMS101_uid57925
 ASM15027v1.18 	 Trichoplax_adhaerens   ASM15027v1.18
+Triticum_aestivum.IWGSP1.21 	 Triticum_aestivum.IWGSP1.21   Triticum_aestivum.IWGSP1.21
 GCA_000007485.1.18 	 Tropheryma_whipplei_str_twist   GCA_000007485.1.18
 GCA_000196075.1.18 	 Tropheryma_whipplei_tw08_27   GCA_000196075.1.18
 Tropheryma_whipplei_TW08_27_uid57961 	 Tropheryma_whipplei_TW08_27_uid57961   Tropheryma_whipplei_TW08_27_uid57961

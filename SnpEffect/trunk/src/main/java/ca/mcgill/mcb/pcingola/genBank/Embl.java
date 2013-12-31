@@ -103,7 +103,8 @@ public class Embl extends Features {
 		} else if (fkey.equals("SQ")) {
 			value = value.replaceAll("\\s", "");
 			value = value.replaceAll("\\d", "");
-			sequence.append(value);
+			if (value.replaceAll("[acgtnACGTN]", "").isEmpty()) sequence.append(value); // Only accept {a,c,g,t,n}
+			else if (sequence.length() > 0) System.err.println("Warning: Improper sequence value ignored:\n\t'" + valueOri + "'"); // Only first line has a summary of the information. Other lines should only have valid sequence characters
 		} else if (fkey.equals("OS") | fkey.equals("OC")) {
 			organism += value;
 		} else if (fkey.equals("FT")) {
