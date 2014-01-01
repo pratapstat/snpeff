@@ -347,13 +347,19 @@ public class SnpSiftCmdDbNsfp extends SnpSift {
 			showCmd();
 		}
 
+		StringBuilder sb = new StringBuilder();
+		for (String f : DEFAULT_FIELDS_NAMES_TO_ADD.split(","))
+			sb.append("\t                - " + f + "\n");
+
 		// Show error
 		showVersion();
 		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar " + command + " [-q|-v] [-a] dbNSFP.txt file.vcf > newFile.vcf\n" //
 				+ "Options:\n" //
-				+ "\t-a : Annotate fields, even if the database has an empty value (annotates using '.' for empty).\n" //
-				+ "\t-f : A comma sepparated list of fields to add. Default: '" + DEFAULT_FIELDS_NAMES_TO_ADD + "'.\n" //
+				+ "\t-a          : Annotate fields, even if the database has an empty value (annotates using '.' for empty).\n" //
 				+ "\t-noCollapse : Collapse repeated values from dbNSFP (implies '-a'). Default: '" + collapseRepeatedValues + "'.\n" //
+				+ "\t-f          : A comma sepparated list of fields to add.\n" //
+				+ "\t              Default fields to add:\n" + sb //
+				+ "\n" //
 		);
 		System.exit(1);
 	}
