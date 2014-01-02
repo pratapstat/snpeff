@@ -133,7 +133,6 @@ bool buildAll() {
 #-------------------------------------------------------------------------------
 
 bool buildSpecial() {
-	
 	# Note: This takes a huge amount of memory, don't run multiple of these process because the server will crash
 	# TODO: Add amount of memory to the taks and remove the constraint
 	print("Buils special.\n\tFIXME: Create a 'task' instead of a 'sys'\n")
@@ -199,7 +198,10 @@ void downloadAll() {
 print("Start!\n")
 
 # Create JAR files
-if( make )	sys ./scripts_build/make.sh
+if( make ) {
+	sys ./scripts_build/make_config.sh
+	sys ./scripts_build/make.sh
+}
 
 # Perform downloads
 if( download ) downloadAll()
