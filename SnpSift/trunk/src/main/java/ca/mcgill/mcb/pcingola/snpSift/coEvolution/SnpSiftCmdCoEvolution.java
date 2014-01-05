@@ -31,7 +31,7 @@ import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 
 	public enum ModelCoevolution {
-		ABS, MAX
+		ABS, MAX, LD
 	};
 
 	public enum ModelPvalue {
@@ -273,7 +273,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 				// Show line
 				if (debug) {
 					// Calculate p-values
-					double pvalue = pValue(genoScores);
+					double pvalue = pValueFisher(genoScores);
 					double logp = -Math.log10(pvalue);
 					minp = Math.min(pvalue, minp);
 
@@ -453,7 +453,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 			nControl[1] = 0;
 			nControl[2] = 0;
 
-			double pvalues[] = pvalues(nCase, nControl, pvalueThreshold);
+			double pvalues[] = pvaluesFisher(nCase, nControl, pvalueThreshold);
 			double pvalue = minPvalue(pvalues);
 			if (debug && pvalue <= pvalueThreshold) System.out.println("NumCases : " + numCases + "\tp-value: " + pvalue);
 			if (pvalue <= pvalueSignificant) powerStr = String.format("" //
@@ -471,7 +471,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	 * @param genoScores
 	 * @return
 	 */
-	double pValue(byte genoScores[]) {
+	double pValueFisher(byte genoScores[]) {
 		int casesHom = 0, casesHet = 0, cases = 0;
 		int ctrlHom = 0, ctrlHet = 0, ctrl = 0;
 		int nCase[] = new int[3];
@@ -511,13 +511,13 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		// Add info fields
 		if (debug) Gpr.debug("\n\tCases: " + casesHom + "," + casesHet + "," + cases + "\n\tControls: " + ctrlHom + "," + ctrlHet + "," + ctrl);
 
-		return minPvalue(pvalues(nControl, nCase, pvalueThreshold));
+		return minPvalue(pvaluesFisher(nControl, nCase, pvalueThreshold));
 	}
 
 	/**
-	 * Compare p-values between two genotypes
+	 * Compare p-values between two genotypes using Fisher model
 	 */
-	public double[] pValue(int i1, int i2) {
+	public double[] pValueFisher(int i1, int i2) {
 		byte scores1[] = genotypes.get(i1);
 		byte scores2[] = genotypes.get(i2);
 		byte codes[] = new byte[scores1.length];
@@ -582,7 +582,96 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 			pvalueTh = 1.0;
 		}
 
-		double pvalues[] = pvalues(nCase, nControl, pvalueTh);
+		double pvalues[] = pvaluesFisher(nCase, nControl, pvalueTh);
+		double pvalue = minPvalue(pvalues);
+
+		// Sanity check
+		if (pvalue == 0.0) Gpr.debug("p-value is zero!" + "\n\t" + entryId.get(i1) + "\t" + entryId.get(i2) + "\n\tCases: " + casesHom + "," + casesHet + "," + cases + "\n\tControls: " + ctrlHom + "," + ctrlHet + "," + ctrl);
+		if (debug) Gpr.debug(entryId.get(i1) + "\t" + entryId.get(i2) + "\n\tCases: " + casesHom + "," + casesHet + "," + cases + "\n\tControls: " + ctrlHom + "," + ctrlHet + "," + ctrl);
+
+		// If p-value is less than 'pvalueThreshold' we should show the result (it is 'significant')
+		show |= (pvalue <= pvalueThreshold);
+
+		if (show) {
+			writeRresults(i1, i2, pvalues, checkSum1, checkSum2);
+			return pvalues;
+		}
+		return null;
+	}
+
+	/**
+	 * Calculate using LD model
+	 * @param i1
+	 * @param i2
+	 * @return
+	 */
+	public double[] pValueLd(int i1, int i2) {
+		if (Math.random() < 3) throw new RuntimeException("UNIMPLEMENTED!!!");
+		byte scores1[] = genotypes.get(i1);
+		byte scores2[] = genotypes.get(i2);
+		byte codes[] = new byte[scores1.length];
+		int casesHom = 0, casesHet = 0, cases = 0;
+		int ctrlHom = 0, ctrlHet = 0, ctrl = 0;
+		int nCase[] = new int[3];
+		int nControl[] = new int[3];
+		int checkSum1 = 0, checkSum2 = 0;
+
+		// Count genotypes
+		for (int idx = 0; idx < scores1.length; idx++) {
+			codes[idx] = -1;
+
+			int code1 = scores1[idx];
+			int code2 = scores2[idx];
+
+			checkSum1 += code1;
+			checkSum2 += code2;
+
+			if ((caseControl[idx] != null)) {
+				if ((code1 >= 0) && (code2 >= 0)) {
+					// Summarize two codes into one
+					int code = coEvolutionCode(code1, code2);
+					codes[idx] = (byte) code;
+
+					// Count a/a, a/A and A/A
+					if (caseControl[idx]) nCase[code]++;
+					else nControl[code]++;
+
+					if (caseControl[idx]) {
+						// Case sample
+						if (code < 0) ; // Missing? => Do not count
+						else if (code == 2) casesHom++;
+						else casesHet++;
+
+						cases += code;
+					} else {
+						//Control sample
+						if (code < 0) ; // Missing? => Do not count
+						else if (code == 2) ctrlHom++;
+						else ctrlHet++;
+
+						ctrl += code;
+					}
+				}
+			}
+		}
+
+		//---
+		// Calculate pValues
+		//---
+
+		// We only show results if p-value is less than maxP 
+		// If showNonSignificant is set, we show 
+		// results once every 'showNonSignificant'
+		long count = incCountTests();
+		boolean show = false;
+		double pvalueTh = pvalueThreshold;
+		if ((showNonSignificant > 0) && (count % showNonSignificant == 0)) {
+			show = true;
+			// Are we forcing to show results? Then we should calculate p-value even if it is high
+			pvalueTh = 1.0;
+		}
+
+		double pvalues[] = pvaluesFisher(nCase, nControl, pvalueTh);
 		double pvalue = minPvalue(pvalues);
 
 		// Sanity check
@@ -611,7 +700,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	 * @param nControl
 	 * @return
 	 */
-	double[] pvalues(int nCase[], int nControl[], double pvalueTh) {
+	double[] pvaluesFisher(int nCase[], int nControl[], double pvalueTh) {
 		// pValues
 		double pTrend = pTrend(nControl, nCase);
 		double pAllelic = pAllelic(nControl, nCase, pvalueTh);
@@ -662,8 +751,8 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 
 		// Iteration start
 		// Note: 'Abs' model yields the same result for [i, j] than [j, i] whereas 'max' model doesn't
-		int minj = 0;
-		if (model == ModelCoevolution.ABS) minj = i + 1;
+		int minj = i + 1;
+		if (model == ModelCoevolution.MAX) minj = 0;
 
 		// Iterate on all entries
 		for (int j = minj; j < numEntries; j++) {
@@ -671,7 +760,19 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 				// Does this entry match 'genes'?
 				if (analyzeEntries(i, j)) {
 
-					double pvalues[] = pValue(i, j);
+					double pvalues[] = null;
+					switch (model) {
+					case LD:
+						pvalues = pValueLd(i, j);
+
+					case MAX:
+					case ABS:
+						pvalues = pValueFisher(i, j);
+						break;
+
+					default:
+						throw new RuntimeException("Unimplemented model " + model);
+					}
 					count++;
 
 					if (pvalues != null) {
@@ -746,7 +847,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		System.err.println("\t-genes <list>   : Comma separated list of genes to analyze. Default: None");
 		System.err.println("\t-maxP  <num>    : Maximum p-value to report. Default: " + pvalueThreshold);
 		System.err.println("\t-minAc <num>    : Filter using minimum number of alleles. Default: " + minAlleleCount);
-		System.err.println("\t-model <model>  : Model to use {ABS, MAX}. Default: " + model);
+		System.err.println("\t-model <model>  : Model to use {ABS, MAX, LD}. Default: " + model);
 		System.err.println("\t-out    <file>  : Write results to 'file'. Default: " + rResultsFileName);
 		System.err.println("\t-outGt  <file>  : Write genotypes to 'file'. Default: " + rGtFileName);
 		System.err.println("\t-pos <list>     : Comma separated list of genomic positions to analyze (chr:pos). Default: None");
