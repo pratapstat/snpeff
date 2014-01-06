@@ -14,7 +14,7 @@ import ca.mcgill.mcb.pcingola.util.Gpr;
  */
 public class TestCasesEpistasis extends TestCase {
 
-	public static boolean debug = true;
+	public static boolean debug = false;
 	public static boolean verbose = true;
 
 	public void test_01() {

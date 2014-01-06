@@ -20,6 +20,8 @@ public class TestSuiteAll {
 		// Stats
 		suite.addTestSuite(TestCasesBinomial.class);
 		suite.addTestSuite(TestCasesHypergeometric.class);
+		suite.addTestSuite(TestCasesFisherExactTest.class);
+		suite.addTestSuite(TestCasesChiSquare.class);
 		suite.addTestSuite(TestCasesIntStats.class);
 		suite.addTestSuite(TestCochranArmitage.class);
 		suite.addTestSuite(TestGenePvalueList.class);

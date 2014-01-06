@@ -1,5 +1,9 @@
 package ca.mcgill.mcb.pcingola.probablility;
 
+import org.apache.commons.math3.special.Gamma;
+
+import flanagan.analysis.Stat;
+
 /**
  * 
  * Calculate Fisher's exact test (based on hypergeometric distribution)
@@ -100,7 +104,39 @@ public class FisherExactTest {
 
 		// Estimation is: 1 - chisquare_cdf( ChiSquare, 1)
 		// Degrees of freedom = 1
-		return 1 - flanagan.analysis.Stat.chiSquareCDF(chiSquare, 1);
+		// return 1 - flanagan.analysis.Stat.chiSquareCDF(chiSquare, 1);
+		return chiSquareCDFComplementary(chiSquare, 1);
+	}
+
+	/** 
+	 * Chi-Square Cumulative Distribution Function 
+	 * probability that an observed chi-square value 
+	 * for a correct model should be less than chiSquare 
+	 * nu  =  the degrees of freedom
+	 * 
+	 * @param chiSquare
+	 * @param nu
+	 * @return
+	 */
+	public double chiSquareCDF(double chiSquare, int nu) {
+		if (nu <= 0) throw new IllegalArgumentException("The degrees of freedom [nu], " + nu + ", must be greater than zero");
+		return Stat.incompleteGamma(nu / 2.0D, chiSquare / 2.0D);
+	}
+
+	/** 
+	 * Chi-Square Complementary of Cumulative Distribution Function: 1 -  chiSquareCDF(x, nu)
+	 * probability that an observed chi-square value 
+	 * for a correct model should be greater than chiSquare 
+	 * nu  =  the degrees of freedom
+	 * 
+	 * @param chiSquare
+	 * @param nu
+	 * @return
+	 */
+	public double chiSquareCDFComplementary(double chiSquare, int nu) {
+		if (nu <= 0) throw new IllegalArgumentException("The degrees of freedom [nu], " + nu + ", must be greater than zero");
+		return Gamma.regularizedGammaQ(nu / 2.0D, chiSquare / 2.0D);
+		// 		return Stat.incompleteGammaComplementary(nu / 2.0D, chiSquare / 2.0D); // This one doesn't work for p-values less than 10^-23
 	}
 
 	/**
