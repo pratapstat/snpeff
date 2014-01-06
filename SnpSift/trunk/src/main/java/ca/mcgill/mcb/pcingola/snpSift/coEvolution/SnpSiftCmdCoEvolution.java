@@ -593,7 +593,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		show |= (pvalue <= pvalueThreshold);
 
 		if (show) {
-			writeRresults(i1, i2, pvalues, checkSum1, checkSum2);
+			writeRResultsFisher(i1, i2, pvalues, checkSum1, checkSum2);
 			return pvalues;
 		}
 		return null;
@@ -601,91 +601,88 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 
 	/**
 	 * Calculate using LD model
+	 * References : "Test for interaction between two unlinked loci", Zhao et. al. 2006
+	 * 
 	 * @param i1
 	 * @param i2
 	 * @return
 	 */
-	public double[] pValueLd(int i1, int i2) {
-		if (Math.random() < 3) throw new RuntimeException("UNIMPLEMENTED!!!");
+	public double pValueLd(int i1, int i2) {
 		byte scores1[] = genotypes.get(i1);
 		byte scores2[] = genotypes.get(i2);
-		byte codes[] = new byte[scores1.length];
-		int casesHom = 0, casesHet = 0, cases = 0;
-		int ctrlHom = 0, ctrlHet = 0, ctrl = 0;
-		int nCase[] = new int[3];
-		int nControl[] = new int[3];
+
+		int count = 0;
+		int count_D1 = 0, counta_D1 = 0;
+		int count_D2 = 0, counta_D2 = 0;
+		int count_11 = 0, counta_11 = 0;
+		int n_G = 0, n_A = 0;
+
 		int checkSum1 = 0, checkSum2 = 0;
-
-		// Count genotypes
 		for (int idx = 0; idx < scores1.length; idx++) {
-			codes[idx] = -1;
-
 			int code1 = scores1[idx];
 			int code2 = scores2[idx];
 
 			checkSum1 += code1;
 			checkSum2 += code2;
 
-			if ((caseControl[idx] != null)) {
-				if ((code1 >= 0) && (code2 >= 0)) {
-					// Summarize two codes into one
-					int code = coEvolutionCode(code1, code2);
-					codes[idx] = (byte) code;
+			// We make sure case/control status AND both genotypes are available
+			if ((caseControl[idx] != null) && (code1 >= 0) && (code2 >= 0)) {
+				count++;
 
-					// Count a/a, a/A and A/A
-					if (caseControl[idx]) nCase[code]++;
-					else nControl[code]++;
-
-					if (caseControl[idx]) {
-						// Case sample
-						if (code < 0) ; // Missing? => Do not count
-						else if (code == 2) casesHom++;
-						else casesHet++;
-
-						cases += code;
-					} else {
-						//Control sample
-						if (code < 0) ; // Missing? => Do not count
-						else if (code == 2) ctrlHom++;
-						else ctrlHet++;
-
-						ctrl += code;
-					}
+				if (caseControl[idx]) {
+					// Affected population
+					n_A++;
+					if (code1 == 0) counta_D1++;
+					if (code2 == 0) counta_D2++;
+					if ((code1 == 0) && (code2 == 0)) counta_11++;
+				} else {
+					// General population
+					n_G++;
+					if (code1 == 0) count_D1++;
+					if (code2 == 0) count_D2++;
+					if ((code1 == 0) && (code2 == 0)) count_11++;
 				}
 			}
 		}
 
+		// General population
+		double dcount = count;
+		double p_D1 = count_D1 / dcount;
+		double p_D2 = count_D2 / dcount;
+		double p_11 = count_11 / dcount;
+		double delta_N = p_11 - p_D1 * p_D2;
+		double V_N = (p_D1 * (1.0 - p_D1) * p_D2 * (1.0 - p_D2) + (1.0 - 2.0 * p_D1) * (1.0 - 2.0 * p_D2) * delta_N - delta_N * delta_N) / (2.0 * n_G);
+
+		// Affected population
+		double pa_D1 = counta_D1 / dcount;
+		double pa_D2 = counta_D2 / dcount;
+		double pa_11 = counta_11 / dcount;
+		double delta_A = pa_11 - pa_D1 * pa_D2;
+		double V_A = (pa_D1 * (1.0 - pa_D1) * pa_D2 * (1.0 - pa_D2) + (1.0 - 2.0 * pa_D1) * (1.0 - 2.0 * pa_D2) * delta_A - delta_A * delta_A) / (2.0 * n_A);
+
+		// Test statistic (see paper, equation 5)
+		double T = ((delta_A - delta_N) * (delta_A - delta_N)) / (V_A + V_N);
+
 		//---
 		// Calculate pValues
 		//---
-
-		// We only show results if p-value is less than maxP 
-		// If showNonSignificant is set, we show 
-		// results once every 'showNonSignificant'
-		long count = incCountTests();
 		boolean show = false;
-		double pvalueTh = pvalueThreshold;
-		if ((showNonSignificant > 0) && (count % showNonSignificant == 0)) {
-			show = true;
-			// Are we forcing to show results? Then we should calculate p-value even if it is high
-			pvalueTh = 1.0;
-		}
 
-		double pvalues[] = pvaluesFisher(nCase, nControl, pvalueTh);
-		double pvalue = minPvalue(pvalues);
+		// According to the paper, T is distributed as a Chi-Squared with 1 degree of freedom
+		double pvalue = 1.0 - flanagan.analysis.Stat.chiSquareCDF(T, 1);
 
 		// Sanity check
-		if (pvalue == 0.0) Gpr.debug("p-value is zero!" + "\n\t" + entryId.get(i1) + "\t" + entryId.get(i2) + "\n\tCases: " + casesHom + "," + casesHet + "," + cases + "\n\tControls: " + ctrlHom + "," + ctrlHet + "," + ctrl);
-		if (debug) Gpr.debug(entryId.get(i1) + "\t" + entryId.get(i2) + "\n\tCases: " + casesHom + "," + casesHet + "," + cases + "\n\tControls: " + ctrlHom + "," + ctrlHet + "," + ctrl);
+		if (pvalue == 0.0) Gpr.debug("p-value is zero!" + "\n\t" + entryId.get(i1) + "\t" + entryId.get(i2));
+		if (debug) Gpr.debug(entryId.get(i1) + "\t" + entryId.get(i2));
 
 		// If p-value is less than 'pvalueThreshold' we should show the result (it is 'significant')
 		show |= (pvalue <= pvalueThreshold);
 
 		if (show) {
-			writeRresults(i1, i2, pvalues, checkSum1, checkSum2);
-			return pvalues;
+			writeRResultsLd(i1, i2, pvalue, checkSum1, checkSum2);
+			return pvalue;
 		}
-		return null;
+		return Double.NaN;
 	}
 
 	/**
@@ -760,14 +757,28 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 				// Does this entry match 'genes'?
 				if (analyzeEntries(i, j)) {
 
-					double pvalues[] = null;
+					boolean show = false;
 					switch (model) {
 					case LD:
-						pvalues = pValueLd(i, j);
+						double pvalue = pValueLd(i, j);
+						if (!Double.isNaN(pvalue)) {
+							show = true;
+							String out = String.format("Result\t%.4e\t%.4e\t%.4e\t%.4e\t[%d, %d]\t%s\t%s\t%d\t%d", pvalue, 1.0, 1.0, 1.0, i, j, entryId.get(i), entryId.get(j), mac(genotypes.get(i)), mac(genotypes.get(j)));
+							if (!isMulti) System.out.println(out);
+							else sb.append((sb.length() > 0 ? "\n" : "") + out);
+						}
+						break;
 
 					case MAX:
 					case ABS:
+						double pvalues[] = null;
 						pvalues = pValueFisher(i, j);
+						if (pvalues != null) {
+							show = true;
+							String out = String.format("Result\t%.4e\t%.4e\t%.4e\t%.4e\t[%d, %d]\t%s\t%s\t%d\t%d", pvalues[0], pvalues[1], pvalues[2], pvalues[3], i, j, entryId.get(i), entryId.get(j), mac(genotypes.get(i)), mac(genotypes.get(j)));
+							if (!isMulti) System.out.println(out);
+							else sb.append((sb.length() > 0 ? "\n" : "") + out);
+						}
 						break;
 
 					default:
@@ -775,12 +786,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 					}
 					count++;
 
-					if (pvalues != null) {
-						String out = String.format("Result\t%.4e\t%.4e\t%.4e\t%.4e\t[%d, %d]\t%s\t%s\t%d\t%d", pvalues[0], pvalues[1], pvalues[2], pvalues[3], i, j, entryId.get(i), entryId.get(j), mac(genotypes.get(i)), mac(genotypes.get(j)));
-						if (!isMulti) System.out.println(out);
-						else sb.append((sb.length() > 0 ? "\n" : "") + out);
-
-					} else if (!isMulti) Gpr.showMark(count, SHOW_EVERY);
+					if (!show && !isMulti) Gpr.showMark(count, SHOW_EVERY);
 				}
 			}
 		}
@@ -891,7 +897,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	 * @param i2
 	 * @param codes
 	 */
-	void writeRresults(int i1, int i2, double pvalues[], int checkSum1, int checkSum2) {
+	void writeRResultsFisher(int i1, int i2, double pvalues[], int checkSum1, int checkSum2) {
 		StringBuilder sb = new StringBuilder();
 
 		// Add indexes (one-based)
@@ -919,10 +925,54 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	}
 
 	/**
+	 * Show in a way that R can read (logistic regression)
+	 * @param i1
+	 * @param i2
+	 * @param codes
+	 */
+	void writeRResultsLd(int i1, int i2, double pvalue, int checkSum1, int checkSum2) {
+		StringBuilder sb = new StringBuilder();
+
+		// Add indexes (one-based)
+		sb.append(i1 + 1);
+		sb.append('\t');
+		sb.append(i2 + 1);
+		sb.append('\t');
+
+		// Add variant data
+		sb.append(entryId.get(i1).replace(' ', '\t'));
+		sb.append('\t');
+		sb.append(entryId.get(i2).replace(' ', '\t'));
+
+		// Add p-values
+		sb.append("\t" + pvalue);
+		sb.append("\t1.0\t1.0\t1.0"); // For compatibility in the R program
+
+		// Add checksums
+		sb.append("\t" + checkSum1 + "\t" + checkSum2);
+
+		sb.append('\n');
+
+		// Write it to file
+		writeR(sb.toString());
+	}
+
+	/**
 	 * Show title in R file
 	 */
 	void writeRResultsTitle() {
-		writeR("idx1\tidx2\tpos1\tgene1\tid1\tpos2\tgene2\tid2\tpAllelic\tpDominant\tpRecessive\tpCodominant\tchecksum1\tchecksum2\n");
-	}
+		switch (model) {
+		case LD:
+			writeR("idx1\tidx2\tpos1\tgene1\tid1\tpos2\tgene2\tid2\tp\tchecksum1\tchecksum2\n");
+			break;
 
+		case MAX:
+		case ABS:
+			writeR("idx1\tidx2\tpos1\tgene1\tid1\tpos2\tgene2\tid2\tpAllelic\tpDominant\tpRecessive\tpCodominant\tchecksum1\tchecksum2\n");
+			break;
+
+		default:
+			throw new RuntimeException("Unimplemented model " + model);
+		}
+	}
 }
