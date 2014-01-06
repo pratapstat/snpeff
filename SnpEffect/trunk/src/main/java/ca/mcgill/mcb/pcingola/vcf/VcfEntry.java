@@ -405,9 +405,32 @@ public class VcfEntry extends Marker implements Iterable<VcfGenotype> {
 		return gt;
 	}
 
+	/**
+	 * Get info string
+	 * @param key
+	 * @return
+	 */
 	public String getInfo(String key) {
 		if (info == null) parseInfo();
 		return info.get(key);
+	}
+
+	/**
+	 * Get info string for a specific allele
+	 * @param key
+	 * @param allele
+	 * @return
+	 */
+	public String getInfo(String key, String allele) {
+		if (info == null) parseInfo();
+
+		String infoStr = info.get(key);
+		if (infoStr == null) return null;
+
+		String infos[] = infoStr.split(",");
+		for (int i = 0; i < alts.length; i++)
+			if (alts[i].equalsIgnoreCase(allele)) return infos[i];
+		return null;
 	}
 
 	/**
@@ -451,7 +474,7 @@ public class VcfEntry extends Marker implements Iterable<VcfGenotype> {
 	 * @param key
 	 * @return
 	 */
-	public Set<String> getInfoKeys(String key) {
+	public Set<String> getInfoKeys() {
 		if (info == null) parseInfo();
 		return info.keySet();
 	}
@@ -509,11 +532,20 @@ public class VcfEntry extends Marker implements Iterable<VcfGenotype> {
 	}
 
 	/**
-	 * Get Info type for a given ID
+	 * Get VcfInfo type for a given ID
 	 * @param id
 	 * @return VcfInfoType
 	 */
-	public VcfInfoType getVcfInfoType(String id) {
+	public VcfInfo getVcfInfo(String id) {
+		return vcfFileIterator.getVcfHeader().getVcfInfo(id);
+	}
+
+	/**
+	 * Get Info number for a given ID
+	 * @param id
+	 * @return VcfInfoType
+	 */
+	public VcfInfoType getVcfInfoNumber(String id) {
 		VcfInfo vcfInfo = vcfFileIterator.getVcfHeader().getVcfInfo(id);
 		if (vcfInfo == null) return null;
 		return vcfInfo.getVcfInfoType();

@@ -1,6 +1,7 @@
 package ca.mcgill.mcb.pcingola.snpSift.testCases;
 
 import java.io.IOException;
+import java.util.List;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -114,7 +115,8 @@ public class TestCasesAnnotate extends TestCase {
 		vcfAnnotate.annotate(vcf);
 
 		// Check
-		Assert.assertEquals("PREVIOUS=annotation;TEST=yes;RSPOS=16346045;AF=0.002;OBS=4,1,1636,2011,3,1,6780,9441;IOD=0.000;AOI=-410.122;AOZ=-399.575;ABE=0.678;ABZ=47.762;AN=488", vcf.getInfoStr());
+		//		Assert.assertEquals("PREVIOUS=annotation;TEST=yes;RSPOS=16346045;AF=0.002;OBS=4,1,1636,2011,3,1,6780,9441;IOD=0.000;AOI=-410.122;AOZ=-399.575;ABE=0.678;ABZ=47.762;AN=488", vcf.getInfoStr());
+		Assert.assertEquals("PREVIOUS=annotation;TEST=yes;ABE=0.678;ABZ=47.762;AF=0.002;AN=488;AOI=-410.122;AOZ=-399.575;IOD=0.000;OBS=4,1,1636,2011,3,1,6780,9441;RSPOS=16346045", vcf.getInfoStr());
 	}
 
 	/**
@@ -291,6 +293,26 @@ public class TestCasesAnnotate extends TestCase {
 			if (line.startsWith("##INFO=<ID=AA")) hasAa++;
 
 		Assert.assertEquals(1, hasAa);
+	}
+
+	public void test_14() {
+		String dbFileName = "./test/annotate_multiple_allele.db.vcf";
+		String fileName = "./test/annotate_multiple_allele.1.vcf";
+		System.out.println("Annotate: " + dbFileName + "\t" + fileName);
+
+		// Create command line
+		String args[] = { dbFileName, fileName };
+
+		// Get SnpSift ready
+		SnpSiftCmdAnnotateSorted vcfAnnotate = new SnpSiftCmdAnnotateSorted(args);
+		vcfAnnotate.setSuppressOutput(true);
+		List<VcfEntry> list = vcfAnnotate.run(true);
+
+		// Check results
+		VcfEntry ve = list.get(0);
+		System.out.println(ve);
+		String allNum = ve.getInfo("ALL_NUM");
+		Assert.assertEquals("2", allNum);
 	}
 
 }
