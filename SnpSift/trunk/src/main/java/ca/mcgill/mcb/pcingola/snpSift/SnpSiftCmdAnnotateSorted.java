@@ -387,7 +387,7 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 						&& !vcf.getRef().startsWith(vcfDb.getRef()) //  
 						&& !vcfDb.getRef().startsWith(vcf.getRef()) //
 				) {
-					System.err.println("WARNING: Reference is '" + vcfDb.getRef() + "' instead of '" + vcf.getRef() + "' at " + chr + ":" + (vcf.getStart() + 1));
+					System.err.println("WARNING: Reference in database file '" + vcfDbFileName + "' is '" + vcfDb.getRef() + "' and reference in input file '" + vcfFileName + "' is '" + vcf.getRef() + "' at " + chr + ":" + (vcf.getStart() + 1));
 					countBadRef++;
 				}
 
