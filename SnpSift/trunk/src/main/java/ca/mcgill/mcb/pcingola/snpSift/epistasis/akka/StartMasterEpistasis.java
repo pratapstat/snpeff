@@ -1,4 +1,4 @@
-package ca.mcgill.mcb.pcingola.snpSift.coEvolution.akka;
+package ca.mcgill.mcb.pcingola.snpSift.epistasis.akka;
 
 import ca.mcgill.mcb.pcingola.akka.msg.StartMaster;
 
@@ -7,9 +7,9 @@ import ca.mcgill.mcb.pcingola.akka.msg.StartMaster;
  * 
  * @author pablocingolani
  */
-public class StartMasterCoEvolution extends StartMaster {
+public class StartMasterEpistasis extends StartMaster {
 
-	public StartMasterCoEvolution(int batchSize, int showEvery) {
+	public StartMasterEpistasis(int batchSize, int showEvery) {
 		super(batchSize, showEvery);
 	}
 }
