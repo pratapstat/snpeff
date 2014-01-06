@@ -9,7 +9,7 @@ import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
 import ca.mcgill.mcb.pcingola.snpEffect.commandLine.SnpEff;
 import ca.mcgill.mcb.pcingola.snpSift.caseControl.SnpSiftCmdCaseControl;
 import ca.mcgill.mcb.pcingola.snpSift.caseControl.SnpSiftCmdCaseControlSummary;
-import ca.mcgill.mcb.pcingola.snpSift.coEvolution.SnpSiftCmdCoEvolution;
+import ca.mcgill.mcb.pcingola.snpSift.epistasis.SnpSiftCmdEpistasis;
 import ca.mcgill.mcb.pcingola.snpSift.hwe.SnpSiftCmdHwe;
 import ca.mcgill.mcb.pcingola.snpSift.matrix.SnpSiftCmdAlleleMatrix;
 import ca.mcgill.mcb.pcingola.snpSift.matrix.SnpSiftCmdCovarianceMatrix;
@@ -213,7 +213,7 @@ public class SnpSift {
 		else if (command.startsWith("GT")) cmd = new SnpSiftCmdGt(args);
 		else if (command.startsWith("SIMPLIFYINDELS")) cmd = new SnpSiftCmdSimplifyIndels(args);
 		else if (command.startsWith("PEDSHOW")) cmd = new SnpSiftCmdPedShow(args);
-		else if (command.startsWith("COEVOLUTION")) cmd = new SnpSiftCmdCoEvolution(args);
+		else if (command.startsWith("EPISTASIS")) cmd = new SnpSiftCmdEpistasis(args);
 		else usage("Unknown command '" + command + "'");
 
 		// Help? Show help and exit
@@ -311,10 +311,10 @@ public class SnpSift {
 				+ "\n\tannMem        : Annotate 'ID' from a database (e.g. dbSnp). Loads db in memory. Does not assume sorted entries." //
 				+ "\n\tcaseControl   : Compare how many variants are in 'case' and in 'control' groups; calculate p-values." //
 				+ "\n\tccs           : Case control summary. Case and control summaries by region, allele frequency and variant's functional effect." //
-				+ "\n\tcoevolution   : Co-evoution case control model (this feature is alpha)." //
 				+ "\n\tconcordance   : Concordance metrics between two VCF files." //
 				+ "\n\tcovMat        : Create an covariance matrix output (allele matrix as input)." //
 				+ "\n\tdbnsfp        : Annotate with multiple entries from dbNSFP. <EXPERIMENTAL>" //
+				+ "\n\tepistatsis    : Epistatic case control model (this feature is alpha)." //
 				+ "\n\textractFields : Extract fields from VCF file into tab separated format." //
 				+ "\n\tfilter        : Filter using arbitrary expressions" //
 				+ "\n\tgeneSets      : Annotate using MSigDb gene sets (MSigDb includes: GO, KEGG, Reactome, BioCarta, etc.)" //
