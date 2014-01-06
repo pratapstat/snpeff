@@ -51,6 +51,8 @@ public class SnpSiftCmdEpistasis extends SnpSiftCmdCaseControl {
 	List<String> sampleIds;
 	ArrayList<byte[]> genotypes;
 	ArrayList<String> entryId;
+	String chromo[];
+	int pos[];
 	HashSet<String> genes, chrPos;
 	BufferedWriter rFile;
 
@@ -114,25 +116,12 @@ public class SnpSiftCmdEpistasis extends SnpSiftCmdCaseControl {
 	 * @return
 	 */
 	long distance(int i1, int i2) {
-		String entryId1 = entryId.get(i1);
-		String entryId2 = entryId.get(i2);
-
-		// Parse chromosomes
-		int c1 = entryId1.indexOf(':');
-		int c2 = entryId2.indexOf(':');
-		String chr1 = entryId1.substring(0, c1);
-		String chr2 = entryId2.substring(0, c2);
-
 		// Different chromosome? Distance is 'infinite'
-		if (!chr1.equals(chr2)) return Long.MAX_VALUE;
+		if (!chromo[i1].equals(chromo[i2])) return Long.MAX_VALUE;
 
-		// Parse positions
-		int u1 = entryId1.indexOf('_');
-		int u2 = entryId2.indexOf('_');
-		String pos1Str = entryId1.substring(c1 + 1, u1);
-		String pos2Str = entryId2.substring(c2 + 1, u2);
-		long pos1 = Long.parseLong(pos1Str);
-		long pos2 = Long.parseLong(pos2Str);
+		// Positions
+		long pos1 = pos[i1];
+		long pos2 = pos[i2];
 
 		return (pos1 > pos2 ? pos1 - pos2 : pos2 - pos1);
 	}
@@ -281,6 +270,8 @@ public class SnpSiftCmdEpistasis extends SnpSiftCmdCaseControl {
 		// Initialize
 		genotypes = new ArrayList<byte[]>();
 		entryId = new ArrayList<String>();
+		ArrayList<String> chromoList = new ArrayList<String>();
+		ArrayList<Integer> posList = new ArrayList<Integer>();
 		double minp = 1.0;
 
 		// Open 'R' file
@@ -301,6 +292,8 @@ public class SnpSiftCmdEpistasis extends SnpSiftCmdCaseControl {
 
 				genotypes.add(genoScores);
 				entryId.add(entryId(ve));
+				chromoList.add(ve.getChromosomeName());
+				posList.add(ve.getStart());
 
 				// Show line
 				if (debug) {
@@ -319,6 +312,13 @@ public class SnpSiftCmdEpistasis extends SnpSiftCmdCaseControl {
 
 		if (verbose) Timer.showStdErr("Finished loading VCF. Loaded: " + genotypes.size() + " lines." + (minp < 1 ? "\n\tMin p-value: " + minp : ""));
 		closeRfile();
+
+		// Create chromo and pos arrays
+		chromo = chromoList.toArray(new String[0]);
+		pos = new int[posList.size()];
+		int i = 0;
+		for (int p : posList)
+			pos[i++] = p;
 	}
 
 	/**
