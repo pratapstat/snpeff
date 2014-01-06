@@ -115,7 +115,7 @@ public class SnpSiftCmdEpistasis extends SnpSiftCmdCaseControl {
 	 * @param i2 : Marker 2 index
 	 * @return
 	 */
-	long distance(int i1, int i2) {
+	public long distance(int i1, int i2) {
 		// Different chromosome? Distance is 'infinite'
 		if (!chromo[i1].equals(chromo[i2])) return Long.MAX_VALUE;
 
@@ -251,6 +251,15 @@ public class SnpSiftCmdEpistasis extends SnpSiftCmdCaseControl {
 		analyzeEntry = new boolean[genotypes.size()];
 		for (int i = 0; i < analyzeEntry.length; i++)
 			analyzeEntry[i] = analyzeEntry(i);
+	}
+
+	/**
+	 * Load data
+	 */
+	public void load() {
+		loadTfam();
+		loadVcf();
+		initMatchGenes();
 	}
 
 	/**
@@ -649,7 +658,6 @@ public class SnpSiftCmdEpistasis extends SnpSiftCmdCaseControl {
 		byte scores1[] = genotypes.get(i1);
 		byte scores2[] = genotypes.get(i2);
 
-		int count = 0;
 		int count_D1 = 0, counta_D1 = 0;
 		int count_D2 = 0, counta_D2 = 0;
 		int count_11 = 0, counta_11 = 0;
@@ -665,8 +673,6 @@ public class SnpSiftCmdEpistasis extends SnpSiftCmdCaseControl {
 
 			// We make sure case/control status AND both genotypes are available
 			if ((caseControl[idx] != null) && (code1 >= 0) && (code2 >= 0)) {
-				count++;
-
 				if (caseControl[idx]) {
 					// Affected population
 					n_A++;
@@ -684,17 +690,18 @@ public class SnpSiftCmdEpistasis extends SnpSiftCmdCaseControl {
 		}
 
 		// General population
-		double dcount = count;
-		double p_D1 = count_D1 / dcount;
-		double p_D2 = count_D2 / dcount;
-		double p_11 = count_11 / dcount;
+		double dng = n_G;
+		double p_D1 = count_D1 / dng;
+		double p_D2 = count_D2 / dng;
+		double p_11 = count_11 / dng;
 		double delta_N = p_11 - p_D1 * p_D2;
 		double V_N = (p_D1 * (1.0 - p_D1) * p_D2 * (1.0 - p_D2) + (1.0 - 2.0 * p_D1) * (1.0 - 2.0 * p_D2) * delta_N - delta_N * delta_N) / (2.0 * n_G);
 
 		// Affected population
-		double pa_D1 = counta_D1 / dcount;
-		double pa_D2 = counta_D2 / dcount;
-		double pa_11 = counta_11 / dcount;
+		double dna = n_A;
+		double pa_D1 = counta_D1 / dna;
+		double pa_D2 = counta_D2 / dna;
+		double pa_11 = counta_11 / dna;
 		double delta_A = pa_11 - pa_D1 * pa_D2;
 		double V_A = (pa_D1 * (1.0 - pa_D1) * pa_D2 * (1.0 - pa_D2) + (1.0 - 2.0 * pa_D1) * (1.0 - 2.0 * pa_D2) * delta_A - delta_A * delta_A) / (2.0 * n_A);
 
@@ -705,9 +712,37 @@ public class SnpSiftCmdEpistasis extends SnpSiftCmdCaseControl {
 		// Calculate pValues
 		//---
 		boolean show = false;
+		long count = incCountTests();
+		if ((showNonSignificant > 0) && (count % showNonSignificant == 0)) show = true; // Are we forcing to show results? Then we should calculate p-value even if it is high
 
 		// According to the paper, T is distributed as a Chi-Squared with 1 degree of freedom
 		double pvalue = 1.0 - flanagan.analysis.Stat.chiSquareCDF(T, 1);
+		if (debug) {
+			System.err.println("Markers: " + entryId.get(i1) + "\t" + entryId.get(i2) //  
+					+ "\n\tp-value     : " + pvalue //
+					+ "\n\tT statistic : " + T //
+					+ "\n" //
+					+ "\n\tN_G         : " + n_G //
+					+ "\n\tcount_D1    : " + count_D1 //
+					+ "\n\tcount_D2    : " + count_D2 //
+					+ "\n\tcount_11    : " + count_11 //
+					+ "\n\tp_D1        : " + p_D1 //
+					+ "\n\tp_D2        : " + p_D2 //
+					+ "\n\tp_11        : " + p_11 //
+					+ "\n\tdelta_N     : " + delta_N //
+					+ "\n\tV_N         : " + V_N //
+					+ "\n" //
+					+ "\n\tN_A         : " + n_A //
+					+ "\n\tcounta_D1   : " + counta_D1 //
+					+ "\n\tcounta_D2   : " + counta_D2 //
+					+ "\n\tcounta_11   : " + counta_11 //
+					+ "\n\tpa_D1       : " + pa_D1 //
+					+ "\n\tpa_D2       : " + pa_D2 //
+					+ "\n\tpa_11       : " + pa_11 //
+					+ "\n\tdelta_A     : " + delta_A //
+					+ "\n\tV_A         : " + V_A //
+			);
+		}
 
 		// Sanity check
 		if (pvalue == 0.0) Gpr.debug("p-value is zero!" + "\n\t" + entryId.get(i1) + "\t" + entryId.get(i2));
@@ -753,10 +788,7 @@ public class SnpSiftCmdEpistasis extends SnpSiftCmdCaseControl {
 	 */
 	@Override
 	public void run() {
-		// Load data
-		loadTfam();
-		loadVcf();
-		initMatchGenes();
+		load(); // Load data
 
 		// Run
 		if (debug) powerCalculation();
