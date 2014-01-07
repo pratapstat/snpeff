@@ -40,6 +40,7 @@ public class ChangeEffect implements Cloneable, Comparable<ChangeEffect> {
 	public enum EffectType {
 		NONE //
 		, CHROMOSOME //
+		, CHROMOSOME_LARGE_DELETION //
 		, INTERGENIC //
 		, UPSTREAM //
 		, UTR_5_PRIME //
@@ -432,6 +433,7 @@ public class ChangeEffect implements Cloneable, Comparable<ChangeEffect> {
 				case STOP_GAINED:
 				case STOP_LOST:
 				case RARE_AMINO_ACID:
+				case CHROMOSOME_LARGE_DELETION:
 					effectImpact = EffectImpact.HIGH;
 					break;
 
@@ -557,6 +559,7 @@ public class ChangeEffect implements Cloneable, Comparable<ChangeEffect> {
 		switch (effectType) {
 		case NONE:
 		case CHROMOSOME:
+		case CHROMOSOME_LARGE_DELETION:
 		case CUSTOM:
 		case CDS:
 			return EffectType.NONE.toString();
