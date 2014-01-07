@@ -31,12 +31,46 @@ import ca.mcgill.mcb.pcingola.util.Gpr;
  */
 public class VcfInfo {
 
+	/**
+	 * Number of values in an INFO field.
+	 * Reference
+	 * 		http://samtools.github.io/hts-specs/VCFv4.2.pdf
+	 * 
+	 * Number of items in an INFO field. The Number entry is an Integer that describes the number of values that can be 
+	 * included with the INFO field. For example, if the INFO field contains
+	 * a single number, then this value should be 1; if the INFO field describes a pair of numbers, then this value should
+	 * be 2 and so on. There are also certain special characters used to define special cases:
+	 * 		- If the field has one value per alternate allele then this value should be `A'.
+	 * 		- If the field has one value for each possible allele (including the reference), then this value should be `R'.
+	 * 		- If the field has one value for each possible genotype (more relevant to the FORMAT tags) then this value should be `G'.
+	 * 		- If the number of possible values varies, is unknown, or is unbounded, then this value should be `.'.
+	 * The `Flag' type indicates that the INFO field does not contain a Value entry, and hence the Number should be 0 in this case.
+	 */
+	public enum VcfInfoNumber {
+		NUMBER, UNLIMITED, ALLELE, ALL_ALLELES, GENOTYPE;
+
+		@Override
+		public String toString() {
+			switch (this) {
+			case NUMBER:
+				return "";
+			case ALLELE:
+				return "A";
+			case ALL_ALLELES:
+				return "R";
+			case GENOTYPE:
+				return "G";
+			default:
+				throw new RuntimeException("Unimplemented method for type " + this);
+			}
+		}
+	};
+
 	String line;
 	String id;
+	VcfInfoNumber vcfInfoNumber;
 	VcfInfoType vcfInfoType;
 	int number;
-	boolean onePerAllele;
-	boolean onePerGenotype;
 	boolean implicit; // Is this field implicit? (Added automatically by VcfHeader class)
 	String description;
 
@@ -62,7 +96,9 @@ public class VcfInfo {
 			if (matcher.find()) id = matcher.group(1);
 			else throw new RuntimeException("Cannot find 'ID' in info line: '" + line + "'");
 
-			// Find Number
+			// Find and parse 'Number'
+			number = -1;
+			vcfInfoNumber = VcfInfoNumber.UNLIMITED;
 			pattern = Pattern.compile("Number=([^,]+),");
 			matcher = pattern.matcher(params);
 			if (matcher.find()) parseNumber(matcher.group(1));
@@ -110,18 +146,24 @@ public class VcfInfo {
 		return implicit;
 	}
 
-	public boolean isOnePerAllele() {
-		return onePerAllele;
+	public boolean isNumberAllAlleles() {
+		return vcfInfoNumber == VcfInfoNumber.ALL_ALLELES;
 	}
 
-	public boolean isOnePerGenotype() {
-		return onePerGenotype;
+	public boolean isNumberOnePerAllele() {
+		return vcfInfoNumber == VcfInfoNumber.ALLELE;
+	}
+
+	public boolean isNumberOnePerGenotype() {
+		return vcfInfoNumber == VcfInfoNumber.GENOTYPE;
 	}
 
 	void parseNumber(String number) {
 		// Parse number field
-		if (number.equals("A")) onePerAllele = true;
-		else if (number.equals("G")) onePerGenotype = true;
+		if (number.equals("A")) vcfInfoNumber = VcfInfoNumber.ALLELE;
+		else if (number.equals("R")) vcfInfoNumber = VcfInfoNumber.ALL_ALLELES;
+		else if (number.equals("G")) vcfInfoNumber = VcfInfoNumber.GENOTYPE;
+		else if (number.equals(".")) vcfInfoNumber = VcfInfoNumber.UNLIMITED;
 		else this.number = Gpr.parseIntSafe(number);
 	}
 
@@ -134,11 +176,10 @@ public class VcfInfo {
 		if (line != null) return line;
 
 		return "##INFO=<ID=" + id//
-				+ ",Number=" + (onePerAllele ? "A" : (onePerGenotype ? "G" : number)) //
+				+ ",Number=" + (number >= 0 ? number : vcfInfoNumber) //
 				+ ",Type=" + vcfInfoType //
 				+ ",Description=\"" + description + "\"" //
 				+ ">" //
 		;
 	}
-
 }

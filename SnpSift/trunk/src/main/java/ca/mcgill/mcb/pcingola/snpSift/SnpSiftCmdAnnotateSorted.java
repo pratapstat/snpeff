@@ -193,7 +193,8 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 			VcfInfo vcfInfo = vcfDb.getVcfInfo(fieldName);
 
 			String val = null;
-			if (vcfInfo != null && vcfInfo.isOnePerAllele()) val = vcfDb.getInfo(fieldName, allele);
+			if (vcfInfo != null && (vcfInfo.isNumberOnePerAllele() || vcfInfo.isNumberAllAlleles())) val = vcfDb.getInfo(fieldName, allele);
+
 			else val = vcfDb.getInfo(fieldName);
 
 			// Any value? => Add
