@@ -1,4 +1,4 @@
-package ca.mcgill.mcb.pcingola.snpSift.coEvolution;
+package ca.mcgill.mcb.pcingola.snpSift.epistasis;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -15,8 +15,8 @@ import ca.mcgill.mcb.pcingola.ped.PedPedigree;
 import ca.mcgill.mcb.pcingola.ped.TfamEntry;
 import ca.mcgill.mcb.pcingola.snpSift.SnpSift;
 import ca.mcgill.mcb.pcingola.snpSift.caseControl.SnpSiftCmdCaseControl;
-import ca.mcgill.mcb.pcingola.snpSift.coEvolution.akka.MasterCoEvolution;
-import ca.mcgill.mcb.pcingola.snpSift.coEvolution.akka.WorkQueueCoEvolution;
+import ca.mcgill.mcb.pcingola.snpSift.epistasis.akka.MasterEpistasis;
+import ca.mcgill.mcb.pcingola.snpSift.epistasis.akka.WorkQueueEpistasis;
 import ca.mcgill.mcb.pcingola.stats.CountByType;
 import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.util.Timer;
@@ -24,14 +24,14 @@ import ca.mcgill.mcb.pcingola.vcf.VcfEffect;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 
 /**
- * Simple 'co-evolutionary inspired' case-control analysis
+ * Simple 'epistatic' case-control analysis
  * 
  * @author pcingola
  */
-public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
+public class SnpSiftCmdEpistasis extends SnpSiftCmdCaseControl {
 
 	public enum ModelCoevolution {
-		ABS, MAX
+		ABS, MAX, LD
 	};
 
 	public enum ModelPvalue {
@@ -43,6 +43,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	boolean isMulti;
 	boolean analyzeEntry[]; // Should we analyze this entry? Does it match a gene or a position that we want to analyze?
 	int minAlleleCount;
+	int minDistance;
 	int showNonSignificant; // Non significant test can be shown every now and then (if this value is positive). This is useful to get the full statistics spectrum (e.g. QQ plots)
 	long countTests;
 	String rResultsFileName, rGtFileName;
@@ -50,10 +51,12 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	List<String> sampleIds;
 	ArrayList<byte[]> genotypes;
 	ArrayList<String> entryId;
+	String chromo[];
+	int pos[];
 	HashSet<String> genes, chrPos;
 	BufferedWriter rFile;
 
-	public SnpSiftCmdCoEvolution(String args[]) {
+	public SnpSiftCmdEpistasis(String args[]) {
 		super(args);
 		command = "coevolution";
 	}
@@ -106,7 +109,51 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		}
 	}
 
-	int coEvolutionCode(int code1, int code2) {
+	/**
+	 * Distance between two markers
+	 * @param i1 : Marker 1 index
+	 * @param i2 : Marker 2 index
+	 * @return
+	 */
+	public long distance(int i1, int i2) {
+		// Different chromosome? Distance is 'infinite'
+		if (!chromo[i1].equals(chromo[i2])) return Long.MAX_VALUE;
+
+		// Positions
+		long pos1 = pos[i1];
+		long pos2 = pos[i2];
+
+		return (pos1 > pos2 ? pos1 - pos2 : pos2 - pos1);
+	}
+
+	/**
+	 * Create an ID for this VCF entry
+	 * @param ve
+	 * @return
+	 */
+	String entryId(VcfEntry ve) {
+		// Try to get gene names
+		HashSet<String> done = new HashSet<String>();
+		StringBuilder sb = new StringBuilder();
+		for (VcfEffect veff : ve.parseEffects()) {
+			String gene = veff.getGene();
+			if ((gene != null) && !done.contains(gene)) {
+				sb.append((sb.length() > 0 ? "," : "") + gene);
+				done.add(gene);
+			}
+		}
+
+		// ID
+		return ve.getChromosomeName() //
+				+ ":" + (ve.getStart() + 1) //
+				+ "_" + ve.getRef() //
+				+ "/" + ve.getAltsStr() //
+				+ " " + sb.toString() //
+				+ " " + ve.getId() //
+		;
+	}
+
+	int epistasisCode(int code1, int code2) {
 		switch (model) {
 		case ABS:
 			/**
@@ -139,33 +186,6 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		default:
 			throw new RuntimeException("Unimplemented model '" + model + "'");
 		}
-	}
-
-	/**
-	 * Create an ID for this VCF entry
-	 * @param ve
-	 * @return
-	 */
-	String entryId(VcfEntry ve) {
-		// Try to get gene names
-		HashSet<String> done = new HashSet<String>();
-		StringBuilder sb = new StringBuilder();
-		for (VcfEffect veff : ve.parseEffects()) {
-			String gene = veff.getGene();
-			if ((gene != null) && !done.contains(gene)) {
-				sb.append((sb.length() > 0 ? "," : "") + gene);
-				done.add(gene);
-			}
-		}
-
-		// ID
-		return ve.getChromosomeName() //
-				+ ":" + (ve.getStart() + 1) //
-				+ "_" + ve.getRef() //
-				+ "/" + ve.getAltsStr() //
-				+ " " + sb.toString() //
-				+ " " + ve.getId() //
-		;
 	}
 
 	/**
@@ -221,6 +241,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		rGtFileName = null; // Don't write genotypes unless specified in the command line
 		showNonSignificant = 0; // By default do not show any non-significant results
 		countTests = 0;
+		minDistance = 1000000; // Minimum distance between two loci for LD analysis
 	}
 
 	/**
@@ -230,6 +251,15 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		analyzeEntry = new boolean[genotypes.size()];
 		for (int i = 0; i < analyzeEntry.length; i++)
 			analyzeEntry[i] = analyzeEntry(i);
+	}
+
+	/**
+	 * Load data
+	 */
+	public void load() {
+		loadTfam();
+		loadVcf();
+		initMatchGenes();
 	}
 
 	/**
@@ -249,6 +279,8 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		// Initialize
 		genotypes = new ArrayList<byte[]>();
 		entryId = new ArrayList<String>();
+		ArrayList<String> chromoList = new ArrayList<String>();
+		ArrayList<Integer> posList = new ArrayList<Integer>();
 		double minp = 1.0;
 
 		// Open 'R' file
@@ -269,11 +301,13 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 
 				genotypes.add(genoScores);
 				entryId.add(entryId(ve));
+				chromoList.add(ve.getChromosomeName());
+				posList.add(ve.getStart());
 
 				// Show line
 				if (debug) {
 					// Calculate p-values
-					double pvalue = pValue(genoScores);
+					double pvalue = pValueFisher(genoScores);
 					double logp = -Math.log10(pvalue);
 					minp = Math.min(pvalue, minp);
 
@@ -287,6 +321,13 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 
 		if (verbose) Timer.showStdErr("Finished loading VCF. Loaded: " + genotypes.size() + " lines." + (minp < 1 ? "\n\tMin p-value: " + minp : ""));
 		closeRfile();
+
+		// Create chromo and pos arrays
+		chromo = chromoList.toArray(new String[0]);
+		pos = new int[posList.size()];
+		int i = 0;
+		for (int p : posList)
+			pos[i++] = p;
 	}
 
 	/**
@@ -453,7 +494,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 			nControl[1] = 0;
 			nControl[2] = 0;
 
-			double pvalues[] = pvalues(nCase, nControl, pvalueThreshold);
+			double pvalues[] = pvaluesFisher(nCase, nControl, pvalueThreshold);
 			double pvalue = minPvalue(pvalues);
 			if (debug && pvalue <= pvalueThreshold) System.out.println("NumCases : " + numCases + "\tp-value: " + pvalue);
 			if (pvalue <= pvalueSignificant) powerStr = String.format("" //
@@ -471,7 +512,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	 * @param genoScores
 	 * @return
 	 */
-	double pValue(byte genoScores[]) {
+	double pValueFisher(byte genoScores[]) {
 		int casesHom = 0, casesHet = 0, cases = 0;
 		int ctrlHom = 0, ctrlHet = 0, ctrl = 0;
 		int nCase[] = new int[3];
@@ -511,13 +552,13 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		// Add info fields
 		if (debug) Gpr.debug("\n\tCases: " + casesHom + "," + casesHet + "," + cases + "\n\tControls: " + ctrlHom + "," + ctrlHet + "," + ctrl);
 
-		return minPvalue(pvalues(nControl, nCase, pvalueThreshold));
+		return minPvalue(pvaluesFisher(nControl, nCase, pvalueThreshold));
 	}
 
 	/**
-	 * Compare p-values between two genotypes
+	 * Compare p-values between two genotypes using Fisher model
 	 */
-	public double[] pValue(int i1, int i2) {
+	public double[] pValueFisher(int i1, int i2) {
 		byte scores1[] = genotypes.get(i1);
 		byte scores2[] = genotypes.get(i2);
 		byte codes[] = new byte[scores1.length];
@@ -540,7 +581,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 			if ((caseControl[idx] != null)) {
 				if ((code1 >= 0) && (code2 >= 0)) {
 					// Summarize two codes into one
-					int code = coEvolutionCode(code1, code2);
+					int code = epistasisCode(code1, code2);
 					codes[idx] = (byte) code;
 
 					// Count a/a, a/A and A/A
@@ -582,7 +623,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 			pvalueTh = 1.0;
 		}
 
-		double pvalues[] = pvalues(nCase, nControl, pvalueTh);
+		double pvalues[] = pvaluesFisher(nCase, nControl, pvalueTh);
 		double pvalue = minPvalue(pvalues);
 
 		// Sanity check
@@ -593,10 +634,128 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		show |= (pvalue <= pvalueThreshold);
 
 		if (show) {
-			writeRresults(i1, i2, pvalues, checkSum1, checkSum2);
+			writeRResultsFisher(i1, i2, pvalues, checkSum1, checkSum2);
 			return pvalues;
 		}
 		return null;
+	}
+
+	/**
+	 * Calculate using LD model
+	 * References : "Test for interaction between two unlinked loci", Zhao et. al. 2006
+	 * 
+	 * @param i1
+	 * @param i2
+	 * @return
+	 */
+	public double pValueLd(int i1, int i2) {
+		// The method assumes that loci are not in LD, so we have to make sure 
+		// that they are far away from each other. Otherwise we invalidate 
+		// the main hypothesis
+		long dist = distance(i1, i2);
+		if (dist < minDistance) return Double.NaN;
+
+		byte scores1[] = genotypes.get(i1);
+		byte scores2[] = genotypes.get(i2);
+
+		int count_D1 = 0, counta_D1 = 0;
+		int count_D2 = 0, counta_D2 = 0;
+		int count_11 = 0, counta_11 = 0;
+		int n_G = 0, n_A = 0;
+
+		int checkSum1 = 0, checkSum2 = 0;
+		for (int idx = 0; idx < scores1.length; idx++) {
+			int code1 = scores1[idx];
+			int code2 = scores2[idx];
+
+			checkSum1 += code1;
+			checkSum2 += code2;
+
+			// We make sure case/control status AND both genotypes are available
+			if ((caseControl[idx] != null) && (code1 >= 0) && (code2 >= 0)) {
+				if (caseControl[idx]) {
+					// Affected population
+					n_A++;
+					if (code1 == 0) counta_D1++;
+					if (code2 == 0) counta_D2++;
+					if ((code1 == 0) && (code2 == 0)) counta_11++;
+				} else {
+					// General population
+					n_G++;
+					if (code1 == 0) count_D1++;
+					if (code2 == 0) count_D2++;
+					if ((code1 == 0) && (code2 == 0)) count_11++;
+				}
+			}
+		}
+
+		// General population
+		double dng = n_G;
+		double p_D1 = count_D1 / dng;
+		double p_D2 = count_D2 / dng;
+		double p_11 = count_11 / dng;
+		double delta_N = p_11 - p_D1 * p_D2;
+		double V_N = (p_D1 * (1.0 - p_D1) * p_D2 * (1.0 - p_D2) + (1.0 - 2.0 * p_D1) * (1.0 - 2.0 * p_D2) * delta_N - delta_N * delta_N) / (2.0 * n_G);
+
+		// Affected population
+		double dna = n_A;
+		double pa_D1 = counta_D1 / dna;
+		double pa_D2 = counta_D2 / dna;
+		double pa_11 = counta_11 / dna;
+		double delta_A = pa_11 - pa_D1 * pa_D2;
+		double V_A = (pa_D1 * (1.0 - pa_D1) * pa_D2 * (1.0 - pa_D2) + (1.0 - 2.0 * pa_D1) * (1.0 - 2.0 * pa_D2) * delta_A - delta_A * delta_A) / (2.0 * n_A);
+
+		// Test statistic (see paper, equation 5)
+		double T = ((delta_A - delta_N) * (delta_A - delta_N)) / (V_A + V_N);
+
+		//---
+		// Calculate pValues
+		//---
+		boolean show = false;
+		long count = incCountTests();
+		if ((showNonSignificant > 0) && (count % showNonSignificant == 0)) show = true; // Are we forcing to show results? Then we should calculate p-value even if it is high
+
+		// According to the paper, T is distributed as a Chi-Squared with 1 degree of freedom
+		double pvalue = 1.0 - flanagan.analysis.Stat.chiSquareCDF(T, 1);
+		if (debug) {
+			System.err.println("Markers: " + entryId.get(i1) + "\t" + entryId.get(i2) //  
+					+ "\n\tp-value     : " + pvalue //
+					+ "\n\tT statistic : " + T //
+					+ "\n" //
+					+ "\n\tN_G         : " + n_G //
+					+ "\n\tcount_D1    : " + count_D1 //
+					+ "\n\tcount_D2    : " + count_D2 //
+					+ "\n\tcount_11    : " + count_11 //
+					+ "\n\tp_D1        : " + p_D1 //
+					+ "\n\tp_D2        : " + p_D2 //
+					+ "\n\tp_11        : " + p_11 //
+					+ "\n\tdelta_N     : " + delta_N //
+					+ "\n\tV_N         : " + V_N //
+					+ "\n" //
+					+ "\n\tN_A         : " + n_A //
+					+ "\n\tcounta_D1   : " + counta_D1 //
+					+ "\n\tcounta_D2   : " + counta_D2 //
+					+ "\n\tcounta_11   : " + counta_11 //
+					+ "\n\tpa_D1       : " + pa_D1 //
+					+ "\n\tpa_D2       : " + pa_D2 //
+					+ "\n\tpa_11       : " + pa_11 //
+					+ "\n\tdelta_A     : " + delta_A //
+					+ "\n\tV_A         : " + V_A //
+			);
+		}
+
+		// Sanity check
+		if (pvalue == 0.0) Gpr.debug("p-value is zero!" + "\n\t" + entryId.get(i1) + "\t" + entryId.get(i2));
+		if (debug) Gpr.debug(entryId.get(i1) + "\t" + entryId.get(i2));
+
+		// If p-value is less than 'pvalueThreshold' we should show the result (it is 'significant')
+		show |= (pvalue <= pvalueThreshold);
+
+		if (show) {
+			writeRResultsLd(i1, i2, pvalue, checkSum1, checkSum2);
+			return pvalue;
+		}
+		return Double.NaN;
 	}
 
 	/**
@@ -611,7 +770,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	 * @param nControl
 	 * @return
 	 */
-	double[] pvalues(int nCase[], int nControl[], double pvalueTh) {
+	double[] pvaluesFisher(int nCase[], int nControl[], double pvalueTh) {
 		// pValues
 		double pTrend = pTrend(nControl, nCase);
 		double pAllelic = pAllelic(nControl, nCase, pvalueTh);
@@ -629,23 +788,20 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	 */
 	@Override
 	public void run() {
-		// Load data
-		loadTfam();
-		loadVcf();
-		initMatchGenes();
+		load(); // Load data
 
 		// Run
 		if (debug) powerCalculation();
-		runCoEvolution();
+		runEpistasis();
 	}
 
-	void runCoEvolution() {
+	void runEpistasis() {
 		// Open 'R' file
 		openRfile(rResultsFileName, "Writing results to file");
 		writeRResultsTitle();
 
-		if (numWorkers <= 1) runCoEvolutionSingle();
-		else runCoEvolutionMulti();
+		if (numWorkers <= 1) runEpistasisSingle();
+		else runEpistasisMulti();
 
 		closeRfile();
 	}
@@ -655,15 +811,15 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	 * @param i
 	 * @return
 	 */
-	public String runCoEvolution(int i) {
+	public String runEpistasis(int i) {
 		int numEntries = genotypes.size();
 		int count = 0;
 		StringBuilder sb = new StringBuilder();
 
 		// Iteration start
 		// Note: 'Abs' model yields the same result for [i, j] than [j, i] whereas 'max' model doesn't
-		int minj = 0;
-		if (model == ModelCoevolution.ABS) minj = i + 1;
+		int minj = i + 1;
+		if (model == ModelCoevolution.MAX) minj = 0;
 
 		// Iterate on all entries
 		for (int j = minj; j < numEntries; j++) {
@@ -671,15 +827,36 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 				// Does this entry match 'genes'?
 				if (analyzeEntries(i, j)) {
 
-					double pvalues[] = pValue(i, j);
+					boolean show = false;
+					switch (model) {
+					case LD:
+						double pvalue = pValueLd(i, j);
+						if (!Double.isNaN(pvalue)) {
+							show = true;
+							String out = String.format("Result\t%.4e\t%.4e\t%.4e\t%.4e\t[%d, %d]\t%s\t%s\t%d\t%d", pvalue, 1.0, 1.0, 1.0, i, j, entryId.get(i), entryId.get(j), mac(genotypes.get(i)), mac(genotypes.get(j)));
+							if (!isMulti) System.out.println(out);
+							else sb.append((sb.length() > 0 ? "\n" : "") + out);
+						}
+						break;
+
+					case MAX:
+					case ABS:
+						double pvalues[] = null;
+						pvalues = pValueFisher(i, j);
+						if (pvalues != null) {
+							show = true;
+							String out = String.format("Result\t%.4e\t%.4e\t%.4e\t%.4e\t[%d, %d]\t%s\t%s\t%d\t%d", pvalues[0], pvalues[1], pvalues[2], pvalues[3], i, j, entryId.get(i), entryId.get(j), mac(genotypes.get(i)), mac(genotypes.get(j)));
+							if (!isMulti) System.out.println(out);
+							else sb.append((sb.length() > 0 ? "\n" : "") + out);
+						}
+						break;
+
+					default:
+						throw new RuntimeException("Unimplemented model " + model);
+					}
 					count++;
 
-					if (pvalues != null) {
-						String out = String.format("Result\t%.4e\t%.4e\t%.4e\t%.4e\t[%d, %d]\t%s\t%s\t%d\t%d", pvalues[0], pvalues[1], pvalues[2], pvalues[3], i, j, entryId.get(i), entryId.get(j), mac(genotypes.get(i)), mac(genotypes.get(j)));
-						if (!isMulti) System.out.println(out);
-						else sb.append((sb.length() > 0 ? "\n" : "") + out);
-
-					} else if (!isMulti) Gpr.showMark(count, SHOW_EVERY);
+					if (!show && !isMulti) Gpr.showMark(count, SHOW_EVERY);
 				}
 			}
 		}
@@ -692,26 +869,26 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	/**
 	 * Run co-evolutionary algorithm
 	 */
-	void runCoEvolutionMulti() {
+	void runEpistasisMulti() {
 		if (verbose) Timer.showStdErr("Starting analysis on " + numWorkers + " cpus.");
 
 		isMulti = true;
 
-		final SnpSiftCmdCoEvolution snpSiftCmdCoEvolution = this;
+		final SnpSiftCmdEpistasis snpSiftCmdEpistasis = this;
 		Props props = new Props(new UntypedActorFactory() {
 
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			public Actor create() {
-				MasterCoEvolution master = new MasterCoEvolution(numWorkers, snpSiftCmdCoEvolution);
+				MasterEpistasis master = new MasterEpistasis(numWorkers, snpSiftCmdEpistasis);
 				return master;
 			}
 		});
 
 		int batchSize = 1;
-		WorkQueueCoEvolution workQueueCoEvolution = new WorkQueueCoEvolution(batchSize, 1, props);
-		workQueueCoEvolution.run(true);
+		WorkQueueEpistasis workQueueEpistasis = new WorkQueueEpistasis(batchSize, 1, props);
+		workQueueEpistasis.run(true);
 
 		if (verbose) Timer.showStdErr("Done. Total tests performed: " + countTests);
 	}
@@ -719,11 +896,11 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	/**
 	 * Run co-evolutionary algorithm
 	 */
-	void runCoEvolutionSingle() {
+	void runEpistasisSingle() {
 		if (verbose) Timer.showStdErr("Starting analysis.");
 
 		for (int i = 0; i < genotypes.size(); i++)
-			runCoEvolution(i);
+			runEpistasis(i);
 
 		if (verbose) Timer.showStdErr("Done. Total tests performed: " + countTests);
 	}
@@ -746,7 +923,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 		System.err.println("\t-genes <list>   : Comma separated list of genes to analyze. Default: None");
 		System.err.println("\t-maxP  <num>    : Maximum p-value to report. Default: " + pvalueThreshold);
 		System.err.println("\t-minAc <num>    : Filter using minimum number of alleles. Default: " + minAlleleCount);
-		System.err.println("\t-model <model>  : Model to use {ABS, MAX}. Default: " + model);
+		System.err.println("\t-model <model>  : Model to use {ABS, MAX, LD}. Default: " + model);
 		System.err.println("\t-out    <file>  : Write results to 'file'. Default: " + rResultsFileName);
 		System.err.println("\t-outGt  <file>  : Write genotypes to 'file'. Default: " + rGtFileName);
 		System.err.println("\t-pos <list>     : Comma separated list of genomic positions to analyze (chr:pos). Default: None");
@@ -790,7 +967,7 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	 * @param i2
 	 * @param codes
 	 */
-	void writeRresults(int i1, int i2, double pvalues[], int checkSum1, int checkSum2) {
+	void writeRResultsFisher(int i1, int i2, double pvalues[], int checkSum1, int checkSum2) {
 		StringBuilder sb = new StringBuilder();
 
 		// Add indexes (one-based)
@@ -818,10 +995,54 @@ public class SnpSiftCmdCoEvolution extends SnpSiftCmdCaseControl {
 	}
 
 	/**
+	 * Show in a way that R can read (logistic regression)
+	 * @param i1
+	 * @param i2
+	 * @param codes
+	 */
+	void writeRResultsLd(int i1, int i2, double pvalue, int checkSum1, int checkSum2) {
+		StringBuilder sb = new StringBuilder();
+
+		// Add indexes (one-based)
+		sb.append(i1 + 1);
+		sb.append('\t');
+		sb.append(i2 + 1);
+		sb.append('\t');
+
+		// Add variant data
+		sb.append(entryId.get(i1).replace(' ', '\t'));
+		sb.append('\t');
+		sb.append(entryId.get(i2).replace(' ', '\t'));
+
+		// Add p-values
+		sb.append("\t" + pvalue);
+		sb.append("\t1.0\t1.0\t1.0"); // For compatibility in the R program
+
+		// Add checksums
+		sb.append("\t" + checkSum1 + "\t" + checkSum2);
+
+		sb.append('\n');
+
+		// Write it to file
+		writeR(sb.toString());
+	}
+
+	/**
 	 * Show title in R file
 	 */
 	void writeRResultsTitle() {
-		writeR("idx1\tidx2\tpos1\tgene1\tid1\tpos2\tgene2\tid2\tpAllelic\tpDominant\tpRecessive\tpCodominant\tchecksum1\tchecksum2\n");
-	}
+		switch (model) {
+		case LD:
+			writeR("idx1\tidx2\tpos1\tgene1\tid1\tpos2\tgene2\tid2\tp\tchecksum1\tchecksum2\n");
+			break;
 
+		case MAX:
+		case ABS:
+			writeR("idx1\tidx2\tpos1\tgene1\tid1\tpos2\tgene2\tid2\tpAllelic\tpDominant\tpRecessive\tpCodominant\tchecksum1\tchecksum2\n");
+			break;
+
+		default:
+			throw new RuntimeException("Unimplemented model " + model);
+		}
+	}
 }

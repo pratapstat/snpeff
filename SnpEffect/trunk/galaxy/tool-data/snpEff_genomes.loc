@@ -7285,7 +7285,6 @@ GCA_000023885.1.18 	 Slackia_heliotrinireducens_dsm_20476   GCA_000023885.1.18
 Slackia_heliotrinireducens_DSM_20476_uid59051 	 Slackia_heliotrinireducens_DSM_20476_uid59051   Slackia_heliotrinireducens_DSM_20476_uid59051
 GCA_000296445.1.18 	 Slackia_piriformis_yit_12062   GCA_000296445.1.18
 GCA_000293015.1.18 	 Slackia_sp_cm382   GCA_000293015.1.18
-30c2c903 	 snpeff   30c2c903
 Sodalis_glossinidius__morsitans__uid58553 	 Sodalis_glossinidius__morsitans__uid58553   Sodalis_glossinidius__morsitans__uid58553
 GCA_000010085.1.18 	 Sodalis_glossinidius_str_morsitans_   GCA_000010085.1.18
 GCA_000271325.1.18 	 Solibacillus_silvestris_stlb046   GCA_000271325.1.18
@@ -8429,9 +8428,9 @@ testHg3767Chr21Mt 	 TestCase   testHg3767Chr21Mt
 testHg3769Chr12 	 TestCase   testHg3769Chr12
 testHg3770Chr22 	 TestCase   testHg3770Chr22
 testHg3771Chr1 	 TestCase   testHg3771Chr1
+testHg3773Chr3 	 TestCase   testHg3773Chr3
 testEmblPberghei 	 Test_Embl_Pberghei   testEmblPberghei
 testEgrandis 	 Test   testEgrandis
-test_robking 	 Test   test_robking
 GCA_000283615.1.18 	 Tetragenococcus_halophilus_nbrc_12172   GCA_000283615.1.18
 Tetragenococcus_halophilus_uid74441 	 Tetragenococcus_halophilus_uid74441   Tetragenococcus_halophilus_uid74441
 TETRAODON8.64 	 Tetraodon_nigroviridis   TETRAODON8.64
@@ -8651,7 +8650,6 @@ ASM17099v1.18 	 Trichoderma_virens   ASM17099v1.18
 GCA_000014265.1.18 	 Trichodesmium_erythraeum_ims101   GCA_000014265.1.18
 Trichodesmium_erythraeum_IMS101_uid57925 	 Trichodesmium_erythraeum_IMS101_uid57925   Trichodesmium_erythraeum_IMS101_uid57925
 ASM15027v1.18 	 Trichoplax_adhaerens   ASM15027v1.18
-Triticum_aestivum.IWGSP1.21 	 Triticum_aestivum.IWGSP1.21   Triticum_aestivum.IWGSP1.21
 GCA_000007485.1.18 	 Tropheryma_whipplei_str_twist   GCA_000007485.1.18
 GCA_000196075.1.18 	 Tropheryma_whipplei_tw08_27   GCA_000196075.1.18
 Tropheryma_whipplei_TW08_27_uid57961 	 Tropheryma_whipplei_TW08_27_uid57961   Tropheryma_whipplei_TW08_27_uid57961

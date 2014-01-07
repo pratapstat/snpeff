@@ -1,43 +1,20 @@
 package ca.mcgill.mcb.pcingola;
 
-import java.io.File;
-import java.io.IOException;
-
-import ca.mcgill.mcb.pcingola.util.Gpr;
-import ca.mcgill.mcb.pcingola.util.Timer;
+import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
+import ca.mcgill.mcb.pcingola.interval.SeqChange;
+import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 
 public class Zzz {
 
-	public static String findPhastConsFile(String dirName, String regex) {
-		try {
-			File dir = new File(dirName);
-			for (File f : dir.listFiles()) {
-				String fname = f.getCanonicalPath();
-				System.out.println(fname);
-				if (fname.matches(regex)) {
-					System.out.println("FOUND: " + fname);
-					return fname;
-				}
-			}
-		} catch (IOException e) {
-			// Do nothing
-		}
-
-		Timer.showStdErr("Cannot find any file in directory '" + dirName + "' matching regular expression '" + regex + "'");
-		return null;
-	}
-
 	public static void main(String[] args) {
+		String vcfFileName = "/home/pcingola/workspace/SnpEff/tests/test.no_change.vcf"; // Gpr.HOME + "/snpEff/z.vcf";
+		VcfFileIterator vcf = new VcfFileIterator(vcfFileName);
 
-		String phastConsDir = Gpr.HOME + "/snpEff/db/phastCons";
-		String chromo = "2";
-
-		// Find a file that matches a phastCons name
-		String wigFile = findPhastConsFile(phastConsDir, ".*/chr" + chromo + ".*wigFix.*");
-
-		if ((wigFile == null) || !Gpr.exists(wigFile)) {
-			if (wigFile != null) Timer.showStdErr("Cannot open PhastCons file '" + wigFile + "' for chromosome '" + chromo + "'");
+		for (VcfEntry ve : vcf) {
+			System.out.println(ve.getStart() + "\t" + ve);
+			for (SeqChange sc : ve.seqChanges()) {
+				System.out.println("\t" + sc);
+			}
 		}
-
 	}
 }

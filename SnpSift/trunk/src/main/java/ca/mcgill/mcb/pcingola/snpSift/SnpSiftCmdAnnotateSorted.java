@@ -1,6 +1,8 @@
 package ca.mcgill.mcb.pcingola.snpSift;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -33,7 +35,7 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 	protected HashMap<String, String> dbId = new HashMap<String, String>();
 	protected HashMap<String, String> dbInfo = new HashMap<String, String>();
 	protected FileIndexChrPos indexDb;
-	protected String infoFields[]; // Use only info fields
+	protected ArrayList<String> infoFields; // Use only info fields
 	protected VcfEntry latestVcfDb = null;
 	protected boolean useId; // Annotate ID fields
 	protected boolean useInfoField; // Use all info fields
@@ -87,33 +89,16 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 	 * @param vcfDb
 	 */
 	void addDb(VcfEntry vcfDb) {
-		for (int i = 0; i < vcfDb.getAlts().length; i++) {
+		String alts[] = vcfDb.getAlts();
+		for (int i = 0; i < alts.length; i++) {
 			String key = key(vcfDb, i);
 			dbId.put(key, vcfDb.getId()); // Add ID field
 
 			// Add INFO fields to DB?
 			if (useInfoField) {
-
-				if (infoFields == null) {
-					// Add all INFO fields
-					dbInfo.put(key, vcfDb.getInfoStr()); // Add INFO field
-				} else {
-					// Add some INFO fields
-					StringBuilder infoSb = new StringBuilder();
-
-					// Add all fields
-					for (String fieldName : infoFields) {
-						String val = vcfDb.getInfo(fieldName);
-
-						// Any value? => Add
-						if (val != null) {
-							if (infoSb.length() > 0) infoSb.append(";");
-							infoSb.append(fieldName + "=" + val);
-						}
-					}
-
-					dbInfo.put(key, infoSb.toString());
-				}
+				// Add all INFO fields
+				String infoFieldsStr = dbInfoFields(vcfDb, alts[i]);
+				dbInfo.put(key, infoFieldsStr);
 			}
 		}
 	}
@@ -183,6 +168,42 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 	protected void clear() {
 		dbId.clear();
 		if (useInfoField) dbInfo.clear();
+	}
+
+	/**
+	 * Extract corresponding info fields as a single string
+	 * @param vcfDb
+	 * @return
+	 */
+	String dbInfoFields(VcfEntry vcfDb, String allele) {
+		// Add some INFO fields
+		StringBuilder infoSb = new StringBuilder();
+
+		// Whih INFO fields should we read?
+		List<String> infoToRead = infoFields;
+		if (infoFields == null) {
+			// Add all INFO fields in alphabetical order
+			infoToRead = new ArrayList<String>();
+			infoToRead.addAll(vcfDb.getInfoKeys());
+			Collections.sort(infoToRead);
+		}
+
+		// Add each field
+		for (String fieldName : infoToRead) {
+			VcfInfo vcfInfo = vcfDb.getVcfInfo(fieldName);
+
+			String val = null;
+			if (vcfInfo != null && vcfInfo.isOnePerAllele()) val = vcfDb.getInfo(fieldName, allele);
+			else val = vcfDb.getInfo(fieldName);
+
+			// Any value? => Add
+			if (val != null) {
+				if (infoSb.length() > 0) infoSb.append(";");
+				infoSb.append(fieldName + "=" + val);
+			}
+		}
+
+		return infoSb.toString();
 	}
 
 	/**
@@ -259,20 +280,24 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 	 * Initialize annotation process
 	 * @throws IOException
 	 */
-	protected void initInputVcf() throws IOException {
-		// Index and open VCF files
-		vcfFile = new VcfFileIterator(vcfFileName);
+	public void initAnnotate() throws IOException {
+		initInputVcf();
+
+		// Open and index database
+		indexDb = index(vcfDbFileName);
+
+		// Re-open VCF db file
+		vcfDbFile = new VcfFileIterator(new SeekableBufferedReader(vcfDbFileName));
+		latestVcfDb = vcfDbFile.next(); // Read first VCf entry from DB file (this also forces to read headers)
 	}
 
 	/**
 	 * Initialize annotation process
 	 * @throws IOException
 	 */
-	public void initAnnotate() throws IOException {
-		initInputVcf();
-		// Open and index database
-		indexDb = index(vcfDbFileName);
-		vcfDbFile = new VcfFileIterator(new SeekableBufferedReader(vcfDbFileName));
+	protected void initInputVcf() throws IOException {
+		// Index and open VCF files
+		vcfFile = new VcfFileIterator(vcfFileName);
 	}
 
 	/**
@@ -317,7 +342,9 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 				if (arg.equals("-id")) useInfoField = false;
 				else if (arg.equals("-info")) {
 					useInfoField = true;
-					infoFields = args[++i].split(",");
+					infoFields = new ArrayList<String>();
+					for (String infoField : args[++i].split(","))
+						infoFields.add(infoField);
 				} else if (arg.equals("-noId")) useId = false;
 				else if (arg.equals("-noAlt")) useRefAlt = false;
 				else usage("Unknown command line option '" + arg + "'");
@@ -360,7 +387,7 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 						&& !vcf.getRef().startsWith(vcfDb.getRef()) //  
 						&& !vcfDb.getRef().startsWith(vcf.getRef()) //
 				) {
-					System.err.println("WARNING: Reference is '" + vcfDb.getRef() + "' instead of '" + vcf.getRef() + "' at " + chr + ":" + (vcf.getStart() + 1));
+					System.err.println("WARNING: Reference in database file '" + vcfDbFileName + "' is '" + vcfDb.getRef() + "' and reference in input file '" + vcfFileName + "' is '" + vcf.getRef() + "' at " + chr + ":" + (vcf.getStart() + 1));
 					countBadRef++;
 				}
 
@@ -375,6 +402,16 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 	 */
 	@Override
 	public void run() {
+		run(false);
+	}
+
+	/**
+	 * Run annotations
+	 * @param createList : If true, return a list with all annotated entries (used for test cases & debugging)
+	 * @return
+	 */
+	public List<VcfEntry> run(boolean createList) {
+		ArrayList<VcfEntry> list = (createList ? new ArrayList<VcfEntry>() : null);
 		if (verbose) Timer.showStdErr("Annotating entries from: '" + vcfFile + "'");
 
 		try {
@@ -400,6 +437,7 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 
 				// Show
 				print(vcfEntry);
+				if (list != null) list.add(vcfEntry);
 
 				if (annotated) countAnnotated++;
 				count++;
@@ -421,6 +459,8 @@ public class SnpSiftCmdAnnotateSorted extends SnpSift {
 					+ "\n\tErrors (bad references) : " + countBadRef //
 			);
 		}
+
+		return list;
 	}
 
 	public void setSuppressOutput(boolean suppressOutput) {

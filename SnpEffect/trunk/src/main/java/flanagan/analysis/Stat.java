@@ -839,7 +839,6 @@ public class Stat extends ArrayMaths {
 	// Incomplete fraction summation used in the method regularisedBetaFunction
 	// modified Lentz's method
 	public static double contFract(double a, double b, double x) {
-
 		double aplusb = a + b;
 		double aplus1 = a + 1.0D;
 		double aminus1 = a - 1.0D;

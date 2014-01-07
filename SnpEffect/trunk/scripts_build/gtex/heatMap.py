@@ -12,6 +12,9 @@ import sys
 # Debug mode?
 debug = False
 
+# How many NAs are too much (skip genes)
+naThreshold = 0.9
+
 #------------------------------------------------------------------------------
 # Process normalized GTEx file
 #------------------------------------------------------------------------------
@@ -54,9 +57,15 @@ def readGtex(gtexFile, ids, labels, genes):
 			if geneId in genes or geneName in genes:
 				# Collect values for requested IDs
 				vals = []
+				countNa = 0
 				for idx in columnIdx :
 					vals.append( fields[idx] )
-				print "{}\t{}".format( geneName, "\t".join(vals) )
+					if fields[idx] == 'NA': countNa += 1
+
+				if countNa < (len(vals) * naThreshold):
+					print "{}\t{}".format( geneName, "\t".join(vals) )
+				else:
+					print >> sys.stderr, "Skipping gene {}, because it has mostly NA values ({} / {}): {}".format( geneName, countNa, len(vals), "\t".join(vals) )
 
 	return gtexGenes
 
