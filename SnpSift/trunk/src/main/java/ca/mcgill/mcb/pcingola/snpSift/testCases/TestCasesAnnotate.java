@@ -315,4 +315,24 @@ public class TestCasesAnnotate extends TestCase {
 		Assert.assertEquals("2", allNum);
 	}
 
+	public void test_15() {
+		String dbFileName = "./test/annotate_multiple_allele_R.db.vcf";
+		String fileName = "./test/annotate_multiple_allele.2.vcf";
+		System.out.println("Annotate: " + dbFileName + "\t" + fileName);
+
+		// Create command line
+		String args[] = { dbFileName, fileName };
+
+		// Get SnpSift ready
+		SnpSiftCmdAnnotateSorted vcfAnnotate = new SnpSiftCmdAnnotateSorted(args);
+		vcfAnnotate.setSuppressOutput(true);
+		List<VcfEntry> list = vcfAnnotate.run(true);
+
+		// Check results
+		VcfEntry ve = list.get(0);
+		System.out.println(ve);
+		String allNum = ve.getInfo("ALL_NUM");
+		Assert.assertEquals("value_C", allNum);
+	}
+
 }
