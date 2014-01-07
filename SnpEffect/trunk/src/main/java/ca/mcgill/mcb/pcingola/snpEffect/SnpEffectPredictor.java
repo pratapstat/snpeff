@@ -38,6 +38,8 @@ public class SnpEffectPredictor implements Serializable {
 	private static final long serialVersionUID = 4519418862303325081L;
 
 	public static final int DEFAULT_UP_DOWN_LENGTH = 5000;
+	public static final int HUGE_DELETION_SIZE_THRESHOLD = 1000000; // Number of bases
+	public static final double HUGE_DELETION_RATIO_THRESHOLD = 0.01; // Percentage of bases
 
 	boolean useChromosomes = true;
 	int upDownStreamLength = DEFAULT_UP_DOWN_LENGTH;
@@ -499,6 +501,25 @@ public class SnpEffectPredictor implements Serializable {
 		if (Config.get().isErrorOnMissingChromo() && isChromosomeMissing(seqChange)) {
 			results.addError(ErrorType.ERROR_CHROMOSOME_NOT_FOUND);
 			return results.newList();
+		}
+
+		// Check that this is not a huge deletion.
+		// Huge deletions would crash the rest of the algorithm, so we need to stop them here.
+		if (seqChange.isDel() && (seqChange.size() > HUGE_DELETION_SIZE_THRESHOLD)) {
+			// Get chromosome
+			String chromoName = seqChange.getChromosomeName();
+			Chromosome chr = genome.getChromosome(chromoName);
+
+			if (chr.size() > 0) {
+				double ratio = seqChange.size() / ((double) chr.size());
+				if (ratio > HUGE_DELETION_RATIO_THRESHOLD) {
+					ArrayList<ChangeEffect> resultsList = new ArrayList<ChangeEffect>();
+					ChangeEffect changeEffect = new ChangeEffect(seqChange, seqChangerRef);
+					changeEffect.set(chr, EffectType.CHROMOSOME_LARGE_DELETION, "");
+					resultsList.add(changeEffect);
+					return resultsList;
+				}
+			}
 		}
 
 		// Which intervals does seqChange intersect?

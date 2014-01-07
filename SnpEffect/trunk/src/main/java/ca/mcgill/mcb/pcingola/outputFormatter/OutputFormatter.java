@@ -92,26 +92,25 @@ public abstract class OutputFormatter {
 	public String endSection(Marker marker) {
 		StringBuilder sb = null;
 
-		if (!supressOutput) {
-			sb = new StringBuilder();
-			// Add header?
-			if (showHeader && (sectionNum == 0)) {
-				String header = toStringHeader();
-				if (!header.isEmpty()) {
-					sb.append(header);
-					sb.append("\n");
-				}
+		//		if (!supressOutput) {
+		sb = new StringBuilder();
+		// Add header?
+		if (showHeader && (sectionNum == 0)) {
+			String header = toStringHeader();
+			if (!header.isEmpty()) {
+				sb.append(header);
+				sb.append("\n");
 			}
-
-			// Add current line
-			sb.append(toString());
 		}
+
+		// Add current line
+		sb.append(toString());
+		//		}
 
 		sectionNum++;
 		changeEffects.clear();
 
-		if (supressOutput) return null;
-		return sb.toString();
+		return supressOutput ? null : sb.toString();
 	}
 
 	/**
