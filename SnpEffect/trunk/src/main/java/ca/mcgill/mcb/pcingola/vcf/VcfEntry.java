@@ -252,7 +252,7 @@ public class VcfEntry extends Marker implements Iterable<VcfGenotype> {
 	 */
 	SeqChange createSeqChange(Chromosome chromo, int start, String reference, String alt, int strand, String id, double quality, int coverage) {
 		// No change?
-		if (alt == null || (ref.isEmpty() && alt.isEmpty()) || alt.equals(reference)) return new SeqChange(chromo, start, reference, reference, strand, id, quality, coverage);
+		if (alt == null || alt.isEmpty() || alt.equals(reference)) return new SeqChange(chromo, start, reference, reference, strand, id, quality, coverage);
 
 		alt = alt.toUpperCase();
 
