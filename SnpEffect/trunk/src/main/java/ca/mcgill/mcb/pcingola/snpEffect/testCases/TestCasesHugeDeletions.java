@@ -14,16 +14,16 @@ import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
  * 
  * @author pcingola
  */
-public class TestCasesHugeVariants extends TestCase {
+public class TestCasesHugeDeletions extends TestCase {
 
 	boolean verbose = false;
 
-	public TestCasesHugeVariants() {
+	public TestCasesHugeDeletions() {
 		super();
 	}
 
 	public void test_01() {
-		String args[] = { "testHg3766Chr1", "./tests/huge_deletion_DEL.vcf" };
+		String args[] = { "-noOut", "testHg3766Chr1", "./tests/huge_deletion_DEL.vcf" };
 
 		SnpEffCmdEff snpEffCmdEff = new SnpEffCmdEff();
 		snpEffCmdEff.parseArgs(args);
@@ -33,10 +33,9 @@ public class TestCasesHugeVariants extends TestCase {
 
 		// Make sure these are "CHROMOSOME_LARGE_DELETION" type of variants
 		for (VcfEntry ve : vcfEntries) {
-			System.out.println(ve);
+			System.out.println(ve.getChromosomeName() + "\t" + ve.getStart() + "\t" + ve.getInfoStr());
 			Assert.assertTrue(ve.getInfo("EFF").startsWith("CHROMOSOME_LARGE_DELETION(HIGH"));
 		}
-
 	}
 
 	public void test_02() {
