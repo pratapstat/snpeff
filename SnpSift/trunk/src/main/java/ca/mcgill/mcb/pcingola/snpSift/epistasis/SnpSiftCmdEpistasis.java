@@ -1031,18 +1031,6 @@ public class SnpSiftCmdEpistasis extends SnpSiftCmdCaseControl {
 	 * Show title in R file
 	 */
 	void writeRResultsTitle() {
-		switch (model) {
-		case LD:
-			writeR("idx1\tidx2\tpos1\tgene1\tid1\tpos2\tgene2\tid2\tp\tchecksum1\tchecksum2\n");
-			break;
-
-		case MAX:
-		case ABS:
-			writeR("idx1\tidx2\tpos1\tgene1\tid1\tpos2\tgene2\tid2\tpAllelic\tpDominant\tpRecessive\tpCodominant\tchecksum1\tchecksum2\n");
-			break;
-
-		default:
-			throw new RuntimeException("Unimplemented model " + model);
-		}
+		writeR("idx1\tidx2\tpos1\tgene1\tid1\tpos2\tgene2\tid2\tpAllelic\tpDominant\tpRecessive\tpCodominant\tchecksum1\tchecksum2\n");
 	}
 }
