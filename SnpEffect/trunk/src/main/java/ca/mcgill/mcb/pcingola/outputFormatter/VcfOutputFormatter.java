@@ -38,10 +38,10 @@ public class VcfOutputFormatter extends OutputFormatter {
 
 	boolean needAddInfo = false;
 	boolean needAddHeader = true;
-	FormatVersion formatVersion = VcfEffect.FormatVersion.FORMAT_SNPEFF_4;
-	List<VcfEntry> vcfEntries;
 	boolean lossOfFunction;
 	boolean gatk;
+	FormatVersion formatVersion = VcfEffect.FormatVersion.FORMAT_SNPEFF_4;
+	List<VcfEntry> vcfEntries;
 	Genome genome;
 
 	/**
@@ -301,8 +301,8 @@ public class VcfOutputFormatter extends OutputFormatter {
 			newOutputFormatter.needAddInfo = needAddInfo;
 			newOutputFormatter.needAddHeader = needAddHeader;
 			newOutputFormatter.lossOfFunction = lossOfFunction;
+			newOutputFormatter.gatk = gatk;
 			newOutputFormatter.genome = genome;
-			newOutputFormatter.config = config;
 			return newOutputFormatter;
 		} catch (Exception e) {
 			throw new RuntimeException(e);

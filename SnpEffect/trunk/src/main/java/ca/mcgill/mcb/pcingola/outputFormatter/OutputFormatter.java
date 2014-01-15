@@ -22,11 +22,11 @@ import ca.mcgill.mcb.pcingola.snpEffect.Config;
 public abstract class OutputFormatter {
 
 	boolean supressOutput; // Do not print anything
+	boolean showHeader = true; // Show header information
 	boolean useHgvs; // Use HGVS notation
 	boolean useGeneId; // Use Gene ID instead of gene name
 	boolean useSequenceOntolgy; // Use Sequence Ontolgy terms
 	boolean useOicr; // Use OICR tag
-	boolean showHeader = true; // Show header information
 	int sectionNum = 0;
 	int outOffset = 1;
 	String commandLineStr;
@@ -60,6 +60,10 @@ public abstract class OutputFormatter {
 			newOutputFormatter = this.getClass().newInstance();
 			newOutputFormatter.supressOutput = supressOutput;
 			newOutputFormatter.showHeader = showHeader;
+			newOutputFormatter.useHgvs = useHgvs;
+			newOutputFormatter.useGeneId = useGeneId;
+			newOutputFormatter.useSequenceOntolgy = useSequenceOntolgy;
+			newOutputFormatter.useOicr = useOicr;
 			newOutputFormatter.sectionNum = sectionNum;
 			newOutputFormatter.outOffset = outOffset;
 			newOutputFormatter.commandLineStr = commandLineStr;
@@ -67,6 +71,8 @@ public abstract class OutputFormatter {
 			newOutputFormatter.chrStr = chrStr;
 			newOutputFormatter.section = section;
 			newOutputFormatter.changeEffectResutFilter = changeEffectResutFilter;
+			newOutputFormatter.config = config;
+
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
