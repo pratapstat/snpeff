@@ -19,6 +19,7 @@ string dirZip					="$dirSnpeff/zip"
 string dirBuild					="$dirSnpeff/build"
 string dirDb					="$dirSnpeff/db"
 string dirDarned				="$dirDb/darned/"
+string pwmsBin					="$dirDb/jaspar/pwms.bin"
 
 # Program parameters and switches
 bool dryrun 					= false		# Dry run: Don't build databases
@@ -132,7 +133,11 @@ bool buildAll() {
 # Build special databases
 #-------------------------------------------------------------------------------
 
-bool buildSpecial() {
+void buildSpecial() {
+	buildNextProt()
+}
+
+void buildNextProt() {
 	# Note: This takes a huge amount of memory, don't run multiple of these process because the server will crash
 	# TODO: Add amount of memory to the taks and remove the constraint
 	print("Buils special.\n\tFIXME: Create a 'task' instead of a 'sys'\n")
@@ -152,8 +157,18 @@ bool buildSpecial() {
 			print("NextProt ($hg): OK\n")
 		}
 	}
-	
-	return( true )
+}
+
+#-------------------------------------------------------------------------------
+# Copy pwms.bin to every human dir
+#-------------------------------------------------------------------------------
+void copyPwm() {
+	humanDirs := dirData.dirPath(".*/GRCh.*")
+	print("Copying $pwmsBin to human genomes\n")
+	for( string hg : humanDirs ) {
+		print("\t$hg\n")
+		sys cp $pwmsBin $hg
+	}
 }
 
 #-------------------------------------------------------------------------------
@@ -208,6 +223,7 @@ if( download ) downloadAll()
 
 # Build genomes
 if( build ) {
+	copyPwm()		# We must do this before building, otherwise we don't get 'motif.bin' databases
 	buildAll()
 	buildSpecial()
 }
@@ -217,6 +233,7 @@ if( distro ) sys ./scripts_build/distro.sh
 
 # Upload files
 if( upload ) sys ./scripts_build/uploadSourceForge.sh
+
 
 wait
 print("Done!\n")
