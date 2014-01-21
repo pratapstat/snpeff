@@ -4709,11 +4709,8 @@ GCA_000169095.1.18 	 Lyngbya_sp_pcc_8106   GCA_000169095.1.18
 GCA_000313955.1.18 	 Lysinibacillus_fusiformis_zb2   GCA_000313955.1.18
 GCA_000178135.1.18 	 Lysinibacillus_fusiformis_zc1   GCA_000178135.1.18
 Lysinibacillus_sphaericus_C3_41_uid58945 	 Lysinibacillus_sphaericus_C3_41_uid58945   Lysinibacillus_sphaericus_C3_41_uid58945
-<<<<<<< .mine
 GCA_000017965.1.18 	 Lysinibacillus_sphaericus_c3_41   GCA_000017965.1.18
-=======
 Macaca_fascicularis 	 Macaca_fascicularis   Macaca_fascicularis
->>>>>>> .r1169
 MMUL_1.64 	 Macaca_mulatta   MMUL_1.64
 MMUL_1.65 	 Macaca_mulatta   MMUL_1.65
 MMUL_1.66 	 Macaca_mulatta   MMUL_1.66
@@ -8642,12 +8639,7 @@ ASM17099v1.18 	 Trichoderma_virens   ASM17099v1.18
 Trichodesmium_erythraeum_IMS101_uid57925 	 Trichodesmium_erythraeum_IMS101_uid57925   Trichodesmium_erythraeum_IMS101_uid57925
 GCA_000014265.1.18 	 Trichodesmium_erythraeum_ims101   GCA_000014265.1.18
 ASM15027v1.18 	 Trichoplax_adhaerens   ASM15027v1.18
-<<<<<<< .mine
-=======
 Triticum_aestivum.IWGSP1.21 	 Triticum_aestivum.IWGSP1.21   Triticum_aestivum.IWGSP1.21
-GCA_000007485.1.18 	 Tropheryma_whipplei_str_twist   GCA_000007485.1.18
-GCA_000196075.1.18 	 Tropheryma_whipplei_tw08_27   GCA_000196075.1.18
->>>>>>> .r1169
 Tropheryma_whipplei_TW08_27_uid57961 	 Tropheryma_whipplei_TW08_27_uid57961   Tropheryma_whipplei_TW08_27_uid57961
 Tropheryma_whipplei_Twist_uid57705 	 Tropheryma_whipplei_Twist_uid57705   Tropheryma_whipplei_Twist_uid57705
 GCA_000007485.1.18 	 Tropheryma_whipplei_str_twist   GCA_000007485.1.18
@@ -9167,11 +9159,7 @@ GCA_000173775.1.18 	 Yersinia_rohdei_atcc_43380   GCA_000173775.1.18
 GCA_000173755.1.18 	 Yersinia_ruckeri_atcc_29473   GCA_000173755.1.18
 GCA_000239335.1.18 	 Yokenella_regensburgei_atcc_43003   GCA_000239335.1.18
 Zobellia_galactanivorans_uid70621 	 Zobellia_galactanivorans_uid70621   Zobellia_galactanivorans_uid70621
-<<<<<<< .mine
-=======
 Zonotrichia_albicollis_1.0 	 Zonotrichia_albicollis_1.0   Zonotrichia_albicollis_1.0
-GCA_000023465.1.18 	 Zunongwangia_profunda_sm_a87   GCA_000023465.1.18
->>>>>>> .r1169
 Zunongwangia_profunda_SM_A87_uid48073 	 Zunongwangia_profunda_SM_A87_uid48073   Zunongwangia_profunda_SM_A87_uid48073
 GCA_000023465.1.18 	 Zunongwangia_profunda_sm_a87   GCA_000023465.1.18
 Zymomonas_mobilis_ATCC_10988_uid55403 	 Zymomonas_mobilis_ATCC_10988_uid55403   Zymomonas_mobilis_ATCC_10988_uid55403
