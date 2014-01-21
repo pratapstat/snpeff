@@ -234,6 +234,5 @@ if( distro ) sys ./scripts_build/distro.sh
 # Upload files
 if( upload ) sys ./scripts_build/uploadSourceForge.sh
 
-
 wait
 print("Done!\n")
