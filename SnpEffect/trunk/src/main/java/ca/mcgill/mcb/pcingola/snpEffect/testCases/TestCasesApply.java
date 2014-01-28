@@ -26,7 +26,7 @@ import ca.mcgill.mcb.pcingola.util.Timer;
 public class TestCasesApply extends TestCase {
 
 	public static boolean debug = false;
-	public static boolean verbose = true;
+	public static boolean verbose = false;
 	public static int SHOW_EVERY = 10;
 
 	public TestCasesApply() {
@@ -51,11 +51,11 @@ public class TestCasesApply extends TestCase {
 		for (Gene g : genome.getGenes()) {
 
 			if (g.isProteinCoding()) { // Only protein coding ones...
-				System.out.println(g.getGeneName());
+				if (verbose) System.out.println(g.getGeneName());
 
 				// All transcripts
 				for (Transcript t : g) {
-					System.out.println("\t" + t.getId());
+					if (verbose) System.out.println("\t" + t.getId());
 
 					// All exons
 					for (Exon ex : t) {
@@ -67,7 +67,7 @@ public class TestCasesApply extends TestCase {
 						if (random.nextInt(10) > 1) continue; // Randomly some exons 
 						if (ex.size() > 1000) continue; // Skip exon if too long
 
-						System.out.println("\t\t" + ex.getId() + "\tStrand: " + ex.getStrand() + "\tSize: " + ex.size());
+						if (verbose) System.out.println("\t\t" + ex.getId() + "\tStrand: " + ex.getStrand() + "\tSize: " + ex.size());
 
 						// Change each base
 						for (int i = ex.getStart(), idx = 0; i < ex.getEnd(); i++, idx++) {
@@ -119,11 +119,11 @@ public class TestCasesApply extends TestCase {
 		for (Gene g : genome.getGenes()) {
 
 			if (g.isProteinCoding()) { // Only protein coding ones...
-				System.out.println(g.getGeneName());
+				if (verbose) System.out.println(g.getGeneName());
 
 				// All transcripts
 				for (Transcript t : g) {
-					System.out.println("\t" + t.getId());
+					if (verbose) System.out.println("\t" + t.getId());
 
 					// All exons
 					for (Exon ex : t) {
@@ -135,7 +135,7 @@ public class TestCasesApply extends TestCase {
 						if (random.nextInt(10) > 1) continue; // Randomly some exons 
 						if (ex.size() > 1000) continue; // Skip exon if too long
 
-						System.out.println("\t\t" + ex.getId() + "\tStrand: " + ex.getStrand() + "\tSize: " + ex.size());
+						if (verbose) System.out.println("\t\t" + ex.getId() + "\tStrand: " + ex.getStrand() + "\tSize: " + ex.size());
 
 						// Change each base
 						for (int i = ex.getStart(), idx = 0; i < ex.getEnd(); i++, idx++) {
@@ -198,11 +198,11 @@ public class TestCasesApply extends TestCase {
 		for (Gene g : genome.getGenes()) {
 
 			if (g.isProteinCoding()) { // Only protein coding ones...
-				System.out.println(g.getGeneName());
+				if (verbose) System.out.println(g.getGeneName());
 
 				// All transcripts
 				for (Transcript t : g) {
-					System.out.println("\t" + t.getId());
+					if (verbose) System.out.println("\t" + t.getId());
 
 					// All exons
 					for (Exon ex : t) {
@@ -214,7 +214,7 @@ public class TestCasesApply extends TestCase {
 						if (random.nextInt(10) > 1) continue; // Randomly some exons 
 						if (ex.size() > 1000) continue; // Skip exon if too long
 
-						System.out.println("\t\t" + ex.getId() + "\tStrand: " + ex.getStrand() + "\tSize: " + ex.size());
+						if (verbose) System.out.println("\t\t" + ex.getId() + "\tStrand: " + ex.getStrand() + "\tSize: " + ex.size());
 
 						// Change each base
 						for (int i = ex.getStart(), idx = 0; i < ex.getEnd(); i++, idx++) {
@@ -273,11 +273,11 @@ public class TestCasesApply extends TestCase {
 		for (Gene g : genome.getGenes()) {
 
 			if (g.isProteinCoding()) { // Only protein coding ones...
-				System.out.println(g.getGeneName());
+				if (verbose) System.out.println(g.getGeneName());
 
 				// All transcripts
 				for (Transcript t : g) {
-					System.out.println("\t" + t.getId());
+					if (verbose) System.out.println("\t" + t.getId());
 
 					// All exons
 					for (Exon ex : t) {
@@ -289,7 +289,7 @@ public class TestCasesApply extends TestCase {
 						if (random.nextInt(10) > 1) continue; // Randomly some exons 
 						if (ex.size() > 1000) continue; // Skip exon if too long
 
-						System.out.println("\t\t" + ex.getId() + "\tStrand: " + ex.getStrand() + "\tSize: " + ex.size());
+						if (verbose) System.out.println("\t\t" + ex.getId() + "\tStrand: " + ex.getStrand() + "\tSize: " + ex.size());
 
 						// Change each base
 						for (int i = ex.getStart(), idx = 0; i < ex.getEnd(); i++, idx++) {
