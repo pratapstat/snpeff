@@ -94,6 +94,7 @@ public class Field extends Expression {
 
 		String value = getFieldString(vcfEntry);
 		if (value == null) return null;
+
 		return Gpr.parseLongSafe(value);
 	}
 

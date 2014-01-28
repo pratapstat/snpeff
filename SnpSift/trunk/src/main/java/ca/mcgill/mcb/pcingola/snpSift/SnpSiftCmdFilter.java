@@ -64,6 +64,7 @@ public class SnpSiftCmdFilter extends SnpSift {
 
 	boolean usePassField; // Use Filter field
 	boolean inverse; // Inverse filter (i.e. do NOT show lines that match the filter)
+	boolean exceptionIfNotFound; // Throw an exception of a field is not found?
 	String inputFile; // Input file
 	String expression; // Expression (as a string)
 	Condition condition; // Condition (parsed expression)
@@ -145,7 +146,7 @@ public class SnpSiftCmdFilter extends SnpSift {
 		if (debug) Gpr.debug("Tree: " + parseTree.toStringTree());
 
 		// Create a language factory
-		LangFactory langFactory = new LangFactory(sets, formatVersion);
+		LangFactory langFactory = new LangFactory(sets, formatVersion, exceptionIfNotFound);
 		return langFactory.conditionFactory(parseTree);
 	}
 
@@ -254,6 +255,7 @@ public class SnpSiftCmdFilter extends SnpSift {
 		rmFilterField = null;
 		sets = new ArrayList<HashSet<String>>();
 		formatVersion = null; // VcfEffect.FormatVersion.FORMAT_SNPEFF_3;
+		exceptionIfNotFound = false;
 	}
 
 	/**
@@ -269,6 +271,7 @@ public class SnpSiftCmdFilter extends SnpSift {
 				else if (args[i].equals("-f") || args[i].equalsIgnoreCase("--file")) inputFile = args[++i];
 				else if (args[i].equals("-s") || args[i].equalsIgnoreCase("--set")) addSet(args[++i]);
 				else if (args[i].equals("-p") || args[i].equalsIgnoreCase("--pass")) usePassField = true;
+				else if (args[i].equalsIgnoreCase("--errMissing")) exceptionIfNotFound = true;
 				else if (args[i].equals("-i") || args[i].equalsIgnoreCase("--filterId")) {
 					usePassField = true;
 					filterId = args[++i];
@@ -409,6 +412,7 @@ public class SnpSiftCmdFilter extends SnpSift {
 		System.err.println("\t-p|--pass             : Use 'PASS' field instead of filtering out VCF entries");
 		System.err.println("\t-r|--rmFilter <str>   : Remove a string from FILTER VCF field if 'expression' is true (and 'str' is in the field). Default: '' (none)");
 		System.err.println("\t-s|--set <file>       : Create a SET using 'file'");
+		System.err.println("\t--errMissing          : Error is a field is missing. Default: " + exceptionIfNotFound);
 		System.err.println("\t--format <format>     : SnpEff format version: {2, 3}. Default: " + (formatVersion == null ? "Auto" : formatVersion));
 		System.err.println("\t--galaxy              : Used from Galaxy (expressions have been sanitized).");
 		System.exit(-1);
