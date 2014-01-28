@@ -1,5 +1,6 @@
 package ca.mcgill.mcb.pcingola.snpEffect.testCases;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 
@@ -29,6 +30,32 @@ public class TestCasesVcf extends TestCase {
 	Random rand;
 	Config config;
 	Genome genome;
+
+	/**
+	 * Creates a test file
+	 * @throws IOException
+	 */
+	public static void create1kgFile() throws IOException {
+		String vcfFile = Gpr.HOME + "/snpEff/1kg.indels.vcf";
+		String vcfOutFile = Gpr.HOME + "/workspace/SnpEff/tests/1kg.indels.vcf";
+
+		StringBuilder outvcf = new StringBuilder();
+
+		VcfFileIterator vcf = new VcfFileIterator(vcfFile);
+		for (VcfEntry ve : vcf) {
+			StringBuilder sb = new StringBuilder();
+
+			for (SeqChange sc : ve.seqChanges()) {
+				if (sb.length() > 0) sb.append(",");
+				sb.append(sc.getReference() + "/" + sc.getChange());
+			}
+
+			ve.addInfo("SEQCHANGE", sb.toString());
+			outvcf.append(ve + "\n");
+		}
+
+		Gpr.toFile(vcfOutFile, outvcf);
+	}
 
 	public TestCasesVcf() {
 		super();
@@ -214,11 +241,8 @@ public class TestCasesVcf extends TestCase {
 			// Compare seqChanges to what we expect
 			List<SeqChange> seqChanges = vcfEntry.seqChanges();
 
-			if (Math.random() < 2.0) throw new RuntimeException("Unimplemented functionality: Mixed changes are not fully supported!!!");
-			Assert.assertEquals("chr1:223919_?????", seqChanges.get(0).toString()); // FIXME: What the hell do I actually expect here?
-			Assert.assertEquals("chr1:223919_TC/AT", seqChanges.get(1).toString());
-
-			throw new RuntimeException("REVIEW WHAT A SeqChange SHOULD LOOK LIKE!!!");
+			Assert.assertEquals("chr1:223921_GACCACTGGAA/ACATCCATACAT", seqChanges.get(0).toString()); // FIXME: What the hell do I actually expect here?			
+			Assert.assertEquals("chr1:223919_TCGACCACTGGAA/ATGACCACTGGAA", seqChanges.get(1).toString());
 		}
 	}
 
@@ -371,6 +395,24 @@ public class TestCasesVcf extends TestCase {
 		formatVersion = formatVersion(vcfFileName);
 		Assert.assertEquals(FormatVersion.FORMAT_SNPEFF_3, formatVersion);
 
+	}
+
+	public void test_16_indels() {
+		String vcfFile = "tests/1kg.indels.vcf";
+
+		VcfFileIterator vcf = new VcfFileIterator(vcfFile);
+		for (VcfEntry ve : vcf) {
+			StringBuilder seqChangeResult = new StringBuilder();
+
+			for (SeqChange sc : ve.seqChanges()) {
+				if (seqChangeResult.length() > 0) seqChangeResult.append(",");
+				seqChangeResult.append(sc.getReference() + "/" + sc.getChange());
+			}
+
+			String seqChangeExpected = ve.getInfo("SEQCHANGE");
+
+			Assert.assertEquals(seqChangeExpected, seqChangeResult.toString());
+		}
 	}
 
 }

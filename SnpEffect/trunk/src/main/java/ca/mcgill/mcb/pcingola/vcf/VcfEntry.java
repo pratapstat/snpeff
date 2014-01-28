@@ -323,6 +323,8 @@ public class VcfEntry extends Marker implements Iterable<VcfGenotype> {
 
 		case MIXED:
 			// Case: Mixed variant (substitution)
+			reference = reference.substring(startDiff);
+			alt = alt.substring(startDiff);
 			return new SeqChange(chromo, start + startDiff, reference, alt, strand, id, quality, coverage);
 
 		default:

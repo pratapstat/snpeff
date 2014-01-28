@@ -64,10 +64,51 @@ public class VcfRefAltAlign extends NeedlemanWunsch {
 	}
 
 	/**
+	 * Trim bases that are equal at the end of stringA / stringB
+	 * @param stringA
+	 * @param stringB
+	 */
+	void trimCommonBasesEnd() {
+		int ia = stringA.length() - 1;
+		int ib = stringB.length() - 1;
+		int count = 0;
+		for (; ia >= offset && ib >= offset; ia--, ib--, count++)
+			if (stringA.charAt(ia) != stringB.charAt(ib)) break;
+
+		// Trim last bases (they are equal)
+		if (count > 0) {
+			stringA = stringA.substring(0, ia + 1);
+			stringB = stringB.substring(0, ib + 1);
+		}
+	}
+
+	/**
 	 * Simplified alignment
 	 * @return
 	 */
 	boolean simpleAlign() {
+
+		if (stringA.length() == stringB.length()) {
+			offset = 0;
+			if (stringA.equals(stringB)) {
+				// No change
+				changeType = ChangeType.Interval;
+				return true;
+			} else if (stringA.length() == 1) {
+				// SNP
+				changeType = ChangeType.SNP;
+				return true;
+			} else {
+				// MNP
+				offset = minCommonBase();
+				changeType = ChangeType.MNP;
+				return true;
+			}
+		}
+
+		offset = minCommonBase();
+		trimCommonBasesEnd();
+
 		if (stringA.length() < stringB.length()) {
 			// A has a deletion respect to B
 			int idx = stringB.indexOf(stringA);
@@ -77,9 +118,10 @@ public class VcfRefAltAlign extends NeedlemanWunsch {
 				alignment = "-" + stringB.substring(stringA.length(), stringB.length());
 				return true;
 			}
-		}
 
-		if (stringA.length() > stringB.length()) {
+			changeType = ChangeType.MIXED;
+			return true;
+		} else if (stringA.length() > stringB.length()) {
 			// A has an insertion respect to B
 			int idx = stringA.indexOf(stringB);
 			if (idx >= 0) {
@@ -88,10 +130,27 @@ public class VcfRefAltAlign extends NeedlemanWunsch {
 				alignment = "+" + stringA.substring(stringB.length(), stringA.length());
 				return true;
 			}
+
+			changeType = ChangeType.MIXED;
+			return true;
 		}
 
 		return false;
+	}
 
+	/**
+	 * Min position with a common base between stringA and stringB
+	 * @param stringA
+	 * @param stringB
+	 * @return
+	 */
+	int minCommonBase() {
+		int min = Math.min(stringA.length(), stringB.length());
+		int i;
+		for (i = 0; i < min; i++)
+			if (stringA.charAt(i) != stringB.charAt(i)) return i;
+
+		return i;
 	}
 
 	/**
