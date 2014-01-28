@@ -1,35 +1,33 @@
 package ca.mcgill.mcb.pcingola;
 
-import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
+import java.io.IOException;
+import java.util.Iterator;
+
+import ca.mcgill.mcb.pcingola.fileIterator.DbNsfpEntry;
+import ca.mcgill.mcb.pcingola.fileIterator.DbNsfpFileIterator;
 import ca.mcgill.mcb.pcingola.util.Gpr;
-import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 
-public class Zzz {
+public class Zzz implements Iterable<String> {
 
-	public static void main(String[] args) {
-		int maxLen = 10 * 1024 * 1024;
+	public static void main(String[] args) throws IOException {
+		String txtFileName = Gpr.HOME + "/snpEff/db/dbNSFP/z.txt.gz";
 
-		String vcfFileName = Gpr.HOME + "/z.vcf";
-		String vcfOutFileName = Gpr.HOME + "/z.cut.vcf";
-		VcfFileIterator vcf = new VcfFileIterator(vcfFileName);
+		//		TabixReader tabix = new TabixReader(txtFileName);
+		//		tabix.query("1:9009444");
+		//		for (String line : tabix)
+		//			System.out.println(line);
 
-		StringBuilder sb = new StringBuilder();
-		for (VcfEntry ve : vcf) {
-			if (vcf.isHeadeSection()) sb.append(vcf.getVcfHeader() + "\n");
-
-			String str = ve.getChromosomeName() //
-					+ "\t" + (ve.getStart() + 1) // 
-					+ "\t" + ve.getId() // 
-					+ "\t" + ve.getRef().substring(0, maxLen) // 
-					+ "\t" + ve.getAltsStr() // 
-					+ "\t" + ve.getFilterPass() // 
-					+ "\t" + ve.getInfoStr() //
-			;
-
-			sb.append(str + "\n");
+		DbNsfpFileIterator db = new DbNsfpFileIterator(txtFileName);
+		for (DbNsfpEntry dbe : db) {
+			System.out.println(dbe);
 		}
 
-		Gpr.toFile(vcfOutFileName, sb);
 		Gpr.debug("Done!");
+	}
+
+	@Override
+	public Iterator<String> iterator() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
