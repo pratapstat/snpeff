@@ -39,7 +39,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import net.sf.samtools.util.BlockCompressedInputStream;
-import ca.mcgill.mcb.pcingola.util.Gpr;
 
 public class TabixReader implements Iterable<String> {
 
@@ -434,7 +433,6 @@ public class TabixReader implements Iterable<String> {
 		mBc = readInt(is);
 		mEc = readInt(is);
 		mMeta = readInt(is);
-		Gpr.debug("meta:" + mMeta);
 		mSkip = readInt(is);
 		// read sequence dictionary
 		int i, j, k, l = readInt(is);
