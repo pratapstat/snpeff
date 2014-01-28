@@ -2,10 +2,12 @@ package ca.mcgill.mcb.pcingola.snpEffect.factory;
 
 import ca.mcgill.mcb.pcingola.genBank.Feature;
 import ca.mcgill.mcb.pcingola.genBank.Feature.Type;
+import ca.mcgill.mcb.pcingola.genBank.FeatureCoordinates;
 import ca.mcgill.mcb.pcingola.genBank.Features;
 import ca.mcgill.mcb.pcingola.genBank.FeaturesFile;
 import ca.mcgill.mcb.pcingola.interval.Cds;
 import ca.mcgill.mcb.pcingola.interval.Chromosome;
+import ca.mcgill.mcb.pcingola.interval.Exon;
 import ca.mcgill.mcb.pcingola.interval.Gene;
 import ca.mcgill.mcb.pcingola.interval.Transcript;
 import ca.mcgill.mcb.pcingola.snpEffect.Config;
@@ -71,44 +73,63 @@ public abstract class SnpEffPredictorFactoryFeatures extends SnpEffPredictorFact
 		if (verbose) System.err.println("Chromosome: '" + chromosome.getId() + "'\tlength: " + chromosome.size());
 
 		//---
-		// Add a genes
+		// Add a genes, transcripts and CDSs
 		//---
-		for (Feature f : features.getFeatures())
-			if (f.getType() == Type.GENE) findOrCreateGene(f, chromosome, false);
-
-		//---
-		// Add transcripts
-		//---
+		Gene geneLatest = null;
+		Transcript trLatest = null;
 		for (Feature f : features.getFeatures()) {
-			// Transcript
-			if (f.getType() == Type.MRNA) {
+			if (f.getType() == Type.GENE) {
+				// Add gene
+				geneLatest = findOrCreateGene(f, chromosome, false);
+				trLatest = null;
+			} else if (f.getType() == Type.MRNA) {
+				// Add transcript information
+
 				// Convert coordinates to zero-based 
 				int start = f.getStart() - inOffset;
 				int end = f.getEnd() - inOffset;
 
-				String trId = f.getTranscriptId();
-				Gene gene = findOrCreateGene(f, chromosome, false); // Find or create gene
+				// Get gene: Make sure the transcript actually refers to the latest gene.
+				Gene gene = null;
+				if ((geneLatest != null) && geneLatest.intersects(start, end)) gene = geneLatest;
+				else gene = findOrCreateGene(f, chromosome, false); // Find or create gene
 
 				// Add transcript
+				String trId = f.getTranscriptId();
 				Transcript tr = new Transcript(gene, start, end, f.isComplement() ? -1 : 1, trId);
-				add(tr);
-			}
-		}
 
-		//---
-		// Add CDS and protein coding information 
-		//---
-		for (Feature f : features.getFeatures()) {
-			// Add CDS
-			if (f.getType() == Type.CDS) {
+				// Add exons?
+				if (f.hasMultipleCoordinates()) {
+					int exNum = 1;
+					for (FeatureCoordinates fc : f) {
+						Exon e = new Exon(tr, fc.start - inOffset, fc.end - inOffset, fc.complement ? -1 : +1, tr.getId() + "_" + exNum, exNum);
+						tr.add(e);
+						exNum++;
+					}
+				}
+
+				add(tr);
+
+				trLatest = tr;
+			} else if (f.getType() == Type.CDS) {
+				// Add CDS and protein coding information
+
 				// Convert coordinates to zero-based 
 				int start = f.getStart() - inOffset;
 				int end = f.getEnd() - inOffset;
 
-				// Try to find transcript
-				String trId = f.getTranscriptId();
+				// Find corresponding transcript
+				Transcript tr = null;
+				String trId = null;
+				if ((trLatest != null) && trLatest.intersects(start, end)) {
+					tr = trLatest;
+					trId = tr.getId();
+				} else {
+					// Try to find transcript
+					trId = f.getTranscriptId();
+					tr = findTranscript(trId);
+				}
 
-				Transcript tr = findTranscript(trId);
 				if (tr == null) {
 					// Not found? => Create gene and transcript
 					Gene gene = findOrCreateGene(f, chromosome, false); // Find or create gene
@@ -125,8 +146,17 @@ public abstract class SnpEffPredictorFactoryFeatures extends SnpEffPredictorFact
 				// Mark transcript as protein coding
 				if (f.getAasequence() != null) tr.setProteinCoding(true);
 
-				Cds cds = new Cds(tr, f.getStart() - inOffset, f.getEnd() - inOffset, f.isComplement() ? -1 : 1, "CDS_" + trId);
-				add(cds);
+				// Add exons?
+				if (f.hasMultipleCoordinates()) {
+					for (FeatureCoordinates fc : f) {
+						Cds cds = new Cds(tr, fc.start - inOffset, fc.end - inOffset, f.isComplement() ? -1 : 1, "CDS_" + trId);
+						tr.add(cds);
+						add(cds);
+					}
+				} else {
+					Cds cds = new Cds(tr, f.getStart() - inOffset, f.getEnd() - inOffset, f.isComplement() ? -1 : 1, "CDS_" + trId);
+					add(cds);
+				}
 			}
 		}
 	}
