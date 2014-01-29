@@ -1,9 +1,9 @@
 package ca.mcgill.mcb.pcingola.genBank;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import ca.mcgill.mcb.pcingola.fileIterator.LineFileIterator;
 import ca.mcgill.mcb.pcingola.util.Gpr;
@@ -68,7 +68,7 @@ public abstract class Features implements Iterable<Feature> {
 	 * @param name
 	 * @param values
 	 */
-	void addFeature(String typeStr, StringBuilder values) {
+	void addFeature(String typeStr, StringBuilder values, int lineNum) {
 		Feature.Type type = Feature.Type.parse(typeStr);
 		if (type == null) {
 			if (debug) Gpr.debug("WARNING: Unknown feature '" + typeStr + "', not added.");
@@ -76,8 +76,8 @@ public abstract class Features implements Iterable<Feature> {
 		}
 
 		try {
-			Collection<Feature> newFeatures = featureFactory(type, values.toString()); // Create new features
-			features.addAll(newFeatures); // Add all features to the list
+			Feature newFeature = featureFactory(type, values.toString(), lineNum); // Create new feature
+			features.add(newFeature); // Add features to list
 		} catch (Exception e) {
 			Gpr.debug("Error parsing feature type '" + typeStr + "' -> '" + type + "':\n" + values);
 			throw new RuntimeException(e);
@@ -87,18 +87,12 @@ public abstract class Features implements Iterable<Feature> {
 	/**
 	 * Create features from a 'type' and 'values'
 	 * 
-	 * Note: Most of the times, only one feature is created. When the coordinates 
-	 * are 'join(....)' then we must create multiple features, since each interval 
-	 * is will be mapped to a different Marker object.
-	 * 
-	 * 
 	 * @param typeStr
 	 * @param values
 	 * @return
 	 */
-	Collection<Feature> featureFactory(Feature.Type type, String def) {
+	Feature featureFactory(Feature.Type type, String def, int lineNum) {
 		boolean complement = false;
-		LinkedList<Feature> features = new LinkedList<Feature>();
 
 		// Get first line (location)
 		int firstLine = def.indexOf("\n");
@@ -121,6 +115,8 @@ public abstract class Features implements Iterable<Feature> {
 
 		// Split multiple locations?
 		String locs[] = locStr.split(",");
+		List<FeatureCoordinates> fcList = new LinkedList<FeatureCoordinates>();
+		int startMin = Integer.MAX_VALUE, endMax = 0;
 		for (String loc : locs) {
 			// Get rid of 'join' and 'complement' strings
 			String locPrev = "";
@@ -151,12 +147,23 @@ public abstract class Features implements Iterable<Feature> {
 				end = start;
 			} else throw new RuntimeException("Cannot calculate start & end coordinates: '" + loc + "'");
 
+			startMin = Math.min(startMin, start);
+			endMax = Math.max(endMax, end);
+
 			// Create feature
-			Feature feature = new Feature(type, def, start, end, complement);
-			features.add(feature);
+			fcList.add(new FeatureCoordinates(start, end, complement));
 		}
 
-		return features;
+		// Create feature
+		Feature feature = new Feature(type, def, startMin, endMax, complement, lineNum);
+
+		// Add all coordinates (if multiple)
+		if (fcList.size() > 1) {
+			for (FeatureCoordinates fc : fcList)
+				feature.add(fc);
+		}
+
+		return feature;
 	}
 
 	public String getAccession() {
@@ -255,13 +262,16 @@ public abstract class Features implements Iterable<Feature> {
 		String type = null;
 		String value = "";
 		StringBuilder values = new StringBuilder();
+		int lineNum = 0;
 		for (String line : featuresStr.toString().split("\n")) {
+			lineNum++;
+
 			// Feature start
 			if (isNewFeature(line)) {
 				String kv[] = line.trim().split(" ", 2);
 				if (kv.length > 1) {
 					// Previous feature data is available? => Add it
-					if (type != null) addFeature(type, values);
+					if (type != null) addFeature(type, values, lineNum);
 
 					// Parse new feature's name
 					type = kv[0];
@@ -282,7 +292,7 @@ public abstract class Features implements Iterable<Feature> {
 		}
 
 		// Add last feature
-		addFeature(type, values);
+		addFeature(type, values, lineNum);
 	}
 
 	/**

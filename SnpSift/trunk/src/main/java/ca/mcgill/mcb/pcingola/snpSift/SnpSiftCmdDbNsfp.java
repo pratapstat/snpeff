@@ -7,11 +7,9 @@ import java.util.Map;
 import ca.mcgill.mcb.pcingola.fileIterator.DbNsfpEntry;
 import ca.mcgill.mcb.pcingola.fileIterator.DbNsfpFileIterator;
 import ca.mcgill.mcb.pcingola.fileIterator.GuessTableTypes;
-import ca.mcgill.mcb.pcingola.fileIterator.SeekableBufferedReader;
 import ca.mcgill.mcb.pcingola.fileIterator.VcfFileIterator;
 import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.util.Timer;
-import ca.mcgill.mcb.pcingola.vcf.FileIndexChrPos;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 import ca.mcgill.mcb.pcingola.vcf.VcfInfoType;
 
@@ -48,7 +46,6 @@ public class SnpSiftCmdDbNsfp extends SnpSift {
 	protected int count = 0;
 	protected int countAnnotated = 0;
 	protected DbNsfpFileIterator dbNsfpFile;
-	protected FileIndexChrPos indexDb;
 	protected VcfFileIterator vcfFile;
 	protected DbNsfpEntry currentDbEntry;
 	protected String prevChr = null;
@@ -70,7 +67,7 @@ public class SnpSiftCmdDbNsfp extends SnpSift {
 			// Get type
 			String type = fieldsType.get(fieldName);
 			if (type == null) {
-				System.err.println("WARNIGN: Cannot find type for field '" + fieldName + "', using 'String'.");
+				System.err.println("WARNING: Cannot find type for field '" + fieldName + "', using 'String'.");
 				type = VcfInfoType.String.toString();
 			}
 
@@ -97,18 +94,7 @@ public class SnpSiftCmdDbNsfp extends SnpSift {
 		String chr = vcf.getChromosomeName();
 		if (!chr.equals(prevChr)) {
 			if (debug) System.err.println("Seeking to chromosome '" + chr + "'");
-
-			// Get to the beginning of the new chromosome
-			long start = indexDb.getStart(chr);
-
-			// No such chromosome?
-			if (start < 0) {
-				warn("Chromosome '" + chr + "' not found in database.");
-				return;
-			}
-
-			// Seek
-			dbNsfpFile.seek(start);
+			dbNsfpFile.seek(chr);
 			prevChr = chr;
 			currentDbEntry = null;
 		}
@@ -116,8 +102,7 @@ public class SnpSiftCmdDbNsfp extends SnpSift {
 		//---
 		// Seek to position in db (within chr)
 		//---
-		int count = 1;
-		if (debug) System.err.println("Looking for " + vcf.getChromosomeName() + ":" + vcf.getStart() + ". Current DB: " + currentDbEntry.getChromosomeName() + ":" + currentDbEntry.getStart() + " : ");
+		if (debug) System.err.println("Looking for " + vcf.getChromosomeName() + ":" + vcf.getStart() + ". Current DB: " + (currentDbEntry == null ? "null" : currentDbEntry.getChromosomeName() + ":" + currentDbEntry.getStart()));
 		while (true) {
 			if (currentDbEntry == null) {
 				currentDbEntry = dbNsfpFile.next();
@@ -129,8 +114,11 @@ public class SnpSiftCmdDbNsfp extends SnpSift {
 
 			// Found the entry
 			if (vcf.getStart() == currentDbEntry.getStart()) break;
-			if (debug) Gpr.showMark(count++, 100);
+			if (debug) Gpr.debug("Current Db Entry:" + currentDbEntry.getChromosomeName() + ":" + currentDbEntry.getStart() + "\tLooking for: " + vcf.getChromosomeName() + ":" + vcf.getStart());
+
+			// OK, jump to next entry
 			currentDbEntry = null;
+			dbNsfpFile.seek(vcf.getChromosomeName(), vcf.getStart());
 		}
 
 		//---
@@ -184,7 +172,7 @@ public class SnpSiftCmdDbNsfp extends SnpSift {
 	public void checkFieldsToAdd() throws IOException {
 		// Check that all fields have a descriptor (used in VCF header)
 		for (String filedName : dbNsfpFile.getFieldNames())
-			if (fieldsDescription.get(filedName) == null) System.err.println("WARNING: Filed (column) '" + filedName + "' does not have an approriate file descriptor.");
+			if (fieldsDescription.get(filedName) == null) System.err.println("WARNING: Field (column) '" + filedName + "' does not have an approriate file descriptor.");
 
 		// Check that all "field to add" are in the database
 		for (String fieldKey : fieldsToAdd.keySet())
@@ -197,21 +185,6 @@ public class SnpSiftCmdDbNsfp extends SnpSift {
 	public void endAnnotate() {
 		vcfFile.close();
 		dbNsfpFile.close();
-	}
-
-	/**
-	 * Index a VCF file
-	 * @param fileName
-	 * @return
-	 */
-	private FileIndexChrPos index(String fileName) {
-		if (verbose) System.err.println("Index: " + fileName);
-		FileIndexChrPos fileIndex = new FileIndexChrPos(fileName);
-		fileIndex.setVerbose(verbose);
-		fileIndex.open();
-		fileIndex.index();
-		fileIndex.close();
-		return fileIndex;
 	}
 
 	/**
@@ -247,10 +220,9 @@ public class SnpSiftCmdDbNsfp extends SnpSift {
 		vcfFile = new VcfFileIterator(vcfFileName);
 
 		// Check and open dbNsfp
-		dbNsfpFile = new DbNsfpFileIterator(new SeekableBufferedReader(dbNsfpFileName));
+		dbNsfpFile = new DbNsfpFileIterator(dbNsfpFileName);
 		dbNsfpFile.setCollapseRepeatedValues(collapseRepeatedValues);
 
-		indexDb = index(dbNsfpFileName);
 		currentDbEntry = null;
 
 		// No field names specified? Use default

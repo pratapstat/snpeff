@@ -1,6 +1,9 @@
 package ca.mcgill.mcb.pcingola.genBank;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,7 +15,7 @@ import ca.mcgill.mcb.pcingola.util.Gpr;
  * 
  * @author pablocingolani
  */
-public class Feature {
+public class Feature implements Iterable<FeatureCoordinates> {
 
 	public enum Type {
 		SOURCE, ID, CDS, GENE, MRNA, TRNA, RRNA, MISC_RNA, REPEAT_UNIT, REPEAT_REGION, MISC_FEATURE, UTR_3, UTR_5;
@@ -35,7 +38,6 @@ public class Feature {
 				return null;
 			}
 		}
-
 	}
 
 	static final String FEATURE_REGEX = "/(\\S+?)=(.*)";
@@ -44,8 +46,10 @@ public class Feature {
 
 	Type type;
 	int start, end;
+	int lineNum;
 	HashMap<String, String> qualifiers;
 	boolean complement;
+	List<FeatureCoordinates> featureCoordinates;
 
 	public Feature(Type type, String def) {
 		this.type = type;
@@ -56,7 +60,7 @@ public class Feature {
 		parse(def);
 	}
 
-	public Feature(Type type, String def, int start, int end, boolean complement) {
+	public Feature(Type type, String def, int start, int end, boolean complement, int lineNum) {
 		this.type = type;
 		qualifiers = new HashMap<String, String>();
 		this.complement = complement;
@@ -69,12 +73,18 @@ public class Feature {
 		}
 		this.start = start;
 		this.end = end;
+		this.lineNum = lineNum;
 
 		// Parse
 		parse(def);
 
 		// Sanity check
 		if (start < 0) throw new RuntimeException("Feature starts with negative coordinates!\n\t" + this);
+	}
+
+	public void add(FeatureCoordinates fc) {
+		if (featureCoordinates == null) featureCoordinates = new LinkedList<FeatureCoordinates>();
+		featureCoordinates.add(fc);
 	}
 
 	/**
@@ -100,8 +110,12 @@ public class Feature {
 	}
 
 	public String getGeneId() {
+		// Try ID
+		String geneId = get("id");
+		if (geneId != null) return geneId;
+
 		// Try 'locus'...
-		String geneId = get("locus_tag");
+		geneId = get("locus_tag");
 		if (geneId != null) return geneId;
 
 		//		// Try 'gene'...
@@ -127,6 +141,10 @@ public class Feature {
 		String geneName = get("gene");
 		if (geneName != null) return geneName;
 
+		// Try 'gene'...
+		geneName = get("gene_synonym");
+		if (geneName != null) return geneName;
+
 		return getGeneId();
 	}
 
@@ -144,12 +162,12 @@ public class Feature {
 		String trId = get("protein_id");
 		if (trId != null) return trId;
 
-		// Try 'db_xref'...
-		trId = get("db_xref");
-		if (trId != null) return trId;
-
 		// Try 'locus'...
 		trId = get("locus_tag");
+		if (trId != null) return trId;
+
+		// Try 'db_xref'...
+		trId = get("db_xref");
 		if (trId != null) return trId;
 
 		trId = get("product");
@@ -162,8 +180,17 @@ public class Feature {
 		return type;
 	}
 
+	public boolean hasMultipleCoordinates() {
+		return featureCoordinates != null;
+	}
+
 	public boolean isComplement() {
 		return complement;
+	}
+
+	@Override
+	public Iterator<FeatureCoordinates> iterator() {
+		return featureCoordinates.iterator();
 	}
 
 	/**
@@ -228,11 +255,18 @@ public class Feature {
 		String format = "\t%-20s: \"%s\"\n";
 		StringBuilder sb = new StringBuilder();
 
-		sb.append("Feature: '" + type //
+		sb.append("Feature (line " + lineNum + "): '" + type //
 				+ "' [ " + start + ", " + end + " ]\t" //
 				+ (complement ? "complement" : "") //
 				+ "\n" //
 		);
+
+		// More coordinates?
+		if (featureCoordinates != null) {
+			sb.append(String.format(format, "coordinates", "join"));
+			for (FeatureCoordinates fc : featureCoordinates)
+				sb.append(String.format(format, "", fc));
+		}
 
 		for (Entry<String, String> e : qualifiers.entrySet())
 			sb.append(String.format(format, e.getKey(), e.getValue()));

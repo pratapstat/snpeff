@@ -86,17 +86,15 @@ public class DbNsfpFileIterator extends MarkerFileIterator<DbNsfpEntry> {
 		}
 	}
 
-	boolean collapseRepeatedValues = true;
-
 	public static final String COLUMN_CHR_NAME = "chr";
-
 	public static final String COLUMN_POS_NAME = "pos(1-coor)";
 	public static final String ALT_NAME = "alt";
 	private final TObjectIntHashMap<String> columnNames2Idx = new TObjectIntHashMap<String>();
 
-	private int chromosomeIdx;
-	private int startIdx;
-	private int altIdx;
+	boolean collapseRepeatedValues = true;
+	int chromosomeIdx;
+	int startIdx;
+	int altIdx;
 
 	/**
 	 * Splits a separated string into an array of <code>String</code> tokens. If
@@ -127,6 +125,10 @@ public class DbNsfpFileIterator extends MarkerFileIterator<DbNsfpEntry> {
 
 	public DbNsfpFileIterator(BufferedReader reader) {
 		super(reader, 1);
+	}
+
+	public DbNsfpFileIterator(String fileName) {
+		super(fileName, 1);
 	}
 
 	public Set<String> getFieldNames() {

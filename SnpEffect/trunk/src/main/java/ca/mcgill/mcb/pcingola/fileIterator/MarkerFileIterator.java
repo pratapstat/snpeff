@@ -1,7 +1,10 @@
 package ca.mcgill.mcb.pcingola.fileIterator;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 
+import net.sf.samtools.tabix.TabixReader;
+import net.sf.samtools.tabix.TabixReader.TabixIterator;
 import ca.mcgill.mcb.pcingola.interval.Chromosome;
 import ca.mcgill.mcb.pcingola.interval.Genome;
 import ca.mcgill.mcb.pcingola.interval.Marker;
@@ -19,6 +22,8 @@ public abstract class MarkerFileIterator<M extends Marker> extends FileIterator<
 	protected Genome genome;
 	protected boolean ignoreChromosomeErrors = true; // If true, do not throw an exception when a chromosome is not found. Just ignore the line
 	protected int inOffset;
+	protected TabixReader tabixReader;
+	protected TabixIterator tabixIterator;
 
 	public MarkerFileIterator(BufferedReader reader, int inOffset) {
 		super(reader);
@@ -31,6 +36,7 @@ public abstract class MarkerFileIterator<M extends Marker> extends FileIterator<
 		super(fileName);
 		this.inOffset = inOffset;
 		this.genome = (genome != null ? genome : new Genome("genome"));
+		initTabix(fileName);
 	}
 
 	public MarkerFileIterator(String fileName, int inOffset) {
@@ -38,6 +44,7 @@ public abstract class MarkerFileIterator<M extends Marker> extends FileIterator<
 		this.inOffset = inOffset;
 		this.genome = new Genome("genome");
 		this.createChromos = true;
+		initTabix(fileName);
 	}
 
 	/**
@@ -52,6 +59,37 @@ public abstract class MarkerFileIterator<M extends Marker> extends FileIterator<
 
 	public Genome getGenome() {
 		return genome;
+	}
+
+	@Override
+	public boolean hasNext() {
+		if (tabixReader == null) return super.hasNext();
+
+		if (tabixIterator == null) return false;
+
+		if (next == null) {
+			next = readNext(); // Try reading next item.
+			if ((next == null) && autoClose) close(); // End of file or any problem? => Close file
+		}
+
+		return (next != null);
+	}
+
+	protected void initTabix(String fileName) {
+		try {
+			// Do we have a tabix file?
+			if (!Gpr.exists(fileName + ".tbi")) return; // No index, cannot open in 'tabix' mode
+
+			// Open tabix reader
+			tabixReader = new TabixReader(fileName);
+			tabixIterator = tabixReader.iterator();
+
+			// We wo'nt be using the reader
+			reader.close();
+			reader = null;
+		} catch (IOException e) {
+			throw new RuntimeException("Error opening tabix file '" + fileName + "'", e);
+		}
 	}
 
 	public boolean isIgnoreChromosomeErrors() {
@@ -77,6 +115,36 @@ public abstract class MarkerFileIterator<M extends Marker> extends FileIterator<
 		return Gpr.parseIntSafe(posStr) - inOffset;
 	}
 
+	@Override
+	protected String readLine() throws IOException {
+		if (tabixReader == null) return super.readLine(); // No tabix => Do 'normal' readline()
+
+		// Use tabix
+		if (nextLine != null) {
+			String nl = nextLine;
+			nextLine = null;
+			return nl;
+		}
+
+		if (tabixIterator != null) nextLine = tabixIterator.next(); // Tabix? => Use tabix iterator
+
+		// Remove trailing '\r'
+		if ((nextLine != null) && (nextLine.length() > 0) && nextLine.charAt(nextLine.length() - 1) == '\r') nextLine = nextLine.substring(0, nextLine.length() - 1);
+
+		if (nextLine != null) lineNum++;
+		return nextLine;
+	}
+
+	@Override
+	protected boolean ready() throws IOException {
+		if ((reader == null) && (tabixReader == null)) return false; // No reader? then we are not ready
+		if (tabixReader == null) return super.ready();
+
+		if (nextLine != null) return true; // Next line is null? then we have to try to read a line (to see if one is available)
+		readLine();
+		return nextLine != null; // Line was read from the file? Then we are ready.
+	}
+
 	/**
 	 * Sanity check
 	 */
@@ -88,6 +156,21 @@ public abstract class MarkerFileIterator<M extends Marker> extends FileIterator<
 			}
 			throw new RuntimeException("ERROR: Chromosome '" + chromoName + "' not found! File '" + fileName + "', line " + lineNum);
 		}
+	}
+
+	public void seek(String chr) {
+		tabixReader.query(chr + ":1");
+		tabixIterator = tabixReader.iterator();
+	}
+
+	/**
+	 * Seek to a chr:pos region
+	 * @param chr
+	 * @param pos
+	 */
+	public void seek(String chr, int pos) {
+		tabixReader.query(chr + ":" + pos);
+		tabixIterator = tabixReader.iterator();
 	}
 
 	public void setCreateChromos(boolean createChromos) {

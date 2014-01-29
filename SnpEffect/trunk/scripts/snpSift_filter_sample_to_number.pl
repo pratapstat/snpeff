@@ -46,7 +46,7 @@ die "Errro: VCF header not found. Unable to  parse sample names!" if ! $sampleNa
 #---
 foreach $sname ( sort keys %sample ) {
 	$snum = $sample{$sname};
-	$filter =~ s/$sname/$snum/ee;
+	$filter =~ s/$sname/$snum/g;
 	# print "Replacing $sname by $snum:\t$filter\n";
 }
 print "$filter\n";

@@ -58,14 +58,16 @@ public class LangFactory {
 	protected static boolean debug = false;
 	ArrayList<HashSet<String>> sets = new ArrayList<HashSet<String>>();
 	VcfEffect.FormatVersion formatVersion;
+	boolean exceptionIfNotFound = false;
 
 	public LangFactory() {
 		sets = new ArrayList<HashSet<String>>(); // No sets
 	}
 
-	public LangFactory(ArrayList<HashSet<String>> sets, VcfEffect.FormatVersion formatVersion) {
+	public LangFactory(ArrayList<HashSet<String>> sets, VcfEffect.FormatVersion formatVersion, boolean exceptionIfNotFound) {
 		this.sets = sets;
 		this.formatVersion = formatVersion;
+		this.exceptionIfNotFound = exceptionIfNotFound;
 	}
 
 	/**
@@ -153,7 +155,7 @@ public class LangFactory {
 		if (debug) Gpr.debug("Field Tree: " + parseTree.toStringTree());
 
 		// Create a language factory
-		LangFactory langFactory = new LangFactory(sets, formatVersion);
+		LangFactory langFactory = new LangFactory(sets, formatVersion, exceptionIfNotFound);
 		return langFactory.fieldFactory(parseTree);
 	}
 
@@ -234,6 +236,7 @@ public class LangFactory {
 			field = new FieldGenotypeSub(name, genotypeIndex, index);
 		} else throw new RuntimeException("Unknown field '" + leaveName + "'");
 
+		field.setExceptionIfNotFound(exceptionIfNotFound);
 		return field;
 	}
 

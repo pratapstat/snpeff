@@ -1493,6 +1493,7 @@ GCA_000175655.1.18 	 Campylobacter_showae_rm3277   GCA_000175655.1.18
 GCA_000287855.1.18 	 Campylobacter_sp_fobrc14   GCA_000287855.1.18
 GCA_000185345.1.18 	 Campylobacter_upsaliensis_jv21   GCA_000185345.1.18
 GCA_000167395.1.18 	 Campylobacter_upsaliensis_rm3195   GCA_000167395.1.18
+c_parapsilosis_CDC317 	 Candida   c_parapsilosis_CDC317
 cAlbicansv21 	 Candida_albicans_SC5314   cAlbicansv21
 GCA_000169295.1.18 	 Candidate_division_tm7_genomosp_gtl1   GCA_000169295.1.18
 Candidatus_Accumulibacter_phosphatis_clade_IIA_UW_1_uid59207 	 Candidatus_Accumulibacter_phosphatis_clade_IIA_UW_1_uid59207   Candidatus_Accumulibacter_phosphatis_clade_IIA_UW_1_uid59207
@@ -5060,6 +5061,7 @@ GCA_000170855.1.18 	 Moritella_sp_pe36   GCA_000170855.1.18
 GCA_000166195.3.18 	 Mucilaginibacter_paludis_dsm_18603   GCA_000166195.3.18
 Muricauda_ruestringensis_DSM_13258_uid72479 	 Muricauda_ruestringensis_DSM_13258_uid72479   Muricauda_ruestringensis_DSM_13258_uid72479
 GCA_000224085.1.18 	 Muricauda_ruestringensis_dsm_13258   GCA_000224085.1.18
+GRCm37.67 	 Mus   GRCm37.67
 GRCm38.68 	 Mus_musculus   GRCm38.68
 GRCm38.69 	 Mus_musculus   GRCm38.69
 GRCm38.70 	 Mus_musculus   GRCm38.70
@@ -8401,6 +8403,7 @@ Terriglobus_roseus_DSM_18391_uid168183 	 Terriglobus_roseus_DSM_18391_uid168183 
 GCA_000265425.1.18 	 Terriglobus_roseus_dsm_18391   GCA_000265425.1.18
 Terriglobus_saanensis_SP1PR4_uid53251 	 Terriglobus_saanensis_SP1PR4_uid53251   Terriglobus_saanensis_SP1PR4_uid53251
 GCA_000179915.2.18 	 Terriglobus_saanensis_sp1pr4   GCA_000179915.2.18
+testENST00000268124 	 Test   testENST00000268124
 testEgrandis 	 Test   testEgrandis
 test 	 TestCase   test
 testCase 	 TestCase   testCase
