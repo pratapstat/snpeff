@@ -77,46 +77,16 @@ public class SnpSiftCmdDbNsfp extends SnpSift {
 	}
 
 	/**
-	 * Annotate a VCF entry
+	 * Annotate a vcf entry
 	 * @param vcf
 	 * @throws IOException
 	 */
 	public void annotate(VcfEntry vcf) throws IOException {
-		//---
-		// Seek to position in db (within chr)
-		//---
-		if (debug) System.err.println("Looking for " + vcf.getChromosomeName() + ":" + vcf.getStart() + ". Current DB: " + (currentDbEntry == null ? "null" : currentDbEntry.getChromosomeName() + ":" + currentDbEntry.getStart()));
-		while (true) {
-			if (currentDbEntry == null) {
-				currentDbEntry = dbNsfpFile.next(); // Read next DB entry
-				if (currentDbEntry == null) return; // End of database?
-			}
+		// Find in database
+		DbNsfpEntry dbEntry = findDbEntry(vcf);
+		if (dbEntry == null) return;
 
-			if (debug) Gpr.debug("Current Db Entry:" + currentDbEntry.getChromosomeName() + ":" + currentDbEntry.getStart() + "\tLooking for: " + vcf.getChromosomeName() + ":" + vcf.getStart());
-
-			// Found the entry?
-			if (currentDbEntry.getChromosomeName().equals(vcf.getChromosomeName()) && (vcf.getStart() == currentDbEntry.getStart())) break;
-			else if (!currentDbEntry.getChromosomeName().equals(vcf.getChromosomeName())) {
-				// Different chromosome? => Jump to chromosome
-				if (debug) Gpr.debug("Chromosome jump:\t" + currentDbEntry.getChromosomeName() + ":" + currentDbEntry.getStart() + "\t->\t" + vcf.getChromosomeName() + ":" + vcf.getStart());
-				dbNsfpFile.seek(vcf.getChromosomeName(), vcf.getStart());
-			} else if (vcf.getStart() < currentDbEntry.getStart()) {
-				// Same chromosome, but passed => No annotations
-				if (debug) Gpr.debug("No db entry found:\t" + currentDbEntry.getChromosomeName() + ":" + currentDbEntry.getStart());
-				currentDbEntry = null;
-				return;
-			} else if ((vcf.getStart() - currentDbEntry.getStart()) > MIN_JUMP) {
-				// Is it far enough? Don't iterate, jump
-				if (debug) Gpr.debug("Position jump:\t" + currentDbEntry.getChromosomeName() + ":" + currentDbEntry.getStart() + "\t->\t" + vcf.getChromosomeName() + ":" + vcf.getStart());
-				dbNsfpFile.seek(vcf.getChromosomeName(), vcf.getStart());
-			}
-
-			currentDbEntry = dbNsfpFile.next();
-		}
-
-		//---
 		// Add all INFO fields that refer to this allele
-		//---
 		boolean annotated = false;
 		StringBuilder info = new StringBuilder();
 		for (String fieldKey : fieldsToAdd.keySet()) {
@@ -126,10 +96,10 @@ public class SnpSiftCmdDbNsfp extends SnpSift {
 			// For each ALT
 			for (String alt : vcf.getAlts()) {
 				// Are there any values to annotate?
-				if (currentDbEntry.hasValues(alt)) {
+				if (dbEntry.hasValues(alt)) {
 
 					// Map<String, String> values = currentDbEntry.getAltAlelleValues(alt);
-					String val = currentDbEntry.getCsv(alt, fieldKey);
+					String val = dbEntry.getCsv(alt, fieldKey);
 
 					if (val == null) {
 						// No value: Don't add		
@@ -154,7 +124,6 @@ public class SnpSiftCmdDbNsfp extends SnpSift {
 			}
 		}
 
-		currentDbEntry = null;
 		if (annotated) countAnnotated++;
 	}
 
@@ -178,6 +147,47 @@ public class SnpSiftCmdDbNsfp extends SnpSift {
 	public void endAnnotate() {
 		vcfFile.close();
 		dbNsfpFile.close();
+	}
+
+	/**
+	 * Find a matching db entry for a vcf entry
+	 * @param vcfEntry
+	 * @throws IOException
+	 */
+	public DbNsfpEntry findDbEntry(VcfEntry vcfEntry) throws IOException {
+		//---
+		// Find db entry 
+		//---
+		if (debug) System.err.println("Looking for " + vcfEntry.getChromosomeName() + ":" + vcfEntry.getStart() + ". Current DB: " + (currentDbEntry == null ? "null" : currentDbEntry.getChromosomeName() + ":" + currentDbEntry.getStart()));
+		while (true) {
+			if (currentDbEntry == null) {
+				currentDbEntry = dbNsfpFile.next(); // Read next DB entry
+				if (currentDbEntry == null) return null; // End of database?
+			}
+
+			if (debug) Gpr.debug("Current Db Entry:" + currentDbEntry.getChromosomeName() + ":" + currentDbEntry.getStart() + "\tLooking for: " + vcfEntry.getChromosomeName() + ":" + vcfEntry.getStart());
+
+			// Found the entry?
+			if (currentDbEntry.getChromosomeName().equals(vcfEntry.getChromosomeName()) && (vcfEntry.getStart() == currentDbEntry.getStart())) {
+				// Found db entry! Break loop and proceed with annotations
+				return currentDbEntry;
+			} else if (!currentDbEntry.getChromosomeName().equals(vcfEntry.getChromosomeName())) {
+				// Different chromosome? => Jump to chromosome
+				if (debug) Gpr.debug("Chromosome jump:\t" + currentDbEntry.getChromosomeName() + ":" + currentDbEntry.getStart() + "\t->\t" + vcfEntry.getChromosomeName() + ":" + vcfEntry.getStart());
+				dbNsfpFile.seek(vcfEntry.getChromosomeName(), vcfEntry.getStart());
+			} else if (vcfEntry.getStart() < currentDbEntry.getStart()) {
+				// Same chromosome, but positioned after => No annotations
+				if (debug) Gpr.debug("No db entry found:\t" + currentDbEntry.getChromosomeName() + ":" + currentDbEntry.getStart());
+				currentDbEntry = null;
+				return null;
+			} else if ((vcfEntry.getStart() - currentDbEntry.getStart()) > MIN_JUMP) {
+				// Is it far enough? Don't iterate, jump
+				if (debug) Gpr.debug("Position jump:\t" + currentDbEntry.getChromosomeName() + ":" + currentDbEntry.getStart() + "\t->\t" + vcfEntry.getChromosomeName() + ":" + vcfEntry.getStart());
+				dbNsfpFile.seek(vcfEntry.getChromosomeName(), vcfEntry.getStart());
+			}
+
+			currentDbEntry = dbNsfpFile.next();
+		}
 	}
 
 	/**
