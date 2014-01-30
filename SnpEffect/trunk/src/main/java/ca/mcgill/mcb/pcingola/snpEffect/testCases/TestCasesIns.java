@@ -83,6 +83,65 @@ public class TestCasesIns extends TestCase {
 		init();
 	}
 
+	/**
+	 * Compare with results from ENSEMBL's VEP on transcript ENST00000268124
+	 */
+	public void compareVep(String genome, String vcf, String trId) {
+		String args[] = { genome, vcf };
+
+		SnpEffCmdEff snpeff = new SnpEffCmdEff();
+		snpeff.parseArgs(args);
+
+		List<VcfEntry> vcfEnties = snpeff.run(true);
+		for (VcfEntry ve : vcfEnties) {
+
+			// Get first effect (there should be only one)
+			List<VcfEffect> veffs = ve.parseEffects();
+			VcfEffect veff = null;
+			for (VcfEffect v : veffs)
+				if (v.getTranscriptId().equals(trId)) veff = v;
+
+			//---
+			// Check that reported effect is the same
+			//---
+			String vep = ve.getInfo("EFF_V");
+			String eff = veff.getEffect().toString();
+			if (!vep.equals(eff)) {
+				if (vep.equals("CODON_INSERTION") && eff.equals("CODON_CHANGE_PLUS_CODON_INSERTION")) ; // OK. I consider these the same
+				else if (vep.equals("STOP_GAINED,CODON_INSERTION") && eff.equals("STOP_GAINED")) ; // OK. I consider these the same
+				else {
+					String msg = "\n" + ve + "\n\tSnpEff:" + veff + "\n\tVEP   :" + ve.getInfo("EFF_V") + "\t" + ve.getInfo("AA") + "\t" + ve.getInfo("CODON");
+					Gpr.debug(msg);
+					throw new RuntimeException(msg);
+				}
+			}
+
+			//---
+			// Check that AA is the same
+			//---
+			String aa = veff.getAa();
+			String vepaa = ve.getInfo("AA");
+			if (aa == null && vepaa.equals("-")) ; // OK, test passed
+			else {
+				String aas[] = aa.split("[0-9]+");
+				String aav = aas[0] + "/" + (aas.length > 0 ? aas[1] : "");
+
+				// Convert from 'Q/QLV' to '-/LV'
+				String aav2 = "";
+				if ((aas[0].length() == 1) && (aas[1].startsWith(aas[0]))) aav2 = "-/" + aas[1].substring(1);
+				if ((aas[0].length() == 1) && (aas[1].endsWith(aas[0]))) aav2 = "-/" + aas[1].substring(0, aas[1].length() - 1);
+
+				if (aav.equals(vepaa)) ; // OK, test passed
+				else if (aav2.equals(vepaa)) ; // OK, test passed
+				else if (aav.endsWith("?") && vepaa.equals("-")) ; // OK, test passed
+				else {
+					Gpr.debug(aa + " (" + aav + ")\t" + vepaa + "\t");
+				}
+			}
+
+		}
+	}
+
 	void init() {
 		initRand();
 		initSnpEffPredictor();
@@ -243,60 +302,12 @@ public class TestCasesIns extends TestCase {
 		}
 	}
 
-	/**
-	 * Compare with results from ENSEMBL's VEP on transcript ENST00000268124
-	 */
 	public void test_03_InsVep() {
-		String args[] = { "testENST00000268124", "tests/testENST00000268124_ins_vep.vcf" };
+		compareVep("testENST00000268124", "tests/testENST00000268124_ins_vep.vcf", "ENST00000268124");
+	}
 
-		SnpEffCmdEff snpeff = new SnpEffCmdEff();
-		snpeff.parseArgs(args);
-
-		List<VcfEntry> vcfEnties = snpeff.run(true);
-		for (VcfEntry ve : vcfEnties) {
-
-			// Get first effect (there should be only one)
-			List<VcfEffect> veffs = ve.parseEffects();
-			VcfEffect veff = veffs.get(0);
-
-			//---
-			// Check that reported effect is the same
-			//---
-			String vep = ve.getInfo("EFF_V");
-			String eff = veff.getEffect().toString();
-			if (!vep.equals(eff)) {
-				if (vep.equals("CODON_INSERTION") && eff.equals("CODON_CHANGE_PLUS_CODON_INSERTION")) ; // OK. I consider these the same
-				else if (vep.equals("STOP_GAINED,CODON_INSERTION") && eff.equals("STOP_GAINED")) ; // OK. I consider these the same
-				else {
-					String msg = ve + "\n\tSnpEff:" + ve + "\n\tVEP   :" + ve.getInfo("EFF_V") + "\t" + ve.getInfo("AA") + "\t" + ve.getInfo("CODON");
-					Gpr.debug(msg);
-					throw new RuntimeException(msg);
-				}
-			}
-
-			//---
-			// Check that AA is the same
-			//---
-			String aa = veff.getAa();
-			String vepaa = ve.getInfo("AA");
-			if (aa == null && vepaa.equals("-")) ; // OK, test passed
-			else {
-				String aas[] = aa.split("[0-9]+");
-				String aav = aas[0] + "/" + (aas.length > 0 ? aas[1] : "");
-
-				// Convert from 'Q/QLV' to '-/LV'
-				String aav2 = aav;
-				if (aas[0].length() == 1) aav2 = "-/" + aas[1].substring(1);
-
-				if (aav.equals(vepaa)) ; // OK, test passed
-				else if (aav2.equals(vepaa)) ; // OK, test passed
-				else if (aav.endsWith("?") && vepaa.equals("-")) ; // OK, test passed
-				else {
-					Gpr.debug(aa + " (" + aav + ")\t" + vepaa + "\t");
-				}
-			}
-
-		}
+	public void test_04_InsVep() {
+		compareVep("testHg3770Chr22", "tests/testENST00000445220_ins_vep.vcf", "ENST00000445220");
 	}
 
 }
