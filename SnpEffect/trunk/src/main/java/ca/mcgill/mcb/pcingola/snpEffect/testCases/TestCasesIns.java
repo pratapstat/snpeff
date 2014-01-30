@@ -15,8 +15,11 @@ import ca.mcgill.mcb.pcingola.interval.Transcript;
 import ca.mcgill.mcb.pcingola.snpEffect.ChangeEffect;
 import ca.mcgill.mcb.pcingola.snpEffect.Config;
 import ca.mcgill.mcb.pcingola.snpEffect.SnpEffectPredictor;
+import ca.mcgill.mcb.pcingola.snpEffect.commandLine.SnpEffCmdEff;
 import ca.mcgill.mcb.pcingola.snpEffect.factory.SnpEffPredictorFactoryRand;
 import ca.mcgill.mcb.pcingola.util.GprSeq;
+import ca.mcgill.mcb.pcingola.vcf.VcfEffect;
+import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 
 /**
  * Test random SNP changes 
@@ -91,7 +94,7 @@ public class TestCasesIns extends TestCase {
 		for (int i = 0; i < N; i++) {
 			initSnpEffPredictor();
 			if (debug) System.out.println("INS Test iteration: " + i + "\n" + transcript);
-			else System.out.println("INS Test iteration: " + i + "\t" + transcript.cds());
+			else System.out.println("INS Test iteration: " + i + "\t" + (transcript.isStrandPlus() ? "+" : "-") + "\t" + transcript.cds());
 
 			int cdsBaseNum = 0;
 
@@ -102,9 +105,10 @@ public class TestCasesIns extends TestCase {
 
 				// For each base in this exon...
 				for (int pos = beg; (pos >= exon.getStart()) && (pos <= exon.getEnd()); pos += step, cdsBaseNum++) {
+
 					// Get a random base different from 'refBase'
 					int insLen = rand.nextInt(10) + 1;
-					String insPlus = GprSeq.randSequence(rand, insLen); // Indesrtio (plus strand)
+					String insPlus = GprSeq.randSequence(rand, insLen); // Insertion (plus strand)
 					String ins = insPlus;
 
 					// Codon number
@@ -122,30 +126,28 @@ public class TestCasesIns extends TestCase {
 						String codonNew = "", aaNew = "";
 
 						// Create a SeqChange
-						int seqChangeStrand = rand.nextBoolean() ? +1 : -1;
+						// int seqChangeStrand = rand.nextBoolean() ? +1 : -1;
+						int seqChangeStrand = 1;
 						if (seqChangeStrand == -exon.getStrand()) ins = GprSeq.reverseWc(insPlus);
 						SeqChange seqChange = new SeqChange(chromosome, pos, "", "+" + ins, seqChangeStrand, "", 1.0, 1);
 
 						// Is it an insertion?
 						Assert.assertEquals(true, seqChange.isIns());
 
+						// Codon change
+						int idx = cdsCodonPos;
+						if (transcript.isStrandMinus()) idx++; // Insert AFTER base (in negative strand)
+						codonNew = codonOld.substring(0, idx) + insPlus + codonOld.substring(idx);
+						aaNew = codonTable.aa(codonNew);
+
 						// Expected Effect
 						String effectExpected = "";
 						if (insLen % 3 != 0) {
-							aaOld = "-";
-							codonNew = insPlus;
-							aaNew = codonTable.aa(codonNew);
 							effectExpected = "FRAME_SHIFT(" + aaOld + "/" + aaNew + ")";
 						} else {
 							if (cdsCodonPos == 0) {
-								codonOld = aaOld = "-";
-								codonNew = insPlus;
-								aaNew = codonTable.aa(codonNew);
 								effectExpected = "CODON_INSERTION(" + aaOld + "/" + aaNew + ")";
 							} else {
-								codonNew = codonOld.substring(0, cdsCodonPos) + insPlus + codonOld.substring(cdsCodonPos);
-								aaNew = codonTable.aa(codonNew);
-
 								if (codonNew.startsWith(codonOld)) effectExpected = "CODON_INSERTION(" + aaOld + "/" + aaNew + ")";
 								else effectExpected = "CODON_CHANGE_PLUS_CODON_INSERTION(" + aaOld + "/" + aaNew + ")";
 							}
@@ -181,4 +183,25 @@ public class TestCasesIns extends TestCase {
 			}
 		}
 	}
+
+	/**
+	 * Insertion on minus strand
+	 */
+	public void test_02_InsOffByOne() {
+		String args[] = { "testENST00000268124", "tests/ins_off_by_one.vcf" };
+
+		SnpEffCmdEff snpeff = new SnpEffCmdEff();
+		snpeff.parseArgs(args);
+
+		List<VcfEntry> vcfEnties = snpeff.run(true);
+		for (VcfEntry ve : vcfEnties) {
+
+			// Get first effect (there should be only one)
+			List<VcfEffect> veffs = ve.parseEffects();
+			VcfEffect veff = veffs.get(0);
+
+			Assert.assertEquals("Q53QQ", veff.getAa());
+		}
+	}
+
 }

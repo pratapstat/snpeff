@@ -3,10 +3,12 @@ package ca.mcgill.mcb.pcingola.snpEffect.testCases;
 import java.util.List;
 import java.util.Random;
 
+import junit.framework.Assert;
 import junit.framework.TestCase;
 import ca.mcgill.mcb.pcingola.interval.Genome;
 import ca.mcgill.mcb.pcingola.snpEffect.Config;
 import ca.mcgill.mcb.pcingola.snpEffect.commandLine.SnpEffCmdEff;
+import ca.mcgill.mcb.pcingola.vcf.VcfEffect;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 
 /**
@@ -36,17 +38,22 @@ public class TestCasesZzz extends TestCase {
 	}
 
 	/**
-	 * Start gained
+	 * Insertion on minus strand
 	 */
-	public void test_34_StartGained() {
-		String args[] = { "testENST00000268124", "tests/ins_off_by_one.eff.vcf" };
+	public void test_34_InsOffByOne() {
+		String args[] = { "testENST00000268124", "tests/ins_off_by_one.vcf" };
 
 		SnpEffCmdEff snpeff = new SnpEffCmdEff();
 		snpeff.parseArgs(args);
 
 		List<VcfEntry> vcfEnties = snpeff.run(true);
 		for (VcfEntry ve : vcfEnties) {
-			System.out.println(ve);
+
+			// Get first effect (there should be only one)
+			List<VcfEffect> veffs = ve.parseEffects();
+			VcfEffect veff = veffs.get(0);
+
+			Assert.assertEquals("Q53QQ", veff.getAa());
 		}
 	}
 }
