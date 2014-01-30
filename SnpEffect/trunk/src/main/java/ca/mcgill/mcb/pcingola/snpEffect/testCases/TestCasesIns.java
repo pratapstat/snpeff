@@ -1,5 +1,6 @@
 package ca.mcgill.mcb.pcingola.snpEffect.testCases;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 
@@ -17,6 +18,7 @@ import ca.mcgill.mcb.pcingola.snpEffect.Config;
 import ca.mcgill.mcb.pcingola.snpEffect.SnpEffectPredictor;
 import ca.mcgill.mcb.pcingola.snpEffect.commandLine.SnpEffCmdEff;
 import ca.mcgill.mcb.pcingola.snpEffect.factory.SnpEffPredictorFactoryRand;
+import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.util.GprSeq;
 import ca.mcgill.mcb.pcingola.vcf.VcfEffect;
 import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
@@ -38,6 +40,43 @@ public class TestCasesIns extends TestCase {
 	SnpEffectPredictor snpEffectPredictor;
 	String chromoSequence = "";
 	char chromoBases[];
+
+	public static void create_ENST00000268124_file() throws IOException {
+		Config config = new Config("testENST00000268124", Gpr.HOME + "/snpEff/" + Config.DEFAULT_CONFIG_FILE);
+		config.loadSnpEffectPredictor();
+
+		Random rand = new Random(20140129);
+		StringBuilder out = new StringBuilder();
+
+		int count = 0;
+		for (Gene g : config.getGenome().getGenes()) {
+			for (Transcript tr : g) {
+				for (Exon e : tr) {
+					for (int i = e.getStart(); i < e.getEnd(); i++) {
+						if (rand.nextDouble() < 0.15) {
+
+							// Insertion length
+							int insLen = rand.nextInt(10) + 1;
+							if (i + insLen > e.getEnd()) insLen = e.getEnd() - i;
+
+							int idx = i - e.getStart();
+
+							String ref = e.basesAt(idx, 1);
+							String alt = ref + GprSeq.randSequence(rand, insLen);
+
+							String line = e.getChromosomeName() + "\t" + i + "\t.\t" + ref + "\t" + alt + "\t.\t.\tAC=1\tGT\t0/1";
+							System.out.println(line);
+							out.append(line + "\n");
+							count++;
+						}
+					}
+				}
+			}
+		}
+
+		System.err.println("Count:" + count);
+		Gpr.toFile(Gpr.HOME + "/snpEff/testENST00000268124.vcf", out);
+	}
 
 	public TestCasesIns() {
 		super();
