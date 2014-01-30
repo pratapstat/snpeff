@@ -788,8 +788,6 @@ public class TestCasesFilter extends TestCase {
 		String expression = "EFF[*].GENE = 'BICD1'";
 		List<VcfEntry> list = vcfFilter.filter("test/test_gene.vcf", expression, true);
 
-		VcfEffect.FormatVersion formatVersion = VcfEffect.FormatVersion.FORMAT_SNPEFF_2;
-
 		// Check that it satisfies the condition
 		System.out.println("Expression: '" + expression + "'");
 		for (VcfEntry vcfEntry : list) {
@@ -946,6 +944,51 @@ public class TestCasesFilter extends TestCase {
 
 		if (vcfEntry.getStart() == 219134261) Assert.assertEquals("OTHER", vcfEntry.getFilterPass());
 		if (vcfEntry.getStart() == 219134272) Assert.assertEquals("DP_OK;OTHER", vcfEntry.getFilterPass());
+	}
+
+	/**
+	 * Test compare to missing field
+	 */
+	public void test_42() {
+		// Filter data
+		SnpSiftCmdFilter vcfFilter = new SnpSiftCmdFilter();
+		String expression = "( ZZZ = 3 ) ";
+		List<VcfEntry> list = vcfFilter.filter("test/test42.vcf", expression, true);
+
+		// Check that it satisfies the condition
+		System.out.println("Expression: '" + expression + "'");
+		Assert.assertNotNull(list);
+		Assert.assertTrue(list.size() == 0);
+	}
+
+	/**
+	 * Test compare to missing field
+	 */
+	public void test_43() {
+		// Filter data
+		SnpSiftCmdFilter vcfFilter = new SnpSiftCmdFilter();
+		String expression = "( ZZZ < 0 ) ";
+		List<VcfEntry> list = vcfFilter.filter("test/test42.vcf", expression, true);
+
+		// Check that it satisfies the condition
+		System.out.println("Expression: '" + expression + "'");
+		Assert.assertNotNull(list);
+		Assert.assertTrue(list.size() == 0);
+	}
+
+	/**
+	 * Test compare to missing field
+	 */
+	public void test_44() {
+		// Filter data
+		SnpSiftCmdFilter vcfFilter = new SnpSiftCmdFilter();
+		String expression = "( ZZZ > 0 ) ";
+		List<VcfEntry> list = vcfFilter.filter("test/test42.vcf", expression, true);
+
+		// Check that it satisfies the condition
+		System.out.println("Expression: '" + expression + "'");
+		Assert.assertNotNull(list);
+		Assert.assertTrue(list.size() == 0);
 	}
 
 }

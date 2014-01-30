@@ -17,6 +17,8 @@ public class Eq extends OpBinary {
 
 	@Override
 	public boolean eval(VcfEntry vcfEntry) {
+		if (!left.canCompareTo(right, vcfEntry)) return false;
+
 		boolean retVal = (left.compareTo(right, vcfEntry) == 0);
 		return negated ? !retVal : retVal;
 	}

@@ -330,10 +330,10 @@ public class SnpSiftCmdDbNsfp extends SnpSift {
 		showVersion();
 		System.err.println("Usage: java -jar " + SnpSift.class.getSimpleName() + ".jar " + command + " [-q|-v] [-a] dbNSFP.txt file.vcf > newFile.vcf\n" //
 				+ "Options:\n" //
-				+ "\t-a          : Annotate fields, even if the database has an empty value (annotates using '.' for empty).\n" //
-				+ "\t-noCollapse : Collapse repeated values from dbNSFP (implies '-a'). Default: '" + collapseRepeatedValues + "'.\n" //
-				+ "\t-f          : A comma sepparated list of fields to add.\n" //
-				+ "\t              Default fields to add:\n" + sb //
+				+ "\t-a            : Annotate fields, even if the database has an empty value (annotates using '.' for empty).\n" //
+				+ "\t-noCollapse   : Switch off 'collapsing' repeated values from dbNSFP (implies '-a').\n" //
+				+ "\t-f            : A comma sepparated list of fields to add.\n" //
+				+ "\t                Default fields to add:\n" + sb //
 				+ "\n" //
 		);
 		System.exit(1);
