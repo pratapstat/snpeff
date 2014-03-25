@@ -15,6 +15,13 @@ public abstract class Expression {
 
 	protected VcfInfoType returnType = VcfInfoType.UNKNOWN; // Default type is INTEGER
 
+	@SuppressWarnings("rawtypes")
+	public boolean canCompareTo(Expression expr, VcfEntry vcfEntry) {
+		Comparable o1 = get(vcfEntry);
+		Comparable o2 = expr.get(vcfEntry);
+		return (o1 != null) && (o2 != null);
+	}
+
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public int compareTo(Expression expr, VcfEntry vcfEntry) {
 		VcfInfoType exprT = expr.getReturnType();

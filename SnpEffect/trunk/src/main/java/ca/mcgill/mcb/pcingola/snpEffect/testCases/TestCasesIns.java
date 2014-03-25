@@ -1,5 +1,6 @@
 package ca.mcgill.mcb.pcingola.snpEffect.testCases;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 
@@ -15,8 +16,12 @@ import ca.mcgill.mcb.pcingola.interval.Transcript;
 import ca.mcgill.mcb.pcingola.snpEffect.ChangeEffect;
 import ca.mcgill.mcb.pcingola.snpEffect.Config;
 import ca.mcgill.mcb.pcingola.snpEffect.SnpEffectPredictor;
+import ca.mcgill.mcb.pcingola.snpEffect.commandLine.SnpEffCmdEff;
 import ca.mcgill.mcb.pcingola.snpEffect.factory.SnpEffPredictorFactoryRand;
+import ca.mcgill.mcb.pcingola.util.Gpr;
 import ca.mcgill.mcb.pcingola.util.GprSeq;
+import ca.mcgill.mcb.pcingola.vcf.VcfEffect;
+import ca.mcgill.mcb.pcingola.vcf.VcfEntry;
 
 /**
  * Test random SNP changes 
@@ -36,9 +41,105 @@ public class TestCasesIns extends TestCase {
 	String chromoSequence = "";
 	char chromoBases[];
 
+	public static void create_ENST00000268124_file() throws IOException {
+		Config config = new Config("testENST00000268124", Gpr.HOME + "/snpEff/" + Config.DEFAULT_CONFIG_FILE);
+		config.loadSnpEffectPredictor();
+
+		Random rand = new Random(20140129);
+		StringBuilder out = new StringBuilder();
+
+		int count = 0;
+		for (Gene g : config.getGenome().getGenes()) {
+			for (Transcript tr : g) {
+				for (Exon e : tr) {
+					for (int i = e.getStart(); i < e.getEnd(); i++) {
+						if (rand.nextDouble() < 0.15) {
+
+							// Insertion length
+							int insLen = rand.nextInt(10) + 1;
+							if (i + insLen > e.getEnd()) insLen = e.getEnd() - i;
+
+							int idx = i - e.getStart();
+
+							String ref = e.basesAt(idx, 1);
+							String alt = ref + GprSeq.randSequence(rand, insLen);
+
+							String line = e.getChromosomeName() + "\t" + i + "\t.\t" + ref + "\t" + alt + "\t.\t.\tAC=1\tGT\t0/1";
+							System.out.println(line);
+							out.append(line + "\n");
+							count++;
+						}
+					}
+				}
+			}
+		}
+
+		System.err.println("Count:" + count);
+		Gpr.toFile(Gpr.HOME + "/snpEff/testENST00000268124.vcf", out);
+	}
+
 	public TestCasesIns() {
 		super();
 		init();
+	}
+
+	/**
+	 * Compare with results from ENSEMBL's VEP on transcript ENST00000268124
+	 */
+	public void compareVep(String genome, String vcf, String trId) {
+		String args[] = { genome, vcf };
+
+		SnpEffCmdEff snpeff = new SnpEffCmdEff();
+		snpeff.parseArgs(args);
+
+		List<VcfEntry> vcfEnties = snpeff.run(true);
+		for (VcfEntry ve : vcfEnties) {
+
+			// Get first effect (there should be only one)
+			List<VcfEffect> veffs = ve.parseEffects();
+			VcfEffect veff = null;
+			for (VcfEffect v : veffs)
+				if (v.getTranscriptId().equals(trId)) veff = v;
+
+			//---
+			// Check that reported effect is the same
+			//---
+			String vep = ve.getInfo("EFF_V");
+			String eff = veff.getEffect().toString();
+			if (!vep.equals(eff)) {
+				if (vep.equals("CODON_INSERTION") && eff.equals("CODON_CHANGE_PLUS_CODON_INSERTION")) ; // OK. I consider these the same
+				else if (vep.equals("STOP_GAINED,CODON_INSERTION") && eff.equals("STOP_GAINED")) ; // OK. I consider these the same
+				else {
+					String msg = "\n" + ve + "\n\tSnpEff:" + veff + "\n\tVEP   :" + ve.getInfo("EFF_V") + "\t" + ve.getInfo("AA") + "\t" + ve.getInfo("CODON");
+					Gpr.debug(msg);
+					throw new RuntimeException(msg);
+				}
+			}
+
+			//---
+			// Check that AA is the same
+			//---
+			String aa = veff.getAa();
+			String vepaa = ve.getInfo("AA");
+			if (aa == null && vepaa.equals("-")) ; // OK, test passed
+			else {
+				String aas[] = aa.split("[0-9]+");
+				String aav = aas[0] + "/" + (aas.length > 0 ? aas[1] : "");
+
+				// Convert from 'Q/QLV' to '-/LV'
+				String aav2 = "";
+				if ((aas[0].length() == 1) && (aas[1].startsWith(aas[0]))) aav2 = "-/" + aas[1].substring(1);
+				if ((aas[0].length() == 1) && (aas[1].endsWith(aas[0]))) aav2 = "-/" + aas[1].substring(0, aas[1].length() - 1);
+
+				if (aav.equals(vepaa)) ; // OK, test passed
+				else if (aav2.equals(vepaa)) ; // OK, test passed
+				else if (aav.endsWith("?") && vepaa.equals("-")) ; // OK, test passed
+				else {
+					Gpr.debug(aa + " (" + aav + ")\t" + vepaa + "\t");
+				}
+			}
+
+		}
 	}
 
 	void init() {
@@ -91,7 +192,7 @@ public class TestCasesIns extends TestCase {
 		for (int i = 0; i < N; i++) {
 			initSnpEffPredictor();
 			if (debug) System.out.println("INS Test iteration: " + i + "\n" + transcript);
-			else System.out.println("INS Test iteration: " + i + "\t" + transcript.cds());
+			else System.out.println("INS Test iteration: " + i + "\t" + (transcript.isStrandPlus() ? "+" : "-") + "\t" + transcript.cds());
 
 			int cdsBaseNum = 0;
 
@@ -102,9 +203,10 @@ public class TestCasesIns extends TestCase {
 
 				// For each base in this exon...
 				for (int pos = beg; (pos >= exon.getStart()) && (pos <= exon.getEnd()); pos += step, cdsBaseNum++) {
+
 					// Get a random base different from 'refBase'
 					int insLen = rand.nextInt(10) + 1;
-					String insPlus = GprSeq.randSequence(rand, insLen); // Indesrtio (plus strand)
+					String insPlus = GprSeq.randSequence(rand, insLen); // Insertion (plus strand)
 					String ins = insPlus;
 
 					// Codon number
@@ -122,30 +224,28 @@ public class TestCasesIns extends TestCase {
 						String codonNew = "", aaNew = "";
 
 						// Create a SeqChange
-						int seqChangeStrand = rand.nextBoolean() ? +1 : -1;
+						// int seqChangeStrand = rand.nextBoolean() ? +1 : -1;
+						int seqChangeStrand = 1;
 						if (seqChangeStrand == -exon.getStrand()) ins = GprSeq.reverseWc(insPlus);
 						SeqChange seqChange = new SeqChange(chromosome, pos, "", "+" + ins, seqChangeStrand, "", 1.0, 1);
 
 						// Is it an insertion?
 						Assert.assertEquals(true, seqChange.isIns());
 
+						// Codon change
+						int idx = cdsCodonPos;
+						if (transcript.isStrandMinus()) idx++; // Insert AFTER base (in negative strand)
+						codonNew = codonOld.substring(0, idx) + insPlus + codonOld.substring(idx);
+						aaNew = codonTable.aa(codonNew);
+
 						// Expected Effect
 						String effectExpected = "";
 						if (insLen % 3 != 0) {
-							aaOld = "-";
-							codonNew = insPlus;
-							aaNew = codonTable.aa(codonNew);
 							effectExpected = "FRAME_SHIFT(" + aaOld + "/" + aaNew + ")";
 						} else {
 							if (cdsCodonPos == 0) {
-								codonOld = aaOld = "-";
-								codonNew = insPlus;
-								aaNew = codonTable.aa(codonNew);
 								effectExpected = "CODON_INSERTION(" + aaOld + "/" + aaNew + ")";
 							} else {
-								codonNew = codonOld.substring(0, cdsCodonPos) + insPlus + codonOld.substring(cdsCodonPos);
-								aaNew = codonTable.aa(codonNew);
-
 								if (codonNew.startsWith(codonOld)) effectExpected = "CODON_INSERTION(" + aaOld + "/" + aaNew + ")";
 								else effectExpected = "CODON_CHANGE_PLUS_CODON_INSERTION(" + aaOld + "/" + aaNew + ")";
 							}
@@ -181,4 +281,33 @@ public class TestCasesIns extends TestCase {
 			}
 		}
 	}
+
+	/**
+	 * Insertion on minus strand
+	 */
+	public void test_02_InsOffByOne() {
+		String args[] = { "testENST00000268124", "tests/ins_off_by_one.vcf" };
+
+		SnpEffCmdEff snpeff = new SnpEffCmdEff();
+		snpeff.parseArgs(args);
+
+		List<VcfEntry> vcfEnties = snpeff.run(true);
+		for (VcfEntry ve : vcfEnties) {
+
+			// Get first effect (there should be only one)
+			List<VcfEffect> veffs = ve.parseEffects();
+			VcfEffect veff = veffs.get(0);
+
+			Assert.assertEquals("Q53QQ", veff.getAa());
+		}
+	}
+
+	public void test_03_InsVep() {
+		compareVep("testENST00000268124", "tests/testENST00000268124_ins_vep.vcf", "ENST00000268124");
+	}
+
+	public void test_04_InsVep() {
+		compareVep("testHg3770Chr22", "tests/testENST00000445220_ins_vep.vcf", "ENST00000445220");
+	}
+
 }

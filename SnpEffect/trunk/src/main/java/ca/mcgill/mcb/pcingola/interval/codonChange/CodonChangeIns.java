@@ -25,6 +25,9 @@ public class CodonChangeIns extends CodonChange {
 	boolean codonChangeSingle(ChangeEffect changeEffect, Exon exon) {
 		String netChange = seqChange.netChange(transcript.getStrand());
 
+		codonsOld = codonsOld();
+		codonsNew = codonsNew();
+
 		if (netChange.length() % CodonChange.CODON_SIZE != 0) {
 			/**
 			 * Length not multiple of CODON_SIZE => FRAME_SHIFT
@@ -34,7 +37,7 @@ public class CodonChangeIns extends CodonChange {
 			 * 		Insert 'TT' pos 1:	ATT AAC CCG GGA AAC CCG GGA AAC CCG GG
 			 * 		Insert 'TT' pos 2:	AAT TAC CCG GGA AAC CCG GGA AAC CCG GG
 			 */
-			changeEffect.setCodons("", netChange, codonNum, codonIndex);
+			changeEffect.setCodons(codonsOld, codonsNew, codonNum, codonIndex);
 			changeEffect.set(exon, EffectType.FRAME_SHIFT, "");
 		} else if (codonIndex == 0) {
 			/**
@@ -44,7 +47,7 @@ public class CodonChangeIns extends CodonChange {
 			 * 		Insert 'TTT' pos 0:	TTT AAA CCC GGG AAA CCC GGG AAA CCC GGG
 			 */
 			changeEffect.set(exon, EffectType.CODON_INSERTION, "");
-			changeEffect.setCodons("", netChange, codonNum, codonIndex);
+			changeEffect.setCodons(codonsOld, codonsNew, codonNum, codonIndex);
 		} else {
 			/**
 			 * Length multiple of CODON_SIZE and insertion does not happen at codon boundary => CODON_CHANGE_PLUS_CODON_INSERTION
@@ -74,17 +77,81 @@ public class CodonChangeIns extends CodonChange {
 		return true;
 	}
 
+	//	/**
+	//	 * Analyze insertions in this transcript.
+	//	 * Add changeEffect to 'changeEffect'
+	//	 */
+	//	@Override
+	//	boolean codonChangeSingle(ChangeEffect changeEffect, Exon exon) {
+	//		String netChange = seqChange.netChange(transcript.getStrand());
+	//
+	//		if (netChange.length() % CodonChange.CODON_SIZE != 0) {
+	//			/**
+	//			 * Length not multiple of CODON_SIZE => FRAME_SHIFT
+	//			 * 	E.g. : 
+	//			 * 		Original:			AAA CCC GGG AAA CCC GGG AAA CCC GGG
+	//			 * 		Insert 'TT' pos 0:	TTA AAC CCG GGA AAC CCG GGA AAC CCG GG
+	//			 * 		Insert 'TT' pos 1:	ATT AAC CCG GGA AAC CCG GGA AAC CCG GG
+	//			 * 		Insert 'TT' pos 2:	AAT TAC CCG GGA AAC CCG GGA AAC CCG GG
+	//			 */
+	//			changeEffect.setCodons("", netChange, codonNum, codonIndex);
+	//			changeEffect.set(exon, EffectType.FRAME_SHIFT, "");
+	//		} else if (codonIndex == 0) {
+	//			/**
+	//			 * Length multiple of CODON_SIZE and insertion happens at codon boundary => CODON_INSERTION
+	//			 * 	E.g. : 
+	//			 * 		Original:			AAA CCC GGG AAA CCC GGG AAA CCC GGG
+	//			 * 		Insert 'TTT' pos 0:	TTT AAA CCC GGG AAA CCC GGG AAA CCC GGG
+	//			 */
+	//			changeEffect.set(exon, EffectType.CODON_INSERTION, "");
+	//			changeEffect.setCodons("", netChange, codonNum, codonIndex);
+	//		} else {
+	//			/**
+	//			 * Length multiple of CODON_SIZE and insertion does not happen at codon boundary => CODON_CHANGE_PLUS_CODON_INSERTION
+	//			 * 	E.g. : 
+	//			 * 		Original:			AAA CCC GGG AAA CCC GGG AAA CCC GGG
+	//			 * 		Insert 'TTT' pos 1:	ATT TAA CCC GGG AAA CCC GGG AAA CCC GGG
+	//			 * 		Insert 'TTT' pos 2:	AAT TTA CCC GGG AAA CCC GGG AAA CCC GGG
+	//			 */
+	//			codonsOld = codonsOld();
+	//			codonsNew = codonsNew();
+	//
+	//			if (codonsNew.toUpperCase().startsWith(codonsOld.toUpperCase())) {
+	//				/**
+	//				 *  May be the inserted base are equal to the old ones.
+	//				 *  E.g.
+	//				 *  	Original:			AAA CCC GGG AAA CCC GGG AAA CCC GGG
+	//				 *  	Insert 'AAA' pos 1:	AAA AAA CCC GGG AAA CCC GGG AAA CCC GGG
+	//				 */
+	//				changeEffect.set(exon, EffectType.CODON_INSERTION, "");
+	//				changeEffect.setCodons(codonsOld, codonsNew, codonNum, codonIndex);
+	//			} else {
+	//				changeEffect.set(exon, EffectType.CODON_CHANGE_PLUS_CODON_INSERTION, "");
+	//				changeEffect.setCodons(codonsOld, codonsNew, codonNum, codonIndex);
+	//			}
+	//		}
+	//
+	//		return true;
+	//	}
+
 	/**
 	 * Get new (modified) codons 
 	 * @return
 	 */
 	@Override
 	String codonsNew() {
+		// Inserts BEFORE base:
+		//		- In positive strand that is BEFORE pos
+		//		- In negative strand, that is AFTER pos
+		int idx = codonIndex + (transcript.isStrandMinus() ? 1 : 0);
+
 		// Insertion: Concatenate...
-		return codonsOld.substring(0, codonIndex) // the first part of the codon
+		String codonsNew = codonsOld.substring(0, idx) // the first part of the codon
 				+ seqChange.netChange(transcript.getStrand()) // insertion
-				+ codonsOld.substring(codonIndex) // the last part of the codon
+				+ codonsOld.substring(idx) // the last part of the codon
 		;
+
+		return codonsNew;
 	}
 
 }
